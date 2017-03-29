@@ -83,6 +83,7 @@ def load_stimuli_from_csv():  #todo: this function should be replaced by a class
 
     return targets
 
+
 #------------------------------------------------
 def prepare_objects():
 
@@ -107,7 +108,7 @@ def prepare_objects():
 
     #-- Target number
     exp_objects.target = xpy.stimuli.TextBox("", (300, 80), (0, screen_height/2 - 50),
-                               text_font="Arial", text_size=50, text_colour=xpy.misc.constants.C_WHITE)
+                                             text_font="Arial", text_size=50, text_colour=xpy.misc.constants.C_WHITE)
     exp_objects.stimuli.add("target", exp_objects.target, visible=False)
 
     #-- Trajectory tracker
@@ -153,6 +154,7 @@ def show_instructions(exp, stim_container):
     exp.mouse.wait_press()
     stim_container.present()
 
+
 #------------------------------------------------
 def show_end_msg(exp):
 
@@ -173,6 +175,7 @@ def run_trial(exp, trial_num, target, exp_objects):
 
     #-- Initialize trial
     exp_objects.target.text = str(target)
+    exp_objects.target.preload()
     exp_objects.target.visible = False
     exp_objects.tracker.reset()
 
@@ -184,7 +187,7 @@ def run_trial(exp, trial_num, target, exp_objects):
     print("   Subject touched the starting point")
 
     err = wait_until_leaving_start_area(exp, exp_objects)
-    if err != None:
+    if err is not None:
         trial_error(exp_objects, trial_num, err)
         return False
 
@@ -236,6 +239,7 @@ def reset_validators(exp_objects, time0):
     for validator in exp_objects.validators:
         validator.reset(time0)
 
+
 #------------------------------------------------
 def apply_validations(exp_objects, pos, time):
 
@@ -246,6 +250,7 @@ def apply_validations(exp_objects, pos, time):
 
     return None
 
+
 #------------------------------------------------
 def wait_until_touching_start_area(exp, exp_objects):
 
@@ -253,6 +258,7 @@ def wait_until_touching_start_area(exp, exp_objects):
     while state != StartPoint.State.init:
         btn_id, moved, pos, rt = exp.mouse.wait_event(wait_button=True, wait_motion=False, buttons=0, wait_for_buttonup=False)
         state = exp_objects.start_area.check_xy(pos[0], pos[1])
+
 
 #------------------------------------------------
 def wait_until_leaving_start_area(exp, exp_objects):
@@ -270,7 +276,7 @@ def wait_until_leaving_start_area(exp, exp_objects):
     if state == StartPoint.State.error:
         return ValidationFailed("started-sideways", "Start the trial by moving upwards, not sideways!", None)
 
-    return  None
+    return None
 
 
 #------------------------------------------------
@@ -279,12 +285,12 @@ def trial_ended(exp_objects, trial_num, success_err_code):
     exp_objects.stimuli.present()
     #todo: write trials.csv entry
 
+
 #------------------------------------------------
 def trial_error(exp_objects, trial_num, err):
     print("   ERROR in trial: " + err.err_code + "  - " + err.message)
     trial_ended(exp_objects, trial_num, err.err_code)
     #todo: show error message; make it hide after some time
-
 
 
 #------------------------------------------------
