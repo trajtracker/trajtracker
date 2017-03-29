@@ -48,7 +48,7 @@ class shapes:
                    y <= self.y + self.height/2
 
         @property
-        def center(self):
+        def position(self):
             return self.x, self.y
 
 
@@ -79,7 +79,7 @@ class shapes:
             return distance_from_center <= self.radius
 
         @property
-        def center(self):
+        def position(self):
             return self.x, self.y
 
 
@@ -127,5 +127,5 @@ class shapes:
                 return not (self.to_angle <= angle <= self.from_angle)
 
         @property
-        def center(self):
+        def position(self):
             return self.x, self.y

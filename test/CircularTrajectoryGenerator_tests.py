@@ -1,9 +1,11 @@
 import unittest
 
-from trajtracker.movement import CircularTrajectoryGenerator
-from expyriment.misc import geometry
+
 
 import trajtracker
+
+from trajtracker.movement import CircularTrajectoryGenerator
+from expyriment.misc import geometry
 
 def uw(xy):
     return (xy['x'], xy['y'])

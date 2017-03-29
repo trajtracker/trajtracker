@@ -9,4 +9,5 @@ TrajTracker - stimuli package
 
 #  Import the package classes
 from _NumberLine import NumberLine
+from _StimulusContainer import StimulusContainer
 from _StimulusSelector import StimulusSelector

@@ -39,8 +39,8 @@ class StartPoint(trajtracker._TTrkObject):
 
         super(StartPoint, self).__init__()
 
-        if "center" not in dir(start_area):
-            raise ValueError("trajtracker error: invalid start_area provided to %s.__init__" % type(self).__name__)
+        if "position" not in dir(start_area):
+            raise ValueError("trajtracker error: invalid start_area provided to {:}.__init__".format(type(self).__name__))
 
         self._start_area = start_area
         self.exit_area = exit_area
@@ -92,7 +92,7 @@ class StartPoint(trajtracker._TTrkObject):
         else:
             raise ValueError("trajtracker error: unsupported exit area '%s'" % name)
 
-        return shapes.Sector(self._start_area.center[0], self._start_area.center[1], 10000, f, t)
+        return shapes.Sector(self._start_area.position[0], self._start_area.position[1], 10000, f, t)
 
 
     #==========================================================================

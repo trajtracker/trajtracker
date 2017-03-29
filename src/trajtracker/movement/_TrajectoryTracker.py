@@ -105,7 +105,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         return zip(trj['x'], trj['y'], trj['time'])
 
     #----------------------------------------------------
-    def init_output_file(self, filename, xy_precision=5, time_precision=3):
+    def init_output_file(self, filename=None, xy_precision=5, time_precision=3):
         """
         Initialize a new CSV output file for saving the results
 
@@ -113,11 +113,16 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         :param xy_precision: Precision of x,y coordinates (default: 5)
         :param time_precision: Precision of time (default: 3)
         """
-        self._filename = filename
+        if filename is not None:
+            self._filename = filename
+
+        if self._filename is None:
+            raise ValueError("trajtracker error: filename was not provided to {:}.init_output_file()".format(type(self).__name__))
+
         self._xy_precision = xy_precision
         self._time_precision = time_precision
 
-        fh = self._open_file(filename, 'w')
+        fh = self._open_file(self._filename, 'w')
         fh.write('trial,time,x,y\n')
         fh.close()
 

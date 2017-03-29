@@ -87,6 +87,8 @@ class NumberLine(trajtracker._TTrkObject):
         #-- When preloaded, visual properties cannot be changed any longer
         self._preloaded = False
 
+        self._canvas = None
+
         self.orientation = orientation
 
         #-- Visual properties of the line itself
@@ -127,7 +129,7 @@ class NumberLine(trajtracker._TTrkObject):
         :param visible: Whether the labels are visible or not (boolean)
         :type visible: bool
         :param box_size: Size of the text box in pixels (width, height)
-        :type box_size: int
+        :type box_size: tuple
         :param font_name: Name of font
         :type font_name: str
         :param font_size: Size of font
@@ -180,6 +182,10 @@ class NumberLine(trajtracker._TTrkObject):
         if self._labels_visible:
             self._prepare_labels()
 
+        self._canvas = xpy.stimuli.Canvas(self.size)
+        self.plot(self._canvas)
+        self._canvas.position = self.position
+
         return get_time() - start_time
 
 
@@ -198,19 +204,13 @@ class NumberLine(trajtracker._TTrkObject):
 
         self.preload()
 
-        #-- Plot all visual elements on the canvas
-        if self._visible:
-            i = 0
-            for k in self._visual_objects:
-                do_clear = clear and i == 0
-                do_update = update and i == len(self._visual_objects) - 1
-                self._visual_objects[k].present(clear=do_clear, update=do_update)
-                i += 1
+        self._canvas.present(clear, update)
 
         return get_time() - start_time
 
     #-------------------------------------------------------
-    def get_size(self):
+    @property
+    def size(self):
         """
         Get the size of the rectangle surrounding the number line, with all its elements.
         The number line center will be at the center of the rectangle
@@ -393,10 +393,10 @@ class NumberLine(trajtracker._TTrkObject):
         #-- Get the relevant coordinates (x or y)
         if self._orientation == NumberLine.Orientation.Horizontal:
             mouse_coord = y_coord
-            line_coord = self._main_line_start()[1]
+            line_coord = self._main_line_start()[1] + self._mid_y
         else:
             mouse_coord = x_coord
-            line_coord = self._main_line_start()[0]
+            line_coord = self._main_line_start()[0] + self._mid_x
 
         distance = line_coord - mouse_coord  # positive value: mouse coord < line coord
 
@@ -524,6 +524,9 @@ class NumberLine(trajtracker._TTrkObject):
         self._mid_x = value[0]
         self._mid_y = value[1]
         self._log_setter("position")
+
+        if self._canvas is not None:
+            self._canvas.position = self.position
 
 
     #-----------------------------------------------------------
