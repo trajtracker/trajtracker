@@ -23,7 +23,7 @@ from trajtracker.validators import _BaseValidator
 class MovementAngleValidator(_BaseValidator):
 
 
-    err_invalid_angle = "invalid_angle"
+    err_invalid_angle = "InvalidAngle"
     arg_angle = 'angle'  # ValidationFailed exception argument: the angle actually observed
 
 

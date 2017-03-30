@@ -21,7 +21,7 @@ class LocationsValidator(_BaseValidator):
     You can define either the valid colors or the invalid colors.
     """
 
-    err_invalid_coordinates = "invalid_coords"
+    err_invalid_coordinates = "InvalidCoords"
     arg_color = 'color'  # ValidationFailed exception argument: the color in the invalid location
 
 

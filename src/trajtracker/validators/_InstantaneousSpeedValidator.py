@@ -25,8 +25,8 @@ class InstantaneousSpeedValidator(_BaseValidator):
     (e.g., pixels). You'll therefore need to define the units-per-mm ratio.
     """
 
-    err_too_slow = "too_slow"
-    err_too_fast = "too_fast"
+    err_too_slow = "TooSlowInstantaneous"
+    err_too_fast = "TooFast"
     arg_speed = 'speed'  # ValidationFailed exception argument: the speed observed
 
     #-----------------------------------------------------------------------------------

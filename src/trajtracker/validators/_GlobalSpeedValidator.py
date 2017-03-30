@@ -28,7 +28,7 @@ class GlobalSpeedValidator(_BaseValidator):
     i.e., impose the limit on the average speed from time=0 until any time point during the trial.
     """
 
-    err_too_slow = "too_slow"
+    err_too_slow = "TooSlowGlobal"
 
     arg_expected_coord = "expected_coord"
     arg_actual_coord = "actual_coord"

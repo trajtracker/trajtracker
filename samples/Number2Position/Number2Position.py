@@ -33,6 +33,7 @@ class NumberLineObjects:
 
     def __init__(self):
         self.nl = None
+        self.fb_arrow = None
         self.start_area = None
         self.target = None
         self.tracker = None
@@ -99,16 +100,20 @@ def prepare_objects(exp):
 
     exp_objects = NumberLineObjects()
 
-    screen_width = xpy._active_exp.screen.size[0]
-    screen_height = xpy._active_exp.screen.size[1]
+    screen_width = exp.screen.size[0]
+    screen_height = exp.screen.size[1]
 
     #-- Number line
-    nl = ttrk.stimuli.NumberLine((0, screen_height/2 - 200), int(screen_width*0.85), 100,
+    nl = ttrk.stimuli.NumberLine((0, screen_height/2 - 80), int(screen_width*0.85), 100,
                                  line_colour=xpy.misc.constants.C_WHITE, end_tick_height=5)
     nl.show_labels(font_name="Arial", font_size=26, box_size=(100, 30),
                    font_colour=xpy.misc.constants.C_GREY, offset=(0, 20))
     exp_objects.stimuli.add('nl', nl)
     exp_objects.nl = nl
+
+    #-- Feedback arrow
+    exp_objects.fb_arrow = create_feedback_arrow(xpy.misc.constants.C_GREEN)
+    exp_objects.stimuli.add("fb_arrow", exp_objects.fb_arrow, False)
 
     #-- "Start" area
     start_area = xpy.stimuli.Rectangle(size=(40, 30))
@@ -127,7 +132,7 @@ def prepare_objects(exp):
         target.position, target.size, target.text_font, target.text_size), 1)
 
     #-- Trajectory tracker
-    subj_id = xpy._active_exp.subject
+    subj_id = exp.subject
     tracker = TrajectoryTracker(xpy.io.defaults.datafile_directory + "/trajectory_{:}.csv".format(subj_id))
     tracker.tracking_active = True
     tracker.init_output_file()
@@ -148,11 +153,30 @@ def prepare_objects(exp):
     exp_objects.validators.append(val2)
     exp_objects.global_speed_validator = val2
 
+    #-- Sounds
+    exp_objects.sound_ok = load_sound("click.wav")
+    exp_objects.sound_err = load_sound("error.wav")
+
     return exp_objects
 
 
 #------------------------------------------------
-def show_instructions(exp, stim_container): #TODO: have a generic function for this? in utils perhaps?
+def create_feedback_arrow(color):
+    arrow = xpy.stimuli.Shape()
+    # noinspection PyTypeChecker
+    arrow.add_vertices([(10, 20), (-6, 0), (0, 20), (-9, 0), (0, -20), (-6, 0)])
+    arrow.colour = color
+    return arrow
+
+
+#------------------------------------------------
+def load_sound(filename):
+    sound = xpy.stimuli.Audio("sounds/" + filename)
+    sound.preload()
+    return  sound
+
+#------------------------------------------------
+def show_instructions(exp, stim_container):  # TODO: have a generic function for this? in utils perhaps?
 
     msg = "Touch the rectangle at the bottom of the screen to start a trial. " + \
           "When you start moving the finger, a target number will appear. " + \
@@ -183,23 +207,14 @@ def run_trial(exp, trial, exp_objects):
     print("Starting trial #{:}, target={:}".format(trial[TRIAL_NUM], target))
 
     #-- Initialize trial
-
-    exp_objects.start_area.reset()
-    exp_objects.nl.reset()
-
-    exp_objects.target.visible = False
-    exp_objects.target.unload()
-    exp_objects.target.text = target
-    exp_objects.target.preload()
-
-    exp_objects.tracker.reset()
-
-    reset_validators(exp_objects, 0)
+    init_trial(exp_objects, target)
 
     #-- Wait for the participant to initiate the trial
 
     exp_objects.start_area.wait_until_touched(exp, exp_objects.stimuli)
     print("   Subject touched the starting point")
+
+    exp_objects.fb_arrow.visible = False
 
     exp_objects.stimuli.present()
     time0 = get_time()
@@ -215,7 +230,7 @@ def run_trial(exp, trial, exp_objects):
         return False, False  # finger lifted
     elif rc == StartPoint.State.error:
         trial_error(exp_objects, trial, trial_info, 0,
-                    ValidationFailed("started-sideways", "Start the trial by moving upwards, not sideways!", None))
+                    ValidationFailed("StartedSideways", "Start the trial by moving upwards, not sideways!", None))
         return False, True
 
     trial_info['time_started_moving'] = get_time() - time0
@@ -240,7 +255,7 @@ def run_trial(exp, trial, exp_objects):
 
         if not still_touching_screen:
             trial_error(exp_objects, trial, trial_info, time_in_trial,
-                        ValidationFailed("finger-lifted", "Finger lifted in mid-trial", None))
+                        ValidationFailed("FingerLifted", "Finger lifted in mid-trial", None))
             return False, True
 
         err = apply_validations(exp_objects, finger_pos, time_in_trial)
@@ -263,6 +278,21 @@ def run_trial(exp, trial, exp_objects):
         exp_objects.stimuli.present()
         time_in_trial = get_time() - time0
         prev_finger_pos = finger_pos
+
+
+#------------------------------------------------
+def init_trial(exp_objects, target):
+
+    exp_objects.start_area.reset()
+    exp_objects.nl.reset()
+    exp_objects.tracker.reset()
+
+    exp_objects.target.visible = False
+    exp_objects.target.unload()
+    exp_objects.target.text = target
+    exp_objects.target.preload()
+
+    reset_validators(exp_objects, 0)
 
 
 #------------------------------------------------
@@ -290,18 +320,21 @@ def trial_ended(exp_objects, trial, trial_info, end_time, success_err_code):
 
     endpoint = exp_objects.nl.last_touched_value
 
+    t_move = "{:.3f}".format(trial_info['time_started_moving']) if 'time_started_moving' in trial_info else -1
+    t_target = "{:.3f}".format(trial_info['time_target_shown']) if 'time_target_shown' in trial_info else -1
+
     #-- Save data to trials file
     trial_data = {
-        'trialNum': trial[TRIAL_NUM],
-        'LineNum': trial[ttrk.data.CSVLoader.FLD_LINE_NUM],
-        'target': trial['target'],
-        'presentedTarget': trial['target'],
-        'endPoint': "" if endpoint is None else "{:.3g}".format(endpoint),
-        'status' : success_err_code,
-        'movementTime' : 0 if end_time == 0 else "{:.3f}".format(end_time - trial_info['time_target_shown']),
-        'timeInSession': "{:.3f}".format(trial_info['time_in_session']),
-        'timeUntilFingerMoved': "{:.3f}".format(trial_info['time_started_moving']),
-        'timeUntilTarget': "{:.3f}".format(trial_info['time_target_shown']),
+        'trialNum':             trial[TRIAL_NUM],
+        'LineNum':              trial[ttrk.data.CSVLoader.FLD_LINE_NUM],
+        'target':               trial['target'],
+        'presentedTarget':      trial['target'],
+        'endPoint':             "" if endpoint is None else "{:.3g}".format(endpoint),
+        'status':               success_err_code,
+        'movementTime':         0 if end_time == 0 else "{:.3f}".format(end_time - trial_info['time_target_shown']),
+        'timeInSession':        "{:.3f}".format(trial_info['time_in_session']),
+        'timeUntilFingerMoved': t_move,
+        'timeUntilTarget':      t_target,
     }
 
     if exp_objects.trials_writer is None:
@@ -318,7 +351,9 @@ def trial_ended(exp_objects, trial, trial_info, end_time, success_err_code):
 #------------------------------------------------
 def trial_error(exp_objects, trial, trial_info, end_time, err):
     print("   ERROR in trial: " + err.err_code + "  - " + err.message)
-    trial_ended(exp_objects, trial, trial_info, end_time, err.err_code)
+
+    exp_objects.sound_err.play()
+    trial_ended(exp_objects, trial, trial_info, end_time, "ERR_" + err.err_code)
     #todo: show error message; make it hide after some time (or when clicking anywhere)
 
 
@@ -326,12 +361,21 @@ def trial_error(exp_objects, trial, trial_info, end_time, err):
 def trial_succeeded(exp_objects, trial, trial_info, end_time):
 
     print("   Trial ended successfully.")
+
+    exp_objects.target.visible = False
+
+    exp_objects.fb_arrow.visible = True
+    nl_pos = exp_objects.nl.position
+    exp_objects.fb_arrow.position = (exp_objects.nl.last_touched_coord + nl_pos[0], nl_pos[1] + exp_objects.fb_arrow.height/2)
+
+    exp_objects.stimuli.present()
+    exp_objects.sound_ok.play()
+
     trial_ended(exp_objects, trial, trial_info, end_time, "OK")
 
     exp_objects.tracker.save_to_file(trial[TRIAL_NUM])
 
-    #todo: show feedback arrow, play sound
-    # exp_objects.stimuli["feedback_arrow"].visible = False  #todo but don't present: this will be done on the next trial
+    #todo: play sound
 
 
 main()

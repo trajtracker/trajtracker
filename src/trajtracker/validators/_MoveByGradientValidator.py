@@ -19,7 +19,7 @@ class MoveByGradientValidator(_BaseValidator):
     from a light color to a darker color (or vice versa).
     """
 
-    err_gradient = "gradient_violation"
+    err_gradient = "GradientViolation"
 
 
     def __init__(self, image, position=(0, 0), rgb_should_ascend=True, max_valid_back_movement=0,

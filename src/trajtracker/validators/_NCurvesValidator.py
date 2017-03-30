@@ -29,7 +29,7 @@ class NCurvesValidator(_BaseValidator):
     """
 
 
-    err_too_many_curves = "too_many_curves"
+    err_too_many_curves = "TooManyCurves"
 
 
     #-----------------------------------------------------------------
