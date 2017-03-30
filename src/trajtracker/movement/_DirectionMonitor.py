@@ -30,20 +30,15 @@ class DirectionMonitor(trajtracker._TTrkObject):
 
 
     #-------------------------------------------------------------------------
-    def __init__(self, units_per_mm, min_distance=0, angle_units=Units.Degrees, zero_angle=0, min_angle_change_per_curve=0):
+    def __init__(self, min_distance=0, angle_units=Units.Degrees, zero_angle=0, min_angle_change_per_curve=0):
         """
         Constructor
 
-        :param units_per_mm: See :attr:`~trajtracker.movement.DirectionMonitor.units_per_mm`
         :param min_distance: See :attr:`~trajtracker.movement.DirectionMonitor.min_distance`
         :param angle_units: See :attr:`~trajtracker.movement.DirectionMonitor.angle_units`
         :param min_angle_change_per_curve: See :attr:`~trajtracker.movement.DirectionMonitor.min_angle_change_per_curve`
         """
         super(DirectionMonitor, self).__init__()
-
-        _u.validate_func_arg_type(self, "__init__", "units_per_mm", units_per_mm, numbers.Number)
-        _u.validate_func_arg_positive(self, "__init__", "units_per_mm", units_per_mm)
-        self._units_per_mm = units_per_mm
 
         self.min_distance = min_distance
         self.angle_units = angle_units
@@ -203,7 +198,7 @@ class DirectionMonitor(trajtracker._TTrkObject):
         if len(self._recent_near_coords) == 0:
             return
 
-        sq_min_distance = (self._min_distance * self._units_per_mm) ** 2
+        sq_min_distance = self._min_distance ** 2
 
         self._pre_recent_coord = None
 
@@ -266,16 +261,6 @@ class DirectionMonitor(trajtracker._TTrkObject):
     #====================================================================================
     #   Configure
     #====================================================================================
-
-    #-------------------------------------
-    @property
-    def units_per_mm(self):
-        """
-        The ratio of units (provided in the call to :func:`~trajtracker.movement.DirectionMonitor.update_xyt`) per mm.
-        This is relevant only for :attr:`~trajtracker.movement.DirectionMonitor.min_distance`
-        """
-        return self._units_per_mm
-
 
     #-------------------------------------
     @property

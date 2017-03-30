@@ -22,16 +22,14 @@ class SpeedMonitor(trajtracker._TTrkObject):
 
 
     #-------------------------------------------------------------------------
-    def __init__(self, units_per_mm, calculation_interval):
+    def __init__(self, calculation_interval):
         """
         Constructor
 
-        :param units_per_mm: See :attr:`~trajtracker.movement.SpeedMonitor.units_per_mm`
         :param calculation_interval: See :attr:`~trajtracker.movement.SpeedMonitor.calculation_interval`
         """
         super(SpeedMonitor, self).__init__()
 
-        self.units_per_mm = units_per_mm
         self.calculation_interval = calculation_interval
 
         self.reset()
@@ -79,10 +77,6 @@ class SpeedMonitor(trajtracker._TTrkObject):
 
         if self._time0 is None:
             self._time0 = time
-
-        #-- Set coordinate space
-        x_coord /= self._units_per_mm
-        y_coord /= self._units_per_mm
 
         #-- Find distance to recent coordinate
         if len(self._recent_points) > 0:
@@ -188,23 +182,6 @@ class SpeedMonitor(trajtracker._TTrkObject):
     #====================================================================================
     #   Properties
     #====================================================================================
-
-    #-------------------------------------------------------------------------
-    @property
-    def units_per_mm(self):
-        """
-        The ratio of units (provided in the call to :func:`~trajtracker.movement.SpeedMonitor.update_xyt`) per mm
-        """
-        return self._units_per_mm
-
-
-    @units_per_mm.setter
-    def units_per_mm(self, value):
-        _u.validate_attr_type(self, "units_per_mm", value, numbers.Number)
-        _u.validate_attr_positive(self, "units_per_mm", value)
-        self._units_per_mm = value
-        self._log_setter("units_per_mm")
-
 
     #-------------------------------------------------------------------------
     @property

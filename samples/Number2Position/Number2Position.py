@@ -138,7 +138,7 @@ def prepare_objects(exp):
     exp._event_file_log("Setup,trials_file,{:}".format(exp_objects.trials_file), 1)
 
     #-- Validators
-    val1 = MovementAngleValidator(1, min_angle=-90, max_angle=90, calc_angle_interval=20, enabled=True)
+    val1 = MovementAngleValidator(min_angle=-90, max_angle=90, calc_angle_interval=20, enabled=True)
     exp_objects.validators.append(val1)
 
     val2 = GlobalSpeedValidator(origin_coord=start_area.position[1] + start_area.size[1]/2,

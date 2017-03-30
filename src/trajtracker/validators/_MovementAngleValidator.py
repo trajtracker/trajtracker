@@ -27,13 +27,11 @@ class MovementAngleValidator(_BaseValidator):
     arg_angle = 'angle'  # ValidationFailed exception argument: the angle actually observed
 
 
-    def __init__(self, units_per_mm, min_angle=None, max_angle=None, calc_angle_interval=None,
+    def __init__(self, min_angle=None, max_angle=None, calc_angle_interval=None,
                  grace_period=0, enabled=True):
         """
         Constructor
 
-        :param units_per_mm: The ratio of units (provided in the call to :func:`~trajtracker.movement.MovementAngleValidator.check_xyt`) per mm.
-                             This is relevant for computation of :func:`~trajtracker.movement.MovementAngleValidator.calc_angle_interval`
         :param min_angle: See :attr:`~trajtracker.movement.MovementAngleValidator.min_angle`
         :param max_angle: See :attr:`~trajtracker.movement.MovementAngleValidator.max_angle`
         :param calc_angle_interval: See :attr:`~trajtracker.movement.MovementAngleValidator.calc_angle_interval`
@@ -41,11 +39,6 @@ class MovementAngleValidator(_BaseValidator):
         :param enabled: See :attr:`~trajtracker.movement.MovementAngleValidator.enabled`
         """
         super(MovementAngleValidator, self).__init__(enabled=enabled)
-
-        if not isinstance(units_per_mm, numbers.Number) or units_per_mm <= 0:
-            raise ValueError("trajtracker error: invalid units_per_mm argument ({0}) to constructor of {1}".format(units_per_mm, self.__class__))
-
-        self._units_per_mm = units_per_mm
 
         self.min_angle = min_angle
         self.max_angle = max_angle
@@ -87,9 +80,6 @@ class MovementAngleValidator(_BaseValidator):
 
         self._check_xyt_validate_and_log(x_coord, y_coord, time)
         self._validate_time(time)
-
-        x_coord /= self._units_per_mm
-        y_coord /= self._units_per_mm
 
         curr_xyt = (x_coord, y_coord, time)
 

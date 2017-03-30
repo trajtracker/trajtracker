@@ -30,12 +30,11 @@ class InstantaneousSpeedValidator(_BaseValidator):
     arg_speed = 'speed'  # ValidationFailed exception argument: the speed observed
 
     #-----------------------------------------------------------------------------------
-    def __init__(self, units_per_mm, axis=ValidationAxis.y, enabled=True, min_speed=None, max_speed=None,
+    def __init__(self, axis=ValidationAxis.y, enabled=True, min_speed=None, max_speed=None,
                  grace_period=0, calculation_interval=0, movement_monitor=None):
         """
         Constructor
 
-        :param units_per_mm: The ratio of units (provided in the call to :func:`~trajtracker.validators.InstantaneousSpeedValidator.check_xyt`) per mm
         :param axis: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.axis`
         :param enabled: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.enabled`
         :param min_speed: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.min_speed`
@@ -46,11 +45,8 @@ class InstantaneousSpeedValidator(_BaseValidator):
 
         super(InstantaneousSpeedValidator, self).__init__(enabled=enabled)
 
-        if not isinstance(units_per_mm, numbers.Number):
-            raise ValueError(_u.ErrMsg.attr_invalid_type(self.__class__, "units_per_mm", "numeric", units_per_mm))
-
         if movement_monitor is None:
-            self._speed_monitor = SpeedMonitor(units_per_mm, calculation_interval)
+            self._speed_monitor = SpeedMonitor(calculation_interval)
         elif isinstance(movement_monitor, SpeedMonitor):
             self._speed_monitor = movement_monitor
         else:

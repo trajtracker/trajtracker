@@ -9,7 +9,7 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
 
     #------------------------------------------
     def test_min_speed(self):
-        validator = InstantaneousSpeedValidator(1, axis=ValidationAxis.y)
+        validator = InstantaneousSpeedValidator(axis=ValidationAxis.y)
         validator.min_speed = 1
 
         self.assertIsNone(validator.check_xyt(0, 0, 0))
@@ -22,7 +22,7 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
 
     #------------------------------------------
     def test_max_speed(self):
-        validator = InstantaneousSpeedValidator(1, axis=ValidationAxis.y)
+        validator = InstantaneousSpeedValidator(axis=ValidationAxis.y)
         validator.max_speed = 1
 
         self.assertIsNone(validator.check_xyt(0, 0, 0))
@@ -36,7 +36,7 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
 
     #------------------------------------------
     def test_grace(self):
-        validator = InstantaneousSpeedValidator(1, axis=ValidationAxis.y)
+        validator = InstantaneousSpeedValidator(axis=ValidationAxis.y)
         validator.min_speed = 1
         validator.grace_period = 2
 
@@ -47,7 +47,7 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
 
     #------------------------------------------
     def test_disabled(self):
-        validator = InstantaneousSpeedValidator(1, axis=ValidationAxis.y, enabled=False)
+        validator = InstantaneousSpeedValidator(axis=ValidationAxis.y, enabled=False)
         validator.min_speed = 1
 
         self.assertIsNone(validator.check_xyt(0, 0, 0))
@@ -58,7 +58,7 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
 
     #------------------------------------------
     def test_reset(self):
-        validator = InstantaneousSpeedValidator(1, axis=ValidationAxis.y)
+        validator = InstantaneousSpeedValidator(axis=ValidationAxis.y)
         validator.min_speed = 1
 
         self.assertIsNone(validator.check_xyt(0, 0, 0))
@@ -69,7 +69,7 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
 
     #------------------------------------------
     def test_interval(self):
-        validator = InstantaneousSpeedValidator(1, axis=ValidationAxis.y)
+        validator = InstantaneousSpeedValidator(axis=ValidationAxis.y)
         validator.min_speed = 1
         validator.calculation_interval = 3
         self.assertIsNone(validator.check_xyt(0, 0, 0))
@@ -79,7 +79,7 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
 
     #------------------------------------------
     def test_speed_y(self):
-        validator = InstantaneousSpeedValidator(1, axis=ValidationAxis.y, min_speed=1)
+        validator = InstantaneousSpeedValidator(axis=ValidationAxis.y, min_speed=1)
         self.assertIsNone(validator.check_xyt(0, 0, 0))
         self.assertIsNone(validator.check_xyt(0, 1, 1))
 
@@ -90,7 +90,7 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
 
     #------------------------------------------
     def test_speed_x(self):
-        validator = InstantaneousSpeedValidator(1, axis=ValidationAxis.x, min_speed=1)
+        validator = InstantaneousSpeedValidator(axis=ValidationAxis.x, min_speed=1)
         self.assertIsNone(validator.check_xyt(0, 0, 0))
         self.assertIsNone(validator.check_xyt(1, 0, 1))
 
@@ -101,7 +101,7 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
 
     #------------------------------------------
     def test_speed_xy(self):
-        validator = InstantaneousSpeedValidator(1, axis=ValidationAxis.xy, min_speed=5)
+        validator = InstantaneousSpeedValidator(axis=ValidationAxis.xy, min_speed=5)
         self.assertIsNone(validator.check_xyt(0, 0, 0))
         self.assertIsNone(validator.check_xyt(3, 4, 1))
 

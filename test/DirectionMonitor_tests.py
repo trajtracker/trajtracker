@@ -11,36 +11,8 @@ class DirectionMonitorTests(unittest.TestCase):
     #===================================================================================
 
     #----------------------------------------------------
-    def test_set_units_per_mm(self):
-        DirectionMonitor(3)
-
-        try:
-            DirectionMonitor("")
-            self.fail()
-        except:
-            pass
-
-        try:
-            DirectionMonitor(None)
-            self.fail()
-        except:
-            pass
-
-        try:
-            DirectionMonitor(0)
-            self.fail()
-        except:
-            pass
-
-        try:
-            DirectionMonitor(-1)
-            self.fail()
-        except:
-            pass
-
-    #----------------------------------------------------
     def test_set_min_distance(self):
-        dm = DirectionMonitor(3)
+        dm = DirectionMonitor()
         dm.min_distance = 1
 
         try:
@@ -69,7 +41,7 @@ class DirectionMonitorTests(unittest.TestCase):
 
     #----------------------------------------------------
     def test_set_angle_units(self):
-        dm = DirectionMonitor(3)
+        dm = DirectionMonitor()
         dm.angle_units = DirectionMonitor.Units.Degrees
         dm.angle_units = DirectionMonitor.Units.Radians
 
@@ -94,7 +66,7 @@ class DirectionMonitorTests(unittest.TestCase):
 
     #----------------------------------------------------
     def test_set_zero_angle(self):
-        dm = DirectionMonitor(3)
+        dm = DirectionMonitor()
         dm.zero_angle = 1
         dm.zero_angle = -1
 
@@ -117,7 +89,7 @@ class DirectionMonitorTests(unittest.TestCase):
 
     #----------------------------------------------------
     def test_update_xyt_arg_types(self):
-        dm = DirectionMonitor(1)
+        dm = DirectionMonitor()
 
         dm.update_xyt(0, 0, 0)
 
@@ -138,7 +110,7 @@ class DirectionMonitorTests(unittest.TestCase):
 
     #----------------------------------------------------
     def test_get_angle_degrees(self):
-        dm = DirectionMonitor(1)
+        dm = DirectionMonitor()
 
         dm.update_xyt(0, 0, 0)
         self.assertIsNone(dm.curr_angle)
@@ -158,7 +130,7 @@ class DirectionMonitorTests(unittest.TestCase):
 
     #----------------------------------------------------
     def test_get_angle_radians(self):
-        dm = DirectionMonitor(1, angle_units=DirectionMonitor.Units.Radians)
+        dm = DirectionMonitor(angle_units=DirectionMonitor.Units.Radians)
 
         dm.update_xyt(0, 0, 0)
         dm.update_xyt(0, 1, 1)
@@ -176,19 +148,7 @@ class DirectionMonitorTests(unittest.TestCase):
 
     #----------------------------------------------------
     def test_min_distance(self):
-        dm = DirectionMonitor(1, min_distance=2)
-
-        dm.update_xyt(0, 0, 0)
-        dm.update_xyt(0, 1, 1)
-        self.assertIsNone(dm.curr_angle)
-
-        dm.update_xyt(0, 2, 1)
-        self.assertEqual(0, dm.curr_angle)
-
-
-    #----------------------------------------------------
-    def test_units_per_mm(self):
-        dm = DirectionMonitor(2, min_distance=1)
+        dm = DirectionMonitor(min_distance=2)
 
         dm.update_xyt(0, 0, 0)
         dm.update_xyt(0, 1, 1)
@@ -200,7 +160,7 @@ class DirectionMonitorTests(unittest.TestCase):
 
     #----------------------------------------------------
     def test_zero_angle(self):
-        dm = DirectionMonitor(1, zero_angle=90)
+        dm = DirectionMonitor(zero_angle=90)
 
         dm.update_xyt(0, 0, 0)
         self.assertIsNone(dm.curr_angle)
@@ -225,7 +185,7 @@ class DirectionMonitorTests(unittest.TestCase):
     #----------------------------------------------------
     def test_track_1_curve(self):
 
-        dm = DirectionMonitor(1)
+        dm = DirectionMonitor()
 
         dm.update_xyt(0, 0, 0)
         dm.update_xyt(0.1, 1, 1)
@@ -246,7 +206,7 @@ class DirectionMonitorTests(unittest.TestCase):
     #----------------------------------------------------
     def test_track_n_curves(self):
 
-        dm = DirectionMonitor(1)
+        dm = DirectionMonitor()
 
         x = 0
         dm.update_xyt(x, 0, 0)
@@ -276,7 +236,7 @@ class DirectionMonitorTests(unittest.TestCase):
     #----------------------------------------------------
     def test_curve_min_distance(self):
 
-        dm = DirectionMonitor(1, min_distance=1.5)
+        dm = DirectionMonitor(min_distance=1.5)
 
         x = 0
         dm.update_xyt(x, 0, 0)
@@ -294,7 +254,7 @@ class DirectionMonitorTests(unittest.TestCase):
     #----------------------------------------------------
     def test_curve_min_angle_first_curve(self):
 
-        dm = DirectionMonitor(1, min_angle_change_per_curve=45)
+        dm = DirectionMonitor(min_angle_change_per_curve=45)
 
         dm.update_xyt(0, 0, 0)
         dm.update_xyt(0, 1, 1)
@@ -318,7 +278,7 @@ class DirectionMonitorTests(unittest.TestCase):
     #----------------------------------------------------
     def test_curve_min_angle_second_curve(self):
 
-        dm = DirectionMonitor(1, min_angle_change_per_curve=45)
+        dm = DirectionMonitor(min_angle_change_per_curve=45)
 
         dm.update_xyt(0, 0, 0)
         dm.update_xyt(0, 1, 1)
