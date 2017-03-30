@@ -77,6 +77,9 @@ class InstantaneousSpeedValidator(_BaseValidator):
 
         :param time0: The time when the trial starts. The grace period will be determined according to this time.
         """
+
+        self._log_func_enters("reset", [time0])
+
         self._speed_monitor.reset(time0)
 
 

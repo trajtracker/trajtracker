@@ -50,11 +50,7 @@ class _BaseValidator(_TTrkObject):
         if time_used:
             _u.validate_func_arg_type(self, "check_xyt", "time", time, numbers.Number, type_name="numeric")
 
-        if self._should_log(self.log_trace):
-            msg = "{0}.check_xyt,{1},{2}".format(type(self).__name__, x_coord, y_coord)
-            if time_used:
-                msg += ",{0}".format(time)
-            self._log_write(msg)
+        self._log_func_enters("check_xyt", [x_coord, y_coord, time])
 
     #--------------------------------------------------------------------
     def _create_validation_error(self, err_code, message, err_args=None):

@@ -65,6 +65,9 @@ class MovementAngleValidator(_BaseValidator):
         """
         Called when a trial starts - reset any previous movement
         """
+
+        self._log_func_enters("reset", [time0])
+
         self._prev_locations = []
 
 

@@ -50,8 +50,11 @@ class SpeedMonitor(trajtracker._TTrkObject):
 
         :param time: The time when the trial starts.
         """
+
         if time is not None and not isinstance(time, (int, float)):
             raise ValueError(_u.ErrMsg.invalid_method_arg_type(self.__class__, "reset", "numeric", "time", time))
+
+        self._log_func_enters("reset", [time])
 
         self._recent_points = []
         self._pre_recent_point = None
@@ -71,6 +74,8 @@ class SpeedMonitor(trajtracker._TTrkObject):
         _u.validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number)
         _u.validate_func_arg_type(self, "update_xyt", "time", time, numbers.Number)
         self._validate_time(time)
+
+        self._log_func_enters("update_xyt", [x_coord, y_coord, time])
 
         if self._time0 is None:
             self._time0 = time

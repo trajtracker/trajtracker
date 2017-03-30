@@ -6,6 +6,8 @@ Number line: The NumberLine class presents a number line, detect when finger/mou
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
+from __future__ import division
+
 from enum import Enum
 import numbers
 import numpy as np
@@ -382,21 +384,24 @@ class NumberLine(trajtracker._TTrkObject):
 
         :return: True if the number line was touched
         """
-        if not isinstance(x_coord, numbers.Number):
-            raise ValueError(NumberLine._errmsg_mouseat_non_numeric_coord.format("x", x_coord))
-        if not isinstance(y_coord, numbers.Number):
-            raise ValueError(NumberLine._errmsg_mouseat_non_numeric_coord.format("y", x_coord))
+
+        _u.validate_func_arg_type(self, "update_xy", "x_coord", x_coord, int)
+        _u.validate_func_arg_type(self, "update_xy", "y_coord", y_coord, int)
+        self._log_func_enters("update_xy", [x_coord, y_coord])
 
         if self._last_touched_coord is not None:
+            self._log_func_returns(False)
             return False
 
         #-- Get the relevant coordinates (x or y)
         if self._orientation == NumberLine.Orientation.Horizontal:
             mouse_coord = y_coord
             line_coord = self._main_line_start()[1] + self._mid_y
+            touch_coord = x_coord - self._mid_x
         else:
             mouse_coord = x_coord
             line_coord = self._main_line_start()[0] + self._mid_x
+            touch_coord = y_coord - self._mid_y
 
         distance = line_coord - mouse_coord  # positive value: mouse coord < line coord
 
@@ -415,10 +420,15 @@ class NumberLine(trajtracker._TTrkObject):
 
             touched = distance < self._touch_distance
 
+        if touched:
+            self._last_touched_coord = touch_coord
+
+        self._log_func_returns(touched)
         return touched
 
 
     #---------------------------------------------------------
+    @property
     def last_touched_coord(self):
         """
         Get the coordinate where the mouse/finger last touched the number line.
@@ -429,6 +439,7 @@ class NumberLine(trajtracker._TTrkObject):
 
 
     #---------------------------------------------------------
+    @property
     def last_touched_value(self):
         """
         The position where the mouse/finger last touched the number line.
@@ -439,12 +450,11 @@ class NumberLine(trajtracker._TTrkObject):
             return None
 
         #-- Convert the coordinate into a position using a 0-1 scale
-        s = self._main_line_start()
-        s_coord = s[0] if self._orientation == NumberLine.Orientation.Horizontal else s[1]
-        pos01 = (self._last_touched_coord - s_coord) / self.line_length
+        pos01 = self._last_touched_coord / self.line_length + 0.5
 
         # noinspection PyUnresolvedReferences
         return pos01 * (self._max_value - self._min_value) + self._min_value
+
 
     #===================================================================================
     #      Property setters / getters
@@ -486,6 +496,7 @@ class NumberLine(trajtracker._TTrkObject):
     def _validate_unlocked(self):
         if self._preloaded:
             raise trajtracker.InvalidStateError('An attempt was made to change the visual properties of a NumberLine after it was already plotted')
+
 
     ###################################
     #  Line properties

@@ -64,7 +64,7 @@ class _TTrkObject(object):
     #-------------------------------------------------
     def _log_setter(self, attr_name, value=None):
 
-        if self._log_level > self.log_trace:
+        if not self._should_log(self.log_trace):
             return
 
         if value is None:
@@ -77,13 +77,34 @@ class _TTrkObject(object):
 
 
     #-------------------------------------------------
-    def _log_write(self, msg):
+    def _log_write(self, msg, prepend_self=False):
+        if prepend_self:
+            msg = type(self).__name__ + "," + msg
         xpy._active_exp._event_file_log(msg, 1)
+
+    #-------------------------------------------------
+    # Write to log when entering a function
+    #
+    def _log_func_enters(self, func_name, args=()):
+        if self._should_log(self.log_trace):
+            args = ",".join([str(a) for a in args])
+            self._log_write("enter_func,{:}({:})".format(func_name, args), prepend_self=True)
+
+
+    #-------------------------------------------------
+    # Write to log when function returns a value
+    #
+    def _log_func_returns(self, retval):
+        if self._should_log(self.log_trace):
+            self._log_write("func_returns,{:}".format(retval), prepend_self=True)
+
+
 
 
 import trajtracker._utils as _utils
 
 import trajtracker.misc as misc
+import trajtracker.data as data
 import trajtracker.stimuli as stimuli
 import trajtracker.movement as movement
 import trajtracker.validators as validators

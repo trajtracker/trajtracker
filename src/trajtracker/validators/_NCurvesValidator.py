@@ -63,6 +63,9 @@ class NCurvesValidator(_BaseValidator):
         """
         Called when a trial starts - reset any previous curves
         """
+
+        self._log_func_enters("reset", [time0])
+
         self._direction_monitor.reset()
 
 
@@ -77,6 +80,7 @@ class NCurvesValidator(_BaseValidator):
         :return: None if all OK, ValidationFailed if error
         """
 
+        self._check_xyt_validate_and_log(x_coord, y_coord, time)
         self._direction_monitor.update_xyt(x_coord, y_coord, time)
 
         if not self.enabled:

@@ -5,6 +5,10 @@ from trajtracker.stimuli import NumberLine
 
 class NumberLineTestCase(unittest.TestCase):
 
+    #=======================================================================
+    #          Configure
+    #=======================================================================
+
     #-- Create a NumberLine object, test default values
     def test_default_propertie(self):
         nl = NumberLine((10,20), 1000, 100)
@@ -31,8 +35,11 @@ class NumberLineTestCase(unittest.TestCase):
         nl.validate()
 
 
-    #----------- Validate update_xy()
+    #=======================================================================
+    #          Detect touches
+    #=======================================================================
 
+    #-----------------------------------------------------------------
     #-- Touch mode = undirectioned, horizontal line
     def test_touch_line_undirectioned_horizontal(self):
         nl = NumberLine((0,0), 100, 100, orientation=NumberLine.Orientation.Horizontal)
@@ -50,6 +57,7 @@ class NumberLineTestCase(unittest.TestCase):
         self.assertTrue(nl.update_xy(0, -9))
 
 
+    #-----------------------------------------------------------------
     #-- Touch mode = undirectioned, vertical line
     def test_touch_line_undirectioned_vertical(self):
         nl = NumberLine((0,0), 100, 100, orientation=NumberLine.Orientation.Vertical)
@@ -66,6 +74,8 @@ class NumberLineTestCase(unittest.TestCase):
         self.assertFalse(nl.update_xy(11, 0))
         self.assertTrue(nl.update_xy(-9, 0))
 
+
+    #-----------------------------------------------------------------
     #-- Touch mode = directioned, horizontal line
     def test_touch_line_directioned_horizontal(self):
         nl = NumberLine((0,0), 100, 100, orientation=NumberLine.Orientation.Horizontal)
@@ -95,6 +105,7 @@ class NumberLineTestCase(unittest.TestCase):
         self.assertTrue(nl.update_xy(0, 100))
 
 
+    #-----------------------------------------------------------------
     #-- Touch mode = directioned, vertical line
     def test_touch_line_directioned_vertical(self):
         nl = NumberLine((0,0), 100, 100, orientation=NumberLine.Orientation.Vertical)
@@ -124,6 +135,7 @@ class NumberLineTestCase(unittest.TestCase):
         self.assertTrue(nl.update_xy(100, 0))
 
 
+    #-----------------------------------------------------------------
     #-- Touch mode = directioned, negative distance
     def test_touch_line_directioned_negative_distance(self):
         nl = NumberLine((0,0), 100, 100, orientation=NumberLine.Orientation.Horizontal)
@@ -138,6 +150,30 @@ class NumberLineTestCase(unittest.TestCase):
         self.assertFalse(nl.update_xy(0, -5))
         self.assertTrue(nl.update_xy(0, -11))
 
+
+    #-----------------------------------------------------------------
+    def test_last_touch_coord(self):
+        nl = NumberLine((0,0), 100, 40, orientation=NumberLine.Orientation.Horizontal)
+
+        self.assertIsNone(nl.last_touched_coord)
+        self.assertIsNone(nl.last_touched_value)
+
+        nl.reset()
+        nl.update_xy(0, -1)
+        nl.update_xy(0, 1)
+
+        self.assertEqual(0, nl.last_touched_coord)
+        self.assertEqual(20, nl.last_touched_value)
+
+        nl.reset()
+        self.assertIsNone(nl.last_touched_coord)
+        self.assertIsNone(nl.last_touched_value)
+
+        nl.update_xy(25, -1)
+        nl.update_xy(25, 1)
+
+        self.assertEqual(25, nl.last_touched_coord)
+        self.assertEqual(30, nl.last_touched_value)
 
 
 

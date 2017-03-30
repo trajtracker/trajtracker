@@ -53,7 +53,7 @@ class MoveByGradientValidator(_BaseValidator):
         """
         The position of the image: (x,y) tuple/list, indicating the image center
         For even-sized images, use the Expyriment standard.
-        The position is used to align the image's coordinate space with that of check_xy()
+        The position is used to align the image's coordinate space with that of check_xyt()
         """
         return self._lcm.position
 
@@ -132,6 +132,9 @@ class MoveByGradientValidator(_BaseValidator):
         """
         Reset the movement validation
         """
+
+        self._log_func_enters("reset", [time0])
+
         self._last_color = None
 
 
@@ -143,10 +146,10 @@ class MoveByGradientValidator(_BaseValidator):
         :return: None if all OK, ValidationFailed if error
         """
 
-        self._check_xyt_validate_and_log(x_coord, y_coord, time, False)
-
         if not self._enabled:
             return None
+
+        self._check_xyt_validate_and_log(x_coord, y_coord, time, False)
 
         color = self._lcm.get_color_at(x_coord, y_coord)
         if color is None:

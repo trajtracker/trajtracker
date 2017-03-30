@@ -113,6 +113,8 @@ class GlobalSpeedValidator(_BaseValidator):
         :type time0: number
         """
 
+        self._log_func_enters("reset", [time0])
+
         if time0 is not None and not isinstance(time0, (int, float)):
             raise ValueError(_u.ErrMsg.invalid_method_arg_type(self.__class__, "reset", "numeric", "time", time0))
 

@@ -53,7 +53,7 @@ class LocationsValidator(_BaseValidator):
         """
         The position of the image: (x,y) tuple/list, indicating the image center
         For even-sized images, use the Expyriment standard.
-        The position is used to align the image's coordinate space with that of check_xy()
+        The position is used to align the image's coordinate space with that of check_xyt()
         """
         return self._lcm.position
 

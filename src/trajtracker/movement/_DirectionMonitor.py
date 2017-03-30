@@ -64,6 +64,9 @@ class DirectionMonitor(trajtracker._TTrkObject):
         """
         Called when a trial starts - reset any previous movement
         """
+
+        self._log_func_enters("reset")
+
         self._recent_near_coords = []
         self._pre_recent_coord = None
 
@@ -94,6 +97,8 @@ class DirectionMonitor(trajtracker._TTrkObject):
         _u.validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number)
         _u.validate_func_arg_type(self, "update_xyt", "time", time, numbers.Number)
         _u.validate_func_arg_not_negative(self, "update_xyt", "time", time)
+
+        self._log_func_enters("update_xyt", [x_coord, y_coord, time])
 
         self._remove_far_enough_recent_coords(x_coord, y_coord)
 
@@ -178,7 +183,6 @@ class DirectionMonitor(trajtracker._TTrkObject):
                 self._curr_curve_start_index = len(self._recent_near_coords) - 1
 
                 self._clear_possible_curve()
-
 
 
     #-------------------------------------------------

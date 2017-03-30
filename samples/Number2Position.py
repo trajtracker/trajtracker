@@ -18,8 +18,15 @@ from trajtracker.movement import StartPoint, TrajectoryTracker
 from trajtracker.validators import *
 
 
+
+xpy.control.defaults.window_mode = True
+xpy.control.defaults.goodbye_text = "Thank you for your participation"
+
+
 MAX_TRIAL_DURATION = 2
 GUIDE_ENABLED = False
+
+TRIAL_NUM = "@@TrialNumber@@"
 
 
 class NumberLineObjects:
@@ -30,10 +37,13 @@ class NumberLineObjects:
         self.target = None
         self.tracker = None
         self.trials_file = None
+        self.trials_writer = None
         self.global_speed_validator = None
         self.validators = []
         self.stimuli = ttrk.stimuli.StimulusContainer()
 
+
+global_inf = {}
 
 #------------------------------------------------
 def main():
@@ -44,48 +54,48 @@ def main():
     exp.mouse.show_cursor()  # todo: not on tablet
 
     #-- Initialize the number-to-position experiment
-    exp_objects = prepare_objects()
-    targets = load_stimuli_from_csv()
+    exp_objects = prepare_objects(exp)
+    trials = load_trials_from_csv()
 
     show_instructions(exp, exp_objects.stimuli)
 
+    global_inf['session_start_time'] = get_time()
+
     #-- Show trials
-    trial_num = 0
-    while len(targets) > 0:
-        trial_num += 1
-        if run_trial(exp, trial_num, targets[0], exp_objects):
-            #-- OK
-            targets.pop(0)
+    trial_num = 1
+    while len(trials) > 0:
+        trials[0][TRIAL_NUM] = trial_num
+        go_to_next_stim, increase_trial_num = run_trial(exp, trials[0], exp_objects)
+
+        if increase_trial_num:
+            trial_num += 1
+
+        if go_to_next_stim:
+            trials.pop(0)
         else:
-            #-- Trial did not finish successfully
-            random.shuffle(targets)
+            random.shuffle(trials)
 
     #-- Experiment ended
-    show_end_msg(exp)
+    exp_objects.trials_fp.close()
     xpy.control.end()
 
 
 #------------------------------------------------
-def load_stimuli_from_csv():  #todo: this function should be replaced by a class
+def load_trials_from_csv():
 
     in_file = "Number2Position.csv"
-    fp = open(in_file)
 
-    try:
-        reader = csv.DictReader(fp)
-        targets = [int(row['target']) for row in reader]
-    finally:
-        fp.close()
+    loader = ttrk.data.CSVLoader()
+    trials = loader.load_file(in_file)
+    print("Read {:} trials from {:}".format(len(trials), in_file))
 
-    print("Read {:} targets from {:}".format(len(targets), in_file))
+    random.shuffle(trials)
 
-    random.shuffle(targets)
-
-    return targets
+    return trials
 
 
 #------------------------------------------------
-def prepare_objects():
+def prepare_objects(exp):
 
     exp_objects = NumberLineObjects()
 
@@ -93,7 +103,7 @@ def prepare_objects():
     screen_height = xpy._active_exp.screen.size[1]
 
     #-- Number line
-    nl = ttrk.stimuli.NumberLine((0, screen_height/2 - 80), int(screen_width*0.85), 100,
+    nl = ttrk.stimuli.NumberLine((0, screen_height/2 - 200), int(screen_width*0.85), 100,
                                  line_colour=xpy.misc.constants.C_WHITE, end_tick_height=5)
     nl.show_labels(font_name="Arial", font_size=26, box_size=(100, 30),
                    font_colour=xpy.misc.constants.C_GREY, offset=(0, 20))
@@ -106,10 +116,15 @@ def prepare_objects():
     exp_objects.start_area = StartPoint(start_area)
     exp_objects.stimuli.add('start', start_area)
 
+    exp._event_file_log("Setup,start_area,pos={:},size={:}".format(start_area.position, start_area.size), 1)
+
     #-- Target number
-    exp_objects.target = xpy.stimuli.TextBox("", (300, 80), (0, screen_height/2 - 50),
-                                             text_font="Arial", text_size=50, text_colour=xpy.misc.constants.C_WHITE)
+    target = xpy.stimuli.TextBox("", (300, 80), (0, screen_height/2 - 50),
+                                 text_font="Arial", text_size=50, text_colour=xpy.misc.constants.C_WHITE)
+    exp_objects.target = target
     exp_objects.stimuli.add("target", exp_objects.target, visible=False)
+    exp._event_file_log("Setup,target_number,pos={:},size={:},font={:},text_size={:}".format(
+        target.position, target.size, target.text_font, target.text_size), 1)
 
     #-- Trajectory tracker
     subj_id = xpy._active_exp.subject
@@ -120,6 +135,7 @@ def prepare_objects():
 
     #-- Trials file
     exp_objects.trials_file = xpy.io.defaults.datafile_directory + "/trials_{:}.csv".format(subj_id)
+    exp._event_file_log("Setup,trials_file,{:}".format(exp_objects.trials_file), 1)
 
     #-- Validators
     val1 = MovementAngleValidator(1, min_angle=-90, max_angle=90, calc_angle_interval=20, enabled=True)
@@ -136,7 +152,7 @@ def prepare_objects():
 
 
 #------------------------------------------------
-def show_instructions(exp, stim_container):
+def show_instructions(exp, stim_container): #TODO: have a generic function for this? in utils perhaps?
 
     msg = "Touch the rectangle at the bottom of the screen to start a trial. " + \
           "When you start moving the finger, a target number will appear. " + \
@@ -156,47 +172,63 @@ def show_instructions(exp, stim_container):
 
 
 #------------------------------------------------
-def show_end_msg(exp):
-
-    message_box = xpy.stimuli.TextBox("Thank you for your participation.", (800, 80), (0, 0),
-                                      text_font="Arial", text_size=20, text_colour=xpy.misc.constants.C_WHITE)
-
-    message_box.present(clear=False)
-    exp.mouse.wait_press()
-
-
-#------------------------------------------------
 # Run a single trial.
 # Returns True/False to indicate whether the trial was presented properly and finished
 #
-def run_trial(exp, trial_num, target, exp_objects):
+def run_trial(exp, trial, exp_objects):
 
-    print("Starting trial #{:}, target={:}".format(trial_num, target))
+    trial_info = {}
+
+    target = trial['target']
+    print("Starting trial #{:}, target={:}".format(trial[TRIAL_NUM], target))
 
     #-- Initialize trial
-    exp_objects.target.text = str(target)
-    exp_objects.target.preload()
+
+    exp_objects.start_area.reset()
+    exp_objects.nl.reset()
+
     exp_objects.target.visible = False
+    exp_objects.target.unload()
+    exp_objects.target.text = target
+    exp_objects.target.preload()
+
     exp_objects.tracker.reset()
 
-    time0 = get_time()
-    reset_validators(exp_objects, time0)
+    reset_validators(exp_objects, 0)
 
-    wait_until_touching_start_area(exp, exp_objects)
-    exp_objects.stimuli.present()
+    #-- Wait for the participant to initiate the trial
+
+    exp_objects.start_area.wait_until_touched(exp, exp_objects.stimuli)
     print("   Subject touched the starting point")
 
-    err = wait_until_leaving_start_area(exp, exp_objects)
-    if err is not None:
-        trial_error(exp_objects, trial_num, err)
-        return False
+    exp_objects.stimuli.present()
+    time0 = get_time()
+
+    reset_validators(exp_objects, time0)
+    trial_info['time_in_session'] = time0 - global_inf['session_start_time']
+
+    #-- Wait for the participant to start moving the finger
+
+    rc = exp_objects.start_area.wait_until_exit(exp, on_loop=exp_objects.stimuli)
+    if rc == StartPoint.State.aborted:
+        print("   Trial aborted.")
+        return False, False  # finger lifted
+    elif rc == StartPoint.State.error:
+        trial_error(exp_objects, trial, trial_info, 0,
+                    ValidationFailed("started-sideways", "Start the trial by moving upwards, not sideways!", None))
+        return False, True
+
+    trial_info['time_started_moving'] = get_time() - time0
 
     print("   Subject started moving")
 
-    #-- Movement started
+    #-- Movement started: initialize stuff
     exp_objects.target.visible = True
     exp_objects.stimuli.present()
     time_in_trial = get_time() - time0
+    trial_info['time_target_shown'] = time_in_trial
+
+    #-- Trial loop
 
     exp_objects.global_speed_validator.reset(time_in_trial)
     prev_finger_pos = None
@@ -207,14 +239,14 @@ def run_trial(exp, trial_num, target, exp_objects):
         still_touching_screen = exp.mouse.check_button_pressed(0)
 
         if not still_touching_screen:
-            trial_error(exp_objects, trial_num,
+            trial_error(exp_objects, trial, trial_info, time_in_trial,
                         ValidationFailed("finger-lifted", "Finger lifted in mid-trial", None))
-            return False
+            return False, True
 
         err = apply_validations(exp_objects, finger_pos, time_in_trial)
         if err is not None:
-            trial_error(exp_objects, trial_num, err)
-            return False
+            trial_error(exp_objects, trial, trial_info, time_in_trial, err)
+            return False, True
 
         #-- Handle movement
         if finger_pos != prev_finger_pos:
@@ -224,8 +256,8 @@ def run_trial(exp, trial_num, target, exp_objects):
 
             #-- Check if the number line was reached
             if exp_objects.nl.update_xy(finger_pos[0], finger_pos[1]):
-                trial_succeeded(exp_objects, trial_num)
-                return True
+                trial_succeeded(exp_objects, trial, trial_info, time_in_trial)
+                return True, True
 
         #-- Go to next frame
         exp_objects.stimuli.present()
@@ -252,53 +284,52 @@ def apply_validations(exp_objects, pos, time):
 
 
 #------------------------------------------------
-def wait_until_touching_start_area(exp, exp_objects):
-
-    state = StartPoint.State.reset
-    while state != StartPoint.State.init:
-        btn_id, moved, pos, rt = exp.mouse.wait_event(wait_button=True, wait_motion=False, buttons=0, wait_for_buttonup=False)
-        state = exp_objects.start_area.check_xy(pos[0], pos[1])
-
-
-#------------------------------------------------
-def wait_until_leaving_start_area(exp, exp_objects):
-
-    #-- Wait
-    state = None
-    while state not in [StartPoint.State.start, StartPoint.State.error]:
-        btn_id, moved, pos, rt = exp.mouse.wait_event(wait_motion=True, buttons=0, wait_for_buttonup=True)
-        if btn_id is not None:
-            #-- Finger lifted up
-            return False
-        if moved:
-            state = exp_objects.start_area.check_xy(pos[0], pos[1])
-
-    if state == StartPoint.State.error:
-        return ValidationFailed("started-sideways", "Start the trial by moving upwards, not sideways!", None)
-
-    return None
-
-
-#------------------------------------------------
-def trial_ended(exp_objects, trial_num, success_err_code):
+def trial_ended(exp_objects, trial, trial_info, end_time, success_err_code):
     exp_objects.target.visible = False
     exp_objects.stimuli.present()
-    #todo: write trials.csv entry
+
+    endpoint = exp_objects.nl.last_touched_value
+
+    #-- Save data to trials file
+    trial_data = {
+        'trialNum': trial[TRIAL_NUM],
+        'LineNum': trial[ttrk.data.CSVLoader.FLD_LINE_NUM],
+        'target': trial['target'],
+        'presentedTarget': trial['target'],
+        'endPoint': "" if endpoint is None else "{:.3g}".format(endpoint),
+        'status' : success_err_code,
+        'movementTime' : 0 if end_time == 0 else "{:.3f}".format(end_time - trial_info['time_target_shown']),
+        'timeInSession': "{:.3f}".format(trial_info['time_in_session']),
+        'timeUntilFingerMoved': "{:.3f}".format(trial_info['time_started_moving']),
+        'timeUntilTarget': "{:.3f}".format(trial_info['time_target_shown']),
+    }
+
+    if exp_objects.trials_writer is None:
+        fields = ['trialNum', 'LineNum', 'target', 'presentedTarget', 'status', 'endPoint', 'movementTime',
+                  'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']
+        exp_objects.trials_fp = open(exp_objects.trials_file, 'w')
+        exp_objects.trials_writer = csv.DictWriter(exp_objects.trials_fp, fields)
+        exp_objects.trials_writer.writeheader()
+
+    exp_objects.trials_writer.writerow(trial_data)
+    exp_objects.trials_fp.flush()
 
 
 #------------------------------------------------
-def trial_error(exp_objects, trial_num, err):
+def trial_error(exp_objects, trial, trial_info, end_time, err):
     print("   ERROR in trial: " + err.err_code + "  - " + err.message)
-    trial_ended(exp_objects, trial_num, err.err_code)
-    #todo: show error message; make it hide after some time
+    trial_ended(exp_objects, trial, trial_info, end_time, err.err_code)
+    #todo: show error message; make it hide after some time (or when clicking anywhere)
 
 
 #------------------------------------------------
-def trial_succeeded(exp_objects, trial_num):
+def trial_succeeded(exp_objects, trial, trial_info, end_time):
 
     print("   Trial ended successfully.")
-    trial_ended(exp_objects, trial_num, "OK")
-    exp_objects.tracker.save_to_file(trial_num)
+    trial_ended(exp_objects, trial, trial_info, end_time, "OK")
+
+    exp_objects.tracker.save_to_file(trial[TRIAL_NUM])
+
     #todo: show feedback arrow, play sound
     # exp_objects.stimuli["feedback_arrow"].visible = False  #todo but don't present: this will be done on the next trial
 
