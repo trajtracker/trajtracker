@@ -157,6 +157,12 @@ def prepare_objects(exp):
     exp_objects.sound_ok = load_sound("click.wav")
     exp_objects.sound_err = load_sound("error.wav")
 
+    #-- Error messages
+    err_popup, err_textbox = create_error_box(exp)
+    exp_objects.err_popup = err_popup
+    exp_objects.err_textbox = err_textbox
+    exp_objects.stimuli.add("err_popup", err_popup, visible=False)
+
     return exp_objects
 
 
@@ -173,10 +179,11 @@ def create_feedback_arrow(color):
 def load_sound(filename):
     sound = xpy.stimuli.Audio("sounds/" + filename)
     sound.preload()
-    return  sound
+    return sound
+
 
 #------------------------------------------------
-def show_instructions(exp, stim_container):  # TODO: have a generic function for this? in utils perhaps?
+def show_instructions(exp, stim_container):
 
     msg = "Touch the rectangle at the bottom of the screen to start a trial. " + \
           "When you start moving the finger, a target number will appear. " + \
@@ -194,6 +201,23 @@ def show_instructions(exp, stim_container):  # TODO: have a generic function for
     exp.mouse.wait_press()
     stim_container.present()
 
+
+#------------------------------------------------
+def create_error_box(exp):
+
+    screen_width = exp.screen.size[0]
+    screen_height = exp.screen.size[1]
+
+
+    popup_img = xpy.stimuli.Picture("popup_background.png")
+    msg_box = xpy.stimuli.TextBox("", (290, 180), (0, 0),
+                                      text_font="Arial", text_size=16, text_colour=xpy.misc.constants.C_RED)
+
+    popup = ttrk.stimuli.StimulusContainer()
+    popup.add("bgnd", popup_img)
+    popup.add("text", msg_box)
+
+    return popup, msg_box
 
 #------------------------------------------------
 # Run a single trial.
@@ -215,6 +239,7 @@ def run_trial(exp, trial, exp_objects):
     print("   Subject touched the starting point")
 
     exp_objects.fb_arrow.visible = False
+    exp_objects.err_popup.visible = False
 
     exp_objects.stimuli.present()
     time0 = get_time()
@@ -296,17 +321,19 @@ def init_trial(exp_objects, target):
 
 
 #------------------------------------------------
-def reset_validators(exp_objects, time0):
+def reset_validators(exp_objects, trial_start_time):
 
     for validator in exp_objects.validators:
-        validator.reset(time0)
+        validator.reset(trial_start_time)
 
 
 #------------------------------------------------
-def apply_validations(exp_objects, pos, time):
+# Run all validations for the given time point
+#
+def apply_validations(exp_objects, finger_position, time_in_trial):
 
     for validator in exp_objects.validators:
-        err = validator.check_xyt(pos[0], pos[1], time)
+        err = validator.check_xyt(finger_position[0], finger_position[1], time_in_trial)
         if err is not None:
             return err
 
@@ -314,6 +341,44 @@ def apply_validations(exp_objects, pos, time):
 
 
 #------------------------------------------------
+# This function is called when a trial ends with an error
+#
+def trial_error(exp_objects, trial, trial_info, end_time, err):
+    print("   ERROR in trial: " + err.err_code + "  - " + err.message)
+
+    exp_objects.sound_err.play()
+    exp_objects.err_textbox.unload()
+    exp_objects.err_textbox.text = err.message
+    exp_objects.err_popup.visible = True
+
+    trial_ended(exp_objects, trial, trial_info, end_time, "ERR_" + err.err_code)
+    #todo: show error message; make it hide after some time (or when clicking anywhere)
+
+
+#------------------------------------------------
+# This function is called when a trial ends with no error
+#
+def trial_succeeded(exp_objects, trial, trial_info, end_time):
+
+    print("   Trial ended successfully.")
+
+    exp_objects.target.visible = False
+
+    exp_objects.fb_arrow.visible = True
+    nl_pos = exp_objects.nl.position
+    exp_objects.fb_arrow.position = (exp_objects.nl.last_touched_coord + nl_pos[0], nl_pos[1] + exp_objects.fb_arrow.height/2)
+
+    exp_objects.stimuli.present()
+    exp_objects.sound_ok.play()
+
+    trial_ended(exp_objects, trial, trial_info, end_time, "OK")
+
+    exp_objects.tracker.save_to_file(trial[TRIAL_NUM])
+
+
+#------------------------------------------------
+# This function is called whenever a trial ends - both for successful trials and for error trials
+#
 def trial_ended(exp_objects, trial, trial_info, end_time, success_err_code):
     exp_objects.target.visible = False
     exp_objects.stimuli.present()
@@ -346,36 +411,6 @@ def trial_ended(exp_objects, trial, trial_info, end_time, success_err_code):
 
     exp_objects.trials_writer.writerow(trial_data)
     exp_objects.trials_fp.flush()
-
-
-#------------------------------------------------
-def trial_error(exp_objects, trial, trial_info, end_time, err):
-    print("   ERROR in trial: " + err.err_code + "  - " + err.message)
-
-    exp_objects.sound_err.play()
-    trial_ended(exp_objects, trial, trial_info, end_time, "ERR_" + err.err_code)
-    #todo: show error message; make it hide after some time (or when clicking anywhere)
-
-
-#------------------------------------------------
-def trial_succeeded(exp_objects, trial, trial_info, end_time):
-
-    print("   Trial ended successfully.")
-
-    exp_objects.target.visible = False
-
-    exp_objects.fb_arrow.visible = True
-    nl_pos = exp_objects.nl.position
-    exp_objects.fb_arrow.position = (exp_objects.nl.last_touched_coord + nl_pos[0], nl_pos[1] + exp_objects.fb_arrow.height/2)
-
-    exp_objects.stimuli.present()
-    exp_objects.sound_ok.play()
-
-    trial_ended(exp_objects, trial, trial_info, end_time, "OK")
-
-    exp_objects.tracker.save_to_file(trial[TRIAL_NUM])
-
-    #todo: play sound
 
 
 main()

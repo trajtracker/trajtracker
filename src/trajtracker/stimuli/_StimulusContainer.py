@@ -40,12 +40,13 @@ class StimulusContainer(trajtracker._TTrkObject):
         :param update: See in `Expyriment <http://docs.expyriment.org/expyriment.stimuli.Rectangle.html#expyriment.stimuli.Rectangle.present>`
         """
 
-        visible_stims = [stim for stim in self._stimuli.values() if stim.visible]
+        visible_stims = [stim for stim in self._stimuli.values() if stim['stimulus'].visible]
+        visible_stims.sort(cmp=lambda a,b: cmp(a["order"], b['order']))
 
         for i in range(len(visible_stims)):
             c = clear if i == 0 else False
             u = update if i == len(visible_stims)-1 else False
-            visible_stims[i].present(clear=c, update=u)
+            visible_stims[i]['stimulus'].present(clear=c, update=u)
 
 
     #----------------------------------------------------------
@@ -66,9 +67,13 @@ class StimulusContainer(trajtracker._TTrkObject):
 
         stimulus.visible = visible
 
-        self._stimuli[stimulus_id] = stimulus
+        order = len(self._stimuli)
+        if stimulus_id not in self._stimuli:
+            order += 1
+
+        self._stimuli[stimulus_id] = {'stimulus': stimulus, 'order': order}
 
 
     #----------------------------------------------------------
     def __getitem__(self, item):
-        return self._stimuli[item]
+        return self._stimuli[item]['stimulus']
