@@ -214,7 +214,21 @@ class GlobalSpeedValidator(_BaseValidator):
     #      Configure
     #========================================================================
 
-    #-----------------------------------------------------------------------------------
+    #----------------------------------------------------------
+    @property
+    def config_attr_types(self):
+        return {'axis': trajtracker.validators._parse_validation_axis,
+                'origin_coord': int,
+                'end_coord': int,
+                'grace_period': float,
+                'max_trial_duration': float,
+                'show_guide': bool,
+                'guide_warning_time_delta': float,
+                'guide_line_length': int,
+                'milestones': self._parse_xml_milestones,
+                }
+
+    #----------------------------------------------------------
     @property
     def axis(self):
         """
@@ -369,6 +383,21 @@ class GlobalSpeedValidator(_BaseValidator):
 
         self._milestones = np.array(milestones)
 
+
+    #-------------------------------------------------------------
+    @staticmethod
+    def _parse_xml_milestones(xml):
+        milestones = []
+        for child in xml:
+            if child.tag != "milestone":
+                raise trajtracker.BadFormatError("Invalid XML format for defining {:}'s milestones: XML block '{:}' is unknown".format(
+                    type(self).__name__, child.tag))
+            if 'time' not in child.attrib or 'distance' not in child.attrib:
+                raise trajtracker.BadFormatError("Invalid XML format for defining {:}'s milestones: either time=xxx or distance=xxx is missing from a 'milestone' XML block".format(
+                    type(self).__name__))
+            milestones.append(GlobalSpeedValidator.Milestone(float(child.attrib['time']), float(child.attrib['distance'])))
+
+        return milestones
 
     #-------------------------------------------------------------
     @property
