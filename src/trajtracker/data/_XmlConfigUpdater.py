@@ -97,7 +97,7 @@ def _convert_xml_value_to_attr_value(obj, attr_name, xml_value, converter, conve
 # The annotation
 #
 # noinspection PyPep8Naming
-def fromXML(converter, convert_raw_xml=False):
+def fromXML(converter, raw_xml=False):
 
     #-- Define the real decorator
     def real_decorator(setter):
@@ -105,7 +105,7 @@ def fromXML(converter, convert_raw_xml=False):
         #-- Create a setter for the attribute
         def set_attr_from_xml(self, value):
             if isinstance(value, _ValueFromXML):
-                setter(self, _convert_xml_value_to_attr_value(self, setter.__name__, value, converter, convert_raw_xml))
+                setter(self, _convert_xml_value_to_attr_value(self, setter.__name__, value, converter, raw_xml))
             elif isinstance(value, _TestIfXmlSupported):
                 raise _TestIfXmlSupported()
             else:

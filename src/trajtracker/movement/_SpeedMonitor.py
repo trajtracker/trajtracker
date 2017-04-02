@@ -138,7 +138,7 @@ class SpeedMonitor(trajtracker._TTrkObject):
     #-------------------------------------------------------------------------
     @property
     def xspeed(self):
-        """ The instantaneous X speed (mm/sec) """
+        """ The instantaneous X speed (coords/sec) """
 
         if self._pre_recent_point is None:
             return None
@@ -151,7 +151,7 @@ class SpeedMonitor(trajtracker._TTrkObject):
     #-------------------------------------------------------------------------
     @property
     def yspeed(self):
-        """ The instantaneous Y speed (mm/sec) """
+        """ The instantaneous Y speed (coords/sec) """
 
         if self._pre_recent_point is None:
             return None
@@ -165,7 +165,7 @@ class SpeedMonitor(trajtracker._TTrkObject):
     @property
     def xyspeed(self):
         """
-        The instantaneous speed (mm/sec) - for this calculation we consider the full distance traveled by the mouse/finger
+        The instantaneous speed (coords/sec) - for this calculation we consider the full distance traveled by the mouse/finger
         """
 
         if self._pre_recent_point is None:

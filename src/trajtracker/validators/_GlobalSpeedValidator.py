@@ -338,7 +338,7 @@ class GlobalSpeedValidator(_BaseValidator):
         return list(self._milestones)
 
     @milestones.setter
-    @fromXML(_parse_xml_milestones, convert_raw_xml=True)
+    @fromXML(_parse_xml_milestones, raw_xml=True)
     def milestones(self, value):
         if value is None:
             value = []

@@ -17,6 +17,7 @@ import trajtracker
 import trajtracker._utils as _u
 import trajtracker.utils as u
 from trajtracker.validators import _BaseValidator
+from trajtracker.data import fromXML
 
 
 # noinspection PyAttributeOutsideInit
@@ -178,6 +179,7 @@ class MovementAngleValidator(_BaseValidator):
 
 
     @min_angle.setter
+    @fromXML(float)
     def min_angle(self, value):
 
         if value is None:
@@ -203,6 +205,7 @@ class MovementAngleValidator(_BaseValidator):
 
 
     @max_angle.setter
+    @fromXML(float)
     def max_angle(self, value):
 
         if value is None:
@@ -221,11 +224,12 @@ class MovementAngleValidator(_BaseValidator):
     @property
     def calc_angle_interval(self):
         """
-        Time minimal distance (in mm) over which a direction vector can be calculated
+        Time minimal distance over which a direction vector can be calculated
         """
         return self._calc_angle_interval
 
     @calc_angle_interval.setter
+    @fromXML(float)
     def calc_angle_interval(self, value):
         value = _u.validate_attr_numeric(self, "calc_angle_interval", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "calc_angle_interval", value)
@@ -239,6 +243,7 @@ class MovementAngleValidator(_BaseValidator):
         return self._grace_period
 
     @grace_period.setter
+    @fromXML(float)
     def grace_period(self, value):
         value = _u.validate_attr_numeric(self, "grace_period", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "grace_period", value)

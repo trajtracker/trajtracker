@@ -1,6 +1,8 @@
 import unittest
 
+import xml.etree.ElementTree as ET
 
+import trajtracker
 from trajtracker.validators import NCurvesValidator, ValidationFailed
 
 
@@ -19,6 +21,18 @@ class NCurvesValidatorTests(unittest.TestCase):
 
         self.assertRaises(TypeError, lambda: NCurvesValidator(max_curves_per_trial=""))
         self.assertRaises(ValueError, lambda: NCurvesValidator(max_curves_per_trial=-1))
+
+    #--------------------------------------------------
+    def test_config_from_xml(self):
+
+        v = NCurvesValidator()
+        configer = trajtracker.data.XmlConfigUpdater()
+        xml = ET.fromstring('<config max_curves_per_trial="3" min_distance="2.5" min_angle_change_per_curve="10.5"/>')
+        configer.configure_object(xml, v)
+        self.assertEqual(3, v.max_curves_per_trial)
+        self.assertEqual(2.5, v.min_distance)
+        self.assertEqual(10.5, v.min_angle_change_per_curve)
+
 
     #===============================================================
     # Validate

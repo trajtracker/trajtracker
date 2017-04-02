@@ -9,6 +9,7 @@ TrajTracker - movement package - private utilities
 from enum import Enum
 import numbers, re
 import numpy as np
+import xml.etree.ElementTree as ET
 
 from expyriment.misc import geometry
 
@@ -220,12 +221,12 @@ def parse_rgb(value):
         return value
 
     if not isinstance(value, str):
-        raise TypeError('Invalid coordinates "{:}" - expecting a string'.format(value))
+        raise TypeError('Invalid RGB "{:}" - expecting a string'.format(value))
 
     m = re.match('^\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$', value)
 
     if m is None:
-        raise ValueError('Invalid coordinates "{:}"'.format(value))
+        raise ValueError('Invalid RGB "{:}"'.format(value))
 
     return (int(m.group(1)), int(m.group(2)), int(m.group(3)))
 
@@ -239,3 +240,18 @@ def parse_rgb_or_num(value):
             return int(m.group(1))
 
     return parse_rgb(value)
+
+#--------------------------------------------------------------------
+def parse_rgb_list(xml):
+
+    if not isinstance(xml, ET.Element):
+        raise TypeError('Invalid RGB list "{:}" - expecting an XML object'.format(xml))
+
+    colors = []
+
+    for child in xml:
+        if child.tag != "color":
+            raise TypeError('Invalid XML format for a list of colors - expecting an XML block with several <color>...</color> blocks under it'.format(value))
+        colors.append(parse_rgb(child.text.strip()))
+
+    return colors

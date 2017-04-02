@@ -17,6 +17,7 @@ import trajtracker
 import trajtracker._utils as _u
 import trajtracker.utils as u
 from trajtracker.validators import _BaseValidator
+from trajtracker.data import fromXML
 
 
 class NCurvesValidator(_BaseValidator):
@@ -105,6 +106,7 @@ class NCurvesValidator(_BaseValidator):
         return self._max_curves_per_trial
 
     @max_curves_per_trial.setter
+    @fromXML(int)
     def max_curves_per_trial(self, value):
         _u.validate_attr_numeric(self, "max_curves_per_trial", value, none_value=_u.NoneValues.Valid)
         _u.validate_attr_not_negative(self, "max_curves_per_trial", value)
@@ -114,12 +116,13 @@ class NCurvesValidator(_BaseValidator):
     @property
     def min_distance(self):
         """
-        The minimal distance (in mm) between points required for calculating direction
+        The minimal distance between points required for calculating direction
         (see :attr:`trajtracker.movement.DirectionMonitor.min_distance`)
         """
         return self._direction_monitor.min_distance
 
     @min_distance.setter
+    @fromXML(float)
     def min_distance(self, value):
         self._direction_monitor.min_distance = value
 
@@ -135,5 +138,6 @@ class NCurvesValidator(_BaseValidator):
         return self._direction_monitor.min_angle_change_per_curve
 
     @min_angle_change_per_curve.setter
+    @fromXML(float)
     def min_angle_change_per_curve(self, value):
         self._direction_monitor.min_angle_change_per_curve = value

@@ -160,7 +160,7 @@ class XmlConfigUpdaterTests(unittest.TestCase):
                 return self._x
 
             @x.setter
-            @fromXML(lambda elem: elem.text.strip(), convert_raw_xml=True)
+            @fromXML(lambda elem: elem.text.strip(), raw_xml=True)
             def x(self, value):
                 self._x = value
 

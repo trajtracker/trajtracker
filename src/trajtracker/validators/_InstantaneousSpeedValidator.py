@@ -21,9 +21,6 @@ class InstantaneousSpeedValidator(_BaseValidator):
     """
     Validator for momentary (instantanesous) speed: make sure that at each given moment, the
     movement speed is within the valid boundaries
-
-    The min/max speed are configured as mm/sec, but the movement progress is provided in arbitrary units
-    (e.g., pixels). You'll therefore need to define the units-per-mm ratio.
     """
 
     err_too_slow = "TooSlowInstantaneous"
@@ -151,7 +148,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
     @property
     def min_speed(self):
         """
-        The minimal valid instantaneous speed (mm/sec).
+        The minimal valid instantaneous speed (coords/sec).
         Only positive values are valid. None = minimal speed will not be enforced.
         """
         return self._min_speed
@@ -168,7 +165,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
     @property
     def max_speed(self):
         """
-        The maximal valid instantaneous speed (mm/sec).
+        The maximal valid instantaneous speed (coords/sec).
         Only positive values are valid. None = maximal speed will not be enforced.
         """
         return self._max_speed

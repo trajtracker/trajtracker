@@ -265,7 +265,7 @@ class DirectionMonitor(trajtracker._TTrkObject):
     #-------------------------------------
     @property
     def min_distance(self):
-        """ The minimal distance (in mm) between points required for calculating direction """
+        """ The minimal distance between points required for calculating direction """
         return self._min_distance
 
     @min_distance.setter

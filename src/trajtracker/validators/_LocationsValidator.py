@@ -11,6 +11,7 @@ import trajtracker._utils as _u
 import trajtracker.utils as u
 from trajtracker.misc import LocationColorMap
 from trajtracker.validators import _BaseValidator
+from trajtracker.data import fromXML
 
 
 
@@ -58,6 +59,7 @@ class LocationsValidator(_BaseValidator):
         return self._lcm.position
 
     @position.setter
+    @fromXML(_u.parse_coord)
     def position(self, value):
         self._lcm.position = value
         self._log_setter("position")
@@ -75,6 +77,7 @@ class LocationsValidator(_BaseValidator):
 
 
     @default_valid.setter
+    @fromXML(bool)
     def default_valid(self, value):
         _u.validate_attr_type(self, "default_valid", value, bool)
         self._default_valid = value
@@ -87,6 +90,7 @@ class LocationsValidator(_BaseValidator):
         return self._valid_colors
 
     @valid_colors.setter
+    @fromXML(_u.parse_rgb_list, raw_xml=True)
     def valid_colors(self, value):
         self._valid_colors = self._get_colors_as_ints(value, "valid_colors")
         self._log_setter("valid_colors")
@@ -98,6 +102,7 @@ class LocationsValidator(_BaseValidator):
         return self._invalid_colors
 
     @invalid_colors.setter
+    @fromXML(_u.parse_rgb_list, raw_xml=True)
     def invalid_colors(self, value):
         self._invalid_colors = self._get_colors_as_ints(value, "valid_colors")
         self._log_setter("invalid_colors")

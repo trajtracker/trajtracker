@@ -21,6 +21,7 @@ class _UtilsTests(unittest.TestCase):
         self.assertRaises(ValueError, lambda: _u.parse_coord('(2,)'))
 
 
+
     def test_parse_rgb(self):
         self.assertEqual((1, 2, 3), _u.parse_rgb('(1,2,3)'))
         self.assertEqual((1, 2, 3), _u.parse_rgb('(1, 2, 3)'))
