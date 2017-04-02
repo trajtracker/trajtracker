@@ -60,6 +60,19 @@ class SpeedMonitorTests(unittest.TestCase):
     #=====================================================================================
 
     #---------------------------------------------------------
+    def test_interval_0(self):
+        m = SpeedMonitor(0)
+        m.update_xyt(0, 0, 0)
+        m.update_xyt(0, 0.5, 1)
+        self.assertEqual(0.5, m.yspeed)
+        m.update_xyt(0, 1.5, 2)
+        self.assertEqual(1, m.yspeed)
+        m.update_xyt(0, 2.6, 3)
+        self.assertEqual(1.1, m.yspeed)
+
+
+
+    #---------------------------------------------------------
     def test_x_speed(self):
         m = SpeedMonitor(0.5)
         m.update_xyt(0, 0, 1)

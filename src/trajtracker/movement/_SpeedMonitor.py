@@ -81,6 +81,8 @@ class SpeedMonitor(trajtracker._TTrkObject):
         #-- Find distance to recent coordinate
         if len(self._recent_points) > 0:
             last_loc = self._recent_points[-1]
+            if time == last_loc[2]:
+                return
             distance = np.sqrt((x_coord-last_loc[0]) ** 2 + (y_coord-last_loc[1]) ** 2)
         else:
             distance = 0
@@ -106,11 +108,16 @@ class SpeedMonitor(trajtracker._TTrkObject):
     #
     def _remove_recent_points_older_than(self, latest_good_time):
 
-        older_than_threshold = np.where([p[2] <= latest_good_time for p in self._recent_points])
-        older_than_threshold = older_than_threshold[0]
+        if len(self._recent_points) == 0:
+            return
+
+        #-- find _recent_points that are old enough to remove
+        older_than_threshold = np.where([p[2] <= latest_good_time for p in self._recent_points])[0]
+
         if len(older_than_threshold) >= 1:
-            self._pre_recent_point = self._recent_points[older_than_threshold[-1]]
-            self._recent_points = self._recent_points[older_than_threshold[-1]+1:]
+            last_ind_to_remove = older_than_threshold[-1]
+            self._pre_recent_point = self._recent_points[last_ind_to_remove]
+            self._recent_points = self._recent_points[last_ind_to_remove+1:]
 
 
     #====================================================================================

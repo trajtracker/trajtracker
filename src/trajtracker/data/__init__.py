@@ -8,3 +8,4 @@ TrajTracker - data package
 """
 
 from _CSVLoader import CSVLoader
+from _XmlConfigUpdater import XmlConfigUpdater
