@@ -48,13 +48,15 @@ class NumberLineObjects:
 
 global_inf = {}
 
+
 #------------------------------------------------
 def main():
 
     #-- Initialize expyriment
     exp = xpy.control.initialize()
     xpy.control.start(exp)
-    exp.mouse.show_cursor()  # todo: not on tablet
+    if not expyriment.misc.is_android_running():
+        exp.mouse.show_cursor()
 
     #-- Initialize the number-to-position experiment
     exp_objects = prepare_objects(exp)
@@ -355,7 +357,6 @@ def trial_error(exp_objects, trial, trial_info, end_time, err):
     exp_objects.err_popup.visible = True
 
     trial_ended(exp_objects, trial, trial_info, end_time, "ERR_" + err.err_code)
-    #todo: show error message; make it hide after some time (or when clicking anywhere)
 
 
 #------------------------------------------------
