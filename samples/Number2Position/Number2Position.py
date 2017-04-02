@@ -24,7 +24,7 @@ xpy.control.defaults.goodbye_text = "Thank you for your participation"
 
 
 MAX_TRIAL_DURATION = 2
-GUIDE_ENABLED = False
+GUIDE_ENABLED = True
 
 TRIAL_NUM = "@@TrialNumber@@"
 
@@ -40,6 +40,8 @@ class NumberLineObjects:
         self.trials_file = None
         self.trials_writer = None
         self.global_speed_validator = None
+        self.err_popup = None
+        self.err_textbox = None
         self.validators = []
         self.stimuli = ttrk.stimuli.StimulusContainer()
 
@@ -58,7 +60,8 @@ def main():
     exp_objects = prepare_objects(exp)
     trials = load_trials_from_csv()
 
-    show_instructions(exp, exp_objects.stimuli)
+    #show_instructions(exp, exp_objects.stimuli)
+    exp_objects.stimuli.present()
 
     global_inf['session_start_time'] = get_time()
 
@@ -150,15 +153,18 @@ def prepare_objects(exp):
                                 end_coord=nl.position[1],
                                 grace_period=0.3, max_trial_duration=MAX_TRIAL_DURATION,
                                 milestones=[(.5, .33), (.5, .67)], show_guide=GUIDE_ENABLED)
+    val2.do_present_guide = False
     exp_objects.validators.append(val2)
     exp_objects.global_speed_validator = val2
+    if GUIDE_ENABLED:
+        exp_objects.stimuli.add("speed_guide", val2.guide.stimulus)
 
     #-- Sounds
     exp_objects.sound_ok = load_sound("click.wav")
     exp_objects.sound_err = load_sound("error.wav")
 
     #-- Error messages
-    err_popup, err_textbox = create_error_box(exp)
+    err_popup, err_textbox = create_error_box()
     exp_objects.err_popup = err_popup
     exp_objects.err_textbox = err_textbox
     exp_objects.stimuli.add("err_popup", err_popup, visible=False)
@@ -183,7 +189,7 @@ def load_sound(filename):
 
 
 #------------------------------------------------
-def show_instructions(exp, stim_container):
+def show_instructions(exp, stim_container): # todo: delete?
 
     msg = "Touch the rectangle at the bottom of the screen to start a trial. " + \
           "When you start moving the finger, a target number will appear. " + \
@@ -203,21 +209,18 @@ def show_instructions(exp, stim_container):
 
 
 #------------------------------------------------
-def create_error_box(exp):
-
-    screen_width = exp.screen.size[0]
-    screen_height = exp.screen.size[1]
-
+def create_error_box():
 
     popup_img = xpy.stimuli.Picture("popup_background.png")
     msg_box = xpy.stimuli.TextBox("", (290, 180), (0, 0),
-                                      text_font="Arial", text_size=16, text_colour=xpy.misc.constants.C_RED)
+                                  text_font="Arial", text_size=16, text_colour=xpy.misc.constants.C_RED)
 
     popup = ttrk.stimuli.StimulusContainer()
     popup.add("bgnd", popup_img)
     popup.add("text", msg_box)
 
     return popup, msg_box
+
 
 #------------------------------------------------
 # Run a single trial.
@@ -381,6 +384,7 @@ def trial_succeeded(exp_objects, trial, trial_info, end_time):
 #
 def trial_ended(exp_objects, trial, trial_info, end_time, success_err_code):
     exp_objects.target.visible = False
+    exp_objects.stimuli["speed_guide"].activate(None)
     exp_objects.stimuli.present()
 
     endpoint = exp_objects.nl.last_touched_value

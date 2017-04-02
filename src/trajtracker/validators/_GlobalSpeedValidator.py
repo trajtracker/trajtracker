@@ -116,6 +116,7 @@ class GlobalSpeedValidator(_BaseValidator):
         self.show_guide = show_guide
         self.guide_warning_time_delta = 0
         self.guide_line_length = None
+        self.do_present_guide = True
 
 
     #========================================================================
@@ -397,7 +398,11 @@ class GlobalSpeedValidator(_BaseValidator):
     #-------------------------------------------------------------
     @property
     def show_guide(self):
-        """ Whether to visualize the speed limit as a moving line (bool) """
+        """
+        Whether to visualize the speed limit as a moving line (bool).
+        If you show the guide, please note the way it's being presented -
+        See :attr:`~trajtracker.validators.GlobalSpeedValidator.do_present_guide`
+        """
         return self._show_guide
 
     @show_guide.setter
@@ -438,6 +443,26 @@ class GlobalSpeedValidator(_BaseValidator):
             _u.validate_attr_positive(self, "guide_line_length", value)
         self._guide_line_length = value
         self._guide = GlobalSpeedGuide(self)
+
+
+    #-------------------------------------------------------
+    @property
+    def do_present_guide(self):
+        """
+        If the guide line is shown, this determines the mechanism used to present it:
+
+        - True: the validator itself will call present() for the stimulus
+        - False: the validator will update the stimulus position and color, but the main program
+           should take care of present()ing validator.guide.stimulus
+        """
+        return None if self._guide is None else self._guide.do_present
+
+    @do_present_guide.setter
+    @fromXML(bool)
+    def do_present_guide(self, value):
+        if self._guide is not None:
+            self._guide.do_present = value
+
 
     #-------------------------------------------------------------
     @property
@@ -521,8 +546,18 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
     #--------------------------------------------------
     def _create_line(self, start_pt, end_pt, color):
         line = xpy.stimuli.Line(start_point=start_pt, end_point=end_pt, line_width=self._line_width, colour=color)
+        line.position = (0,0)
         line.preload()
-        return line
+
+        if self._validator.axis == ValidationAxis.x:
+            line_canvas_size = (self._line_width, self._get_line_length())
+        else:
+            line_canvas_size = (self._get_line_length(), self._line_width)
+        canvas = xpy.stimuli.Canvas(size=line_canvas_size)
+        line.plot(canvas)
+        canvas.preload()
+
+        return canvas
 
 
     #=====================================================================================
@@ -548,6 +583,12 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
         self._guide_line.present(clear=False, update=False)
 
 
+    #--------------------------------------------------------------------------
+    @property
+    def stimulus(self):
+        return self._guide_line
+
+
     #=====================================================================================
     #    Configure
     #=====================================================================================
@@ -562,6 +603,23 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
     def visible(self, value):
         _u.validate_attr_type(self, "visible", value, bool)
         self._visible = value
+
+
+    #-------------------------------------------------------
+    @property
+    def do_present(self):
+        """
+        Whether the line will be present()ed by the validator.
+        If False: the line's positon will be updated, but you need to take care yourself to continuously
+        present() the object returned by self.stimulus
+         """
+        return self._do_present
+
+    @do_present.setter
+    def do_present(self, value):
+        _u.validate_attr_type(self, "do_present", value, bool)
+        self._do_present = value
+
 
     #-------------------------------------------------------
     @property

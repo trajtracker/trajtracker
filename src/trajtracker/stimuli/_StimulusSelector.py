@@ -6,6 +6,8 @@ Stimulus selector: show one of several stimuli
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
+import expyriment
+
 import trajtracker
 import trajtracker._utils as _u
 
@@ -58,6 +60,11 @@ class StimulusSelector(trajtracker._TTrkObject):
 
 
     #--------------------------------------------------
+    def _get_stimulus(self, key):
+        return self._stimuli[key]
+
+
+    #--------------------------------------------------
     def activate(self, key):
         """
         Set one of the stimuli as the active one.
@@ -87,7 +94,14 @@ class StimulusSelector(trajtracker._TTrkObject):
     def present(self, clear=True, update=True):
         """ present the active stimulus """
         s = self.active_stimulus
-        s.present(clear=clear, update=update)
+        if s is None:
+            # Take care of the clear and update
+            if clear:
+                expyriment._active_exp.screen.clear()
+            if update:
+                expyriment._active_exp.screen.update()
+        else:
+            s.present(clear=clear, update=update)
 
 
     #--------------------------------------------------
