@@ -1,9 +1,11 @@
 
+import inspect
 import xml.etree.ElementTree as ET
-import trajtracker as ttrk
+
+from trajtracker import _TTrkObject, BadFormatError
 
 
-class XmlConfigUpdater(ttrk._TTrkObject):
+class XmlConfigUpdater(_TTrkObject):
     """
 
     """
@@ -20,7 +22,7 @@ class XmlConfigUpdater(ttrk._TTrkObject):
 
             #-- Make sure that this object in fact exists
             if obj_id not in objects:
-                raise ttrk.BadFormatError("Invalid xml configuration in {:} (<'{:}' ...>): there is no object to configure named {:}".format(
+                raise BadFormatError("Invalid xml configuration in {:} (<'{:}' ...>): there is no object to configure named {:}".format(
                     xml_source, obj_id, obj_id))
 
             self.configure_object(one_obj_config, objects[obj_id])
@@ -29,45 +31,87 @@ class XmlConfigUpdater(ttrk._TTrkObject):
     #--------------------------------------------------
     def configure_object(self, xml, obj):
 
-        obj_attr_types = obj.config_attr_types if 'config_attr_types' in dir(obj) else {}
-
         #-- Update by XML attributes
         for attr_name in xml.attrib:
-            value = xml.attrib[attr_name]
-            value_converter = self._get_attr_type(obj, attr_name, obj_attr_types)
-            if value_converter is not None:
-                value = value_converter(value)
-            obj.__setattr__(attr_name, value)
+            self._validate_attr(obj, attr_name)
+            setattr(obj, attr_name, _ValueFromXML(xml.tag, xml.attrib[attr_name]))
 
         #-- Update by XML elements: this must be done via functions
         for sub_element in xml:
-            value_converter = self._get_attr_type(obj, sub_element.tag, obj_attr_types)
-            if value_converter is None:
-                raise ttrk.BadFormatError(
-                    ('Invalid XML configuration: to configure {:}.{:}, use <{:} {:}="..."/>' +
-                     ' should be defined as an XML attribute, not as an element').format(
-                        type(obj).__name__, sub_element.tag, type(obj).__name__, sub_element.tag))
-            if not isinstance(value_converter, type(lambda:1)):
-                raise ttrk.BadFormatError(
-                    ('Invalid XML configuration fo {:}.{:}: to configure an attribute with an XML block (<{:} ...>), ' +
-                     'you must explicitly specify the function that parses this block').format(
-                        type(obj).__name__, sub_element.tag, sub_element.tag))
-            obj.__setattr__(sub_element.tag, value_converter(sub_element))
+            self._validate_attr(obj, sub_element.tag)
+            setattr(obj, sub_element.tag, _ValueFromXML(xml.tag, sub_element))
+
 
     #--------------------------------------------------
-    def _get_attr_type(self, obj, attr_name, attr_types):
-        if attr_name not in dir(obj):
-            raise TypeError(
-                "trajtracker error: invalid XML configuration - object {:} does not have a '{:}' attribute".format(
-                    type(obj).__name__, attr_name))
-
-        return attr_types[attr_name] if attr_name in attr_types else None
-
+    def _validate_attr(self, obj, attr_name):
+        try:
+            setattr(obj, attr_name, _TestIfXmlSupported())
+            raise BadFormatError('Invalid XML configuration: {:}.{:} cannot be configured from XML'.format(type(obj).__name__, attr_name))
+        except _TestIfXmlSupported:
+            pass
 
 
-#--------------------------------------------------
-def load_xml(filename):
+#==================================================================
+# Annotations to define on the class
+#==================================================================
 
-    root = ET.parse(filename)
-    return _xml_to_object(root.getroot())
+
+#------------------------------------------------------------------------------------
+# When setting attribute value from XML, we set it to this value
+#
+class _ValueFromXML(object):
+    def __init__(self, tag, value):
+        self.tag = tag
+        self.value = value
+
+
+class _TestIfXmlSupported(Exception):
+    pass
+
+
+
+
+#------------------------------------------------------------------------------------
+# Actually convert the value from the XML (string if it was an attribute; or an XML Element) to the
+# target object's expected attribute value
+#
+def _convert_xml_value_to_attr_value(obj, attr_name, xml_value, converter, convert_raw_xml):
+
+    value = xml_value.value
+
+    if convert_raw_xml:
+        #-- Make sure that we got the XML node
+        if not isinstance(xml_value.value, ET.Element):
+            BadFormatError(
+                'Invalid XML configuration <{:} ...>: to configure {:}.{:} via XML, you must define a sub-block'.format(
+                xml_value.tag, type(obj).__name__, attr_name))
+
+    elif isinstance(xml_value.value, ET.Element):
+        #-- We got the XML element (node), but we need its text value
+        value = xml_value.value.text.strip()
+
+    return converter(value)
+
+
+#------------------------------------------------------------------------------------
+# The annotation
+#
+# noinspection PyPep8Naming
+def fromXML(converter, convert_raw_xml=False):
+
+    #-- Define the real decorator
+    def real_decorator(setter):
+
+        #-- Create a setter for the attribute
+        def set_attr_from_xml(self, value):
+            if isinstance(value, _ValueFromXML):
+                setter(self, _convert_xml_value_to_attr_value(self, setter.__name__, value, converter, convert_raw_xml))
+            elif isinstance(value, _TestIfXmlSupported):
+                raise _TestIfXmlSupported()
+            else:
+                setter(self, value)
+
+        return set_attr_from_xml
+
+    return real_decorator
 

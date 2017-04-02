@@ -10,6 +10,7 @@ import trajtracker._utils as _u
 import trajtracker.utils as u
 from trajtracker.misc import LocationColorMap
 from trajtracker.validators import _BaseValidator
+from trajtracker.data import fromXML
 
 
 
@@ -58,6 +59,7 @@ class MoveByGradientValidator(_BaseValidator):
         return self._lcm.position
 
     @position.setter
+    @fromXML(_u.parse_coord)
     def position(self, value):
         self._lcm.position = value
 
@@ -72,6 +74,7 @@ class MoveByGradientValidator(_BaseValidator):
 
 
     @rgb_should_ascend.setter
+    @fromXML(bool)
     def rgb_should_ascend(self, value):
         _u.validate_attr_type(self, "rgb_should_ascend", value, bool)
         self._rgb_should_ascend = value
@@ -93,6 +96,7 @@ class MoveByGradientValidator(_BaseValidator):
 
 
     @last_validated_rgb.setter
+    @fromXML(_u.parse_rgb_or_num)
     def last_validated_rgb(self, value):
         if u.is_rgb(value):
             self._last_validated_rgb = u.color_rgb_to_num(value)
@@ -115,6 +119,7 @@ class MoveByGradientValidator(_BaseValidator):
 
 
     @max_valid_back_movement.setter
+    @fromXML(float)
     def max_valid_back_movement(self, value):
         _u.validate_attr_numeric(self, "max_valid_back_movement", value)
         _u.validate_attr_not_negative(self, "max_valid_back_movement", value)

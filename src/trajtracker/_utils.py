@@ -7,7 +7,7 @@ TrajTracker - movement package - private utilities
 """
 
 from enum import Enum
-import numbers
+import numbers, re
 import numpy as np
 
 from expyriment.misc import geometry
@@ -194,3 +194,48 @@ def _get_func_name(obj, func_name):
         return func_name
     else:
         return "{:}.{:}".format(_get_type_name(obj), func_name)
+
+
+
+#--------------------------------------------------------------------
+def parse_coord(value):
+
+    if isinstance(value, tuple):
+        return value
+
+    if not isinstance(value, str):
+        raise TypeError('Invalid coordinates "{:}" - expecting a string'.format(value))
+
+    m = re.match('^\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)\s*$', value)
+
+    if m is None:
+        raise ValueError('Invalid coordinates "{:}"'.format(value))
+
+    return (int(m.group(1)), int(m.group(2)))
+
+#--------------------------------------------------------------------
+def parse_rgb(value):
+
+    if isinstance(value, tuple):
+        return value
+
+    if not isinstance(value, str):
+        raise TypeError('Invalid coordinates "{:}" - expecting a string'.format(value))
+
+    m = re.match('^\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$', value)
+
+    if m is None:
+        raise ValueError('Invalid coordinates "{:}"'.format(value))
+
+    return (int(m.group(1)), int(m.group(2)), int(m.group(3)))
+
+
+#--------------------------------------------------------------------
+def parse_rgb_or_num(value):
+
+    if isinstance(value, str):
+        m = re.match('^\s*\d+\s*$', value)
+        if m is not None:
+            return int(m.group(1))
+
+    return parse_rgb(value)

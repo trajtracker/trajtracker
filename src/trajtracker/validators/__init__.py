@@ -11,11 +11,12 @@ import enum
 import numbers
 
 import trajtracker._utils as _u
-from trajtracker import _TTrkObject
+from trajtracker import _TTrkObject, BadFormatError
 
 ValidationAxis = enum.Enum('ValidationAxis', 'x y xy')
 
 from _ValidationFailed import ValidationFailed
+from trajtracker.data import fromXML
 
 
 #-------------------------------------------------------------------
@@ -36,6 +37,7 @@ class _BaseValidator(_TTrkObject):
         return self._enabled
 
     @enabled.setter
+    @fromXML(bool)
     def enabled(self, value):
         _u.validate_attr_type(self, "enabled", value, bool)
         self._enabled = value
@@ -61,6 +63,9 @@ class _BaseValidator(_TTrkObject):
 
 
 #--------------------------------------------------------------------
+
+
+#--------------------------------------------------------------------
 def _parse_validation_axis(value):
 
     if isinstance(value, ValidationAxis):
@@ -78,8 +83,7 @@ def _parse_validation_axis(value):
     elif value == 'xy':
         return ValidationAxis.xy
 
-    raise ValueError('Invalid ValidationAxis "{:}"'.format(value))
-
+    raise BadFormatError('Invalid ValidationAxis "{:}"'.format(value))
 
 #--------------------------------------------------------------------
 

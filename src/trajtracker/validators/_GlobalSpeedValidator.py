@@ -16,8 +16,26 @@ import expyriment as xpy
 
 import trajtracker
 import trajtracker._utils as _u
-from trajtracker.validators import ValidationAxis, ValidationFailed, _BaseValidator
+from trajtracker.validators import ValidationAxis, ValidationFailed, _BaseValidator, _parse_validation_axis
 from trajtracker.movement import StimulusAnimator
+from trajtracker.data import fromXML
+
+
+# -------------------------------------------------------------
+def _parse_xml_milestones(xml):
+    milestones = []
+    for child in xml:
+        if child.tag != "milestone":
+            raise trajtracker.BadFormatError(
+                "Invalid XML format for defining {:}'s milestones: XML block '{:}' is unknown".format(
+                    type(self).__name__, child.tag))
+        if 'time' not in child.attrib or 'distance' not in child.attrib:
+            raise trajtracker.BadFormatError(
+                "Invalid XML format for defining {:}'s milestones: either time=xxx or distance=xxx is missing from a 'milestone' XML block".format(
+                    type(self).__name__))
+        milestones.append(GlobalSpeedValidator.Milestone(float(child.attrib['time']), float(child.attrib['distance'])))
+
+    return milestones
 
 
 # noinspection PyAttributeOutsideInit
@@ -216,20 +234,6 @@ class GlobalSpeedValidator(_BaseValidator):
 
     #----------------------------------------------------------
     @property
-    def config_attr_types(self):
-        return {'axis': trajtracker.validators._parse_validation_axis,
-                'origin_coord': int,
-                'end_coord': int,
-                'grace_period': float,
-                'max_trial_duration': float,
-                'show_guide': bool,
-                'guide_warning_time_delta': float,
-                'guide_line_length': int,
-                'milestones': self._parse_xml_milestones,
-                }
-
-    #----------------------------------------------------------
-    @property
     def axis(self):
         """
         The ValidationAxis on which speed is validated
@@ -240,6 +244,7 @@ class GlobalSpeedValidator(_BaseValidator):
         return self._axis
 
     @axis.setter
+    @fromXML(_parse_validation_axis)
     def axis(self, value):
         _u.validate_attr_type(self, "axis", value, ValidationAxis)
         if value == ValidationAxis.xy:
@@ -258,6 +263,7 @@ class GlobalSpeedValidator(_BaseValidator):
         return self._origin_coord
 
     @origin_coord.setter
+    @fromXML(int)
     def origin_coord(self, value):
         _u.validate_attr_numeric(self, "origin_coord", value, _u.NoneValues.Invalid)
         self._origin_coord = value
@@ -273,6 +279,7 @@ class GlobalSpeedValidator(_BaseValidator):
         return self._end_coord
 
     @end_coord.setter
+    @fromXML(int)
     def end_coord(self, value):
         _u.validate_attr_numeric(self, "end_coord", value, _u.NoneValues.Invalid)
         self._end_coord = value
@@ -286,6 +293,7 @@ class GlobalSpeedValidator(_BaseValidator):
         return self._grace_period
 
     @grace_period.setter
+    @fromXML(float)
     def grace_period(self, value):
         value = _u.validate_attr_numeric(self, "grace_period", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "grace_period", value)
@@ -299,6 +307,7 @@ class GlobalSpeedValidator(_BaseValidator):
         return self._max_trial_duration
 
     @max_trial_duration.setter
+    @fromXML(int)
     def max_trial_duration(self, value):
         value = _u.validate_attr_numeric(self, "max_trial_duration", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_positive(self, "max_trial_duration", value)
@@ -329,6 +338,7 @@ class GlobalSpeedValidator(_BaseValidator):
         return list(self._milestones)
 
     @milestones.setter
+    @fromXML(_parse_xml_milestones, convert_raw_xml=True)
     def milestones(self, value):
         if value is None:
             value = []
@@ -385,27 +395,13 @@ class GlobalSpeedValidator(_BaseValidator):
 
 
     #-------------------------------------------------------------
-    @staticmethod
-    def _parse_xml_milestones(xml):
-        milestones = []
-        for child in xml:
-            if child.tag != "milestone":
-                raise trajtracker.BadFormatError("Invalid XML format for defining {:}'s milestones: XML block '{:}' is unknown".format(
-                    type(self).__name__, child.tag))
-            if 'time' not in child.attrib or 'distance' not in child.attrib:
-                raise trajtracker.BadFormatError("Invalid XML format for defining {:}'s milestones: either time=xxx or distance=xxx is missing from a 'milestone' XML block".format(
-                    type(self).__name__))
-            milestones.append(GlobalSpeedValidator.Milestone(float(child.attrib['time']), float(child.attrib['distance'])))
-
-        return milestones
-
-    #-------------------------------------------------------------
     @property
     def show_guide(self):
         """ Whether to visualize the speed limit as a moving line (bool) """
         return self._show_guide
 
     @show_guide.setter
+    @fromXML(bool)
     def show_guide(self, show):
         _u.validate_attr_type(self, "show_guide", show, bool)
         self._show_guide = show
@@ -420,6 +416,7 @@ class GlobalSpeedValidator(_BaseValidator):
         return self._guide_warning_time_delta
 
     @guide_warning_time_delta.setter
+    @fromXML(float)
     def guide_warning_time_delta(self, value):
         _u.validate_attr_type(self, "guide_warning_time_delta", value, numbers.Number)
         _u.validate_attr_not_negative(self, "guide_warning_time_delta", value)
@@ -434,6 +431,7 @@ class GlobalSpeedValidator(_BaseValidator):
         return self._guide_line_length
 
     @guide_line_length.setter
+    @fromXML(int)
     def guide_line_length(self, value):
         _u.validate_attr_type(self, "guide_line_length", value, numbers.Number, none_allowed=True)
         if value is not None:

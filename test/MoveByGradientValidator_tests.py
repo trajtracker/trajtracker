@@ -1,5 +1,8 @@
 import unittest
 
+import xml.etree.ElementTree as ET
+
+import trajtracker
 from trajtracker.validators import MoveByGradientValidator, ValidationFailed
 
 grad = [[(0, 0, i) for i in range(0,100)]]
@@ -143,6 +146,20 @@ class MoveByGradientValidatorTests(unittest.TestCase):
         except TypeError:
             pass
 
+    # --------------------------------------------------
+    def test_config_from_xml(self):
+
+        v = MoveByGradientValidator([[]])
+        configer = trajtracker.data.XmlConfigUpdater()
+        xml = ET.fromstring('''
+        <config max_valid_back_movement="0.5" position="(1,2)" rgb_should_ascend="True"
+                last_validated_rgb="(0, 0, 100)"/>
+        ''')
+        configer.configure_object(xml, v)
+        self.assertEqual(0.5, v.max_valid_back_movement)
+        self.assertEqual((1,2), v.position)
+        self.assertEqual(True, v.rgb_should_ascend)
+        self.assertEqual(100, v.last_validated_rgb)
 
     #-------------------------------------------------------
     def test_validate_basic(self):

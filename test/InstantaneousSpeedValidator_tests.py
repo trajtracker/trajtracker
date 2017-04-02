@@ -1,5 +1,9 @@
 import unittest
 
+import xml.etree.ElementTree as ET
+
+import trajtracker
+
 
 from trajtracker.validators import InstantaneousSpeedValidator, ValidationAxis, ValidationFailed
 
@@ -112,6 +116,22 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
         validator.reset()
         self.assertIsNone(validator.check_xyt(0, 0, 0))
         self.assertIsNotNone(validator.check_xyt(2.99, 4, 1))
+
+
+    #--------------------------------------------------
+    def test_config_from_xml(self):
+
+        v = InstantaneousSpeedValidator()
+        configer = trajtracker.data.XmlConfigUpdater()
+        xml = ET.fromstring('''
+        <config axis="y" min_speed="1" max_speed="10" grace_period="0.5" calculation_interval="2.5"/>
+        ''')
+        configer.configure_object(xml, v)
+        self.assertEqual(ValidationAxis.y, v.axis)
+        self.assertEqual(1, v.min_speed)
+        self.assertEqual(10, v.max_speed)
+        self.assertEqual(0.5, v.grace_period)
+        self.assertEqual(2.5, v.calculation_interval)
 
 
 
