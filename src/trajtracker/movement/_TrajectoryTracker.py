@@ -12,6 +12,7 @@ import expyriment
 
 import trajtracker
 import trajtracker._utils as _u
+from trajtracker.data import fromXML
 
 
 # noinspection PyAttributeOutsideInit
@@ -31,17 +32,24 @@ class TrajectoryTracker(trajtracker._TTrkObject):
 
 
     #----------------------------------------------------
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, tracking_active=False, track_if_no_movement=False):
         """
         Constructor
 
-        :param filename: See :attr:`~trajtracker.movement.TrajectoryTracker.filename` (default=None).
+        :param filename: See :attr:`~trajtracker.movement.TrajectoryTracker.filename`
+        :param tracking_active: See :attr:`~trajtracker.movement.TrajectoryTracker.tracking_active`
+        :param track_if_no_movement: See :attr:`~trajtracker.movement.TrajectoryTracker.track_if_no_movement`
         """
         super(TrajectoryTracker, self).__init__()
         self.reset(False)
         self._filename = filename
-        self.tracking_active = False
+        self.tracking_active = tracking_active
+        self.track_if_no_movement = track_if_no_movement
 
+
+    #==============================================================================
+    #    Properties
+    #==============================================================================
 
     #----------------------------------------------------
     @property
@@ -53,11 +61,32 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         return self._tracking_active
 
     @tracking_active.setter
+    @fromXML(bool)
     def tracking_active(self, value):
         _u.validate_attr_type(self, "tracking_active", value, bool)
         self._tracking_active = value
         self._log_setter("tracking_active")
 
+
+    #----------------------------------------------------
+    @property
+    def track_if_no_movement(self):
+        """
+        Whether to record x,y,t if the coordinates did not change
+        """
+        return self._track_if_no_movement
+
+    @track_if_no_movement.setter
+    @fromXML(bool)
+    def track_if_no_movement(self, value):
+        _u.validate_attr_type(self, "track_if_no_movement", value, bool)
+        self._track_if_no_movement = value
+        self._log_setter("track_if_no_movement")
+
+
+    #==============================================================================
+    #    Runtime API
+    #==============================================================================
 
     #----------------------------------------------------
     def reset(self, tracking_active=None):
@@ -70,6 +99,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
             self.tracking_active = tracking_active
 
         self._trajectory = {'x' : [], 'y' : [], 'time' : []}
+        self._last_coord = None
 
         if self._log_level:
             self._log_write("Trajectory,Reset")
@@ -88,6 +118,11 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         _u.validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number)
         _u.validate_func_arg_type(self, "update_xyt", "time", time, numbers.Number)
         _u.validate_func_arg_not_negative(self, "update_xyt", "time", time)
+
+        if not self._track_if_no_movement and len(self._trajectory['x']) > 0 and  \
+            self._trajectory['x'][-1] == x_coord and \
+            self._trajectory['y'][-1] == y_coord:
+            return
 
         self._trajectory['x'].append(x_coord)
         self._trajectory['y'].append(y_coord)

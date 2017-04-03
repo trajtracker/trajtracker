@@ -372,7 +372,7 @@ class NumberLine(trajtracker._TTrkObject):
 
 
     #---------------------------------------------------------
-    def update_xy(self, x_coord, y_coord):
+    def update_xyt(self, x_coord, y_coord, time=None):
         """
         This function is called when mouse/touch has moved. It checks whether the movement implies touching the number line.
 
@@ -382,7 +382,7 @@ class NumberLine(trajtracker._TTrkObject):
         :param y_coord:
         :type y_coord: int
 
-        :return: True if the number line was touched
+        :param time: ignored.
         """
 
         _u.validate_func_arg_type(self, "update_xy", "x_coord", x_coord, int)
@@ -390,8 +390,8 @@ class NumberLine(trajtracker._TTrkObject):
         self._log_func_enters("update_xy", [x_coord, y_coord])
 
         if self._last_touched_coord is not None:
-            self._log_func_returns(False)
-            return False
+            self._log_func_returns()
+            return
 
         #-- Get the relevant coordinates (x or y)
         if self._orientation == NumberLine.Orientation.Horizontal:
@@ -423,8 +423,16 @@ class NumberLine(trajtracker._TTrkObject):
         if touched:
             self._last_touched_coord = touch_coord
 
-        self._log_func_returns(touched)
-        return touched
+        self._log_func_returns()
+
+
+    #---------------------------------------------------------
+    @property
+    def touched(self):
+        """
+        Return whether the number line was touched or not
+        """
+        return self._last_touched_coord is not None
 
 
     #---------------------------------------------------------

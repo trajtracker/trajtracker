@@ -99,7 +99,7 @@ def run_trial():
             return
 
         #-- Handle movement: Check if the number line was reached
-        if finger_pos != prev_finger_pos and number_line.update_xy(finger_pos[0], finger_pos[1]):
+        if finger_pos != prev_finger_pos and number_line.update_xyt(finger_pos[0], finger_pos[1]):
             trial_succeeded()
             return
 

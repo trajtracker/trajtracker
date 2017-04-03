@@ -39,7 +39,6 @@ class NumberLineObjects:
         self.trials_file = None
         self.trials_writer = None
         self.global_speed_validator = None
-        self.err_popup = None
         self.err_textbox = None
         self.validators = []
         self.stimuli = ttrk.stimuli.StimulusContainer()
@@ -165,10 +164,12 @@ def prepare_objects(exp):
     exp_objects.sound_err = load_sound("error.wav")
 
     #-- Error messages
-    err_popup, err_textbox = create_error_box()
-    exp_objects.err_popup = err_popup
+    err_textbox = \
+        xpy.stimuli.TextBox("", (290, 180), (0, 0),
+                            text_font="Arial", text_size=16, text_colour=xpy.misc.constants.C_RED)
+
     exp_objects.err_textbox = err_textbox
-    exp_objects.stimuli.add("err_popup", err_popup, visible=False)
+    exp_objects.stimuli.add("err_textbox", err_textbox, visible=False)
 
     return exp_objects
 
@@ -210,20 +211,6 @@ def show_instructions(exp, stim_container): # todo: delete?
 
 
 #------------------------------------------------
-def create_error_box():
-
-    popup_img = xpy.stimuli.Picture("popup_background.png")
-    msg_box = xpy.stimuli.TextBox("", (290, 180), (0, 0),
-                                  text_font="Arial", text_size=16, text_colour=xpy.misc.constants.C_RED)
-
-    popup = ttrk.stimuli.StimulusContainer()
-    popup.add("bgnd", popup_img)
-    popup.add("text", msg_box)
-
-    return popup, msg_box
-
-
-#------------------------------------------------
 # Run a single trial.
 # Returns True/False to indicate whether the trial was presented properly and finished
 #
@@ -243,7 +230,7 @@ def run_trial(exp, trial, exp_objects):
     print("   Subject touched the starting point")
 
     exp_objects.fb_arrow.visible = False
-    exp_objects.err_popup.visible = False
+    exp_objects.err_textbox.visible = False
 
     exp_objects.stimuli.present()
     time0 = get_time()
@@ -297,9 +284,10 @@ def run_trial(exp, trial, exp_objects):
 
             # -- track the trajectory
             exp_objects.tracker.update_xyt(finger_pos[0], finger_pos[1], time_in_trial)
+            exp_objects.nl.update_xyt(finger_pos[0], finger_pos[1], time_in_trial)
 
             #-- Check if the number line was reached
-            if exp_objects.nl.update_xy(finger_pos[0], finger_pos[1]):
+            if exp_objects.nl.touched:
                 trial_succeeded(exp_objects, trial, trial_info, time_in_trial)
                 return True, True
 
@@ -353,7 +341,7 @@ def trial_error(exp_objects, trial, trial_info, end_time, err):
     exp_objects.sound_err.play()
     exp_objects.err_textbox.unload()
     exp_objects.err_textbox.text = err.message
-    exp_objects.err_popup.visible = True
+    exp_objects.err_textbox.visible = True
 
     trial_ended(exp_objects, trial, trial_info, end_time, "ERR_" + err.err_code)
 

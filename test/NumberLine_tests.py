@@ -48,13 +48,17 @@ class NumberLineTestCase(unittest.TestCase):
 
         #-- touch twice from the same direction
         nl.reset()
-        self.assertFalse(nl.update_xy(0, 11))
-        self.assertTrue(nl.update_xy(0, 9))
+        nl.update_xyt(0, 11)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(0, 9)
+        self.assertTrue(nl.touched)
 
         #-- touch twice from two different directions
         nl.reset()
-        self.assertFalse(nl.update_xy(0, 11))
-        self.assertTrue(nl.update_xy(0, -9))
+        nl.update_xyt(0, 11)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(0, -9)
+        self.assertTrue(nl.touched)
 
 
     #-----------------------------------------------------------------
@@ -66,13 +70,17 @@ class NumberLineTestCase(unittest.TestCase):
 
         #-- touch twice from the same direction
         nl.reset()
-        self.assertFalse(nl.update_xy(11, 0))
-        self.assertTrue(nl.update_xy(9, 0))
+        nl.update_xyt(11, 0)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(9, 0)
+        self.assertTrue(nl.touched)
 
         #-- touch twice from two different directions
         nl.reset()
-        self.assertFalse(nl.update_xy(11, 0))
-        self.assertTrue(nl.update_xy(-9, 0))
+        nl.update_xyt(11, 0)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(-9, 0)
+        self.assertTrue(nl.touched)
 
 
     #-----------------------------------------------------------------
@@ -84,25 +92,33 @@ class NumberLineTestCase(unittest.TestCase):
 
         #-- Get closer to the line
         nl.reset()
-        self.assertFalse(nl.update_xy(0, 11))
-        self.assertTrue(nl.update_xy(0, 9))
+        nl.update_xyt(0, 11)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(0, 9)
+        self.assertTrue(nl.touched)
 
         #-- Cross the line
         nl.reset()
-        self.assertFalse(nl.update_xy(0, 11))
-        self.assertTrue(nl.update_xy(0, -100))
+        nl.update_xyt(0, 11)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(0, -100)
+        self.assertTrue(nl.touched)
 
         #--- Now, from the other direction
 
         #-- Get closer to the line
         nl.reset()
-        self.assertFalse(nl.update_xy(0, -11))
-        self.assertTrue(nl.update_xy(0, -9))
+        nl.update_xyt(0, -11)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(0, -9)
+        self.assertTrue(nl.touched)
 
         #-- Cross the line
         nl.reset()
-        self.assertFalse(nl.update_xy(0, -11))
-        self.assertTrue(nl.update_xy(0, 100))
+        nl.update_xyt(0, -11)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(0, 100)
+        self.assertTrue(nl.touched)
 
 
     #-----------------------------------------------------------------
@@ -114,25 +130,33 @@ class NumberLineTestCase(unittest.TestCase):
 
         #-- Get closer to the line
         nl.reset()
-        self.assertFalse(nl.update_xy(11, 0))
-        self.assertTrue(nl.update_xy(9, 0))
+        nl.update_xyt(11, 0)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(9, 0)
+        self.assertTrue(nl.touched)
 
         #-- Cross the line
         nl.reset()
-        self.assertFalse(nl.update_xy(11, 0))
-        self.assertTrue(nl.update_xy(-100, 0))
+        nl.update_xyt(11, 0)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(-100, 0)
+        self.assertTrue(nl.touched)
 
         #--- Now, from the other direction
 
         #-- Get closer to the line
         nl.reset()
-        self.assertFalse(nl.update_xy(-11, 0))
-        self.assertTrue(nl.update_xy(-9, 0))
+        nl.update_xyt(-11, 0)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(-9, 0)
+        self.assertTrue(nl.touched)
 
         #-- Cross the line
         nl.reset()
-        self.assertFalse(nl.update_xy(-11, 0))
-        self.assertTrue(nl.update_xy(100, 0))
+        nl.update_xyt(-11, 0)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(100, 0)
+        self.assertTrue(nl.touched)
 
 
     #-----------------------------------------------------------------
@@ -144,11 +168,16 @@ class NumberLineTestCase(unittest.TestCase):
 
         #-- Get closer to the line
         nl.reset()
-        self.assertFalse(nl.update_xy(0, 10))
-        self.assertFalse(nl.update_xy(0, 1))
-        self.assertFalse(nl.update_xy(0, 0))
-        self.assertFalse(nl.update_xy(0, -5))
-        self.assertTrue(nl.update_xy(0, -11))
+        nl.update_xyt(0, 10)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(0, 1)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(0, 0)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(0, -5)
+        self.assertFalse(nl.touched)
+        nl.update_xyt(0, -11)
+        self.assertTrue(nl.touched)
 
 
     #-----------------------------------------------------------------
@@ -159,8 +188,8 @@ class NumberLineTestCase(unittest.TestCase):
         self.assertIsNone(nl.last_touched_value)
 
         nl.reset()
-        nl.update_xy(0, -1)
-        nl.update_xy(0, 1)
+        nl.update_xyt(0, -1)
+        nl.update_xyt(0, 1)
 
         self.assertEqual(0, nl.last_touched_coord)
         self.assertEqual(20, nl.last_touched_value)
@@ -169,8 +198,8 @@ class NumberLineTestCase(unittest.TestCase):
         self.assertIsNone(nl.last_touched_coord)
         self.assertIsNone(nl.last_touched_value)
 
-        nl.update_xy(25, -1)
-        nl.update_xy(25, 1)
+        nl.update_xyt(25, -1)
+        nl.update_xyt(25, 1)
 
         self.assertEqual(25, nl.last_touched_coord)
         self.assertEqual(30, nl.last_touched_value)

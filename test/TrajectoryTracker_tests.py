@@ -1,5 +1,8 @@
 import unittest
 
+import xml.etree.ElementTree as ET
+
+import trajtracker
 from trajtracker.movement import TrajectoryTracker
 from ttrk_testing import DummyFileHandle
 
@@ -96,6 +99,36 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
         self.assertEqual("trial,time,x,y\n0,0.100,0.20,0.30\n", ttrk._file_data.data)
 
     #------------------------------------------------------------------
+    def test_no_track_no_movement(self):
+
+        ttrk = TrajectoryTrackerForTesting()
+        ttrk.tracking_active = True
+        ttrk.track_if_no_movement = False
+        ttrk.init_output_file("stam", xy_precision=1, time_precision=1)
+
+        ttrk.update_xyt(1, 1, 0.1)
+        ttrk.update_xyt(1, 1, 0.2)
+        ttrk.save_to_file(2)
+
+        self.assertEqual("trial,time,x,y\n2,0.1,1,1\n", ttrk._file_data.data)
+
+
+    #------------------------------------------------------------------
+    def test_track_if_movement(self):
+
+        ttrk = TrajectoryTrackerForTesting()
+        ttrk.tracking_active = True
+        ttrk.track_if_no_movement = True
+        ttrk.init_output_file("stam", xy_precision=1, time_precision=1)
+
+        ttrk.update_xyt(1, 1, 0.1)
+        ttrk.update_xyt(1, 1, 0.2)
+        ttrk.save_to_file(2)
+
+        self.assertEqual("trial,time,x,y\n2,0.1,1,1\n2,0.2,1,1\n", ttrk._file_data.data)
+
+
+    #------------------------------------------------------------------
     def test_non_numeric_time(self):
         ttrk = TrajectoryTrackerForTesting()
         try:
@@ -132,7 +165,36 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
         except(Exception):
             pass
 
+    # ==============================================================================
+    #    Properties
+    # ==============================================================================
 
+
+    #------------------------------------------------------------------
+    def test_set_tracking_active(self):
+        trk = TrajectoryTracker()
+        trk.tracking_active = True
+        self.assertRaises(TypeError, lambda: TrajectoryTracker(tracking_active=""))
+        self.assertRaises(TypeError, lambda: TrajectoryTracker(tracking_active=None))
+
+
+    #------------------------------------------------------------------
+    def test_set_track_if_no_movement(self):
+        trk = TrajectoryTracker()
+        trk.track_if_no_movement = True
+        self.assertRaises(TypeError, lambda: TrajectoryTracker(track_if_no_movement=""))
+        self.assertRaises(TypeError, lambda: TrajectoryTracker(track_if_no_movement=None))
+
+
+    #--------------------------------------------------
+    def test_config_from_xml(self):
+
+        trk = TrajectoryTracker()
+        configer = trajtracker.data.XmlConfigUpdater()
+        xml = ET.fromstring('<config track_if_no_movement="True" tracking_active="True"/>')
+        configer.configure_object(xml, trk)
+        self.assertEqual(True, trk.tracking_active)
+        self.assertEqual(True, trk.track_if_no_movement)
 
 
 if __name__ == '__main__':
