@@ -536,12 +536,12 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
     def _get_line_length(self):
         if self._validator.guide_line_length is not None:
             return self._validator.guide_line_length
-        elif xpy._active_exp.screen is None:
+        elif xpy._internals.active_exp.screen is None:
             return None
         elif self._validator.axis == ValidationAxis.x:
-            return xpy._active_exp.screen.size[1]
+            return xpy._internals.active_exp.screen.size[1]
         else:
-            return xpy._active_exp.screen.size[0]
+            return xpy._internals.active_exp.screen.size[0]
 
     #--------------------------------------------------
     def _create_line(self, start_pt, end_pt, color):

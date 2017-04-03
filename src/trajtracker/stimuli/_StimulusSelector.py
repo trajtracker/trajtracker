@@ -97,9 +97,9 @@ class StimulusSelector(trajtracker._TTrkObject):
         if s is None:
             # Take care of the clear and update
             if clear:
-                expyriment._active_exp.screen.clear()
+                expyriment._internals.active_exp.screen.clear()
             if update:
-                expyriment._active_exp.screen.update()
+                expyriment._internals.active_exp.screen.update()
         else:
             s.present(clear=clear, update=update)
 

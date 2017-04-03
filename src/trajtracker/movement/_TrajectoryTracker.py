@@ -72,7 +72,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         self._trajectory = {'x' : [], 'y' : [], 'time' : []}
 
         if self._log_level:
-            expyriment._active_exp._event_file_log("Trajectory,Reset", 1)
+            self._log_write("Trajectory,Reset")
 
     #----------------------------------------------------
     def update_xyt(self, x_coord, y_coord, time):
@@ -94,7 +94,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         self._trajectory['time'].append(time)
 
         if self._log_level:
-            expyriment._active_exp._event_file_log("Trajectory,Track_xyt,{0},{1},{2}".format(x_coord, y_coord, time), 2)
+            self._log_write("Trajectory,Track_xyt,{0},{1},{2}".format(x_coord, y_coord, time))
 
     #----------------------------------------------------
     def get_xyt(self):
@@ -127,8 +127,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         fh.close()
 
         if self._log_level:
-            expyriment._active_exp._event_file_log(
-                "Trajectory,InitOutputFile,%s" % self._filename, 2)
+            self._log_write("Trajectory,InitOutputFile,%s" % self._filename)
 
     #----------------------------------------------------
     def save_to_file(self, trial_num):
@@ -152,8 +151,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         fh.close()
 
         if self._log_level:
-            expyriment._active_exp._event_file_log(
-                "Trajectory,SavedTrial,%s,%d,%d" % (self._filename, trial_num, len(rows)), 2)
+            self._log_write("Trajectory,SavedTrial,%s,%d,%d" % (self._filename, trial_num, len(rows)))
 
         return len(rows)
 

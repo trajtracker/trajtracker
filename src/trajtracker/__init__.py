@@ -80,7 +80,7 @@ class _TTrkObject(object):
     def _log_write(self, msg, prepend_self=False):
         if prepend_self:
             msg = type(self).__name__ + "," + msg
-        xpy._active_exp._event_file_log(msg, 1)
+        xpy._internals.active_exp._event_file_log(msg, 1)
 
     #-------------------------------------------------
     # Write to log when entering a function

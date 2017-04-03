@@ -108,7 +108,7 @@ class MovementAngleValidator(_BaseValidator):
 
                 if self._log_level:
                     # noinspection PyProtectedMember
-                    expyriment._active_exp._event_file_log("%s,InvalidAngle,%.1f" % (str(self.__class__), angle_deg), 1)
+                    self._log_write("%s,InvalidAngle,%.1f" % (str(self.__class__), angle_deg))
 
                 return self._create_validation_error(self.err_invalid_angle, "You moved in an incorrect direction",
                                                      {self.arg_angle: angle_deg})

@@ -18,7 +18,6 @@ from trajtracker.movement import StartPoint, TrajectoryTracker
 from trajtracker.validators import *
 
 
-
 xpy.control.defaults.window_mode = True
 xpy.control.defaults.goodbye_text = "Thank you for your participation"
 
@@ -26,7 +25,7 @@ xpy.control.defaults.goodbye_text = "Thank you for your participation"
 MAX_TRIAL_DURATION = 2
 GUIDE_ENABLED = True
 
-TRIAL_NUM = "@@TrialNumber@@"
+TRIAL_NUM = "@@TrialNumber@@"  # Dummy entry in the trial dict
 
 
 class NumberLineObjects:
@@ -55,7 +54,7 @@ def main():
     #-- Initialize expyriment
     exp = xpy.control.initialize()
     xpy.control.start(exp)
-    if not expyriment.misc.is_android_running():
+    if not xpy.misc.is_android_running():
         exp.mouse.show_cursor()
 
     #-- Initialize the number-to-position experiment
