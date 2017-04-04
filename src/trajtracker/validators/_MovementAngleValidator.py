@@ -16,6 +16,7 @@ import numpy as np
 import trajtracker
 import trajtracker._utils as _u
 import trajtracker.utils as u
+import trajtracker.validators
 from trajtracker.validators import _BaseValidator
 from trajtracker.data import fromXML
 
@@ -79,7 +80,7 @@ class MovementAngleValidator(_BaseValidator):
         if not self._enabled or self._min_angle == self._max_angle or self._min_angle is None or self._max_angle is None:
             return None
 
-        self._update_xyt_validate_and_log(x_coord, y_coord, time)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time)
         self._validate_time(time)
 
         curr_xyt = (x_coord, y_coord, time)
@@ -110,8 +111,8 @@ class MovementAngleValidator(_BaseValidator):
                     # noinspection PyProtectedMember
                     self._log_write("%s,InvalidAngle,%.1f" % (str(self.__class__), angle_deg))
 
-                return self._create_experiment_error(self.err_invalid_angle, "You moved in an incorrect direction",
-                                                     {self.arg_angle: angle_deg})
+                return trajtracker.validators.create_experiment_error(self, self.err_invalid_angle, "You moved in an incorrect direction",
+                                                                      {self.arg_angle: angle_deg})
 
         else:
             #-- Direction cannot be validated - the finger hasn't moved enough yet

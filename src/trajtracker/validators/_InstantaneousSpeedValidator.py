@@ -11,9 +11,10 @@ from __future__ import division
 import numbers
 
 import trajtracker._utils as _u
+import trajtracker.validators
 from trajtracker.movement import SpeedMonitor
 from trajtracker.data import fromXML
-from trajtracker.validators import ValidationAxis, ExperimentError, _BaseValidator, _parse_validation_axis
+from trajtracker.validators import ValidationAxis, ExperimentError, _BaseValidator
 
 
 # noinspection PyAttributeOutsideInit
@@ -91,7 +92,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
         if not self._enabled:
             return None
 
-        self._update_xyt_validate_and_log(x_coord, y_coord, time)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time)
 
         self._speed_monitor.update_xyt(x_coord, y_coord, time)
 
@@ -114,10 +115,10 @@ class InstantaneousSpeedValidator(_BaseValidator):
                 return None
 
             if self._min_speed is not None and speed < self._min_speed:
-                return self._create_experiment_error(self.err_too_slow, "You moved too slowly", {self.arg_speed: speed})
+                return trajtracker.validators.create_experiment_error(self, self.err_too_slow, "You moved too slowly", {self.arg_speed: speed})
 
             if self._max_speed is not None and speed > self._max_speed:
-                return self._create_experiment_error(self.err_too_fast, "You moved too fast", {self.arg_speed: speed})
+                return trajtracker.validators.create_experiment_error(self, self.err_too_fast, "You moved too fast", {self.arg_speed: speed})
 
         return None
 
@@ -137,7 +138,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
         return self._axis
 
     @axis.setter
-    @fromXML(_parse_validation_axis)
+    @fromXML(ValidationAxis.parse)
     def axis(self, value):
         _u.validate_attr_type(self, "axis", value, ValidationAxis)
         self._axis = value

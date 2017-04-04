@@ -16,7 +16,8 @@ import expyriment as xpy
 
 import trajtracker
 import trajtracker._utils as _u
-from trajtracker.validators import ValidationAxis, ExperimentError, _BaseValidator, _parse_validation_axis
+import trajtracker.validators
+from trajtracker.validators import ValidationAxis, ExperimentError, _BaseValidator
 from trajtracker.movement import StimulusAnimator
 from trajtracker.data import fromXML
 
@@ -155,7 +156,7 @@ class GlobalSpeedValidator(_BaseValidator):
         :returns: None if all OK; ExperimentError object if error
         """
 
-        self._update_xyt_validate_and_log(x_coord, y_coord, time)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time)
         self._assert_initialized(self._origin_coord, "origin_coord")
         self._assert_initialized(self._end_coord, "end_coord")
         self._assert_initialized(self._max_trial_duration, "max_trial_duration")
@@ -186,8 +187,8 @@ class GlobalSpeedValidator(_BaseValidator):
 
         #-- Actual coordinate must be ahead of the expected minimum
         if d_coord != 0 and np.sign(d_coord) != np.sign(self._end_coord - self._origin_coord):
-            return self._create_experiment_error(self.err_too_slow, "You moved too slowly",
-                                                 {self.arg_expected_coord: expected_coord, self.arg_actual_coord: coord})
+            return trajtracker.validators.create_experiment_error(self, self.err_too_slow, "You moved too slowly",
+                                                                  {self.arg_expected_coord: expected_coord, self.arg_actual_coord: coord})
 
         if self._show_guide:
             # Get the coordinate that the mouse/finger should reach shortly
@@ -245,7 +246,7 @@ class GlobalSpeedValidator(_BaseValidator):
         return self._axis
 
     @axis.setter
-    @fromXML(_parse_validation_axis)
+    @fromXML(ValidationAxis.parse)
     def axis(self, value):
         _u.validate_attr_type(self, "axis", value, ValidationAxis)
         if value == ValidationAxis.xy:

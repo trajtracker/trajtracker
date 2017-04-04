@@ -9,6 +9,7 @@
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 import trajtracker.utils as u
+import trajtracker.validators
 from trajtracker.misc import LocationColorMap
 from trajtracker.validators import _BaseValidator
 from trajtracker.data import fromXML
@@ -138,7 +139,7 @@ class LocationsValidator(_BaseValidator):
         :param time: ignored
         :return: None if all OK, ExperimentError if error
         """
-        self._update_xyt_validate_and_log(x_coord, y_coord, time, False)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time, False)
 
         if not self._enabled:
             return None
@@ -153,7 +154,7 @@ class LocationsValidator(_BaseValidator):
             return None
 
         else:
-            return self._create_experiment_error(self.err_invalid_coordinates, "You moved to an invalid location",
-                                                 {self.arg_color: color})
+            return trajtracker.validators.create_experiment_error(self, self.err_invalid_coordinates, "You moved to an invalid location",
+                                                                  {self.arg_color: color})
 
 

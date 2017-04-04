@@ -8,6 +8,7 @@
 
 import trajtracker._utils as _u
 import trajtracker.utils as u
+import trajtracker.validators
 from trajtracker.misc import LocationColorMap
 from trajtracker.validators import _BaseValidator
 from trajtracker.data import fromXML
@@ -154,7 +155,7 @@ class MoveByGradientValidator(_BaseValidator):
         if not self._enabled:
             return None
 
-        self._update_xyt_validate_and_log(x_coord, y_coord, time, False)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time, False)
 
         color = self._lcm.get_color_at(x_coord, y_coord)
         if color is None:
@@ -186,6 +187,6 @@ class MoveByGradientValidator(_BaseValidator):
             #-- Previous color is very close to 0 - avoid validating, in order to allow "crossing the 0 color"
             return None
 
-        return self._create_experiment_error(self.err_gradient, "You moved in an invalid direction")
+        return trajtracker.validators.create_experiment_error(self, self.err_gradient, "You moved in an invalid direction")
 
 

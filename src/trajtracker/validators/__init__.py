@@ -20,17 +20,15 @@ from trajtracker.data import fromXML
 
 
 #-------------------------------------------------------------------
+# Base class for all validators
+#
 class _BaseValidator(_TTrkObject):
-    """
-    Base class for validators
-    """
 
     def __init__(self, enabled=False):
         super(_BaseValidator, self).__init__()
         self.enabled = enabled
 
 
-    #--------------------------------------------------------------------
     @property
     def enabled(self):
         """Whether the validator is currently enabled (boolean)"""
@@ -43,29 +41,9 @@ class _BaseValidator(_TTrkObject):
         self._enabled = value
 
 
-    #--------------------------------------------------------------------
-    def _update_xyt_validate_and_log(self, x_coord, y_coord, time, time_used=True):
-
-        _u.validate_func_arg_type(self, "update_xyt", "x_coord", x_coord, numbers.Number, type_name="numeric")
-        _u.validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number, type_name="numeric")
-
-        if time_used:
-            _u.validate_func_arg_type(self, "update_xyt", "time", time, numbers.Number, type_name="numeric")
-
-        self._log_func_enters("update_xyt", [x_coord, y_coord, time])
-
-    #--------------------------------------------------------------------
-    def _create_experiment_error(self, err_code, message, err_args=None):
-        if self._should_log(self.log_warn):
-            self._log_write("ExperimentError,{0},{1},{2},{3}".format(type(self).__name__, err_code, message, err_args))
-
-        return ExperimentError(err_code, message, self, err_args)
-
-
 #--------------------------------------------------------------------
-
-
-#--------------------------------------------------------------------
+# Parse a string into ValidationAxis (for loading from XML)
+#
 def _parse_validation_axis(value):
 
     if isinstance(value, ValidationAxis):
@@ -85,6 +63,18 @@ def _parse_validation_axis(value):
 
     raise BadFormatError('Invalid ValidationAxis "{:}"'.format(value))
 
+
+ValidationAxis.parse = staticmethod(_parse_validation_axis)
+
+
+#--------------------------------------------------------------------
+def create_experiment_error(self, err_code, message, err_args=None):
+    if self._should_log(self.log_warn):
+        self._log_write("ExperimentError,{0},{1},{2},{3}".format(type(self).__name__, err_code, message, err_args))
+
+    return ExperimentError(err_code, message, self, err_args)
+
+
 #--------------------------------------------------------------------
 
 from _GlobalSpeedValidator import GlobalSpeedValidator, GlobalSpeedGuide
@@ -93,4 +83,5 @@ from _LocationsValidator import LocationsValidator
 from _MovementAngleValidator import MovementAngleValidator
 from _MoveByGradientValidator import MoveByGradientValidator
 from _NCurvesValidator import NCurvesValidator
+
 

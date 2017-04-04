@@ -6,11 +6,12 @@ TrajTracker - movement package - private utilities
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
-from enum import Enum
-import numbers, re
-import numpy as np
+import numbers
+import re
 import xml.etree.ElementTree as ET
 
+import numpy as np
+from enum import Enum
 from expyriment.misc import geometry
 
 
@@ -189,6 +190,22 @@ def validate_func_arg_positive(obj, func_name, arg_name, value):
         raise ValueError("trajtracker error: Argument {:} of {:}() has a negative/0 value ({:})".format(arg_name, _get_func_name(obj, func_name), value))
 
 
+#--------------------------------------------------------------------
+def update_xyt_validate_and_log(self, x_coord, y_coord, time, time_used=True):
+
+    validate_func_arg_type(self, "update_xyt", "x_coord", x_coord, numbers.Number, type_name="numeric")
+    validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number, type_name="numeric")
+
+    if time_used:
+        validate_func_arg_type(self, "update_xyt", "time", time, numbers.Number, type_name="numeric")
+
+    self._log_func_enters("update_xyt", [x_coord, y_coord, time])
+
+
+#============================================================================
+#   Misc
+#============================================================================
+
 #--------------------------------------
 def _get_func_name(obj, func_name):
     if obj is None:
@@ -196,6 +213,10 @@ def _get_func_name(obj, func_name):
     else:
         return "{:}.{:}".format(_get_type_name(obj), func_name)
 
+
+#============================================================================
+#  Parse strings into values (this is used mainly for configuring objects via XML)
+#============================================================================
 
 
 #--------------------------------------------------------------------

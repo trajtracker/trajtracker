@@ -16,6 +16,7 @@ import numpy as np
 import trajtracker
 import trajtracker._utils as _u
 import trajtracker.utils as u
+import trajtracker.validators
 from trajtracker.validators import _BaseValidator
 from trajtracker.data import fromXML
 
@@ -81,14 +82,14 @@ class NCurvesValidator(_BaseValidator):
         :return: None if all OK, ExperimentError if error
         """
 
-        self._update_xyt_validate_and_log(x_coord, y_coord, time)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time)
         self._direction_monitor.update_xyt(x_coord, y_coord, time)
 
         if not self.enabled:
             return None
 
         if self._direction_monitor.n_curves > self._max_curves_per_trial:
-            return self._create_experiment_error(self.err_too_many_curves, "Too many left-right deviations", {})
+            return trajtracker.validators.create_experiment_error(self, self.err_too_many_curves, "Too many left-right deviations", {})
 
         return None
 
