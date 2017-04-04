@@ -71,7 +71,7 @@ def run_trial():
         print("   Trial aborted.")
         return
     elif rc == StartPoint.State.error:
-        trial_error(ValidationFailed("StartedSideways", "Start the trial by moving upwards, not sideways!", None))
+        trial_error(ExperimentError("StartedSideways", "Start the trial by moving upwards, not sideways!", None))
         return
 
     #-- Movement started: initialize stuff
@@ -90,7 +90,7 @@ def run_trial():
         still_touching_screen = exp.mouse.check_button_pressed(0)
 
         if not still_touching_screen:
-            trial_error(ValidationFailed("FingerLifted", "Finger lifted in mid-trial", None))
+            trial_error(ExperimentError("FingerLifted", "Finger lifted in mid-trial", None))
             return
 
         err = apply_validations(finger_pos, time_in_trial)

@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 import trajtracker
 
 
-from trajtracker.validators import InstantaneousSpeedValidator, ValidationAxis, ValidationFailed
+from trajtracker.validators import InstantaneousSpeedValidator, ValidationAxis, ExperimentError
 
 
 

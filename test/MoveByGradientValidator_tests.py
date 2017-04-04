@@ -3,7 +3,7 @@ import unittest
 import xml.etree.ElementTree as ET
 
 import trajtracker
-from trajtracker.validators import MoveByGradientValidator, ValidationFailed
+from trajtracker.validators import MoveByGradientValidator, ExperimentError
 
 grad = [[(0, 0, i) for i in range(0,100)]]
 

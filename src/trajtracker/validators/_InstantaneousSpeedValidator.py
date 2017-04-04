@@ -13,7 +13,7 @@ import numbers
 import trajtracker._utils as _u
 from trajtracker.movement import SpeedMonitor
 from trajtracker.data import fromXML
-from trajtracker.validators import ValidationAxis, ValidationFailed, _BaseValidator, _parse_validation_axis
+from trajtracker.validators import ValidationAxis, ExperimentError, _BaseValidator, _parse_validation_axis
 
 
 # noinspection PyAttributeOutsideInit
@@ -25,7 +25,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
 
     err_too_slow = "TooSlowInstantaneous"
     err_too_fast = "TooFast"
-    arg_speed = 'speed'  # ValidationFailed exception argument: the speed observed
+    arg_speed = 'speed'  # ExperimentError argument: the speed observed
 
     #-----------------------------------------------------------------------------------
     def __init__(self, axis=ValidationAxis.y, enabled=True, min_speed=None, max_speed=None,
@@ -85,7 +85,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
         :param x_coord: Current x coordinate (in the predefined coordinate system)
         :param y_coord: Current y coordinate (in the predefined coordinate system)
         :param time: Time, in seconds. The zero point doesn't matter, as long as you're consistent until reset() is called.
-        :return: None if all OK, ValidationFailed if error
+        :return: None if all OK, ExperimentError if error
         """
 
         if not self._enabled:
@@ -114,10 +114,10 @@ class InstantaneousSpeedValidator(_BaseValidator):
                 return None
 
             if self._min_speed is not None and speed < self._min_speed:
-                return self._create_validation_error(self.err_too_slow, "You moved too slowly", {self.arg_speed: speed})
+                return self._create_experiment_error(self.err_too_slow, "You moved too slowly", {self.arg_speed: speed})
 
             if self._max_speed is not None and speed > self._max_speed:
-                return self._create_validation_error(self.err_too_fast, "You moved too fast", {self.arg_speed: speed})
+                return self._create_experiment_error(self.err_too_fast, "You moved too fast", {self.arg_speed: speed})
 
         return None
 

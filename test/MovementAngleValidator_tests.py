@@ -3,7 +3,7 @@ import unittest
 import xml.etree.ElementTree as ET
 
 import trajtracker
-from trajtracker.validators import MovementAngleValidator, ValidationFailed
+from trajtracker.validators import MovementAngleValidator, ExperimentError
 
 
 class DirectionValidatorTestCase(unittest.TestCase):

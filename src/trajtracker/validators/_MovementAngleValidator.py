@@ -25,7 +25,7 @@ class MovementAngleValidator(_BaseValidator):
 
 
     err_invalid_angle = "InvalidAngle"
-    arg_angle = 'angle'  # ValidationFailed exception argument: the angle actually observed
+    arg_angle = 'angle'  # ExperimentError argument: the angle actually observed
 
 
     def __init__(self, min_angle=None, max_angle=None, calc_angle_interval=None,
@@ -73,7 +73,7 @@ class MovementAngleValidator(_BaseValidator):
         :param x_coord: Current x coordinate (in the predefined coordinate system)
         :param y_coord: Current y coordinate (in the predefined coordinate system)
         :param time: Time, in seconds. The zero point doesn't matter, as long as you're consistent until reset() is called.
-        :return: None if all OK, ValidationFailed if error
+        :return: None if all OK, ExperimentError if error
         """
 
         if not self._enabled or self._min_angle == self._max_angle or self._min_angle is None or self._max_angle is None:
@@ -110,7 +110,7 @@ class MovementAngleValidator(_BaseValidator):
                     # noinspection PyProtectedMember
                     self._log_write("%s,InvalidAngle,%.1f" % (str(self.__class__), angle_deg))
 
-                return self._create_validation_error(self.err_invalid_angle, "You moved in an incorrect direction",
+                return self._create_experiment_error(self.err_invalid_angle, "You moved in an incorrect direction",
                                                      {self.arg_angle: angle_deg})
 
         else:

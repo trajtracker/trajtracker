@@ -16,7 +16,7 @@ import expyriment as xpy
 
 import trajtracker
 import trajtracker._utils as _u
-from trajtracker.validators import ValidationAxis, ValidationFailed, _BaseValidator, _parse_validation_axis
+from trajtracker.validators import ValidationAxis, ExperimentError, _BaseValidator, _parse_validation_axis
 from trajtracker.movement import StimulusAnimator
 from trajtracker.data import fromXML
 
@@ -152,7 +152,7 @@ class GlobalSpeedValidator(_BaseValidator):
         :type y_coord: int
 
         :param time: Time from start of trial
-        :returns: None if all OK; ValidationFailed object if error
+        :returns: None if all OK; ExperimentError object if error
         """
 
         self._check_xyt_validate_and_log(x_coord, y_coord, time)
@@ -186,7 +186,7 @@ class GlobalSpeedValidator(_BaseValidator):
 
         #-- Actual coordinate must be ahead of the expected minimum
         if d_coord != 0 and np.sign(d_coord) != np.sign(self._end_coord - self._origin_coord):
-            return self._create_validation_error(self.err_too_slow, "You moved too slowly",
+            return self._create_experiment_error(self.err_too_slow, "You moved too slowly",
                                                  {self.arg_expected_coord: expected_coord, self.arg_actual_coord: coord})
 
         if self._show_guide:

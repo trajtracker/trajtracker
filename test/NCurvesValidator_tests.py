@@ -3,7 +3,7 @@ import unittest
 import xml.etree.ElementTree as ET
 
 import trajtracker
-from trajtracker.validators import NCurvesValidator, ValidationFailed
+from trajtracker.validators import NCurvesValidator, ExperimentError
 
 
 class NCurvesValidatorTests(unittest.TestCase):

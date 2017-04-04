@@ -1,6 +1,6 @@
 """
 
-Exception class, thrown by validators when they fail
+An error object, describing an invalid user behavior during the experiment
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
@@ -8,9 +8,12 @@ Exception class, thrown by validators when they fail
 
 
 
-class ValidationFailed(BaseException):
+class ExperimentError(BaseException):
 
-    """ An application validation has failed """
+    """
+    Describes an invalid behavior of the participant during the experiment, which should result
+    in an error message
+    """
 
 
     def __init__(self, err_code, message, validator, err_args=None):

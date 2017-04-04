@@ -148,7 +148,7 @@ class MoveByGradientValidator(_BaseValidator):
         """
         Validate the movement
 
-        :return: None if all OK, ValidationFailed if error
+        :return: None if all OK, ExperimentError if error
         """
 
         if not self._enabled:
@@ -186,6 +186,6 @@ class MoveByGradientValidator(_BaseValidator):
             #-- Previous color is very close to 0 - avoid validating, in order to allow "crossing the 0 color"
             return None
 
-        return self._create_validation_error(self.err_gradient, "You moved in an invalid direction")
+        return self._create_experiment_error(self.err_gradient, "You moved in an invalid direction")
 
 

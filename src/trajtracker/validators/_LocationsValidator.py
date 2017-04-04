@@ -23,7 +23,7 @@ class LocationsValidator(_BaseValidator):
     """
 
     err_invalid_coordinates = "InvalidCoords"
-    arg_color = 'color'  # ValidationFailed exception argument: the color in the invalid location
+    arg_color = 'color'  # ExperimentError argument: the color in the invalid location
 
 
     #------------------------------------------------------------
@@ -136,7 +136,7 @@ class LocationsValidator(_BaseValidator):
         Check whether the given coordinate is a valid one
 
         :param time: ignored
-        :return: None if all OK, ValidationFailed if error
+        :return: None if all OK, ExperimentError if error
         """
         self._check_xyt_validate_and_log(x_coord, y_coord, time, False)
 
@@ -153,7 +153,7 @@ class LocationsValidator(_BaseValidator):
             return None
 
         else:
-            return self._create_validation_error(self.err_invalid_coordinates, "You moved to an invalid location",
+            return self._create_experiment_error(self.err_invalid_coordinates, "You moved to an invalid location",
                                                  {self.arg_color: color})
 
 

@@ -246,7 +246,7 @@ def run_trial(exp, trial, exp_objects):
         return False, False  # finger lifted
     elif rc == StartPoint.State.error:
         trial_error(exp_objects, trial, trial_info, 0,
-                    ValidationFailed("StartedSideways", "Start the trial by moving upwards, not sideways!", None))
+                    ExperimentError("StartedSideways", "Start the trial by moving upwards, not sideways!", None))
         return False, True
 
     trial_info['time_started_moving'] = get_time() - time0
@@ -271,7 +271,7 @@ def run_trial(exp, trial, exp_objects):
 
         if not still_touching_screen:
             trial_error(exp_objects, trial, trial_info, time_in_trial,
-                        ValidationFailed("FingerLifted", "Finger lifted in mid-trial", None))
+                        ExperimentError("FingerLifted", "Finger lifted in mid-trial", None))
             return False, True
 
         err = apply_validations(exp_objects, finger_pos, time_in_trial)

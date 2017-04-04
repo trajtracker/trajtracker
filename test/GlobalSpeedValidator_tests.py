@@ -5,7 +5,7 @@ import numpy as np
 import xml.etree.ElementTree as ET
 
 import trajtracker
-from trajtracker.validators import GlobalSpeedValidator, ValidationAxis, ValidationFailed
+from trajtracker.validators import GlobalSpeedValidator, ValidationAxis, ExperimentError
 from ttrk_testing import DummyStimulus
 
 

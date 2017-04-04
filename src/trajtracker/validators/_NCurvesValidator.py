@@ -78,7 +78,7 @@ class NCurvesValidator(_BaseValidator):
         :param x_coord: Current x coordinate (in the predefined coordinate system)
         :param y_coord: Current y coordinate (in the predefined coordinate system)
         :param time: Time, in seconds. The zero point doesn't matter, as long as you're consistent until reset() is called.
-        :return: None if all OK, ValidationFailed if error
+        :return: None if all OK, ExperimentError if error
         """
 
         self._check_xyt_validate_and_log(x_coord, y_coord, time)
@@ -88,7 +88,7 @@ class NCurvesValidator(_BaseValidator):
             return None
 
         if self._direction_monitor.n_curves > self._max_curves_per_trial:
-            return self._create_validation_error(self.err_too_many_curves, "Too many left-right deviations", {})
+            return self._create_experiment_error(self.err_too_many_curves, "Too many left-right deviations", {})
 
         return None
 

@@ -15,7 +15,7 @@ from trajtracker import _TTrkObject, BadFormatError
 
 ValidationAxis = enum.Enum('ValidationAxis', 'x y xy')
 
-from _ValidationFailed import ValidationFailed
+from _ExperimentError import ExperimentError
 from trajtracker.data import fromXML
 
 
@@ -55,11 +55,11 @@ class _BaseValidator(_TTrkObject):
         self._log_func_enters("check_xyt", [x_coord, y_coord, time])
 
     #--------------------------------------------------------------------
-    def _create_validation_error(self, err_code, message, err_args=None):
+    def _create_experiment_error(self, err_code, message, err_args=None):
         if self._should_log(self.log_warn):
-            self._log_write("ValidationFailed,{0},{1},{2},{3}".format(type(self).__name__, err_code, message, err_args))
+            self._log_write("ExperimentError,{0},{1},{2},{3}".format(type(self).__name__, err_code, message, err_args))
 
-        return ValidationFailed(err_code, message, self, err_args)
+        return ExperimentError(err_code, message, self, err_args)
 
 
 #--------------------------------------------------------------------
