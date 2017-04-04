@@ -6,6 +6,8 @@
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
+import numpy as np
+
 import trajtracker._utils as _u
 import trajtracker.utils as u
 import trajtracker.validators
@@ -21,7 +23,7 @@ class MoveByGradientValidator(_BaseValidator):
 
 
     def __init__(self, image, position=(0, 0), rgb_should_ascend=True, max_valid_back_movement=0,
-                 last_validated_rgb=None, enabled=True):
+                 cyclic=False, enabled=True):
         """
         Constructor
 
@@ -30,14 +32,15 @@ class MoveByGradientValidator(_BaseValidator):
         :param position: See :attr:`~trajtracker.movement.MoveByGradientValidator.position`
         :param rgb_should_ascend: See :attr:`~trajtracker.movement.MoveByGradientValidator.rgb_should_ascend`
         :param max_valid_back_movement: See :attr:`~trajtracker.movement.MoveByGradientValidator.max_valid_back_movement`
-        :param last_validated_rgb: See :attr:`~trajtracker.movement.MoveByGradientValidator.last_validated_rgb`
+        :param cyclic: See :attr:`~trajtracker.movement.MoveByGradientValidator.cyclic`
         """
         super(MoveByGradientValidator, self).__init__(enabled=enabled)
 
         self._lcm = LocationColorMap(image, position=position, use_mapping=True, colormap="RGB")
         self.rgb_should_ascend = rgb_should_ascend
         self.max_valid_back_movement = max_valid_back_movement
-        self.last_validated_rgb = last_validated_rgb
+        self.cyclic = cyclic
+        self.color_filter = None
         self.reset()
 
 
@@ -80,34 +83,6 @@ class MoveByGradientValidator(_BaseValidator):
 
     #-------------------------------------------------
     @property
-    def last_validated_rgb(self):
-        """
-        The last RGB color code to be validated (number between 0 and 65535; when assigning, you can also
-        specify a list/tuple of 3 integers, each 0-255).
-        If the last mouse position was on a color with RGB higher than this (or lower for rgb_should_ascend=False),
-        validation is not done. This is intended to allow for "cyclic" movement, i.e., allow to "cross" the 0
-        (e.g. from 0 to 65535 and then back to 0).
-        Setting the value to None disables this feature
-        """
-        return self._last_validated_rgb
-
-
-    @last_validated_rgb.setter
-    @fromXML(_u.parse_rgb_or_num)
-    def last_validated_rgb(self, value):
-        if u.is_rgb(value):
-            self._last_validated_rgb = u.color_rgb_to_num(value)
-        else:
-            if value is not None:
-                _u.validate_attr_numeric(self, "last_validated_rgb", value)
-                _u.validate_attr_not_negative(self, "last_validated_rgb", value)
-            self._last_validated_rgb = value
-
-        self._log_setter("last_validated_rgb")
-
-
-    #-------------------------------------------------
-    @property
     def max_valid_back_movement(self):
         """
         The maximal valid delta of color-change in the opposite direction that would still be allowed
@@ -123,6 +98,72 @@ class MoveByGradientValidator(_BaseValidator):
         self._max_valid_back_movement = value
         self._log_setter("max_valid_back_movement")
 
+
+    #-------------------------------------------------
+    @property
+    def color_filter(self):
+        """
+        Define which colors should be used by this validator. Other colors are ignored. If the finger/mouse
+        steps over them, the validation is temporarily suspended. Possible values are:
+
+        - A list/tuple/set of valid colors
+        - A filtering function - gets an RGB color as tuple, returns a bool
+        - A mask - only matching colors (and 0=black) will be included
+        """
+        return self._color_filter
+
+    @color_filter.setter
+    def color_filter(self, filter):
+
+        if filter is None:
+            self._color_filter = None
+            self._lcm.colormap = "RGB"
+            self._get_min_max_colors()
+            return
+
+        _u.validate_attr_type(self, "color_filter", filter, (list, tuple, set, type(lambda:1), int))
+
+        if isinstance(filter, (list, tuple, set)):
+            used_values = set(filter)
+            sample_value = list(used_values)[0]
+            if isinstance(sample_value, int):
+                filter = lambda color: u.color_rgb_to_num(color) in used_values
+            elif isinstance(sample_value, tuple):
+                filter = lambda color: color in used_values
+
+        elif isinstance(filter, int):
+            mask = filter
+            def filter_func(color):
+                color_num = u.color_rgb_to_num(color)
+                return color_num == 0 or (color_num & ~mask) == 0
+            filter = filter_func
+
+        self._color_filter = filter
+        self._lcm.colormap = lambda color: u.color_rgb_to_num(color) if filter(color) else None
+        self._get_min_max_colors()
+
+
+    #-------------------------------------------------
+    @property
+    def cyclic(self):
+        """
+        Whether the gradient is cyclic, i.e., allows moving between the darkest to the lightest color
+        """
+        return self._cyclic
+
+    @cyclic.setter
+    @fromXML(bool)
+    def cyclic(self, value):
+        _u.validate_attr_type(self, "cyclic", value, bool)
+        self._cyclic = value
+
+
+    #-------------------------------------------------
+    def _get_min_max_colors(self):
+        filter = (lambda c: True) if self._color_filter is None else self._color_filter
+        colors = [u.color_rgb_to_num(c) for c in self._lcm.available_colors if filter(c)]
+        self._min_available_color = min(colors)
+        self._max_available_color = max(colors)
 
 
     #======================================================================
@@ -154,17 +195,18 @@ class MoveByGradientValidator(_BaseValidator):
         _u.update_xyt_validate_and_log(self, x_coord, y_coord, time, False)
 
         color = self._lcm.get_color_at(x_coord, y_coord)
-        if color is None:
-            return None  # can't validate
+        if color is None:  # color N/A -- can't validate
+            self._last_color = None
+            return None
 
         if self._last_color is None:
             #-- Nothing to validate
             self._last_color = color
             return None
 
-
         expected_direction = 1 if self._rgb_should_ascend else -1
         rgb_delta = (color - self._last_color) * expected_direction
+        print "RGB delta = %d  (%d --> %d)" % (rgb_delta, self._last_color, color)
         if rgb_delta >= 0:
             #-- All is OK
             self._last_color = color
@@ -175,13 +217,16 @@ class MoveByGradientValidator(_BaseValidator):
             #-- Don't issue an error, but also don't update "last_color" - remember the previous one
             return None
 
-        #-- Invalid situation!
+        if self._cyclic:
+            range = self._max_available_color - self._min_available_color
+            if np.abs(rgb_delta) >= 8 * (range - np.abs(rgb_delta)):
+                # It's much more likely to interpret this movement as a "cyclic" movement - i.e., one that crossed
+                # the boundary of lightest-to-darkest (or the other way around, depending on the ascend/descend direction)
+                self._last_color = color
+                return None
 
-        if self._last_validated_rgb is not None and \
-                ((self._rgb_should_ascend and self._last_color > self._last_validated_rgb) or
-                 (not self._rgb_should_ascend and self._last_color < self._last_validated_rgb)):
-            #-- Previous color is very close to 0 - avoid validating, in order to allow "crossing the 0 color"
-            return None
+        if self._should_log(self.log_debug):
+            self._log_write("InvalidDirection,last_color={:},curr_color={:}".format(self._last_color, color), True)
 
         return trajtracker.validators.create_experiment_error(self, self.err_gradient, "You moved in an invalid direction")
 

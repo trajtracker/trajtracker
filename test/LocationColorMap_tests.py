@@ -10,7 +10,7 @@ testimage = [
     [0, 2, 0, 17, 15, 15, 0],
 ]
 
-testimage =  [[(cell,) for cell in row] for row in testimage]
+testimage =  [[(0, 0, cell) for cell in row] for row in testimage]
 all_colors = {0, 2, 5, 10, 15, 17, 20, 30}
 
 
@@ -25,7 +25,7 @@ class LocationColorMapTests(unittest.TestCase):
     #-------------------------------------------------------------------------
     def test_get_default_props(self):
         lcm = LocationColorMap(testimage)
-        self.assertEqual(frozenset([(c,) for c in all_colors]), lcm.available_colors)
+        self.assertEqual(frozenset([(0, 0, c) for c in all_colors]), lcm.available_colors)
         self.assertIsNone(lcm.colormap)
 
     #-------------------------------------------------------------------------
@@ -38,7 +38,7 @@ class LocationColorMapTests(unittest.TestCase):
         codes = {}
         i = 0
         for c in all_colors:
-            codes[(c,)] = i
+            codes[(0, 0, c)] = i
             i += 1
         return codes
 
@@ -48,7 +48,7 @@ class LocationColorMapTests(unittest.TestCase):
         codes = {}
         i = 0
         for c in {0, 2, 5, 10}:
-            codes[(c,)] = i
+            codes[(0, 0, c)] = i
             i += 1
 
         try:
@@ -63,9 +63,9 @@ class LocationColorMapTests(unittest.TestCase):
         lcm.colormap = "default"
         print("Default colormap:")
         print(lcm.colormap)
-        self.assertEqual(lcm.colormap[(0,)], 0)
-        self.assertEqual(lcm.colormap[(2,)], 1)
-        self.assertEqual(lcm.colormap[(30,)], len(all_colors)-1)
+        self.assertEqual(lcm.colormap[(0, 0, 0)], 0)
+        self.assertEqual(lcm.colormap[(0, 0, 2)], 1)
+        self.assertEqual(lcm.colormap[(0, 0, 30)], len(all_colors)-1)
 
     #-------------------------------------------------------------------------
     def test_colormap_rgb(self):
@@ -104,9 +104,9 @@ class LocationColorMapTests(unittest.TestCase):
     #-------------------------------------------------------------------------
     def test_get_raw_colors(self):
         lcm = LocationColorMap(testimage)
-        self.assertEqual(lcm.get_color_at(-3, -2), (0,))
-        self.assertEqual(lcm.get_color_at(0, 0), (30,))
-        self.assertEqual(lcm.get_color_at(2, 1), (15,))
+        self.assertEqual(lcm.get_color_at(-3, -2), (0, 0, 0))
+        self.assertEqual(lcm.get_color_at(0, 0), (0, 0, 30))
+        self.assertEqual(lcm.get_color_at(2, 1), (0, 0, 15))
 
         self.assertIsNone(lcm.get_color_at(-4, 0))
         self.assertIsNone(lcm.get_color_at(4, 0))
@@ -116,9 +116,9 @@ class LocationColorMapTests(unittest.TestCase):
     #-------------------------------------------------------------------------
     def test_get_with_coord(self):
         lcm = LocationColorMap(testimage, position=(3,2))
-        self.assertEqual(lcm.get_color_at(0, 0), (0,))
-        self.assertEqual(lcm.get_color_at(3, 2), (30,))
-        self.assertEqual(lcm.get_color_at(3, 4), (17,))
+        self.assertEqual(lcm.get_color_at(0, 0), (0, 0, 0))
+        self.assertEqual(lcm.get_color_at(3, 2), (0, 0, 30))
+        self.assertEqual(lcm.get_color_at(3, 4), (0, 0, 17))
 
         self.assertIsNone(lcm.get_color_at(7, 0))
         self.assertIsNone(lcm.get_color_at(-1, 0))
@@ -130,12 +130,12 @@ class LocationColorMapTests(unittest.TestCase):
         img1 = [r[:-1] for r in testimage[:-1]]  # remove last row and column
 
         lcm = LocationColorMap(img1)
-        self.assertEqual(lcm.get_color_at(-1, 0), (5,))
+        self.assertEqual(lcm.get_color_at(-1, 0), (0, 0, 5))
 
     #-------------------------------------------------------------------------
     def test_get_mapped_colors(self):
         lcm = LocationColorMap(testimage)
-        codes = dict(zip([(c,) for c in all_colors], all_colors))  # map each (c,) to c
+        codes = dict(zip([(0, 0, c) for c in all_colors], all_colors))
         lcm.colormap = codes
         self.assertEqual(lcm.get_color_at(-3, -2, use_mapping=True), 0)
         lcm.use_mapping = True

@@ -66,11 +66,11 @@ def is_rgb(rgb):
     """
     Check if the given value is a valid RGB color (3 integers, each 0-255)
     """
-    return isinstance(rgb, (list, tuple, np.ndarray)) and len(rgb) == 3 \
-           and isinstance(rgb[0], int) and 0 <= rgb[0] <= 255 \
-           and isinstance(rgb[1], int) and 0 <= rgb[1] <= 255 \
-           and isinstance(rgb[2], int) and 0 <= rgb[2] <= 255
-
+    try:
+        return isinstance(rgb, (list, tuple, np.ndarray)) and len(rgb) == 3 \
+               and 0 <= rgb[0] <= 255 and 0 <= rgb[1] <= 255 and 0 <= rgb[2] <= 255
+    except:
+        return False
 
 
 #--------------------------------------------------------------------------

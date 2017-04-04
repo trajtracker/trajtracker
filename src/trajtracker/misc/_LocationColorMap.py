@@ -15,7 +15,7 @@ from scipy import misc
 
 import trajtracker
 import trajtracker._utils as _u
-from trajtracker.utils import color_rgb_to_num
+from trajtracker.utils import color_rgb_to_num, color_num_to_rgb
 
 
 # noinspection PyAttributeOutsideInit
@@ -150,9 +150,7 @@ class LocationColorMap(trajtracker._TTrkObject):
 
         elif isinstance(value, str) and value.lower() == "rgb":
             # Translate each triplet to an RGB code
-            self._color_to_code = {}
-            for color in self._available_colors:
-                self._color_to_code[color] = color_rgb_to_num(color)
+            self._color_to_code = { color: color_rgb_to_num(color) for color in self._available_colors }
 
         elif isinstance(value, dict):
             #-- Use this mapping; but make sure that all colors from the image were defined
@@ -164,6 +162,10 @@ class LocationColorMap(trajtracker._TTrkObject):
                 raise ValueError("trajtracker error: Invalid value for {0}.color_codes - some colors are missing: {1}".format(self.__class__, missing_colors))
 
             self._color_to_code = value.copy()
+
+        elif isinstance(value, type(lambda:1)):
+            #-- A function that maps each color to a code
+            self._color_to_code = { color: value(color) for color in self._available_colors }
 
         else:
             raise ValueError(
@@ -213,6 +215,7 @@ class LocationColorMap(trajtracker._TTrkObject):
 
         x_coord -= self._top_left_x
         y_coord -= self._top_left_y
+        y_coord = len(self._image) - 1 - y_coord   # reverse up/down
 
         v = self._image[y_coord][x_coord]
 

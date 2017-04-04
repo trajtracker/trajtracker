@@ -55,58 +55,6 @@ class MoveByGradientValidatorTests(unittest.TestCase):
             pass
 
 
-    # -------------------------------------------------------
-    def test_set_last_validated_rgb(self):
-        val = MoveByGradientValidator(grad)
-
-        val.last_validated_rgb = (0, 0, 50)
-        val.last_validated_rgb = 50
-
-        try:
-            val.last_validated_rgb = (-1, 0, 50)
-        except TypeError:
-            pass
-
-        try:
-            val.last_validated_rgb = (0, 0, 256)
-        except TypeError:
-            pass
-
-        try:
-            val.last_validated_rgb = (1.5, 0, 50)
-        except TypeError:
-            pass
-
-        try:
-            val.last_validated_rgb = ("", 0, 50)
-        except TypeError:
-            pass
-
-        try:
-            val.last_validated_rgb = (0, 0)
-        except TypeError:
-            pass
-
-        try:
-            val.last_validated_rgb = -1
-        except ValueError:
-            pass
-
-        try:
-            val.last_validated_rgb = 65536
-        except ValueError:
-            pass
-
-        try:
-            val.last_validated_rgb = ""
-        except TypeError:
-            pass
-
-        try:
-            val.last_validated_rgb = None
-        except TypeError:
-            pass
-
 
     # -------------------------------------------------------
     def test_set_max_valid_back_movement(self):
@@ -152,14 +100,13 @@ class MoveByGradientValidatorTests(unittest.TestCase):
         v = MoveByGradientValidator([[]])
         configer = trajtracker.data.XmlConfigUpdater()
         xml = ET.fromstring('''
-        <config max_valid_back_movement="0.5" position="(1,2)" rgb_should_ascend="True"
-                last_validated_rgb="(0, 0, 100)"/>
+        <config max_valid_back_movement="0.5" position="(1,2)" rgb_should_ascend="True" cyclic="True"/>
         ''')
         configer.configure_object(xml, v)
         self.assertEqual(0.5, v.max_valid_back_movement)
         self.assertEqual((1,2), v.position)
         self.assertEqual(True, v.rgb_should_ascend)
-        self.assertEqual(100, v.last_validated_rgb)
+        self.assertEqual(True, v.cyclic)
 
     #-------------------------------------------------------
     def test_validate_basic(self):
@@ -202,13 +149,13 @@ class MoveByGradientValidatorTests(unittest.TestCase):
 
     #-------------------------------------------------------
     def test_validate_cross_zero(self):
-        val = MoveByGradientValidator(grad, last_validated_rgb=(0, 0, 90))
+        val = MoveByGradientValidator(grad, cyclic=True)
         self.assertIsNone(val.update_xyt(0, 0))   # the color here is 50
         self.assertIsNone(val.update_xyt(40, 0))  # the color here is 90
         self.assertIsNone(val.update_xyt(45, 0))  # the color here is 95
         self.assertIsNone(val.update_xyt(-45, 0))  # the color here is 5
 
-        val = MoveByGradientValidator(grad, last_validated_rgb=(0, 0, 90))
+        val = MoveByGradientValidator(grad, cyclic=True)
         self.assertIsNone(val.update_xyt(0, 0))   # the color here is 50
         self.assertIsNone(val.update_xyt(39, 0))  # the color here is 89
         self.assertIsNotNone(val.update_xyt(-45, 0))
