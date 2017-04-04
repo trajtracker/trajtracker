@@ -1,5 +1,7 @@
 import unittest
 
+import xml.etree.ElementTree as ET
+
 import trajtracker
 
 from trajtracker.movement import LineTrajectoryGenerator
@@ -66,7 +68,21 @@ class LineTrajectoryGeneratorTests(unittest.TestCase):
         LineTrajectoryGenerator(cyclic=True, return_to_start=True)
 
 
-    # todo: test XML config
+    # --------------------------------------------------
+    def test_config_from_xml(self):
+
+        gen = LineTrajectoryGenerator()
+        configer = trajtracker.data.XmlConfigUpdater()
+        xml = ET.fromstring('<config start_point="(1,1)" end_point="(2,2)" duration="3" cyclic="True" return_to_start="True"/>')
+        configer.configure_object(xml, gen)
+        self.assertEqual(1, gen.start_point[0])
+        self.assertEqual(1, gen.start_point[1])
+        self.assertEqual(2, gen.end_point[0])
+        self.assertEqual(2, gen.end_point[1])
+        self.assertEqual(3, gen.duration)
+        self.assertEqual(True, gen.cyclic)
+        self.assertEqual(True, gen.return_to_start)
+
 
 
     #============================ generate traj ====================

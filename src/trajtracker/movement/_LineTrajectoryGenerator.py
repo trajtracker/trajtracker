@@ -147,6 +147,7 @@ class LineTrajectoryGenerator(trajtracker._TTrkObject):
         return self._return_to_start
 
     @return_to_start.setter
+    @fromXML(bool)
     def return_to_start(self, value):
         _u.validate_attr_type(self, "return_to_start", value, bool)
         self._return_to_start = value

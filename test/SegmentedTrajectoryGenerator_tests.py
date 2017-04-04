@@ -15,7 +15,28 @@ def uw(xy):
 
 class SegmentedTrajectoryGeneratorTests(unittest.TestCase):
 
-    #todo: test config
+    #--------------------------------------------------
+    def test_config_simple(self):
+        SegmentedTrajectoryGenerator(cyclic=True, segments=[(LineTrajectoryGenerator(), 1)])
+
+    #--------------------------------------------------
+    def test_config_bad_cyclic(self):
+        self.assertRaises(TypeError, lambda: SegmentedTrajectoryGenerator(cyclic=""))
+
+        try:
+            SegmentedTrajectoryGenerator().cyclic = None
+            self.fail()
+        except:
+            pass
+
+    #--------------------------------------------------
+    def test_config_bad_segments(self):
+        gen = SegmentedTrajectoryGenerator()
+        self.assertRaises(TypeError, lambda: gen.add_segments(""))
+        self.assertRaises(TypeError, lambda: gen.add_segments([()]))
+        self.assertRaises(TypeError, lambda: gen.add_segments([(1,2,3)]))
+        self.assertRaises(TypeError, lambda: gen.add_segments([(None,"")]))
+
 
     #============================ generate traj ====================
 
