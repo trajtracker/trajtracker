@@ -41,15 +41,15 @@ class NCurvesValidatorTests(unittest.TestCase):
     #-------------------------------------------
     def test_validate(self):
         val = NCurvesValidator(direction_monitor=DirectionMonitorDbg(2), max_curves_per_trial=2)
-        self.assertIsNone(val.check_xyt(0, 0, 0))
+        self.assertIsNone(val.update_xyt(0, 0, 0))
 
         val.max_curves_per_trial = 1
-        self.assertIsNotNone(val.check_xyt(0, 0, 0))
+        self.assertIsNotNone(val.update_xyt(0, 0, 0))
 
     #-------------------------------------------
     def test_disabled(self):
         val = NCurvesValidator(direction_monitor=DirectionMonitorDbg(2), max_curves_per_trial=1, enabled=False)
-        self.assertIsNone(val.check_xyt(0, 0, 0))
+        self.assertIsNone(val.update_xyt(0, 0, 0))
 
 
 

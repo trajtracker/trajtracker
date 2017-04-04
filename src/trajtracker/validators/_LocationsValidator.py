@@ -54,7 +54,7 @@ class LocationsValidator(_BaseValidator):
         """
         The position of the image: (x,y) tuple/list, indicating the image center
         For even-sized images, use the Expyriment standard.
-        The position is used to align the image's coordinate space with that of check_xyt()
+        The position is used to align the image's coordinate space with that of update_xyt()
         """
         return self._lcm.position
 
@@ -131,14 +131,14 @@ class LocationsValidator(_BaseValidator):
         pass
 
 
-    def check_xyt(self, x_coord, y_coord, time=None):
+    def update_xyt(self, x_coord, y_coord, time=None):
         """
         Check whether the given coordinate is a valid one
 
         :param time: ignored
         :return: None if all OK, ExperimentError if error
         """
-        self._check_xyt_validate_and_log(x_coord, y_coord, time, False)
+        self._update_xyt_validate_and_log(x_coord, y_coord, time, False)
 
         if not self._enabled:
             return None

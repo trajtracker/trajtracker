@@ -12,10 +12,12 @@ from enum import Enum
 import numbers
 import numpy as np
 
+# noinspection PyProtectedMember
 from expyriment.misc._timer import get_time
 import expyriment as xpy
 
 import trajtracker
+# noinspection PyProtectedMember
 import trajtracker._utils as _u
 
 
@@ -360,10 +362,13 @@ class NumberLine(trajtracker._TTrkObject):
     _errmsg_mouseat_non_numeric_coord = "trajtracker error in NumberLine.mouseAt(): a non-numeric {0} coordinate was provided ({1})"
 
     #---------------------------------------------------------
-    def reset(self):
+    # noinspection PyUnusedLocal
+    def reset(self, time0=None):
         """
         Reset the last-known mouse position, so that update_xy() will forget any previous movement
         This function is typically called in the beginning of a trial.
+
+        :param time0: ignored.
         """
 
         self._last_mouse_coord = None    # Last coordinate where mouse was observed (x or y, depending on the number line orientation)
@@ -372,6 +377,7 @@ class NumberLine(trajtracker._TTrkObject):
 
 
     #---------------------------------------------------------
+    # noinspection PyUnusedLocal
     def update_xyt(self, x_coord, y_coord, time=None):
         """
         This function is called when mouse/touch has moved. It checks whether the movement implies touching the number line.
@@ -424,6 +430,8 @@ class NumberLine(trajtracker._TTrkObject):
             self._last_touched_coord = touch_coord
 
         self._log_func_returns()
+
+        return None
 
 
     #---------------------------------------------------------

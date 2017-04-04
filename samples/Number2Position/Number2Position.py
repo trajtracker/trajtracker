@@ -325,7 +325,7 @@ def reset_validators(exp_objects, trial_start_time):
 def apply_validations(exp_objects, finger_position, time_in_trial):
 
     for validator in exp_objects.validators:
-        err = validator.check_xyt(finger_position[0], finger_position[1], time_in_trial)
+        err = validator.update_xyt(finger_position[0], finger_position[1], time_in_trial)
         if err is not None:
             return err
 

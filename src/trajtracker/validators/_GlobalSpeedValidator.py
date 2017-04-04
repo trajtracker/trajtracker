@@ -141,7 +141,7 @@ class GlobalSpeedValidator(_BaseValidator):
 
 
     #----------------------------------------------------------------------------------
-    def check_xyt(self, x_coord, y_coord, time):
+    def update_xyt(self, x_coord, y_coord, time):
         """
         Validate movement.
 
@@ -155,7 +155,7 @@ class GlobalSpeedValidator(_BaseValidator):
         :returns: None if all OK; ExperimentError object if error
         """
 
-        self._check_xyt_validate_and_log(x_coord, y_coord, time)
+        self._update_xyt_validate_and_log(x_coord, y_coord, time)
         self._assert_initialized(self._origin_coord, "origin_coord")
         self._assert_initialized(self._end_coord, "end_coord")
         self._assert_initialized(self._max_trial_duration, "max_trial_duration")
@@ -169,7 +169,7 @@ class GlobalSpeedValidator(_BaseValidator):
             return None
 
         if time < self._time0:
-            raise trajtracker.InvalidStateError("{0}.check_xyt() was called with time={1}, but the trial started at time={2}".format(self.__class__, time, self._time0))
+            raise trajtracker.InvalidStateError("{0}.update_xyt() was called with time={1}, but the trial started at time={2}".format(self.__class__, time, self._time0))
 
         time -= self._time0
 
@@ -203,7 +203,7 @@ class GlobalSpeedValidator(_BaseValidator):
 
     def _assert_initialized(self, value, attr_name):
         if value is None:
-            raise trajtracker.InvalidStateError("{:}.check_xyt() was called before {:} was initalized".format(type(self).__name__, attr_name))
+            raise trajtracker.InvalidStateError("{:}.update_xyt() was called before {:} was initalized".format(type(self).__name__, attr_name))
 
     #----------------------------------------------------------------------------------
     # Get the coordinate expected

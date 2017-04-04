@@ -11,11 +11,12 @@ import numbers
 import expyriment
 
 import trajtracker
+# noinspection PyProtectedMember
 import trajtracker._utils as _u
 from trajtracker.data import fromXML
 
 
-# noinspection PyAttributeOutsideInit
+# noinspection PyAttributeOutsideInit,PyProtectedMember
 class TrajectoryTracker(trajtracker._TTrkObject):
     """
     Track mouse/finger trajectory and save results to a CSV file.
@@ -41,7 +42,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         :param track_if_no_movement: See :attr:`~trajtracker.movement.TrajectoryTracker.track_if_no_movement`
         """
         super(TrajectoryTracker, self).__init__()
-        self.reset(False)
+        self.reset()
         self._filename = filename
         self.tracking_active = tracking_active
         self.track_if_no_movement = track_if_no_movement
@@ -89,26 +90,24 @@ class TrajectoryTracker(trajtracker._TTrkObject):
     #==============================================================================
 
     #----------------------------------------------------
-    def reset(self, tracking_active=None):
+    # noinspection PyUnusedLocal
+    def reset(self, time0=None):
         """
         Forget any previously-tracked points.
 
-        :param tracking_active: Whether to activate or deactivate tracking. Default: None (don't change)
+        :param time0: ignored
         """
-        if tracking_active is not None:
-            self.tracking_active = tracking_active
 
-        self._trajectory = {'x' : [], 'y' : [], 'time' : []}
+        self._trajectory = dict(x=[], y=[], time=[])
         self._last_coord = None
 
         if self._log_level:
-            self._log_write("Trajectory,Reset")
+            self._log_write("TrajectoryTracker,Reset")
 
     #----------------------------------------------------
     def update_xyt(self, x_coord, y_coord, time):
         """
-        Track a point.
-        If tracking is currently inactive, this function will do nothing.
+        Track a point. If tracking is currently inactive, this function will do nothing.
         """
 
         if not self._tracking_active:
@@ -121,7 +120,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
 
         if not self._track_if_no_movement and len(self._trajectory['x']) > 0 and  \
             self._trajectory['x'][-1] == x_coord and \
-            self._trajectory['y'][-1] == y_coord:
+                self._trajectory['y'][-1] == y_coord:
             return
 
         self._trajectory['x'].append(x_coord)
@@ -131,6 +130,9 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         if self._log_level:
             self._log_write("Trajectory,Track_xyt,{0},{1},{2}".format(x_coord, y_coord, time))
 
+        return None
+
+
     #----------------------------------------------------
     def get_xyt(self):
         """
@@ -138,6 +140,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         """
         trj = self._trajectory
         return zip(trj['x'], trj['y'], trj['time'])
+
 
     #----------------------------------------------------
     def init_output_file(self, filename=None, xy_precision=5, time_precision=3):

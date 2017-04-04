@@ -44,15 +44,15 @@ class _BaseValidator(_TTrkObject):
 
 
     #--------------------------------------------------------------------
-    def _check_xyt_validate_and_log(self, x_coord, y_coord, time, time_used=True):
+    def _update_xyt_validate_and_log(self, x_coord, y_coord, time, time_used=True):
 
-        _u.validate_func_arg_type(self, "check_xyt", "x_coord", x_coord, numbers.Number, type_name="numeric")
-        _u.validate_func_arg_type(self, "check_xyt", "y_coord", y_coord, numbers.Number, type_name="numeric")
+        _u.validate_func_arg_type(self, "update_xyt", "x_coord", x_coord, numbers.Number, type_name="numeric")
+        _u.validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number, type_name="numeric")
 
         if time_used:
-            _u.validate_func_arg_type(self, "check_xyt", "time", time, numbers.Number, type_name="numeric")
+            _u.validate_func_arg_type(self, "update_xyt", "time", time, numbers.Number, type_name="numeric")
 
-        self._log_func_enters("check_xyt", [x_coord, y_coord, time])
+        self._log_func_enters("update_xyt", [x_coord, y_coord, time])
 
     #--------------------------------------------------------------------
     def _create_experiment_error(self, err_code, message, err_args=None):

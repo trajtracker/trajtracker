@@ -31,7 +31,8 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
         ttrk.update_xyt(2, 2.5, 0.2)
         ttrk.save_to_file(0)
 
-        ttrk.reset(True)
+        ttrk.reset()
+        ttrk.tracking_active = True
         ttrk.update_xyt(12, 2.5, 0.2)
         ttrk.update_xyt(13, 3.5, 0.3)
         ttrk.save_to_file(1)
@@ -43,33 +44,6 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
         self.assertEqual((12,2.5,0.2), xyt[0])
         self.assertEqual((13,3.5,0.3), xyt[1])
 
-
-    #------------------------------------------------------------------
-    def test_track_reset_false(self):
-
-        ttrk = TrajectoryTrackerForTesting()
-        ttrk.tracking_active = True
-        ttrk.reset(False)
-        ttrk.update_xyt(12, 2.5, 0.2)
-        self.assertEqual(0, len(ttrk.get_xyt()))
-
-    #------------------------------------------------------------------
-    def test_track_reset_true(self):
-
-        ttrk = TrajectoryTrackerForTesting()
-        ttrk.tracking_active = False
-        ttrk.reset(True)
-        ttrk.update_xyt(12, 2.5, 0.2)
-        self.assertEqual(1, len(ttrk.get_xyt()))
-
-    #------------------------------------------------------------------
-    def test_track_reset_none(self):
-
-        ttrk = TrajectoryTrackerForTesting()
-        ttrk.tracking_active = True
-        ttrk.reset()
-        ttrk.update_xyt(12, 2.5, 0.2)
-        self.assertEqual(1, len(ttrk.get_xyt()))
 
     #------------------------------------------------------------------
     def test_track_active_inactive(self):

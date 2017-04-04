@@ -78,7 +78,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
 
 
     #-----------------------------------------------------------------------------------
-    def check_xyt(self, x_coord, y_coord, time):
+    def update_xyt(self, x_coord, y_coord, time):
         """
         Given a current position, check whether the movement complies with the speed limits.
 
@@ -91,7 +91,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
         if not self._enabled:
             return None
 
-        self._check_xyt_validate_and_log(x_coord, y_coord, time)
+        self._update_xyt_validate_and_log(x_coord, y_coord, time)
 
         self._speed_monitor.update_xyt(x_coord, y_coord, time)
 

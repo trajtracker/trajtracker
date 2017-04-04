@@ -71,7 +71,7 @@ class NCurvesValidator(_BaseValidator):
 
 
     #-----------------------------------------------------------
-    def check_xyt(self, x_coord, y_coord, time):
+    def update_xyt(self, x_coord, y_coord, time):
         """
         Validate the number of curves in the trial
 
@@ -81,7 +81,7 @@ class NCurvesValidator(_BaseValidator):
         :return: None if all OK, ExperimentError if error
         """
 
-        self._check_xyt_validate_and_log(x_coord, y_coord, time)
+        self._update_xyt_validate_and_log(x_coord, y_coord, time)
         self._direction_monitor.update_xyt(x_coord, y_coord, time)
 
         if not self.enabled:

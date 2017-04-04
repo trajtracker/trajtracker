@@ -66,7 +66,7 @@ class MovementAngleValidator(_BaseValidator):
 
 
     #-----------------------------------------------------------------------------------
-    def check_xyt(self, x_coord, y_coord, time):
+    def update_xyt(self, x_coord, y_coord, time):
         """
         Given a current position, check whether the movement complies with the speed limits.
 
@@ -79,7 +79,7 @@ class MovementAngleValidator(_BaseValidator):
         if not self._enabled or self._min_angle == self._max_angle or self._min_angle is None or self._max_angle is None:
             return None
 
-        self._check_xyt_validate_and_log(x_coord, y_coord, time)
+        self._update_xyt_validate_and_log(x_coord, y_coord, time)
         self._validate_time(time)
 
         curr_xyt = (x_coord, y_coord, time)
