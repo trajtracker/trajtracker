@@ -1,6 +1,7 @@
 
-import inspect
+import inspect, re
 import xml.etree.ElementTree as ET
+import expyriment as xpy
 
 from trajtracker import _TTrkObject, BadFormatError
 
@@ -9,6 +10,8 @@ class XmlConfigUpdater(_TTrkObject):
     """
 
     """
+
+    _vars_for_eval = {}
 
     def __init__(self):
         super(XmlConfigUpdater, self).__init__()
@@ -31,10 +34,13 @@ class XmlConfigUpdater(_TTrkObject):
     #--------------------------------------------------
     def configure_object(self, xml, obj):
 
+        self._init_vars_for_eval()
+
         #-- Update by XML attributes
         for attr_name in xml.attrib:
             self._validate_attr(obj, attr_name)
-            setattr(obj, attr_name, _ValueFromXML(xml.tag, xml.attrib[attr_name]))
+            value = self._eval_value(xml.attrib[attr_name])
+            setattr(obj, attr_name, _ValueFromXML(xml.tag, value))
 
         #-- Update by XML elements: this must be done via functions
         for sub_element in xml:
@@ -50,6 +56,30 @@ class XmlConfigUpdater(_TTrkObject):
         except _TestIfXmlSupported:
             pass
 
+
+    #---------------------------------------------------
+    # Initialize constants for evaluation by _eval_value()
+    #
+    def _init_vars_for_eval(self):
+        XmlConfigUpdater._vars_for_eval = {}
+        if xpy._internals.active_exp.screen is None:
+            print("trajtracker WARNING: Expyriment screen was not yet initialized; its size will not be available for XML configuration")
+            XmlConfigUpdater._vars_for_eval['screen_width'] = 'N/A'
+            XmlConfigUpdater._vars_for_eval['screen_height'] = 'N/A'
+        else:
+            XmlConfigUpdater._vars_for_eval['screen_width'] = xpy._internals.active_exp.screen.size[0]
+            XmlConfigUpdater._vars_for_eval['screen_height'] = xpy._internals.active_exp.screen.size[1]
+
+    #---------------------------------------------------
+    # If a string value is ${....} - evaluate it as a python expression
+    #
+    @staticmethod
+    def _eval_value(attr_value):
+        m = re.match('^\${(.*)}$', attr_value)
+        if m is None:
+            return attr_value
+        else:
+            return eval(m.group(1), XmlConfigUpdater._vars_for_eval)
 
 #==================================================================
 # Annotations to define on the class
@@ -88,9 +118,12 @@ def _convert_xml_value_to_attr_value(obj, attr_name, xml_value, converter, conve
 
     elif isinstance(xml_value.value, ET.Element):
         #-- We got the XML element (node), but we need its text value
-        value = xml_value.value.text.strip()
+        value = XmlConfigUpdater._eval_value(xml_value.value.text.strip())
 
-    return converter(value)
+    if converter is None:
+        return value
+    else:
+        return converter(value)
 
 
 #------------------------------------------------------------------------------------

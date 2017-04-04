@@ -16,20 +16,16 @@ class SimpleSampleObject(object):
         self._x = value
 
 
+class TestXmlConfigUpdater(XmlConfigUpdater):
 
-
-class Sample1:
     def __init__(self):
+        super(TestXmlConfigUpdater, self).__init__()
         self.x = None
 
-    @property
-    def x(self):
-        return self._x
+    def _init_vars_for_eval(self):
+        super(TestXmlConfigUpdater, self)._init_vars_for_eval()
+        XmlConfigUpdater._vars_for_eval['one'] = 1
 
-    @x.setter
-    @fromXML(lambda value: int(value) + 1)
-    def x(self, value):
-        self._x = value
 
 
 class XmlConfigUpdaterTests(unittest.TestCase):
@@ -105,6 +101,24 @@ class XmlConfigUpdaterTests(unittest.TestCase):
         updater.configure_object(xml, obj)
         self.assertEqual(1, obj.x)
 
+    #-----------------------------------------------------------
+    def test_no_type_conversion(self):
+        class Sample(object):
+            @property
+            def x(self):
+                return self._x
+
+            @x.setter
+            @fromXML(None)
+            def x(self, value):
+                self._x = value
+
+        updater = XmlConfigUpdater()
+        obj = Sample()
+        xml = ET.fromstring('<data x="1"/>')
+        updater.configure_object(xml, obj)
+        self.assertEqual("1", obj.x)
+
 
     #==========================================================================
     # Convert values by functions
@@ -170,6 +184,67 @@ class XmlConfigUpdaterTests(unittest.TestCase):
         updater.configure_object(xml, obj)
         self.assertEqual("hello there!", obj.x)
 
+
+
+    #============================================================================
+    #   Python expressions as values
+    #============================================================================
+
+    #-----------------------------------------------------------
+    def test_eval_expression_attrib(self):
+        class Sample(object):
+            @property
+            def x(self):
+                return self._x
+
+            @x.setter
+            @fromXML(None)
+            def x(self, value):
+                self._x = value
+
+        updater = XmlConfigUpdater()
+        obj = Sample()
+        xml = ET.fromstring('<data x="${1}"/>')
+        updater.configure_object(xml, obj)
+        self.assertEqual(1, obj.x)
+
+
+    #-----------------------------------------------------------
+    def test_eval_expression_with_constants(self):
+        class Sample(object):
+            @property
+            def x(self):
+                return self._x
+
+            @x.setter
+            @fromXML(None)
+            def x(self, value):
+                self._x = value
+
+        updater = TestXmlConfigUpdater()
+        obj = Sample()
+        xml = ET.fromstring('<data x="${one+1}"/>')
+        updater.configure_object(xml, obj)
+        self.assertEqual(2, obj.x)
+
+
+    #-----------------------------------------------------------
+    def test_eval_expression_element(self):
+        class Sample(object):
+            @property
+            def x(self):
+                return self._x
+
+            @x.setter
+            @fromXML(None)
+            def x(self, value):
+                self._x = value
+
+        updater = TestXmlConfigUpdater()
+        obj = Sample()
+        xml = ET.fromstring('<data> <x> ${1} </x> </data>')
+        updater.configure_object(xml, obj)
+        self.assertEqual(1, obj.x)
 
 
     #============================================================================
