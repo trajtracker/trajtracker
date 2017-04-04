@@ -19,12 +19,6 @@ import trajtracker.utils as u
 
 
 class DirectionMonitor(trajtracker._TTrkObject):
-    """
-    Monitor the mouse/finger direction.
-
-    This class also maintains some information about curves in the trajectory.
-    """
-
 
     Units = Enum("Units", "Degrees Radians")
 

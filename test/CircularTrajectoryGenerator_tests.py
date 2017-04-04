@@ -79,6 +79,12 @@ class CircularTrajectoryGeneratorTests(unittest.TestCase):
 
         self.assertRaises(TypeError, lambda: CircularTrajectoryGenerator(degrees_at_t0=""))
 
+
+    #--------------------------------------------------------
+    def test_set_duplicate(self):
+        self.assertRaises(ValueError, lambda: CircularTrajectoryGenerator(full_rotation_duration=1, degrees_per_sec=2))
+
+
     #============================ generate ====================
 
     #--------------------------------------------------------
@@ -96,6 +102,15 @@ class CircularTrajectoryGeneratorTests(unittest.TestCase):
         self.assertEqual((100, 0), uw(gen.get_traj_point(5)))
 
     #--------------------------------------------------------
+    def test_generate_counter_clockwise(self):
+
+        gen = CircularTrajectoryGenerator(center=(0,0), radius=100, degrees_per_sec=90, clockwise=False)
+        self.assertEqual((0, 100), uw(gen.get_traj_point(0)))
+        self.assertEqual((-100, 0), uw(gen.get_traj_point(1)))
+        self.assertEqual((0, -100), uw(gen.get_traj_point(2)))
+        self.assertEqual((100, 0), uw(gen.get_traj_point(3)))
+
+    #--------------------------------------------------------
     def test_generate_change_center(self):
         gen = CircularTrajectoryGenerator(center=(10,-10), radius=100, degrees_per_sec=90)
         self.assertEqual((10, 90), uw(gen.get_traj_point(0)))
@@ -104,6 +119,12 @@ class CircularTrajectoryGeneratorTests(unittest.TestCase):
     def test_generate_change_angle0(self):
         gen = CircularTrajectoryGenerator(center=(0,0), radius=100, degrees_per_sec=90, degrees_at_t0=90)
         self.assertEqual((100, 0), uw(gen.get_traj_point(0)))
+
+    #--------------------------------------------------------
+    def test_generate_counter_clockwise_angle0(self):
+
+        gen = CircularTrajectoryGenerator(center=(0,0), radius=100, degrees_per_sec=90, clockwise=False, degrees_at_t0=90)
+        self.assertEqual((0, 100), uw(gen.get_traj_point(1)))
 
     #--------------------------------------------------------
     def test_generate_change_duration(self):

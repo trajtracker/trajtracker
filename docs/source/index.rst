@@ -15,7 +15,7 @@ trajtracker.stimuli
 Visual objects.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :glob:
 
    stimuli/*
@@ -25,7 +25,7 @@ trajtracker.movement
 --------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :glob:
 
    movement/*
@@ -40,17 +40,28 @@ observe a mouse/finger movement.
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :glob:
 
    validators/*
+
+
+trajtracker.events
+------------------
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   events/events_overview
+   events/Event
 
 
 trajtracker.misc
 ----------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :glob:
 
    misc/*
@@ -60,7 +71,7 @@ other modules
 -------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :glob:
 
    utils

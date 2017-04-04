@@ -7,7 +7,6 @@ An error object, describing an invalid user behavior during the experiment
 """
 
 
-
 class ExperimentError(BaseException):
 
     """

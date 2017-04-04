@@ -1,6 +1,6 @@
 """
 
-Trajectory generators (to be used by StimulusAnimator)
+Generate a circular trajectory
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
@@ -12,16 +12,13 @@ import numpy as np
 
 import trajtracker
 import trajtracker._utils as _u
+from trajtracker.data import fromXML
 
 
 class CircularTrajectoryGenerator(trajtracker._TTrkObject):
-    """
-    Generate a circular movement trajectory for a stimulus.
 
-    Use this class in conjunction with :class:`~trajtracker.movement.StimulusAnimator`
-    """
-
-    def __init__(self, center=None, radius=None, degrees_per_sec=None, degrees_at_t0=None):
+    def __init__(self, center=None, radius=None, degrees_per_sec=None, full_rotation_duration=None,
+                 degrees_at_t0=None, clockwise=True):
         """
         Constructor
 
@@ -32,6 +29,14 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         """
         super(CircularTrajectoryGenerator, self).__init__()
 
+        if full_rotation_duration is not None and degrees_per_sec is not None:
+            raise ValueError("trajtracker error: you cannot provide both full_rotation_duration and degrees_per_sec " +
+                             "to the constructor of {:}".format(type(self).__name__))
+
+        self._center = None
+        self._radius = None
+        self._degrees_per_sec = None
+
         if center is not None:
             self.center = center
 
@@ -41,7 +46,11 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         if degrees_per_sec is not None:
             self.degrees_per_sec = degrees_per_sec
 
+        if full_rotation_duration is not None:
+            self.full_rotation_duration = full_rotation_duration
+
         self.degrees_at_t0 = degrees_at_t0
+        self.clockwise = clockwise
 
 
     #============================================================================
@@ -57,14 +66,15 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         """
 
         _u.validate_func_arg_type(self, "get_xy", "time", time, numbers.Number)
-        if not hasattr(self, "_center"):
+        if self._center is None:
             raise trajtracker.InvalidStateError("trajtracker error: {:}.get_xy() was called without setting center".format(type(self).__name__))
-        if not hasattr(self, "_degrees_per_sec"):
+        if self._degrees_per_sec is None:
             raise trajtracker.InvalidStateError("trajtracker error: {:}.get_xy() was called without setting degrees_per_sec".format(type(self).__name__))
-        if not hasattr(self, "_radius"):
+        if self._radius is None:
             raise trajtracker.InvalidStateError("trajtracker error: {:}.get_xy() was called without setting radius".format(type(self).__name__))
 
-        curr_degrees = (self._degrees_at_t0 + self._degrees_per_sec * time) % 360
+        dps = self._degrees_per_sec * (1 if self._clockwise else -1)
+        curr_degrees = (self._degrees_at_t0 + dps * time) % 360
 
         curr_degrees_rad = curr_degrees / 360 * np.pi * 2
 
@@ -92,6 +102,7 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         return self._center
 
     @center.setter
+    @fromXML(_u.parse_coord)
     def center(self, value):
         value = _u.validate_attr_is_coord(self, "center", value)
         self._center = value
@@ -106,6 +117,7 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         return self._radius
 
     @radius.setter
+    @fromXML(float)
     def radius(self, value):
         _u.validate_attr_type(self, "radius", value, numbers.Number)
         _u.validate_attr_positive(self, "radius", value)
@@ -121,6 +133,7 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         return self._degrees_per_sec
 
     @degrees_per_sec.setter
+    @fromXML(float)
     def degrees_per_sec(self, value):
         _u.validate_attr_type(self, "degrees_per_sec", value, numbers.Number)
         _u.validate_attr_positive(self, "degrees_per_sec", value)
@@ -136,9 +149,10 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         return 360 / self._degrees_per_sec
 
     @full_rotation_duration.setter
+    @fromXML(float)
     def full_rotation_duration(self, value):
-        _u.validate_attr_type(self, "degrees_per_sec", value, numbers.Number)
-        _u.validate_attr_positive(self, "degrees_per_sec", value)
+        _u.validate_attr_type(self, "full_rotation_duration", value, numbers.Number)
+        _u.validate_attr_positive(self, "full_rotation_duration", value)
         self._degrees_per_sec = (360 / value) % 360
 
     #------------------------------------------------------------
@@ -150,7 +164,23 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         return self._degrees_at_t0
 
     @degrees_at_t0.setter
+    @fromXML(float)
     def degrees_at_t0(self, value):
         value = _u.validate_attr_numeric(self, "degrees_at_t0", value, none_value=_u.NoneValues.ChangeTo0)
         self._degrees_at_t0 = value % 360
+
+
+    #------------------------------------------------------------
+    @property
+    def clockwise(self):
+        """
+        Whether the movement is clockwise or counter-clockwise
+        """
+        return self._clockwise
+
+    @clockwise.setter
+    @fromXML(bool)
+    def clockwise(self, value):
+        _u.validate_attr_type(self, "clockwise", value, bool)
+        self._clockwise = value
 

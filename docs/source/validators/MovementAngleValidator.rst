@@ -1,7 +1,12 @@
-.. Dobby Tools : MovementAngleValidator.py
+.. TrajTracker : MovementAngleValidator.py
 
 MovementAngleValidator class
 ============================
+
+
+
+Methods and properties:
+-----------------------
 
 .. autoclass:: trajtracker.validators.MovementAngleValidator
    :members:

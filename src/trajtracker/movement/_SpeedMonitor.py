@@ -16,9 +16,6 @@ import trajtracker._utils as _u
 
 
 class SpeedMonitor(trajtracker._TTrkObject):
-    """
-    Monitor the mouse/finger instantaneous speed
-    """
 
 
     #-------------------------------------------------------------------------

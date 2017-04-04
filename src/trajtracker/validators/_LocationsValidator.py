@@ -17,11 +17,6 @@ from trajtracker.data import fromXML
 
 
 class LocationsValidator(_BaseValidator):
-    """
-    This validator gets an image, and validates that the mouse/finger would be placed
-    only on pixels of certain color(s).
-    You can define either the valid colors or the invalid colors.
-    """
 
     err_invalid_coordinates = "InvalidCoords"
     arg_color = 'color'  # ExperimentError argument: the color in the invalid location

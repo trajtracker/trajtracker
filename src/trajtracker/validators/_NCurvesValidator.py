@@ -22,13 +22,6 @@ from trajtracker.data import fromXML
 
 
 class NCurvesValidator(_BaseValidator):
-    """
-    Validate that there aren't too many curves per trial (i.e., that the participant is not zigzagging)
-
-    A curve is defined as a trajectory section where the finger/mouse consistently changes its course
-    in the same direction (clockwise or counter-clockwise).
-
-    """
 
 
     err_too_many_curves = "TooManyCurves"

@@ -28,6 +28,8 @@ import expyriment as xpy
 
 class _TTrkObject(object):
 
+    log_to_console = False
+
     def __init__(self):
         self.log_level = self.log_none
 
@@ -81,6 +83,8 @@ class _TTrkObject(object):
         if prepend_self:
             msg = type(self).__name__ + "," + msg
         xpy._internals.active_exp._event_file_log(msg, 1)
+        if _TTrkObject.log_to_console:
+            print(msg)
 
     #-------------------------------------------------
     # Write to log when entering a function
@@ -105,6 +109,7 @@ import trajtracker._utils as _utils
 
 import trajtracker.misc as misc
 import trajtracker.data as data
+import trajtracker.events as events
 import trajtracker.stimuli as stimuli
 import trajtracker.movement as movement
 import trajtracker.validators as validators

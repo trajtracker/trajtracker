@@ -19,10 +19,6 @@ from trajtracker.validators import ValidationAxis, ExperimentError, _BaseValidat
 
 # noinspection PyAttributeOutsideInit
 class InstantaneousSpeedValidator(_BaseValidator):
-    """
-    Validator for momentary (instantanesous) speed: make sure that at each given moment, the
-    movement speed is within the valid boundaries
-    """
 
     err_too_slow = "TooSlowInstantaneous"
     err_too_fast = "TooFast"

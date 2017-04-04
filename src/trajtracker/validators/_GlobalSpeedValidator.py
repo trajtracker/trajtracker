@@ -41,11 +41,6 @@ def _parse_xml_milestones(xml):
 
 # noinspection PyAttributeOutsideInit
 class GlobalSpeedValidator(_BaseValidator):
-    """
-    Validate minimal movement speed.
-    The validation is of the *average* speed per trial. The validator can also interpolate the speed limit,
-    i.e., impose the limit on the average speed from time=0 until any time point during the trial.
-    """
 
     err_too_slow = "TooSlowGlobal"
 
@@ -501,7 +496,7 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
         self._initialized = False
         self._guide_line = None
 
-        self.line_width = 1
+        self.line_width = 2
         self.colour_grace = (255, 255, 255)
         self.colour_ok = (0, 255, 0)
         self.colour_err = (255, 0, 0)
@@ -545,20 +540,20 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
             return xpy._internals.active_exp.screen.size[0]
 
     #--------------------------------------------------
-    def _create_line(self, start_pt, end_pt, color):
+    def _create_line(self, start_pt, end_pt, color, r2=False):
         line = xpy.stimuli.Line(start_point=start_pt, end_point=end_pt, line_width=self._line_width, colour=color)
         line.position = (0,0)
         line.preload()
 
         if self._validator.axis == ValidationAxis.x:
-            line_canvas_size = (self._line_width, self._get_line_length())
+            line_canvas_size = (self._line_width, self._get_line_length() + 2)
         else:
-            line_canvas_size = (self._get_line_length(), self._line_width)
+            line_canvas_size = (self._get_line_length() + 2, self._line_width)
         canvas = xpy.stimuli.Canvas(size=line_canvas_size)
         line.plot(canvas)
         canvas.preload()
 
-        return canvas
+        return (canvas,line) if r2 else canvas
 
 
     #=====================================================================================
@@ -568,6 +563,8 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
 
     #------------------------------------------------------------------------
     def show(self, coord, line_mode):
+
+        self._log_func_enters("show", [coord, line_mode])
 
         if self._guide_line is None:
             self._create_guide_line()  # try creating again. Maybe the experiment was inactive

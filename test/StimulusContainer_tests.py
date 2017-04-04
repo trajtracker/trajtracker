@@ -11,8 +11,8 @@ class StimulusContainerTests(unittest.TestCase):
         c = StimulusContainer()
         a = DummyStimulus()
         b = DummyStimulus()
-        c.add("a", a)
-        c.add("b", b)
+        c.add(a, "a")
+        c.add(b, "b")
 
         self.assertEqual(a, c['a'])
         self.assertEqual(b, c['b'])
@@ -23,8 +23,8 @@ class StimulusContainerTests(unittest.TestCase):
         c = StimulusContainer()
         a = DummyStimulus()
         b = DummyStimulus()
-        c.add("a", a)
-        c.add("b", b)
+        c.add(a, "a")
+        c.add(b, "b")
 
         c.present()
         self.assertTrue(a.presented)
@@ -42,8 +42,8 @@ class StimulusContainerTests(unittest.TestCase):
         c = StimulusContainer()
         a = DummyStimulus()
         b = DummyStimulus()
-        c.add("a", a)
-        c.add("b", b)
+        c.add(a, "a")
+        c.add(b, "b")
         c["b"].visible = False
 
         c.present()

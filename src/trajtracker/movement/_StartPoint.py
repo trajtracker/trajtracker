@@ -17,12 +17,6 @@ from trajtracker.misc import shapes
 
 
 class StartPoint(trajtracker._TTrkObject):
-    """
-    A rectangular starting point.
-    The starting point defines two areas:
-    - start area: where you must touch/click to initiate a trial
-    - exit area: for successful start, you must drag the mouse/finger from the start area directly into this area
-    """
 
     default_exit_area_size = 100
 

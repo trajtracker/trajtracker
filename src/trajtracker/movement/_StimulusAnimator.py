@@ -13,16 +13,6 @@ import trajtracker._utils as _u
 
 
 class StimulusAnimator(trajtracker._TTrkObject):
-    """
-    Move a stimulus in a predefined visual trajectory.
-
-    The trajectory is defined by a separate class, a "trajectory generator", which defines where the stimulus
-    should appear in each time point. The trajectory generator should have a get_traj_point() method, which
-    gets a time point (a number, specifying seconds) and returns a dict with the trajectory info
-    at that time point ('x', 'y', and 'visible' entries, all optional).
-
-    See :class:`~trajtracker.movement.CircularTrajectoryGenerator` for an example trajectory generator.
-    """
 
 
     def __init__(self, animated_object=None, trajectory_generator=None, position_shift=None):
@@ -117,8 +107,8 @@ class StimulusAnimator(trajtracker._TTrkObject):
     @trajectory_generator.setter
     def trajectory_generator(self, obj):
 
-        if "get_xy" not in dir(obj):
-            raise ValueError("trajtracker error: {0}.trajectory_generator must be an object with a get_xy() method".format(type(self).__name__))
+        if "get_traj_point" not in dir(obj):
+            raise ValueError("trajtracker error: {0}.trajectory_generator must be an object with a get_traj_point() method".format(type(self).__name__))
 
         self._trajectory_generator = obj
 

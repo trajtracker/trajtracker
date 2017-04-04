@@ -22,32 +22,7 @@ import trajtracker._utils as _u
 
 
 # noinspection PyAttributeOutsideInit,PyProtectedMember
-class NumberLine(trajtracker._TTrkObject):
-    """
-     A class that plots a number line and monitors its behavior.
-
-     **How to use this class:**
-
-     - configure the object via constructor/properties
-     - :func:`trajtracker.stimuli.NumberLine.plot` or :func:`trajtracker.stimuli.NumberLine.present` it
-     - call :func:`trajtracker.stimuli.NumberLine.reset` when mouse/finger starts moving
-     - call :func:`trajtracker.stimuli.NumberLine.update_xy` when the mouse/finger continues moving
-
-
-     **Visual features:**
-
-     - Plot a number line, horizontal or vertical
-     - Optional tick marks at the end of the line and in locations along the line
-     - Optional text labels at the end of the line
-     - Allow modifying all common properties of the line and the text labels
-
-
-     **Behavioral features:**
-
-     - Detect when the finger/mouse clicks or crosses the number line
-     - Support both the physical coordinate space and the logical position on the line
-
-    """
+class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
     Orientation = Enum('Orientation', 'Horizontal Vertical')
 

@@ -9,15 +9,11 @@ Stimulus container: holds several stimuli, and can present them all
 import expyriment as xpy
 
 import trajtracker
+# noinspection PyProtectedMember
 import trajtracker._utils as _u
 
 
-class StimulusContainer(trajtracker._TTrkObject):
-    """
-    Maintain several stimuli, and can present them all in one command.
-
-    You can also define some of the stimuli as temporarily invisible.
-    """
+class StimulusContainer(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
 
     def __init__(self):
@@ -41,7 +37,10 @@ class StimulusContainer(trajtracker._TTrkObject):
         """
 
         visible_stims = [stim for stim in self._stimuli.values() if stim['stimulus'].visible]
-        visible_stims.sort(cmp=lambda a,b: cmp(a["order"], b['order']))
+        visible_stims.sort(cmp=lambda a, b: cmp(a["order"], b['order']))
+
+        if self._should_log(self.log_trace):
+            self._log_write("Present,stimuli={:}".format(";".join([str(s['id']) for s in visible_stims])))
 
         for i in range(len(visible_stims)):
             c = clear if i == 0 else False
@@ -50,28 +49,39 @@ class StimulusContainer(trajtracker._TTrkObject):
 
 
     #----------------------------------------------------------
-    def add(self, stimulus_id, stimulus, visible=True):
+    def add(self, stimulus, stimulus_id=None, visible=True):
         """
         Add a stimulus to the container.
 
-        :param stimulus_id: Stimulus name. Use it later to set the stimulus as visible/invisible.
         :param stimulus: An Expyriment stimulus, or any other object that has a similar present() method
+        :param stimulus_id: Stimulus name. Use it later to set the stimulus as visible/invisible.
+                            If not provided or None, an arbitrary ID will be generated.
         :param visible: See The stimulus ID (as defined in :func:`~trajtracker.stimuli.StimulusContainer.set_visible`)
         :return:
         """
 
         _u.validate_func_arg_type(self, "add", "visible", visible, bool)
-        if not "present" in dir(stimulus):
+        if "present" not in dir(stimulus):
             raise TypeError("trajtracker error: invalid stimulus ({:}) in {:}.add() - expecting an expyriment stimulus".format(
                 stimulus, type(self).__name__))
 
         stimulus.visible = visible
 
+        if stimulus_id is None:
+            n = len(self._stimuli)+1
+            while True:
+                stimulus_id = "stimulus#{:}".format(n)
+                if stimulus_id in self._stimuli:
+                    n += 1
+                else:
+                    break
+
+
         order = len(self._stimuli)
         if stimulus_id not in self._stimuli:
             order += 1
 
-        self._stimuli[stimulus_id] = {'stimulus': stimulus, 'order': order}
+        self._stimuli[stimulus_id] = dict(id=stimulus_id, stimulus=stimulus, order=order)
 
 
     #----------------------------------------------------------

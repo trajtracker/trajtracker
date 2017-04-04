@@ -14,10 +14,6 @@ from expyriment.stimuli import Picture
 import trajtracker
 
 class PictureSet(trajtracker._TTrkObject):
-    """
-     A class that holds a set of expyriment.stimuli.Picture objects, each with a logical name.
-     It can retrieve each picture, and rescale all pictures to the same size
-    """
 
     #
     # Defines how images are scaled to the dictionary's size:

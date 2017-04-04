@@ -20,9 +20,6 @@ from trajtracker.utils import color_rgb_to_num
 
 # noinspection PyAttributeOutsideInit
 class LocationColorMap(trajtracker._TTrkObject):
-    """
-    Translate the finger location into a code, according to a BMP image
-    """
 
     #-------------------------------------------------
     def __init__(self, image, position=None, use_mapping=False, colormap=None):

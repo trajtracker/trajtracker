@@ -16,10 +16,6 @@ from trajtracker.data import fromXML
 
 
 class MoveByGradientValidator(_BaseValidator):
-    """
-    This validator gets an image, and allows mouse to move only according to it -
-    from a light color to a darker color (or vice versa).
-    """
 
     err_gradient = "GradientViolation"
 
