@@ -58,7 +58,7 @@ class LocationsValidator(_BaseValidator):
     @fromXML(_u.parse_coord)
     def position(self, value):
         self._lcm.position = value
-        self._log_setter("position")
+        self._log_property_changed("position")
 
 
     #-------------------------------------------------
@@ -77,7 +77,7 @@ class LocationsValidator(_BaseValidator):
     def default_valid(self, value):
         _u.validate_attr_type(self, "default_valid", value, bool)
         self._default_valid = value
-        self._log_setter("default_valid")
+        self._log_property_changed("default_valid")
 
 
     #-------------------------------------------------
@@ -89,7 +89,7 @@ class LocationsValidator(_BaseValidator):
     @fromXML(_u.parse_rgb_list, raw_xml=True)
     def valid_colors(self, value):
         self._valid_colors = self._get_colors_as_ints(value, "valid_colors")
-        self._log_setter("valid_colors")
+        self._log_property_changed("valid_colors")
 
 
     #-------------------------------------------------
@@ -101,7 +101,7 @@ class LocationsValidator(_BaseValidator):
     @fromXML(_u.parse_rgb_list, raw_xml=True)
     def invalid_colors(self, value):
         self._invalid_colors = self._get_colors_as_ints(value, "valid_colors")
-        self._log_setter("invalid_colors")
+        self._log_property_changed("invalid_colors")
 
 
     def _get_colors_as_ints(self, value, attr_name):

@@ -249,7 +249,7 @@ class GlobalSpeedValidator(_BaseValidator):
             raise ValueError(_u.ErrMsg.attr_invalid_value(self.__class__, "axis", value))
 
         self._axis = value
-        self._log_setter("axis")
+        self._log_property_changed("axis")
 
     #-----------------------------------------------------------------------------------
     @property
@@ -265,7 +265,7 @@ class GlobalSpeedValidator(_BaseValidator):
     def origin_coord(self, value):
         _u.validate_attr_numeric(self, "origin_coord", value, _u.NoneValues.Invalid)
         self._origin_coord = value
-        self._log_setter("origin_coord")
+        self._log_property_changed("origin_coord")
 
     #-----------------------------------------------------------------------------------
     @property
@@ -281,7 +281,7 @@ class GlobalSpeedValidator(_BaseValidator):
     def end_coord(self, value):
         _u.validate_attr_numeric(self, "end_coord", value, _u.NoneValues.Invalid)
         self._end_coord = value
-        self._log_setter("end_coord")
+        self._log_property_changed("end_coord")
 
 
     #-----------------------------------------------------------------------------------
@@ -296,7 +296,7 @@ class GlobalSpeedValidator(_BaseValidator):
         value = _u.validate_attr_numeric(self, "grace_period", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "grace_period", value)
         self._grace_period = value
-        self._log_setter("grace_period")
+        self._log_property_changed("grace_period")
 
     #-----------------------------------------------------------------------------------
     @property
@@ -310,7 +310,7 @@ class GlobalSpeedValidator(_BaseValidator):
         value = _u.validate_attr_numeric(self, "max_trial_duration", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_positive(self, "max_trial_duration", value)
         self._max_trial_duration = value
-        self._log_setter("max_trial_duration")
+        self._log_property_changed("max_trial_duration")
 
     #-----------------------------------------------------------------------------------
 
@@ -602,6 +602,7 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
     def visible(self, value):
         _u.validate_attr_type(self, "visible", value, bool)
         self._visible = value
+        self._log_property_changed("visible")
 
 
     #-------------------------------------------------------
@@ -618,6 +619,7 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
     def do_present(self, value):
         _u.validate_attr_type(self, "do_present", value, bool)
         self._do_present = value
+        self._log_property_changed("do_present")
 
 
     #-------------------------------------------------------
@@ -631,6 +633,7 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
         _u.validate_attr_rgb(self, "colour_grace", value)
         self._colour_grace = value
         self._create_guide_line()
+        self._log_property_changed("colour_grace")
 
     #--------------------------
     @property
@@ -643,6 +646,7 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
         _u.validate_attr_rgb(self, "colour_ok", value)
         self._colour_ok = value
         self._create_guide_line()
+        self._log_property_changed("colour_ok")
 
     #--------------------------
     @property
@@ -655,6 +659,7 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
         _u.validate_attr_rgb(self, "colour_err", value)
         self._colour_err = value
         self._create_guide_line()
+        self._log_property_changed("colour_err")
 
     #-------------------------------------------------------
     @property
@@ -667,3 +672,4 @@ class GlobalSpeedGuide(trajtracker._TTrkObject):
         _u.validate_attr_type(self, "line_width", value, int)
         self._line_width = value
         self._create_guide_line()
+        self._log_property_changed("line_width")

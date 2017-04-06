@@ -267,7 +267,7 @@ class DirectionMonitor(trajtracker._TTrkObject):
         _u.validate_attr_numeric(self, "min_distance", value)
         _u.validate_attr_not_negative(self, "min_distance", value)
         self._min_distance = value
-        self._log_setter("min_distance")
+        self._log_property_changed("min_distance")
 
 
     #-------------------------------------
@@ -282,7 +282,7 @@ class DirectionMonitor(trajtracker._TTrkObject):
     def angle_units(self, value):
         _u.validate_attr_type(self, "angle_units", value, self.Units)
         self._angle_units = value
-        self._log_setter("angle_units")
+        self._log_property_changed("angle_units")
 
     #-------------------------------------
     @property
@@ -299,7 +299,7 @@ class DirectionMonitor(trajtracker._TTrkObject):
     def zero_angle(self, value):
         _u.validate_attr_numeric(self, "zero_angle", value)
         self._zero_angle = value
-        self._log_setter("zero_angle")
+        self._log_property_changed("zero_angle")
 
 
     #-------------------------------------
@@ -316,4 +316,4 @@ class DirectionMonitor(trajtracker._TTrkObject):
         _u.validate_attr_numeric(self, "min_angle_change_per_curve", value)
         _u.validate_attr_not_negative(self, "min_angle_change_per_curve", value)
         self._min_angle_change_per_curve = value
-        self._log_setter("min_angle_change_per_curve")
+        self._log_property_changed("min_angle_change_per_curve")

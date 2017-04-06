@@ -105,6 +105,7 @@ class NCurvesValidator(_BaseValidator):
         _u.validate_attr_numeric(self, "max_curves_per_trial", value, none_value=_u.NoneValues.Valid)
         _u.validate_attr_not_negative(self, "max_curves_per_trial", value)
         self._max_curves_per_trial = value
+        self._log_property_changed("max_curves_per_trial")
 
     #-------------------------------------
     @property
@@ -119,6 +120,7 @@ class NCurvesValidator(_BaseValidator):
     @fromXML(float)
     def min_distance(self, value):
         self._direction_monitor.min_distance = value
+        self._log_property_changed("min_distance")
 
 
     #-------------------------------------
@@ -135,3 +137,4 @@ class NCurvesValidator(_BaseValidator):
     @fromXML(float)
     def min_angle_change_per_curve(self, value):
         self._direction_monitor.min_angle_change_per_curve = value
+        self._log_property_changed("min_angle_change_per_curve")

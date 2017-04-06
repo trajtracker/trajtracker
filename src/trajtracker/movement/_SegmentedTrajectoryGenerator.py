@@ -112,6 +112,7 @@ class SegmentedTrajectoryGenerator(trajtracker._TTrkObject):
     def cyclic(self, value):
         _u.validate_attr_type(self, "cyclic", value, bool)
         self._cyclic = value
+        self._log_property_changed("cyclic")
 
     #------------------------------------------------------------
     @property

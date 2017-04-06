@@ -193,7 +193,7 @@ class MovementAngleValidator(_BaseValidator):
         self._min_angle = value % 360
         self._min_angle_rad = self._min_angle / 360 * np.pi * 2
 
-        self._log_setter("min_angle")
+        self._log_property_changed("min_angle")
 
     #-----------------------------------------------------------------------------------
     @property
@@ -219,7 +219,7 @@ class MovementAngleValidator(_BaseValidator):
         self._max_angle = value % 360
         self._max_angle_rad = self._max_angle / 360 * np.pi * 2
 
-        self._log_setter("max_angle")
+        self._log_property_changed("max_angle")
 
     #-----------------------------------------------------------------------------------
     @property
@@ -235,7 +235,7 @@ class MovementAngleValidator(_BaseValidator):
         value = _u.validate_attr_numeric(self, "calc_angle_interval", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "calc_angle_interval", value)
         self._calc_angle_interval = value
-        self._log_setter("calc_angle_interval")
+        self._log_property_changed("calc_angle_interval")
 
     #-----------------------------------------------------------------------------------
     @property
@@ -249,5 +249,5 @@ class MovementAngleValidator(_BaseValidator):
         value = _u.validate_attr_numeric(self, "grace_period", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "grace_period", value)
         self._grace_period = value
-        self._log_setter("grace_period")
+        self._log_property_changed("grace_period")
 

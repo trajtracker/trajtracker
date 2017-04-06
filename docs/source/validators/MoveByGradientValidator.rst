@@ -13,7 +13,9 @@ RGB colors are represented in Python as (red, green, blue) tuples. The tuple can
 by calculating
 
 .. code-block:: python
+
    numeric_value = red * 256 * 256 + green * 256 + blue
+
 
 This is the value used by the validator to determine the gradient.
 

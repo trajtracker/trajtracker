@@ -202,4 +202,4 @@ class SpeedMonitor(trajtracker._TTrkObject):
         _u.validate_attr_type(self, "calculation_interval", value, numbers.Number)
         _u.validate_attr_not_negative(self, "calculation_interval", value)
         self._calculation_interval = value
-        self._log_setter("calculation_interval")
+        self._log_property_changed("calculation_interval")

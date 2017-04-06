@@ -519,7 +519,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
             raise ValueError("trajtracker error: invalid value for NumberLine.orientation ({0}) - expecting NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical".format(value))
 
         self._orientation = value
-        self._log_setter("orientation")
+        self._log_property_changed("orientation")
 
     #-----------------------------------------------------------
     @property
@@ -536,7 +536,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         value = _u.validate_attr_is_coord(self, "position", value)
         self._mid_x = value[0]
         self._mid_y = value[1]
-        self._log_setter("position")
+        self._log_property_changed("position")
 
         if self._canvas is not None:
             self._canvas.position = self.position
@@ -555,7 +555,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         _u.validate_attr_positive(self, "line_length", value)
 
         self._line_length = value
-        self._log_setter("line_length")
+        self._log_property_changed("line_length")
 
     #-----------------------------------------------------------
     @property
@@ -572,7 +572,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         _u.validate_attr_type(self, "end_tick_height", value, numbers.Number, none_allowed=True)
 
         self._end_tick_height = value
-        self._log_setter("end_tick_height")
+        self._log_property_changed("end_tick_height")
 
     #-----------------------------------------------------------
     @property
@@ -587,7 +587,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         _u.validate_attr_positive(self, "line_width", value)
 
         self._line_width = value
-        self._log_setter("line_width")
+        self._log_property_changed("line_width")
 
     #-----------------------------------------------------------
     @property
@@ -600,7 +600,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         self._validate_unlocked()
         _u.validate_attr_rgb(self, "line_colour", value, none_allowed=True)
         self._line_colour = value
-        self._log_setter("line_colour")
+        self._log_property_changed("line_colour")
 
 
     ###################################
@@ -618,7 +618,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         _u.validate_attr_type(self, "labels_visible", value, bool)
 
         self._labels_visible = value
-        self._log_setter("labels_visible")
+        self._log_property_changed("labels_visible")
 
     #-----------------------------------------------------------
     @property
@@ -632,7 +632,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         _u.validate_attr_type(self, "labels_font_name", value, str, none_allowed=True)
 
         self._labels_font_name = value
-        self._log_setter("labels_font_name")
+        self._log_property_changed("labels_font_name")
 
     #-----------------------------------------------------------
     @property
@@ -648,7 +648,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         self._validate_unlocked()
         _u.validate_attr_rgb(self, "line_colour", value, none_allowed=True)
         self._labels_font_colour = value
-        self._log_setter("labels_font_colour")
+        self._log_property_changed("labels_font_colour")
 
 
     #-----------------------------------------------------------
@@ -664,7 +664,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         _u.validate_attr_positive(self, "labels_font_size", value)
 
         self._labels_font_size = value
-        self._log_setter("labels_font_size")
+        self._log_property_changed("labels_font_size")
 
 
     #-----------------------------------------------------------
@@ -683,7 +683,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
             _u.validate_attr_positive(self, "labels_box_size[1]", value[1])
 
         self._labels_box_size = value
-        self._log_setter("labels_box_size")
+        self._log_property_changed("labels_box_size")
 
     #-----------------------------------------------------------
     @property
@@ -700,7 +700,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         value = _u.validate_attr_is_coord(self, "labels_offset", value, True)
         self._labels_offset_x = value[0]
         self._labels_offset_y = value[1]
-        self._log_setter("labels_offset")
+        self._log_property_changed("labels_offset")
 
     #-----------------------------------------------------------
     @property
@@ -718,7 +718,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
             _u.validate_attr_type(self, "label_min_text", value, str, none_allowed=True)
 
         self._label_min_text = value
-        self._log_setter("label_min_text")
+        self._log_property_changed("label_min_text")
 
     #-----------------------------------------------------------
     @property
@@ -736,7 +736,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
             _u.validate_attr_type(self, "label_max_text", value, str, none_allowed=True)
 
         self._label_max_text = value
-        self._log_setter("label_max_text")
+        self._log_property_changed("label_max_text")
 
 
 
@@ -756,7 +756,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         self._validate_unlocked()
         _u.validate_attr_type(self, "min_value", value, numbers.Number)
         self._min_value = value
-        self._log_setter("min_value")
+        self._log_property_changed("min_value")
 
     #-----------------------------------------------------------
     @property
@@ -769,7 +769,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         self._validate_unlocked()
         _u.validate_attr_type(self, "max_value", value, numbers.Number)
         self._max_value = value
-        self._log_setter("max_value")
+        self._log_property_changed("max_value")
 
 
     #-----------------------------------------------------------
@@ -783,7 +783,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         _u.validate_attr_type(self, "visible", value, bool)
 
         self._visible = value
-        self._log_setter("visible")
+        self._log_property_changed("visible")
 
 
     ###################################
@@ -802,7 +802,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         _u.validate_attr_type(self, "touch_distance", value, numbers.Number, none_allowed=True)
 
         self._touch_distance = value
-        self._log_setter("touch_distance")
+        self._log_property_changed("touch_distance")
 
 
     #-----------------------------------------------------------
@@ -817,4 +817,4 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         _u.validate_attr_type(self, "touch_directioned", value, bool)
 
         self._touch_directioned = value
-        self._log_setter("touch_directioned")
+        self._log_property_changed("touch_directioned")

@@ -54,7 +54,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
     def tracking_active(self, value):
         _u.validate_attr_type(self, "tracking_active", value, bool)
         self._tracking_active = value
-        self._log_setter("tracking_active")
+        self._log_property_changed("tracking_active")
 
 
     #----------------------------------------------------
@@ -70,7 +70,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
     def track_if_no_movement(self, value):
         _u.validate_attr_type(self, "track_if_no_movement", value, bool)
         self._track_if_no_movement = value
-        self._log_setter("track_if_no_movement")
+        self._log_property_changed("track_if_no_movement")
 
 
     #==============================================================================

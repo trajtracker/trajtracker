@@ -97,7 +97,7 @@ class LocationColorMap(trajtracker._TTrkObject):
         _u.validate_attr_type(self, "position[1]", value[1], numbers.Number)
 
         self._position = (value[0], value[1])
-        self._log_setter("position")
+        self._log_property_changed("position")
 
         #-- Find top-left coordinates. The rounding is done in the same way as Expyriment does.
         self._top_left_x = value[0] - int(np.floor((self._width-1)/2))
@@ -118,7 +118,7 @@ class LocationColorMap(trajtracker._TTrkObject):
     def use_mapping(self, value):
         _u.validate_attr_type(self, "use_mapping", value, bool)
         self._use_mapping = value
-        self._log_setter("use_mapping")
+        self._log_property_changed("use_mapping")
 
 
     #-------------------------------------------------
@@ -175,7 +175,7 @@ class LocationColorMap(trajtracker._TTrkObject):
                 "trajtracker error: {0}.color_codes can only be set to None, 'default', or a dict. Invalid value: {1}".format(
                     self.__class__, value))
 
-        self._log_setter("colormap", value)
+        self._log_property_changed("colormap", value)
 
 
     #====================================================================================

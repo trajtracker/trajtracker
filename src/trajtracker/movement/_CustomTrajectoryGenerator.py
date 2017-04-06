@@ -333,6 +333,7 @@ class CustomTrajectoryGenerator(trajtracker._TTrkObject):
     def interpolate(self, value):
         _u.validate_attr_type(self, "interpolate", value, bool)
         self._interpolate = value
+        self._log_property_changed("interpolate")
 
 
     #---------------------------------------------------------------
@@ -350,4 +351,5 @@ class CustomTrajectoryGenerator(trajtracker._TTrkObject):
         self._cyclic = value
 
         self._validation_err = None
+        self._log_property_changed("cyclic")
 

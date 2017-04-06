@@ -138,7 +138,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
     def axis(self, value):
         _u.validate_attr_type(self, "axis", value, ValidationAxis)
         self._axis = value
-        self._log_setter("axis")
+        self._log_property_changed("axis")
 
 
     #-----------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
         _u.validate_attr_numeric(self, "min_speed", value, none_value=_u.NoneValues.Valid)
         _u.validate_attr_positive(self, "min_speed", value)
         self._min_speed = value
-        self._log_setter("min_speed")
+        self._log_property_changed("min_speed")
 
     #-----------------------------------------------------------------------------------
     @property
@@ -173,7 +173,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
         _u.validate_attr_numeric(self, "max_speed", value, none_value=_u.NoneValues.Valid)
         _u.validate_attr_positive(self, "max_speed", value)
         self._max_speed = value
-        self._log_setter("max_speed")
+        self._log_property_changed("max_speed")
 
     #-----------------------------------------------------------------------------------
     @property
@@ -187,7 +187,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
         value = _u.validate_attr_numeric(self, "grace_period", value, none_value=_u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "grace_period", value)
         self._grace_period = value
-        self._log_setter("grace_period")
+        self._log_property_changed("grace_period")
 
     #-----------------------------------------------------------------------------------
     @property
@@ -202,4 +202,4 @@ class InstantaneousSpeedValidator(_BaseValidator):
     @fromXML(float)
     def calculation_interval(self, value):
         self._speed_monitor.calculation_interval = value
-        self._log_setter("calculation_interval")
+        self._log_property_changed("calculation_interval")

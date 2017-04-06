@@ -108,6 +108,7 @@ class LineTrajectoryGenerator(trajtracker._TTrkObject):
     def start_point(self, value):
         value = _u.validate_attr_is_coord(self, "start_point", value)
         self._start_point = value
+        self._log_property_changed("start_point")
 
 
     #------------------------------------------------------------
@@ -123,6 +124,7 @@ class LineTrajectoryGenerator(trajtracker._TTrkObject):
     def end_point(self, value):
         value = _u.validate_attr_is_coord(self, "end_point", value)
         self._end_point = value
+        self._log_property_changed("end_point")
 
 
     #------------------------------------------------------------
@@ -139,6 +141,8 @@ class LineTrajectoryGenerator(trajtracker._TTrkObject):
         _u.validate_attr_type(self, "duration", value, numbers.Number)
         _u.validate_attr_positive(self, "duration", value)
         self._duration = value
+        self._log_property_changed("duration")
+
 
     #------------------------------------------------------------
     @property
@@ -151,6 +155,8 @@ class LineTrajectoryGenerator(trajtracker._TTrkObject):
     def return_to_start(self, value):
         _u.validate_attr_type(self, "return_to_start", value, bool)
         self._return_to_start = value
+        self._log_property_changed("return_to_start")
+
 
     #------------------------------------------------------------
     @property
@@ -163,3 +169,4 @@ class LineTrajectoryGenerator(trajtracker._TTrkObject):
     def cyclic(self, value):
         _u.validate_attr_type(self, "cyclic", value, bool)
         self._cyclic = value
+        self._log_property_changed("cyclic")

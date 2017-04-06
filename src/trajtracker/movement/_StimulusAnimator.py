@@ -95,6 +95,7 @@ class StimulusAnimator(trajtracker._TTrkObject):
             raise ValueError("trajtracker error: {0}.animated_object must be an object with a 'position' property".format(type(self).__name__))
 
         self._animated_object = obj
+        self._log_property_changed("animated_object")
 
     #------------------------------------------------------------
     @property
@@ -127,6 +128,7 @@ class StimulusAnimator(trajtracker._TTrkObject):
     def position_shift(self, value):
         value = _u.validate_attr_is_coord(self, "position_shift", value, change_none_to_0=True)
         self._position_shift = value
+        self._log_property_changed("position_shift")
 
     #------------------------------------------------------------
     @property
@@ -140,6 +142,7 @@ class StimulusAnimator(trajtracker._TTrkObject):
     def do_clear_screen(self, value):
         _u.validate_attr_type(self, "do_clear_screen", value, bool)
         self._do_clear_screen = value
+        self._log_property_changed("do_clear_screen")
 
     #------------------------------------------------------------
     @property
@@ -153,4 +156,5 @@ class StimulusAnimator(trajtracker._TTrkObject):
     def do_update_screen(self, value):
         _u.validate_attr_type(self, "do_update_screen", value, bool)
         self._do_update_screen = value
+        self._log_property_changed("do_update_screen")
 

@@ -156,11 +156,13 @@ class PictureSet(trajtracker._TTrkObject):
     @position.setter
     def position(self, position):
         self._position = position
-        self._log_setter("position")
+        self._log_property_changed("position")
 
         if self._preloaded:
             for name in self._pics:
                 self._pics[name].position = position
+
+        self._log_property_changed("position")
 
     # =======================================================================================
     #    Access pictures

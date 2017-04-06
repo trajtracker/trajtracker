@@ -65,10 +65,10 @@ class StartPoint(trajtracker._TTrkObject):
     def exit_area(self, value):
         if isinstance(value, str):
             self._exit_area = self._create_default_exit_area(value)
-            self._log_setter("exit_area", value=value)
+            self._log_property_changed("exit_area", value=value)
         elif "overlapping_with_position" in dir(value):
             self._exit_area = value
-            self._log_setter("exit_area", value="shape")
+            self._log_property_changed("exit_area", value="shape")
         else:
             raise ValueError("trajtracker error: invalid value for %s.exit_area" % type(self).__name__)
 

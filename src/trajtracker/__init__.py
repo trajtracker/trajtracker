@@ -31,7 +31,7 @@ class _TTrkObject(object):
     log_to_console = False
 
     def __init__(self):
-        self.log_level = self.log_none
+        self.log_level = self.log_error
 
 
     #-- Log levels (each level will also print the higher log levels)
@@ -40,31 +40,34 @@ class _TTrkObject(object):
     log_info = 3
     log_warn = 4
     log_error = 5
-    log_none = 9999
+    log_none = 6
 
     @property
     def log_level(self):
-        """Getter for logging level."""
+        """
+        Logging level of this object: log_none, log_error (default), log_warn, log_info, log_debug, log_trace
+        """
         return self._log_level
 
     @log_level.setter
     def log_level(self, level):
-        """
-        Set the log level of this object
-        :param level: Use the constants _TTrkObject.log_xxxxx
-        """
+        if level is None or not isinstance(level, int) or level < _TTrkObject.log_trace or level > _TTrkObject.log_none:
+            raise ValueError("trajtracker error: invalid log_level({:})".format(level))
+
         self._log_level = level
 
 
     #--------------------------------------------
-    #-- Some default logging functions
-
+    # Check if the object should log a message of the given level
+    #
     def _should_log(self, message_level):
         return message_level >= self._log_level
 
 
     #-------------------------------------------------
-    def _log_setter(self, attr_name, value=None):
+    # Write to log after a property was set
+    #
+    def _log_property_changed(self, attr_name, value=None):
 
         if not self._should_log(self.log_trace):
             return

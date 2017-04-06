@@ -106,3 +106,4 @@ class StimulusSelector(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetOb
         s = self.active_stimulus
         if s is not None:
             s.position = value
+        self._log_property_changed("position")

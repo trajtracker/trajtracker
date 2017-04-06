@@ -31,11 +31,11 @@ class MoveByGradientValidator(_BaseValidator):
         Constructor - invoked when you create a new object by writing MoveByGradientValidator()
 
         :param image: Name of a BMP file, or the actual image (rectangular matrix of colors)
-        :param position: See :attr:`~trajtracker.movement.MoveByGradientValidator.enabled`
-        :param position: See :attr:`~trajtracker.movement.MoveByGradientValidator.position`
-        :param rgb_should_ascend: See :attr:`~trajtracker.movement.MoveByGradientValidator.rgb_should_ascend`
-        :param max_valid_back_movement: See :attr:`~trajtracker.movement.MoveByGradientValidator.max_valid_back_movement`
-        :param cyclic: See :attr:`~trajtracker.movement.MoveByGradientValidator.cyclic`
+        :param position: See :attr:`~trajtracker.validators.MoveByGradientValidator.enabled`
+        :param position: See :attr:`~trajtracker.validators.MoveByGradientValidator.position`
+        :param rgb_should_ascend: See :attr:`~trajtracker.validators.MoveByGradientValidator.rgb_should_ascend`
+        :param max_valid_back_movement: See :attr:`~trajtracker.validators.MoveByGradientValidator.max_valid_back_movement`
+        :param cyclic: See :attr:`~trajtracker.validators.MoveByGradientValidator.cyclic`
         """
         super(MoveByGradientValidator, self).__init__(enabled=enabled)
 
@@ -82,7 +82,7 @@ class MoveByGradientValidator(_BaseValidator):
     def rgb_should_ascend(self, value):
         _u.validate_attr_type(self, "rgb_should_ascend", value, bool)
         self._rgb_should_ascend = value
-        self._log_setter("rgb_should_ascend")
+        self._log_property_changed("rgb_should_ascend")
 
 
     #-------------------------------------------------
@@ -100,7 +100,7 @@ class MoveByGradientValidator(_BaseValidator):
         _u.validate_attr_numeric(self, "max_valid_back_movement", value)
         _u.validate_attr_not_negative(self, "max_valid_back_movement", value)
         self._max_valid_back_movement = value
-        self._log_setter("max_valid_back_movement")
+        self._log_property_changed("max_valid_back_movement")
 
 
     #-------------------------------------------------
@@ -132,6 +132,7 @@ class MoveByGradientValidator(_BaseValidator):
         self._single_color = value
         self._lcm.colormap = u.color_rgb_to_num if value is None else self._colormaps[value]
         self._calc_min_max_colors()
+        self._log_property_changed("single_color")
 
 
     def _calc_min_max_colors(self):
@@ -170,6 +171,7 @@ class MoveByGradientValidator(_BaseValidator):
     def cyclic(self, value):
         _u.validate_attr_type(self, "cyclic", value, bool)
         self._cyclic = value
+        self._log_property_changed("cyclic")
 
 
     #======================================================================

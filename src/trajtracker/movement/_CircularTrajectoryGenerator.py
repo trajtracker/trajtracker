@@ -106,7 +106,7 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
     def center(self, value):
         value = _u.validate_attr_is_coord(self, "center", value)
         self._center = value
-
+        self._log_property_changed("center")
 
     #------------------------------------------------------------
     @property
@@ -122,6 +122,7 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         _u.validate_attr_type(self, "radius", value, numbers.Number)
         _u.validate_attr_positive(self, "radius", value)
         self._radius = value
+        self._log_property_changed("radius")
 
     #------------------------------------------------------------
     @property
@@ -138,6 +139,7 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         _u.validate_attr_type(self, "degrees_per_sec", value, numbers.Number)
         _u.validate_attr_positive(self, "degrees_per_sec", value)
         self._degrees_per_sec = value % 360
+        self._log_property_changed("degrees_per_sec")
 
     #------------------------------------------------------------
     @property
@@ -154,6 +156,7 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         _u.validate_attr_type(self, "full_rotation_duration", value, numbers.Number)
         _u.validate_attr_positive(self, "full_rotation_duration", value)
         self._degrees_per_sec = (360 / value) % 360
+        self._log_property_changed("full_rotation_duration")
 
     #------------------------------------------------------------
     @property
@@ -168,6 +171,7 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
     def degrees_at_t0(self, value):
         value = _u.validate_attr_numeric(self, "degrees_at_t0", value, none_value=_u.NoneValues.ChangeTo0)
         self._degrees_at_t0 = value % 360
+        self._log_property_changed("degrees_at_t0")
 
 
     #------------------------------------------------------------
@@ -183,4 +187,5 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
     def clockwise(self, value):
         _u.validate_attr_type(self, "clockwise", value, bool)
         self._clockwise = value
+        self._log_property_changed("clockwise")
 
