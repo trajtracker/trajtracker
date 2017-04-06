@@ -5,6 +5,8 @@ Non-visual circle
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
+import numpy as np
+
 import trajtracker._utils as _u
 
 

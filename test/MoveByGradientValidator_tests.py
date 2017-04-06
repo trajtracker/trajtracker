@@ -127,7 +127,7 @@ class MoveByGradientValidatorTests(unittest.TestCase):
     def test_validate_out_of_range(self):
         val = MoveByGradientValidator(grad)
         self.assertIsNone(val.update_xyt(0, 0))
-        self.assertIsNone(val.update_xyt(-100, 0))
+        self.assertIsNone(val.update_xyt(-130, 0))
 
 
     #-------------------------------------------------------
@@ -155,10 +155,10 @@ class MoveByGradientValidatorTests(unittest.TestCase):
         self.assertIsNone(val.update_xyt(45, 0))  # the color here is 95
         self.assertIsNone(val.update_xyt(-45, 0))  # the color here is 5
 
-        val = MoveByGradientValidator(grad, cyclic=True)
-        self.assertIsNone(val.update_xyt(0, 0))   # the color here is 50
-        self.assertIsNone(val.update_xyt(39, 0))  # the color here is 89
-        self.assertIsNotNone(val.update_xyt(-45, 0))
+        val.reset()
+        self.assertIsNone(val.update_xyt(0, 0))      # the color here is 50
+        self.assertIsNone(val.update_xyt(45, 0))    # the color here is 95
+        self.assertIsNotNone(val.update_xyt(-20, 0)) # the color here is 30
 
 
 

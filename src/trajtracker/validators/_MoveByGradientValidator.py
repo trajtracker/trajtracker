@@ -43,8 +43,9 @@ class MoveByGradientValidator(_BaseValidator):
         self.rgb_should_ascend = rgb_should_ascend
         self.max_valid_back_movement = max_valid_back_movement
         self.cyclic = cyclic
-        self.color_filter = None
+        self.single_color = None
         self.reset()
+        self._calc_min_max_colors()
 
 
     #======================================================================
@@ -123,19 +124,19 @@ class MoveByGradientValidator(_BaseValidator):
 
     @single_color.setter
     def single_color(self, value):
-        _u.validate_attr_type(self, "color_filter", value, str, none_allowed=True)
+        _u.validate_attr_type(self, "single_color", value, str, none_allowed=True)
         if value is not None and value not in self._colormaps:
             raise ValueError("trajtracker error: invalid value for {:}.single_color ({:}) - valid values are {:}".format(
                 type(self).__name__, value, ",".join(self._colormaps.keys())))
 
         self._single_color = value
-        self._lcm.colormap = None if value is None else self._colormaps[value]
+        self._lcm.colormap = u.color_rgb_to_num if value is None else self._colormaps[value]
         self._calc_min_max_colors()
 
 
     def _calc_min_max_colors(self):
         if self._single_color is None:
-            mapping_func = lambda color: u.color_rgb_to_num(color)
+            mapping_func = u.color_rgb_to_num
         else:
             mapping_func = self._colormaps[self._single_color]
 
@@ -146,13 +147,13 @@ class MoveByGradientValidator(_BaseValidator):
 
 
     _colormaps = {
-        'R': lambda color: None if color[1] > MoveByGradientValidator.max_irrelevant_color_value or \
+        'R': lambda color: None if color[1] > MoveByGradientValidator.max_irrelevant_color_value or
                                    color[2] > MoveByGradientValidator.max_irrelevant_color_value else color[0],
 
-        'G': lambda color: None if color[0] > MoveByGradientValidator.max_irrelevant_color_value or \
+        'G': lambda color: None if color[0] > MoveByGradientValidator.max_irrelevant_color_value or
                                    color[2] > MoveByGradientValidator.max_irrelevant_color_value else color[1],
 
-        'B': lambda color: None if color[0] > MoveByGradientValidator.max_irrelevant_color_value or \
+        'B': lambda color: None if color[0] > MoveByGradientValidator.max_irrelevant_color_value or
                                    color[1] > MoveByGradientValidator.max_irrelevant_color_value else color[2],
     }
 
@@ -222,8 +223,8 @@ class MoveByGradientValidator(_BaseValidator):
             return None
 
         if self._cyclic and self._min_available_color is not None:
-            range = self._max_available_color - self._min_available_color
-            if np.abs(rgb_delta) >= self.cyclic_ratio * (range - np.abs(rgb_delta)):
+            color_range = self._max_available_color - self._min_available_color
+            if np.abs(rgb_delta) >= self.cyclic_ratio * (color_range - np.abs(rgb_delta)):
                 # It's much more likely to interpret this movement as a "cyclic" movement - i.e., one that crossed
                 # the boundary of lightest-to-darkest (or the other way around, depending on the ascend/descend direction)
                 self._last_color = color

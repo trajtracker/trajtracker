@@ -2,12 +2,13 @@ import unittest
 
 from trajtracker.misc import LocationColorMap
 
+# Remember this is upside down.
 testimage = [
-    [0, 0, 0, 10, 10, 10, 0],
-    [0, 5, 0, 20, 20, 0, 0],
-    [0, 0, 0, 30, 0, 0, 0],
-    [0, 2, 0, 15, 15, 15, 0],
     [0, 2, 0, 17, 15, 15, 0],
+    [0, 2, 0, 15, 15, 15, 0],
+    [0, 0, 0, 30, 0, 0, 0],
+    [0, 5, 0, 20, 20, 0, 0],
+    [0, 0, 0, 10, 10, 10, 0],
 ]
 
 testimage =  [[(0, 0, cell) for cell in row] for row in testimage]
@@ -127,7 +128,7 @@ class LocationColorMapTests(unittest.TestCase):
 
     #-------------------------------------------------------------------------
     def test_get_even_size(self):
-        img1 = [r[:-1] for r in testimage[:-1]]  # remove last row and column
+        img1 = [r[:-1] for r in testimage[1:]]  # remove last row and column
 
         lcm = LocationColorMap(img1)
         self.assertEqual(lcm.get_color_at(-1, 0), (0, 0, 5))

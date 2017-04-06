@@ -5,7 +5,10 @@ Non-visual sector of a circle
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
+import numpy as np
+
 import trajtracker._utils as _u
+import trajtracker.utils as u
 
 
 class Sector(object):

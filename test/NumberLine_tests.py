@@ -31,7 +31,7 @@ class NumberLineTestCase(unittest.TestCase):
         nl.labels_visible = True
         self.assertRaises(ValueError, lambda: nl.validate())
 
-        nl.show_labels(box_size=(10,10), font_name='Arial', font_size=3, font_colour=1)
+        nl.show_labels(box_size=(10,10), font_name='Arial', font_size=3, font_colour=(255,0,0))
         nl.validate()
 
 

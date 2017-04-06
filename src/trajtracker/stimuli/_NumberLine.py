@@ -12,13 +12,12 @@ from enum import Enum
 import numbers
 import numpy as np
 
-# noinspection PyProtectedMember
-from trajtracker.utils import get_time
 import expyriment as xpy
 
 import trajtracker
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
+from trajtracker.utils import get_time
 
 
 # noinspection PyAttributeOutsideInit,PyProtectedMember
@@ -187,6 +186,28 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
         return get_time() - start_time
 
+
+    #-------------------------------------------------------
+    def plot(self, stim):
+        """
+        Plot the number line on another stimulus
+
+        :param stim: Any Expyriment visual object
+        :return: The time it took this function to run (seconds)
+        """
+
+        start_time = get_time()
+
+        self.preload()
+
+        #-- Plot all visual elements on the canvas
+        if self._visible:
+            for k in self._visual_objects:
+                self._visual_objects[k].plot(stim)
+
+        return get_time() - start_time
+
+
     #-------------------------------------------------------
     @property
     def size(self):
@@ -309,27 +330,6 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
             return 0, self._line_length/2
 
 
-    #-------------------------------------------------------
-    def plot(self, stim):
-        """
-        Plot the number line on another stimulus
-
-        :param stim: Any Expyriment visual object
-        :return: The time it took this function to run (seconds)
-        """
-
-        start_time = get_time()
-
-        self.preload()
-
-        #-- Plot all visual elements on the canvas
-        if self._visible:
-            for k in self._visual_objects:
-                self._visual_objects[k].plot(stim)
-
-        return get_time() - start_time
-
-
     #===================================================================================
     #      Track movement
     #===================================================================================
@@ -409,6 +409,10 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         return None
 
 
+    #===================================================================================
+    #      Get results
+    #===================================================================================
+
     #---------------------------------------------------------
     @property
     def touched(self):
@@ -454,7 +458,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
 
     #===================================================================================
-    #      Property setters / getters
+    #      Congifuration
     #===================================================================================
 
     _errmsg_set_to_non_numeric = "trajtracker error: invalid attempt to set NumberLine.{0} to a non-numeric value ({1})"
@@ -547,11 +551,8 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @line_length.setter
     def line_length(self, value):
         self._validate_unlocked()
-
-        if not isinstance(value, numbers.Number):
-            raise ValueError(NumberLine._errmsg_set_to_non_numeric.format("line_length", value))
-        if value <= 0:
-            raise ValueError(NumberLine._errmsg_set_to_non_positive.format("line_length", value))
+        _u.validate_attr_type(self, "line_length", value, numbers.Number, none_allowed=True)
+        _u.validate_attr_positive(self, "line_length", value)
 
         self._line_length = value
         self._log_setter("line_length")
@@ -568,9 +569,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @end_tick_height.setter
     def end_tick_height(self, value):
         self._validate_unlocked()
-
-        if value is not None and not isinstance(value, numbers.Number):
-            raise ValueError(NumberLine._errmsg_set_to_non_numeric.format("end_tick_height", value))
+        _u.validate_attr_type(self, "end_tick_height", value, numbers.Number, none_allowed=True)
 
         self._end_tick_height = value
         self._log_setter("end_tick_height")
@@ -584,11 +583,8 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @line_width.setter
     def line_width(self, value):
         self._validate_unlocked()
-
-        if not isinstance(value, numbers.Number):
-            raise ValueError(NumberLine._errmsg_set_to_non_numeric.format("line_width", value))
-        if value <= 0:
-            raise ValueError(NumberLine._errmsg_set_to_non_positive.format("line_width", value))
+        _u.validate_attr_type(self, "line_width", value, numbers.Number, none_allowed=True)
+        _u.validate_attr_positive(self, "line_width", value)
 
         self._line_width = value
         self._log_setter("line_width")
@@ -602,6 +598,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @line_colour.setter
     def line_colour(self, value):
         self._validate_unlocked()
+        _u.validate_attr_rgb(self, "line_colour", value, none_allowed=True)
         self._line_colour = value
         self._log_setter("line_colour")
 
@@ -618,10 +615,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
     @labels_visible.setter
     def labels_visible(self, value):
-        if isinstance(value, numbers.Number):
-            value = value != 0
-        elif not isinstance(value, bool):
-                raise ValueError(NumberLine._errmsg_set_to_non_boolean, "labels_visible", value)
+        _u.validate_attr_type(self, "labels_visible", value, bool)
 
         self._labels_visible = value
         self._log_setter("labels_visible")
@@ -635,9 +629,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @labels_font_name.setter
     def labels_font_name(self, value):
         self._validate_unlocked()
-
-        if value is not None and type(value) != str:
-            raise ValueError(NumberLine._errmsg_set_to_non_string.format("labels_font_name", value))
+        _u.validate_attr_type(self, "labels_font_name", value, str, none_allowed=True)
 
         self._labels_font_name = value
         self._log_setter("labels_font_name")
@@ -654,6 +646,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @labels_font_colour.setter
     def labels_font_colour(self, value):
         self._validate_unlocked()
+        _u.validate_attr_rgb(self, "line_colour", value, none_allowed=True)
         self._labels_font_colour = value
         self._log_setter("labels_font_colour")
 
@@ -667,12 +660,8 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @labels_font_size.setter
     def labels_font_size(self, value):
         self._validate_unlocked()
-
-        if value is not None:
-            if not isinstance(value, numbers.Number):
-                raise ValueError(NumberLine._errmsg_set_to_non_numeric.format("labels_font_size", value))
-            if value <= 0:
-                raise ValueError(NumberLine._errmsg_set_to_non_positive.format("labels_font_size", value))
+        _u.validate_attr_type(self, "labels_font_size", value, numbers.Number, none_allowed=True)
+        _u.validate_attr_positive(self, "labels_font_size", value)
 
         self._labels_font_size = value
         self._log_setter("labels_font_size")
@@ -689,18 +678,9 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         self._validate_unlocked()
 
         if value is not None:
-            if not hasattr(value, '__iter__'):
-                raise ValueError(NumberLine._errmsg_value_not_collection.format("labels_box_size", value))
-            if len(value) != 2:
-                raise ValueError(NumberLine._errmsg_value_bad_length.format("labels_box_size", value))
-            if not isinstance(value[0], numbers.Number):
-                raise ValueError(NumberLine._errmsg_set_to_non_numeric_entry.format("labels_box_size", value, "height"))
-            if not isinstance(value[1], numbers.Number):
-                raise ValueError(NumberLine._errmsg_set_to_non_numeric_entry.format("labels_box_size", value, "width"))
-            if value[0] <= 0:
-                raise ValueError(NumberLine._errmsg_set_to_non_positive_entry.format("labels_box_size", value, "height"))
-            if value[1] <= 0:
-                raise ValueError(NumberLine._errmsg_set_to_non_positive_entry.format("labels_box_size", value, "width"))
+            _u.validate_attr_is_coord(self, "labels_box_size", value)
+            _u.validate_attr_positive(self, "labels_box_size[0]", value[0])
+            _u.validate_attr_positive(self, "labels_box_size[1]", value[1])
 
         self._labels_box_size = value
         self._log_setter("labels_box_size")
@@ -734,8 +714,8 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
         if isinstance(value, numbers.Number):
             value = str(value)
-        elif value is not None and type(value) != str:
-            raise ValueError(NumberLine._errmsg_set_to_non_string.format("label_min_text", value))
+        else:
+            _u.validate_attr_type(self, "label_min_text", value, str, none_allowed=True)
 
         self._label_min_text = value
         self._log_setter("label_min_text")
@@ -752,8 +732,8 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
         if isinstance(value, numbers.Number):
             value = str(value)
-        elif value is not None and type(value) != str:
-            raise ValueError(NumberLine._errmsg_set_to_non_string.format("label_max_text", value))
+        else:
+            _u.validate_attr_type(self, "label_max_text", value, str, none_allowed=True)
 
         self._label_max_text = value
         self._log_setter("label_max_text")
@@ -774,8 +754,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @min_value.setter
     def min_value(self, value):
         self._validate_unlocked()
-        if not isinstance(value, numbers.Number):
-            raise ValueError(NumberLine._errmsg_set_to_non_numeric.format("min_value", value))
+        _u.validate_attr_type(self, "min_value", value, numbers.Number)
         self._min_value = value
         self._log_setter("min_value")
 
@@ -788,8 +767,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @max_value.setter
     def max_value(self, value):
         self._validate_unlocked()
-        if not isinstance(value, numbers.Number):
-            raise ValueError(NumberLine._errmsg_set_to_non_numeric.format("max_value", value))
+        _u.validate_attr_type(self, "max_value", value, numbers.Number)
         self._max_value = value
         self._log_setter("max_value")
 
@@ -802,10 +780,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
     @visible.setter
     def visible(self, value):
-        if isinstance(value, numbers.Number):
-            value = value != 0
-        elif not isinstance(value, bool):
-                raise ValueError(NumberLine._errmsg_set_to_non_boolean, "visible", value)
+        _u.validate_attr_type(self, "visible", value, bool)
 
         self._visible = value
         self._log_setter("visible")
@@ -824,9 +799,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @touch_distance.setter
     def touch_distance(self, value):
         self._validate_unlocked()
-
-        if not isinstance(value, numbers.Number):
-            raise ValueError(NumberLine._errmsg_set_to_non_numeric.format("touch_distance", value))
+        _u.validate_attr_type(self, "touch_distance", value, numbers.Number, none_allowed=True)
 
         self._touch_distance = value
         self._log_setter("touch_distance")
@@ -840,13 +813,8 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
     @touch_directioned.setter
     def touch_directioned(self, value):
-
         self._validate_unlocked()
-
-        if not isinstance(value, numbers.Number):
-            raise ValueError(NumberLine._errmsg_set_to_non_boolean.format("touch_directioned", value))
+        _u.validate_attr_type(self, "touch_directioned", value, bool)
 
         self._touch_directioned = value
         self._log_setter("touch_directioned")
-
-

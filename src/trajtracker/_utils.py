@@ -90,7 +90,10 @@ def validate_attr_anylist(obj, attr_name, value, min_length=None, max_length=Non
 
 
 #--------------------------------------
-def validate_attr_rgb(obj, attr_name, value, accept_single_num=False):
+def validate_attr_rgb(obj, attr_name, value, accept_single_num=False, none_allowed=False):
+
+    if none_allowed and value is None:
+        return None
 
     if accept_single_num and isinstance(value, int) and 0 <= value < 2**24:
         return (int(np.floor(value / 2 ** 16)), int(np.floor(value / 256)) % 256, value % 256)

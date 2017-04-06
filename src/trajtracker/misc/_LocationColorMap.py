@@ -218,8 +218,8 @@ class LocationColorMap(trajtracker._TTrkObject):
 
         x_coord -= self._top_left_x
         y_coord -= self._top_left_y
-        y_coord = len(self._image) - 1 - y_coord   # reverse up/down
+        #y_coord = len(self._image) - 1 - y_coord   # reverse up/down
 
-        v = self._image[y_coord][x_coord]
+        v = self._image[-(y_coord+1)][x_coord]
 
         return self._color_to_code[v] if use_mapping else v
