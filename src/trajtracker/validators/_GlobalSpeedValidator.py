@@ -138,7 +138,7 @@ class GlobalSpeedValidator(_BaseValidator):
 
 
     #----------------------------------------------------------------------------------
-    def update_xyt(self, x_coord, y_coord, time):
+    def update_xyt(self, x_coord, y_coord, time_in_trial):
         """
         Validate movement.
 
@@ -148,11 +148,11 @@ class GlobalSpeedValidator(_BaseValidator):
         :param y_coord:
         :type y_coord: int
 
-        :param time: Time from start of trial
+        :param time_in_trial: Time from start of trial
         :returns: None if all OK; ExperimentError object if error
         """
 
-        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial)
         self._assert_initialized(self._origin_coord, "origin_coord")
         self._assert_initialized(self._end_coord, "end_coord")
         self._assert_initialized(self._max_trial_duration, "max_trial_duration")
@@ -162,21 +162,21 @@ class GlobalSpeedValidator(_BaseValidator):
 
         #-- If this is the first call in a trial: do nothing
         if self._time0 is None:
-            self.reset(time)
+            self.reset(time_in_trial)
             return None
 
-        if time < self._time0:
-            raise trajtracker.InvalidStateError("{0}.update_xyt() was called with time={1}, but the trial started at time={2}".format(self.__class__, time, self._time0))
+        if time_in_trial < self._time0:
+            raise trajtracker.InvalidStateError("{0}.update_xyt() was called with time={1}, but the trial started at time={2}".format(self.__class__, time_in_trial, self._time0))
 
-        time -= self._time0
+        time_in_trial -= self._time0
 
         #-- Get the expected and actual coordinates
         coord = x_coord if self._axis == ValidationAxis.x else y_coord
-        expected_coord = int(self.get_expected_coord_at_time(time))
+        expected_coord = int(self.get_expected_coord_at_time(time_in_trial))
         d_coord = coord - expected_coord
 
         #-- No validation during grace period
-        if time <= self._grace_period:
+        if time_in_trial <= self._grace_period:
             if self._show_guide:
                 self._guide.show(expected_coord, GlobalSpeedGuide.LineMode.Grace)
             return None
@@ -188,7 +188,7 @@ class GlobalSpeedValidator(_BaseValidator):
 
         if self._show_guide:
             # Get the coordinate that the mouse/finger should reach shortly
-            coord_expected_soon = self.get_expected_coord_at_time(time + self._guide_warning_time_delta)
+            coord_expected_soon = self.get_expected_coord_at_time(time_in_trial + self._guide_warning_time_delta)
 
             # check if mouse/finger already reached this coordinate
             reached_expected_soon = d_coord == 0 or np.sign(coord - coord_expected_soon) == np.sign(self._end_coord - self._origin_coord)

@@ -25,9 +25,6 @@ trajtracker.validators
 ----------------------
 
 Perform various validations on mouse/finger movement during the trial.
-Typically, you'd call reset() for each validator when the trial starts, and check_xyt() each time you
-observe a mouse/finger movement.
-
 
 .. toctree::
    :maxdepth: 1

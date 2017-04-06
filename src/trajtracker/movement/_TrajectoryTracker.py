@@ -93,7 +93,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
             self._log_write("TrajectoryTracker,Reset")
 
     #----------------------------------------------------
-    def update_xyt(self, x_coord, y_coord, time):
+    def update_xyt(self, x_coord, y_coord, time_in_trial):
         """
         Track a point. If tracking is currently inactive, this function will do nothing.
         """
@@ -103,8 +103,8 @@ class TrajectoryTracker(trajtracker._TTrkObject):
 
         _u.validate_func_arg_type(self, "update_xyt", "x_coord", x_coord, numbers.Number)
         _u.validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number)
-        _u.validate_func_arg_type(self, "update_xyt", "time", time, numbers.Number)
-        _u.validate_func_arg_not_negative(self, "update_xyt", "time", time)
+        _u.validate_func_arg_type(self, "update_xyt", "time", time_in_trial, numbers.Number)
+        _u.validate_func_arg_not_negative(self, "update_xyt", "time_in_trial", time_in_trial)
 
         if not self._track_if_no_movement and len(self._trajectory['x']) > 0 and  \
             self._trajectory['x'][-1] == x_coord and \
@@ -113,10 +113,10 @@ class TrajectoryTracker(trajtracker._TTrkObject):
 
         self._trajectory['x'].append(x_coord)
         self._trajectory['y'].append(y_coord)
-        self._trajectory['time'].append(time)
+        self._trajectory['time'].append(time_in_trial)
 
         if self._log_level:
-            self._log_write("Trajectory,Track_xyt,{0},{1},{2}".format(x_coord, y_coord, time))
+            self._log_write("Trajectory,Track_xyt,{0},{1},{2}".format(x_coord, y_coord, time_in_trial))
 
         return None
 

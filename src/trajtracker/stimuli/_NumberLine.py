@@ -353,7 +353,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
     #---------------------------------------------------------
     # noinspection PyUnusedLocal
-    def update_xyt(self, x_coord, y_coord, time=None):
+    def update_xyt(self, x_coord, y_coord, time_in_trial=None):
         """
         This function is called when mouse/touch has moved. It checks whether the movement implies touching the number line.
 
@@ -363,7 +363,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         :param y_coord:
         :type y_coord: int
 
-        :param time: ignored.
+        :param time_in_trial: ignored.
         """
 
         _u.validate_func_arg_type(self, "update_xy", "x_coord", x_coord, int)

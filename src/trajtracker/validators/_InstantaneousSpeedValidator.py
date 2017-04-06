@@ -75,22 +75,22 @@ class InstantaneousSpeedValidator(_BaseValidator):
 
 
     #-----------------------------------------------------------------------------------
-    def update_xyt(self, x_coord, y_coord, time):
+    def update_xyt(self, x_coord, y_coord, time_in_trial):
         """
         Given a current position, check whether the movement complies with the speed limits.
 
         :param x_coord: Current x coordinate (in the predefined coordinate system)
         :param y_coord: Current y coordinate (in the predefined coordinate system)
-        :param time: Time, in seconds. The zero point doesn't matter, as long as you're consistent until reset() is called.
+        :param time_in_trial: Time, in seconds. The zero point doesn't matter, as long as you're consistent until reset() is called.
         :return: None if all OK, ExperimentError if error
         """
 
         if not self._enabled:
             return None
 
-        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial)
 
-        self._speed_monitor.update_xyt(x_coord, y_coord, time)
+        self._speed_monitor.update_xyt(x_coord, y_coord, time_in_trial)
 
 
         #-- Calculate speed, if possible

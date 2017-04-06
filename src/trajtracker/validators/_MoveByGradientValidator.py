@@ -187,7 +187,7 @@ class MoveByGradientValidator(_BaseValidator):
 
 
     #-----------------------------------------------------------------
-    def update_xyt(self, x_coord, y_coord, time=None):
+    def update_xyt(self, x_coord, y_coord, time_in_trial=None):
         """
         Validate the movement
 
@@ -197,7 +197,7 @@ class MoveByGradientValidator(_BaseValidator):
         if not self._enabled:
             return None
 
-        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time, False)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial, False)
 
         color = self._lcm.get_color_at(x_coord, y_coord)
         if color is None:  # color N/A -- can't validate

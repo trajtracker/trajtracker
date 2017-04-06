@@ -127,14 +127,14 @@ class LocationsValidator(_BaseValidator):
         pass
 
 
-    def update_xyt(self, x_coord, y_coord, time=None):
+    def update_xyt(self, x_coord, y_coord, time_in_trial=None):
         """
         Check whether the given coordinate is a valid one
 
-        :param time: ignored
+        :param time_in_trial: ignored
         :return: None if all OK, ExperimentError if error
         """
-        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time, False)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial, False)
 
         if not self._enabled:
             return None

@@ -191,15 +191,15 @@ def validate_func_arg_positive(obj, func_name, arg_name, value):
 
 
 #--------------------------------------------------------------------
-def update_xyt_validate_and_log(self, x_coord, y_coord, time, time_used=True):
+def update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial, time_used=True):
 
     validate_func_arg_type(self, "update_xyt", "x_coord", x_coord, numbers.Number, type_name="numeric")
     validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number, type_name="numeric")
 
     if time_used:
-        validate_func_arg_type(self, "update_xyt", "time", time, numbers.Number, type_name="numeric")
+        validate_func_arg_type(self, "update_xyt", "time_in_trial", time_in_trial, numbers.Number, type_name="numeric")
 
-    self._log_func_enters("update_xyt", [x_coord, y_coord, time])
+    self._log_func_enters("update_xyt", [x_coord, y_coord, time_in_trial])
 
 
 #============================================================================
