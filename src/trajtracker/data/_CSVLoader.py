@@ -29,7 +29,7 @@ class CSVLoader(trajtracker._TTrkObject):
     #------------------------------------------------
     def __init__(self, case_sensitive_col_names=False):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing CSVLoader()
 
         :param case_sensitive_col_names: If True, all field names will be converted to lowercase when loading
         """

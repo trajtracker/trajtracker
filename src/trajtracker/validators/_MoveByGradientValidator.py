@@ -28,7 +28,7 @@ class MoveByGradientValidator(_BaseValidator):
     def __init__(self, image, position=(0, 0), rgb_should_ascend=True, max_valid_back_movement=0,
                  cyclic=False, enabled=True):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing MoveByGradientValidator()
 
         :param image: Name of a BMP file, or the actual image (rectangular matrix of colors)
         :param position: See :attr:`~trajtracker.movement.MoveByGradientValidator.enabled`

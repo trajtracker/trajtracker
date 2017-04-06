@@ -25,7 +25,7 @@ class LocationsValidator(_BaseValidator):
     #------------------------------------------------------------
     def __init__(self, image, enabled=True, position=None, default_valid=False):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing LocationsValidator()
 
         :param image: Name of a BMP file, or the actual image (rectangular matrix of colors)
         :param enabled: See :attr:`~trajtracker.validators.LocationsValidator.enabled`

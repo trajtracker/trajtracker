@@ -23,7 +23,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
     #----------------------------------------------------
     def __init__(self, filename=None, tracking_active=False, track_if_no_movement=False):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing TrajectoryTracker()
 
         :param filename: See :attr:`~trajtracker.movement.TrajectoryTracker.filename`
         :param tracking_active: See :attr:`~trajtracker.movement.TrajectoryTracker.tracking_active`

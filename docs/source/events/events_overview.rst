@@ -41,11 +41,11 @@ Practical information: How to use the event mechanism
 -----------------------------------------------------
 
 1. Create an :class:`~trajtracker.events.EventManager`
-2. Create event-sensitive objects. Each should be registered using :class:`~trajtracker.events.EventManager`. :meth:`~trajtracker.events.EventManager.register`.
+2. Create event-sensitive objects. Each should be registered using :meth:`EventManager.register() <trajtracker.events.EventManager.register>`.
 3. Configure the relevant events on each event-sensitive object.
 4. Your program should notify the event manager about any event that occurs using the
-   :class:`~trajtracker.events.EventManager`. :meth:`~trajtracker.events.EventManager.dispatch_event` method. You should also call
-   :class:`~trajtracker.events.EventManager`. :meth:`~trajtracker.events.EventManager.on_frame` very frequently - e.g., in a loop that runs once per frame.
+   :meth:`EventManager.dispatch_event() <trajtracker.events.EventManager.dispatch_event>` method. You should also call
+   :meth:`EventManager.on_frame() <trajtracker.events.EventManager.on_frame>` very frequently - e.g., in a loop that runs once per frame.
 
 For example:
  .. code-block:: python
@@ -87,7 +87,7 @@ For a more comprehensive example, check out the "Events" samples provided with T
 
 - when using event manager to show/hide visual objects, you must put these objects in a
   :class:`~trajtracker.stimuli.StimulusContainer` and use
-  :meth:`~trajtracker.stimuli.StimulusContainer.present` to update the display.
+  :meth:`StimulusContainer.present() <trajtracker.stimuli.StimulusContainer.present>` to update the display.
 - Operation can be timed to the precise moment when an event occurred (as in the example above), or to some
   time later. For example, to start tracking the trajectory 100 ms after the trial started:
 
@@ -95,10 +95,13 @@ For a more comprehensive example, check out the "Events" samples provided with T
 
    traj_tracker.activate_event = trajtracker.events.EVENT_TRIAL_STARTED + 0.1
 
-- When several operations are invoked together (following a single call to EventManager.
-  :meth:`~trajtracker.events.EventManager.dispatch_event` or :meth:`~trajtracker.events.EventManager.on_frame`),
+- When several operations are invoked together (following a single call to
+  :meth:`EventManager.dispatch_event() <trajtracker.events.EventManager.dispatch_event>` or
+  :meth:`EventManager.on_frame() <trajtracker.events.EventManager.on_frame>`),
   the order of invoking them is not guaranteed.
 
+
+.. _pre-defined-events:
 
 Pre-defined Events
 ------------------
@@ -106,11 +109,17 @@ Pre-defined Events
 TrajTracker has several pre-defined events. When using the event mechanism, some of trajtracker's objects
 rely on these events, so you should dispatch them on each trial:
 
-TBD
+- **TRIAL_INITIALIZED**: Dispatch this event once everything was initialized for a trial - config was loaded,
+  stimuli were prepared, etc.
 
-TRIAL_INITIALIZED
-TRIAL_STARTED
-TRIAL_SUCCEEDED
-TRIAL_ERROR
+- **TRIAL_STARTED**: Dispatch this event when the trial starts. In some experiments, the start-of-trial may
+  be triggered by the user (e.g. when the finger touches the screen). In other experiments, the start-of-trial
+  time is determined by the software, and may even be right after the trial initialization.
 
-TRIAL_ENDED
+- **TRIAL_SUCCEEDED**: Dispatch this event when the trial ended without an error.
+
+- **TRIAL_ERROR**: Dispatch this event when the trial was invalidated by an error. Note that there is a
+  difference betwee an *error* and an *incorrect response*. A trial may end successfully with an incorrect response.
+
+- **TRIAL_ENDED**: This event is not dispatched directly - but implicitly via TRIAL_SUCCEEDED and TRIAL_ERROR
+  (both of which extend TRIAL_ENDED, see :meth:`Event() <trajtracker.events.Event.__init__>`)

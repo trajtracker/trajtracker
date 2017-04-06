@@ -1,6 +1,6 @@
 """
 
- Given a BMP image, translate a coordinate into the color code in that coordinate.
+Given a BMP image, translate a coordinate into the color code in that coordinate.
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
@@ -24,7 +24,7 @@ class LocationColorMap(trajtracker._TTrkObject):
     #-------------------------------------------------
     def __init__(self, image, position=None, use_mapping=False, colormap=None):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing LocationColorMap()
 
         :param image: Name of a BMP file, or the actual image (rectangular matrix of colors)
         :param position: See :attr:`~trajtracker.misc.LocationColorMap.position`
@@ -109,6 +109,8 @@ class LocationColorMap(trajtracker._TTrkObject):
     def use_mapping(self):
         """
         The default value of the 'use_mapping' argument in get_color_at()
+
+        :type: bool
         """
         return self._use_mapping
 
@@ -126,6 +128,7 @@ class LocationColorMap(trajtracker._TTrkObject):
         Mapping of each color in the image to another value. This mapping will be used when calling get_color_at(use_mapping=True)
 
         Valid values:
+
         - None (default): no mapping; calling get_color_at(use_mapping=True)
         - "RGB": Each color is assigned the RGB code - a number between 0 and 65535 (0xFFFFFF)
         - "DEFAULT": Each color is assigned a unique code (0, 1, 2, etc.). Codes are assigned by order of RGB codes.

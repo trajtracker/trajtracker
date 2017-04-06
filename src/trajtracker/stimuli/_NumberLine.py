@@ -37,7 +37,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
                  line_width=1, line_colour=None, end_tick_height=None,
                  visible=True):
         """
-        Create a NumberLine object.
+        Constructor - invoked when you create a new object by writing NumberLine()
 
         :param position: the (x,y) coordinates of the middle of the line
         :param orientation: NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical
@@ -413,7 +413,9 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @property
     def touched(self):
         """
-        Return whether the number line was touched or not
+        Indicates whether the number line was touched or not
+
+        :type: bool
         """
         return self._last_touched_coord is not None
 
@@ -425,6 +427,8 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         Get the coordinate where the mouse/finger last touched the number line.
         This is either the x or y coordinate, depending on the number line orientation
         If the finger didn't touch the line since the last call to reset_mouse_pos(), the function returns None.
+
+        :type: int
         """
         return self._last_touched_coord
 
@@ -436,6 +440,8 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         The position where the mouse/finger last touched the number line.
         The value returned is in the number line's scale.
         If the finger didn't touch the line since the last call to reset_mouse_pos(), the function returns None.
+
+        :type: float
         """
         if self._last_touched_coord is None:
             return None
@@ -465,7 +471,8 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     def validate(self):
         """
         Validate that the number line configuration is ok.
-        Raises an ValueError if not.
+
+        :raise: ValueError - if the configuration is invalid
         """
 
         if self._min_value >= self._max_value:
@@ -497,7 +504,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     #-----------------------------------------------------------
     @property
     def orientation(self):
-        """The number line's orientation (NLOrientation.Horizontal or NLOrientation.Vertical)"""
+        """ The number line's orientation (NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical) """
         return self._orientation
 
     @orientation.setter

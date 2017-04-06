@@ -27,10 +27,9 @@ class PictureSet(trajtracker._TTrkObject):
     #=======================================================================================
 
     #------------------------------------------------------------------
-    # Constructor
     def __init__(self, width, height, base_dir='/'):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing PictureSet()
 
         :param width: Width of the picture returned
         :param height: Height of the picture returned

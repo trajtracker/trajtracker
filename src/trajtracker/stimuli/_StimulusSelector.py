@@ -18,7 +18,7 @@ class StimulusSelector(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetOb
 
     def __init__(self, stimuli=()):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing StimulusSelector()
 
         :param stimuli: A list of stimuli to add. Each entry in the list is a (key, stimulus) pair -
                         see :func:`~trajtracker.stimuli.StimulusSelector.add_stimulus`

@@ -61,6 +61,7 @@ class GlobalSpeedValidator(_BaseValidator):
     def __init__(self, enabled=True, origin_coord=None, end_coord=None, axis=ValidationAxis.y,
                  grace_period=None, max_trial_duration=None, milestones=None, show_guide=False):
         """
+        Constructor - invoked when you create a new object by writing GlobalSpeedValidator()
 
         :param enabled: See :attr:`~trajtracker.validators.GlobalSpeedValidator.enabled`
         :type enabled: bool

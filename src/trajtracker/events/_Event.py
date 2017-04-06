@@ -19,6 +19,14 @@ class Event(trajtracker._TTrkObject):
 
     #----------------------------------------------------
     def __init__(self, event_id, extends=None):
+        """
+        Constructor - invoked when you create a new object by writing Event()
+
+        :param event_id: A string that uniquely identifies the event
+        :type event_id: str
+        :param extends: If this event extends another one (see details in :ref:`event-hierarchy`)
+        :type extends: Event
+        """
         super(Event, self).__init__()
 
         _u.validate_func_arg_type(self, "__init__", "extends", extends, Event, True)
@@ -35,14 +43,18 @@ class Event(trajtracker._TTrkObject):
     #----------------------------------------------------
     @property
     def event_id(self):
-        """The ID of this event (string)"""
+        """
+        The ID of this event (string)
+        """
         return self._event_id
 
 
     #----------------------------------------------------
     @property
     def offset(self):
-        """An offset (in seconds) relatively to the time the event occurred"""
+        """
+        An offset (in seconds) relatively to the time the event occurred
+        """
         return self._offset
 
 

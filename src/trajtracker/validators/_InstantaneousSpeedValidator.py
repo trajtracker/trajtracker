@@ -28,7 +28,7 @@ class InstantaneousSpeedValidator(_BaseValidator):
     def __init__(self, axis=ValidationAxis.y, enabled=True, min_speed=None, max_speed=None,
                  grace_period=0, calculation_interval=0, movement_monitor=None):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing InstantaneousSpeedValidator()
 
         :param axis: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.axis`
         :param enabled: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.enabled`

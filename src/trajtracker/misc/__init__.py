@@ -7,7 +7,7 @@ TrajTracker - misc package
 
 """
 
-from _shapes import shapes
-
 from _LocationColorMap import LocationColorMap
 from _PictureSet import PictureSet
+
+import nvshapes

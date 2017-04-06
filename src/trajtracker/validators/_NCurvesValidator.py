@@ -30,7 +30,7 @@ class NCurvesValidator(_BaseValidator):
     #-----------------------------------------------------------------
     def __init__(self, direction_monitor=None, max_curves_per_trial=None, enabled=True):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing NCurvesValidator()
 
         :param direction_monitor: A :class:`~trajtracker.movement.DirectionMonitor` object for tracking curves.
                                   If this object is not provided, a default one would be created.
@@ -111,7 +111,7 @@ class NCurvesValidator(_BaseValidator):
     def min_distance(self):
         """
         The minimal distance between points required for calculating direction
-        (see :attr:`trajtracker.movement.DirectionMonitor.min_distance`)
+        (see :attr:`DirectionMonitor.min_distance <trajtracker.movement.DirectionMonitor.min_distance>`)
         """
         return self._direction_monitor.min_distance
 
@@ -127,7 +127,7 @@ class NCurvesValidator(_BaseValidator):
         """
         A curve must change the finger/mouse direction by at least this amount (specified in degrees).
         Smaller changes do not count as curves.
-        (see :attr:`trajtracker.movement.DirectionMonitor.min_angle_change_per_curve`)
+        (see :attr:`DirectionMonitor.min_angle_change_per_curve <trajtracker.movement.DirectionMonitor.min_angle_change_per_curve>`)
         """
         return self._direction_monitor.min_angle_change_per_curve
 

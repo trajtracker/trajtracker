@@ -17,7 +17,7 @@ class StimulusAnimator(trajtracker._TTrkObject):
 
     def __init__(self, animated_object=None, trajectory_generator=None, position_shift=None):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing StimulusAnimator()
 
         :param animated_object: See :attr:`~trajtracker.movement.StimulusAnimator.animated_object`
         :type animated_object: Expyriment stimulus

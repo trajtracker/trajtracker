@@ -3,13 +3,13 @@
 Event class
 ===========
 
- This class defines an event that occurred during the experiment.
- Several TrajTracker objects can define things that should happen when an event occurs, or some time later.
- For example, stimuli can appear or disappear at certain times.
+This class defines an event that occurred during the experiment.
+Several TrajTracker objects can define things that should happen when an event occurs, or some time later.
+For example, stimuli can appear or disappear at certain times.
 
- **Defining an event:**
+**Defining an event:**
 
- .. code-block:: python
+.. code-block:: python
 
     number_line = trajtracker.stimuli.NumberLine()
     number_line.onset = Event("SessionStarts")
@@ -18,6 +18,10 @@ Event class
 Defining stimulus behavior via events requires that you use :class:`~trajtracker.events.EventManager`
 in your program.
 
+TrajTracker also has some :ref:`pre-defined-events`.
+
+
+.. _event-hierarchy:
 
 Advanced: Event Hierarchy
 -------------------------
@@ -31,7 +35,7 @@ TRIAL_ERROR event, any operation registered to run on TRIAL_ENDED would be invok
 
 To define hierarchies in your custom events, use the "extends" argument when creating the Event object:
 
- .. code-block:: python
+.. code-block:: python
 
    TRIAL_ENDED = Event("TRIAL_ENDED")
    TRIAL_SUCCEEDED = Event("TRIAL_SUCCEEDED", TRIAL_ENDED)

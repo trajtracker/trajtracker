@@ -32,7 +32,7 @@ class MovementAngleValidator(_BaseValidator):
     def __init__(self, min_angle=None, max_angle=None, calc_angle_interval=None,
                  grace_period=0, enabled=True):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing MovementAngleValidator()
 
         :param min_angle: See :attr:`~trajtracker.movement.MovementAngleValidator.min_angle`
         :param max_angle: See :attr:`~trajtracker.movement.MovementAngleValidator.max_angle`

@@ -22,7 +22,7 @@ class CustomTrajectoryGenerator(trajtracker._TTrkObject):
 
     def __init__(self, cyclic=False, interpolate=True):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing CustomTrajectoryGenerator()
 
         :param cyclic: See :attr:`~trajtracker.movement.CustomTrajectoryGenerator.cyclic`
         :param interpolate:  See :attr:`~trajtracker.movement.CustomTrajectoryGenerator.interpolate`

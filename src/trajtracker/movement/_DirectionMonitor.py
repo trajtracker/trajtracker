@@ -26,7 +26,7 @@ class DirectionMonitor(trajtracker._TTrkObject):
     #-------------------------------------------------------------------------
     def __init__(self, min_distance=0, angle_units=Units.Degrees, zero_angle=0, min_angle_change_per_curve=0):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing DirectionMonitor()
 
         :param min_distance: See :attr:`~trajtracker.movement.DirectionMonitor.min_distance`
         :param angle_units: See :attr:`~trajtracker.movement.DirectionMonitor.angle_units`

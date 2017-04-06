@@ -21,7 +21,7 @@ class SpeedMonitor(trajtracker._TTrkObject):
     #-------------------------------------------------------------------------
     def __init__(self, calculation_interval):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing SpeedMonitor()
 
         :param calculation_interval: See :attr:`~trajtracker.movement.SpeedMonitor.calculation_interval`
         """

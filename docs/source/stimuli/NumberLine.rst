@@ -28,6 +28,13 @@ A class that plots a number line and detects when the participant touches it in 
 
 
 
+Class-level definitions:
+------------------------
+
+**NumberLine.Orientation**: An enum that defines the number line orientation.
+Possible values: *NumberLine.Orientation.Horizontal* or *NumberLine.Orientation.Vertical*
+
+
 Methods and properties:
 -----------------------
 

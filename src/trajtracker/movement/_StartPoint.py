@@ -13,7 +13,7 @@ from enum import Enum
 
 import trajtracker
 import trajtracker._utils as _u
-from trajtracker.misc import shapes
+from trajtracker.misc import nvshapes
 
 
 class StartPoint(trajtracker._TTrkObject):
@@ -26,11 +26,12 @@ class StartPoint(trajtracker._TTrkObject):
     #-----------------------------------------------------------
     def __init__(self, start_area, exit_area="above"):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing StartPoint()
 
         :param start_area: The area where you must touch/click to initiate a trial.
                            This object must support an overlapping_with_position() method and a "center" property.
-                           It can be an expyriment stimulus, a shape from :func:`~trajtracker.misc.shapes`, or your own object
+                           It can be an expyriment stimulus, a shape from :func:`~trajtracker.misc.nvshapes`,
+                           or your own object
         :param exit_area: See :attr:`~trajtracker.misc.RectStartPoint.exit_area`
         """
 
@@ -52,7 +53,7 @@ class StartPoint(trajtracker._TTrkObject):
         After the mouse/finger leaves the start area, it must enter immediately the exit_area in order
         for the trial to start. Otherwise, it would count as an error.
         This object must support the overlapping_with_position() method. It can be
-        an expyriment stimulus, a shape from :func:`~trajtracker.misc.shapes`, or your own object.
+        an expyriment stimulus, a shape from :func:`~trajtracker.misc.nvshapes`, or your own object.
         Also, you can use any of the predefined keywords "above", "below", "right" and "left". Each of those
         define a region that is a 90-degrees sector, centered on start_area's center
         ("above" = -45 degrees to 45 degrees; the others accordingly),
@@ -89,7 +90,7 @@ class StartPoint(trajtracker._TTrkObject):
         else:
             raise ValueError("trajtracker error: unsupported exit area '%s'" % name)
 
-        return shapes.Sector(self._start_area.position[0], self._start_area.position[1], 10000, f, t)
+        return nvshapes.Sector(self._start_area.position[0], self._start_area.position[1], 10000, f, t)
 
 
     #==========================================================================

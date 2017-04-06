@@ -31,7 +31,11 @@ class _BaseValidator(_TTrkObject):
 
     @property
     def enabled(self):
-        """Whether the validator is currently enabled (boolean)"""
+        """
+        Whether the validator is currently enabled
+
+        :type: bool
+        """
         return self._enabled
 
     @enabled.setter

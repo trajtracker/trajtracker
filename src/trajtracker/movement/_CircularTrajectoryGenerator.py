@@ -20,7 +20,7 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
     def __init__(self, center=None, radius=None, degrees_per_sec=None, full_rotation_duration=None,
                  degrees_at_t0=None, clockwise=True):
         """
-        Constructor
+        Constructor - invoked when you create a new object by writing CircularTrajectoryGenerator()
 
         :param center: See :attr:`~trajtracker.movement.CircularTrajectoryGenerator.center`
         :param radius: See :attr:`~trajtracker.movement.CircularTrajectoryGenerator.radius`
