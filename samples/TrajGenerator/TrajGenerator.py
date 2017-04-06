@@ -10,7 +10,7 @@ as a green circle.
 """
 
 import expyriment as xpy
-from expyriment.misc._timer import get_time
+from trajtracker.utils import get_time
 from expyriment.misc.geometry import XYPoint
 
 import trajtracker as ttrk

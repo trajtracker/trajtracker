@@ -6,6 +6,8 @@ Stimulus container: holds several stimuli, and can present them all
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
+from operator import itemgetter
+
 import expyriment as xpy
 
 import trajtracker
@@ -37,7 +39,7 @@ class StimulusContainer(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetO
         """
 
         visible_stims = [stim for stim in self._stimuli.values() if stim['stimulus'].visible]
-        visible_stims.sort(cmp=lambda a, b: cmp(a["order"], b['order']))
+        visible_stims.sort(key=itemgetter('order'))
 
         if self._should_log(self.log_trace):
             self._log_write("Present,stimuli={:}".format(";".join([str(s['id']) for s in visible_stims])))

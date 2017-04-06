@@ -19,6 +19,9 @@ from trajtracker.data import fromXML
 
 class MoveByGradientValidator(_BaseValidator):
 
+    max_irrelevant_color_value = 10
+    cyclic_ratio = 5
+
     err_gradient = "GradientViolation"
 
 
@@ -101,47 +104,57 @@ class MoveByGradientValidator(_BaseValidator):
 
     #-------------------------------------------------
     @property
-    def color_filter(self):
+    def single_color(self):
         """
-        Define which colors should be used by this validator. Other colors are ignored. If the finger/mouse
-        steps over them, the validation is temporarily suspended. Possible values are:
+        Consider only one color out of the three (red / green / blue) available in the image.
+        Each pixel in the image has a value between 0 and 255 for each of the 3 colors.
+        If you set a single color (by setting this attribute to "R"/"G"/"B"), the validator will consider
+        only the value of the selected color. Furthermore, the validator considers only pixels that are purely of
+        this color (e.g., if you select "B", it means that only pixels with blue=0-255, red=0 and green=0 are
+        relevant for validation).
 
-        - A list/tuple/set of valid colors
-        - A filtering function - gets an RGB color as tuple, returns a bool
-        - A mask - only matching colors (and 0=black) will be included
+        To accomodate small possible mistakes in the generation of the BMP image, the validator allows for
+        miniscule presence of the irrelevant colors: i.e., if you set single_color="B", the validator will
+        consider only pixels with blue=0-255, red<10, and green<10 (the treshold 10 can be changed by setting
+        MoveByGradientValidator.max_irrelevant_color_value); and for this pixels, the validator will consider
+        only the blue value.
         """
-        return self._color_filter
+        return self._single_color
 
-    @color_filter.setter
-    def color_filter(self, filter):
+    @single_color.setter
+    def single_color(self, value):
+        _u.validate_attr_type(self, "color_filter", value, str, none_allowed=True)
+        if value is not None and value not in self._colormaps:
+            raise ValueError("trajtracker error: invalid value for {:}.single_color ({:}) - valid values are {:}".format(
+                type(self).__name__, value, ",".join(self._colormaps.keys())))
 
-        if filter is None:
-            self._color_filter = None
-            self._lcm.colormap = "RGB"
-            self._get_min_max_colors()
-            return
+        self._single_color = value
+        self._lcm.colormap = None if value is None else self._colormaps[value]
+        self._calc_min_max_colors()
 
-        _u.validate_attr_type(self, "color_filter", filter, (list, tuple, set, type(lambda:1), int))
 
-        if isinstance(filter, (list, tuple, set)):
-            used_values = set(filter)
-            sample_value = list(used_values)[0]
-            if isinstance(sample_value, int):
-                filter = lambda color: u.color_rgb_to_num(color) in used_values
-            elif isinstance(sample_value, tuple):
-                filter = lambda color: color in used_values
+    def _calc_min_max_colors(self):
+        if self._single_color is None:
+            mapping_func = lambda color: u.color_rgb_to_num(color)
+        else:
+            mapping_func = self._colormaps[self._single_color]
 
-        elif isinstance(filter, int):
-            mask = filter
-            def filter_func(color):
-                color_num = u.color_rgb_to_num(color)
-                return color_num == 0 or (color_num & ~mask) == 0
-            filter = filter_func
+        colors = [mapping_func(color) for color in self._lcm.available_colors]
+        colors = [c for c in colors if c is not None]
+        self._min_available_color = None if len(colors) == 0 else min(colors)
+        self._max_available_color = None if len(colors) == 0 else max(colors)
 
-        self._color_filter = filter
-        self._lcm.colormap = lambda color: u.color_rgb_to_num(color) if filter(color) else None
-        self._get_min_max_colors()
 
+    _colormaps = {
+        'R': lambda color: None if color[1] > MoveByGradientValidator.max_irrelevant_color_value or \
+                                   color[2] > MoveByGradientValidator.max_irrelevant_color_value else color[0],
+
+        'G': lambda color: None if color[0] > MoveByGradientValidator.max_irrelevant_color_value or \
+                                   color[2] > MoveByGradientValidator.max_irrelevant_color_value else color[1],
+
+        'B': lambda color: None if color[0] > MoveByGradientValidator.max_irrelevant_color_value or \
+                                   color[1] > MoveByGradientValidator.max_irrelevant_color_value else color[2],
+    }
 
     #-------------------------------------------------
     @property
@@ -156,14 +169,6 @@ class MoveByGradientValidator(_BaseValidator):
     def cyclic(self, value):
         _u.validate_attr_type(self, "cyclic", value, bool)
         self._cyclic = value
-
-
-    #-------------------------------------------------
-    def _get_min_max_colors(self):
-        filter = (lambda c: True) if self._color_filter is None else self._color_filter
-        colors = [u.color_rgb_to_num(c) for c in self._lcm.available_colors if filter(c)]
-        self._min_available_color = min(colors)
-        self._max_available_color = max(colors)
 
 
     #======================================================================
@@ -206,7 +211,6 @@ class MoveByGradientValidator(_BaseValidator):
 
         expected_direction = 1 if self._rgb_should_ascend else -1
         rgb_delta = (color - self._last_color) * expected_direction
-        print "RGB delta = %d  (%d --> %d)" % (rgb_delta, self._last_color, color)
         if rgb_delta >= 0:
             #-- All is OK
             self._last_color = color
@@ -217,9 +221,9 @@ class MoveByGradientValidator(_BaseValidator):
             #-- Don't issue an error, but also don't update "last_color" - remember the previous one
             return None
 
-        if self._cyclic:
+        if self._cyclic and self._min_available_color is not None:
             range = self._max_available_color - self._min_available_color
-            if np.abs(rgb_delta) >= 8 * (range - np.abs(rgb_delta)):
+            if np.abs(rgb_delta) >= self.cyclic_ratio * (range - np.abs(rgb_delta)):
                 # It's much more likely to interpret this movement as a "cyclic" movement - i.e., one that crossed
                 # the boundary of lightest-to-darkest (or the other way around, depending on the ascend/descend direction)
                 self._last_color = color

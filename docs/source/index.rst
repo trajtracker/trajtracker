@@ -55,6 +55,7 @@ trajtracker.events
 
    events/events_overview
    events/Event
+   events/EventManager
 
 
 trajtracker.misc

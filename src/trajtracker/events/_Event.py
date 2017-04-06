@@ -18,10 +18,18 @@ class Event(trajtracker._TTrkObject):
 
 
     #----------------------------------------------------
-    def __init__(self, event_id):
+    def __init__(self, event_id, extends=None):
         super(Event, self).__init__()
+
+        _u.validate_func_arg_type(self, "__init__", "extends", extends, Event, True)
+
         self._event_id = event_id
         self._offset = 0
+
+        self._extended = False
+        self._extends = extends
+        if extends is not None:
+            extends._extended = True
 
 
     #----------------------------------------------------
@@ -36,6 +44,27 @@ class Event(trajtracker._TTrkObject):
     def offset(self):
         """An offset (in seconds) relatively to the time the event occurred"""
         return self._offset
+
+
+    #----------------------------------------------------
+    @property
+    def extends(self):
+        """The event that the present event extends (or None)"""
+        return self._extends
+
+
+    #----------------------------------------------------
+    @property
+    def event_hierarchy(self):
+        """The present event, and all the events it extends"""
+
+        result = []
+        e = self
+        while e is not None:
+            result.append(e)
+            e = e._extends
+
+        return result
 
 
     #----------------------------------------------------
@@ -73,3 +102,10 @@ class Event(trajtracker._TTrkObject):
             event += float(m.group(3))
 
         return event
+
+    #----------------------------------------------------
+    def __str__(self):
+        if self._offset == 0:
+            return self._event_id
+        else:
+            return "{:} + {:.3g}sec".format(self._event_id, self._offset)

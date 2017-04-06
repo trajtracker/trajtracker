@@ -13,7 +13,7 @@ import numbers
 import numpy as np
 
 # noinspection PyProtectedMember
-from expyriment.misc._timer import get_time
+from trajtracker.utils import get_time
 import expyriment as xpy
 
 import trajtracker

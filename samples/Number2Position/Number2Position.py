@@ -11,7 +11,7 @@ import random
 import numpy as np
 
 import expyriment as xpy
-from expyriment.misc._timer import get_time
+from trajtracker.utils import get_time
 
 import trajtracker as ttrk
 from trajtracker.movement import StartPoint

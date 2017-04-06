@@ -11,7 +11,7 @@ The image gradient.bmp is the same shape; it is not presented, but is used for v
 """
 
 import expyriment as xpy
-from expyriment.misc._timer import get_time
+from trajtracker.utils import get_time
 
 import trajtracker as ttrk
 from trajtracker.validators import *
@@ -36,7 +36,7 @@ in_ring_validator.invalid_colors = ((255, 255, 255))
 
 direction_validator = \
     MoveByGradientValidator("gradient.bmp", position=(0, 0), cyclic=True, max_valid_back_movement=5)
-direction_validator.color_filter = 0xFF
+direction_validator.single_color = "B"   # use only the blue scale
 direction_validator.log_level = direction_validator.log_debug
 
 #-- Messages shown to subject

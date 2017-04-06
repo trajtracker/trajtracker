@@ -10,6 +10,7 @@ from __future__ import division
 from numpy import pi
 import numpy as np
 
+from expyriment.misc import _timer as xpy_timer
 
 #--------------------------------------------------------------------------
 def get_angle(xy1, xy2, as_degrees=False):
@@ -25,19 +26,19 @@ def get_angle(xy1, xy2, as_degrees=False):
 
     if dx == 0:
         # up=0, down=pi
-        angle = 0 if dy > 0 else pi
+        angle = 0 if dy > 0 else np.pi
 
     elif dx > 0:
         # Right movement; return angles from 0 to pi
-        angle = np.arctan(- dy / dx) + pi / 2
+        angle = np.arctan(- dy / dx) + np.pi / 2
 
     else:
         # Left movement; return angles from pi to pi*2
-        angle = np.arctan(- dy / dx) + pi * 3 / 2
+        angle = np.arctan(- dy / dx) + np.pi * 3 / 2
 
 
     if as_degrees:
-        angle *= 360 / (pi*2)
+        angle *= 360 / (np.pi*2)
 
     return angle
 
@@ -86,7 +87,7 @@ def rotate_coord(coord, angle, origin=(0,0), is_radians=False):
     """
 
     if not is_radians:
-        angle = angle / 360 * pi*2
+        angle = angle / 360 * np.pi*2
 
     x = coord[0] - origin[0]
     y = coord[1] - origin[1]
@@ -95,3 +96,11 @@ def rotate_coord(coord, angle, origin=(0,0), is_radians=False):
     y1 = y * np.cos(angle) - x * np.sin(angle)
 
     return x1 + origin[0], y1 + origin[1]
+
+#--------------------------------------------------------------------------
+def get_time():
+    """
+    Get the current time (in seconds).
+    This is a wrapper to Expyriment's get_time function
+    """
+    return xpy_timer.get_time()

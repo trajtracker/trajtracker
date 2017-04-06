@@ -79,11 +79,11 @@ class _TTrkObject(object):
 
 
     #-------------------------------------------------
-    def _log_write(self, msg, prepend_self=False):
+    def _log_write(self, msg, prepend_self=False, print_to_console=False):
         if prepend_self:
             msg = type(self).__name__ + "," + msg
         xpy._internals.active_exp._event_file_log(msg, 1)
-        if _TTrkObject.log_to_console:
+        if _TTrkObject.log_to_console or print_to_console:
             print(msg)
 
     #-------------------------------------------------

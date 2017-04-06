@@ -31,20 +31,21 @@ the trajectory by defining :attr:`~trajtracker.movement.TrajectoryTracker.activa
 :attr:`~trajtracker.movement.TrajectoryTracker.deactivate_event`.
 
 4. :class:`~trajtracker.events.EventManager`: This is the object that coordinates between events, operations,
-and your program. It is mandatory when using TrajTracker's event mechanism. Your program notifies the event manager
-when an event occurs, and the event manager dispatches this event to the relevant event-sensitive objects
+and your program. It is mandatory when using TrajTracker's event mechanism. Typically, your program should have
+only one instance of this object. The program notifies the event manager when an event occurs,
+and the event manager dispatches this event to the relevant event-sensitive objects
 and makes sure that they run the appropriate operations.
 
 
-How to use this mechanism
--------------------------
+Practical information: How to use the event mechanism
+-----------------------------------------------------
 
 1. Create an :class:`~trajtracker.events.EventManager`
-2. Create event-sensitive objects. Each should be registered using :func:`trajtracker.events.EventManager.register`.
+2. Create event-sensitive objects. Each should be registered using :class:`~trajtracker.events.EventManager`. :meth:`~trajtracker.events.EventManager.register`.
 3. Configure the relevant events on each event-sensitive object.
 4. Your program should notify the event manager about any event that occurs using the
-   :func:`~trajtracker.events.EventManager.dispatch_event` method. You should also call
-   :func:`~trajtracker.events.EventManager.on_frame` very frequently - e.g., in a loop that runs once per frame.
+   :class:`~trajtracker.events.EventManager`. :meth:`~trajtracker.events.EventManager.dispatch_event` method. You should also call
+   :class:`~trajtracker.events.EventManager`. :meth:`~trajtracker.events.EventManager.on_frame` very frequently - e.g., in a loop that runs once per frame.
 
 For example:
  .. code-block:: python
@@ -85,8 +86,8 @@ For a more comprehensive example, check out the "Events" samples provided with T
 **Notes:**:
 
 - when using event manager to show/hide visual objects, you must put these objects in a
-  :class:`~trajtracker.stimuli.StimulusContainer` and use the container's
-  :func:`~trajtracker.stimuli.StimulusContainer.present` method to update the display.
+  :class:`~trajtracker.stimuli.StimulusContainer` and use
+  :meth:`~trajtracker.stimuli.StimulusContainer.present` to update the display.
 - Operation can be timed to the precise moment when an event occurred (as in the example above), or to some
   time later. For example, to start tracking the trajectory 100 ms after the trial started:
 
@@ -94,7 +95,22 @@ For a more comprehensive example, check out the "Events" samples provided with T
 
    traj_tracker.activate_event = trajtracker.events.EVENT_TRIAL_STARTED + 0.1
 
+- When several operations are invoked together (following a single call to EventManager.
+  :meth:`~trajtracker.events.EventManager.dispatch_event` or :meth:`~trajtracker.events.EventManager.on_frame`),
+  the order of invoking them is not guaranteed.
 
-Specific Events
----------------
 
+Pre-defined Events
+------------------
+
+TrajTracker has several pre-defined events. When using the event mechanism, some of trajtracker's objects
+rely on these events, so you should dispatch them on each trial:
+
+TBD
+
+TRIAL_INITIALIZED
+TRIAL_STARTED
+TRIAL_SUCCEEDED
+TRIAL_ERROR
+
+TRIAL_ENDED
