@@ -40,6 +40,7 @@ Methods and properties:
 
 .. autoclass:: trajtracker.stimuli.NumberLine
    :members:
+   :inherited-members:
    :member-order: bysource
 
 

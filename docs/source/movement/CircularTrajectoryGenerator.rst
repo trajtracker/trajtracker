@@ -12,5 +12,6 @@ Methods and properties:
 
 .. autoclass:: trajtracker.movement.CircularTrajectoryGenerator
    :members:
+   :inherited-members:
    :member-order: bysource
 

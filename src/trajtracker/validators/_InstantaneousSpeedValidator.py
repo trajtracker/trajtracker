@@ -14,11 +14,12 @@ import trajtracker._utils as _u
 import trajtracker.validators
 from trajtracker.movement import SpeedMonitor
 from trajtracker.data import fromXML
-from trajtracker.validators import ValidationAxis, ExperimentError, _BaseValidator
+from trajtracker.misc import EnabledDisabledObj
+from trajtracker.validators import ValidationAxis, ExperimentError
 
 
 # noinspection PyAttributeOutsideInit
-class InstantaneousSpeedValidator(_BaseValidator):
+class InstantaneousSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
     err_too_slow = "TooSlowInstantaneous"
     err_too_fast = "TooFast"
@@ -38,7 +39,8 @@ class InstantaneousSpeedValidator(_BaseValidator):
         :param calculation_interval: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.calculation_interval`
         """
 
-        super(InstantaneousSpeedValidator, self).__init__(enabled=enabled)
+        trajtracker._TTrkObject.__init__(self)
+        EnabledDisabledObj.__init__(self, enabled=enabled)
 
         if movement_monitor is None:
             self._speed_monitor = SpeedMonitor(calculation_interval)

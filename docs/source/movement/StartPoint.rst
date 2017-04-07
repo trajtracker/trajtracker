@@ -16,5 +16,6 @@ Methods and properties:
 
 .. autoclass:: trajtracker.movement.StartPoint
    :members:
+   :inherited-members:
    :member-order: bysource
 

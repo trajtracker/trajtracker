@@ -14,48 +14,34 @@ import trajtracker
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 from trajtracker.data import fromXML
+from trajtracker.misc import EnabledDisabledObj
 
 
 # noinspection PyAttributeOutsideInit,PyProtectedMember
-class TrajectoryTracker(trajtracker._TTrkObject):
+class TrajectoryTracker(trajtracker._TTrkObject, EnabledDisabledObj):
 
 
     #----------------------------------------------------
-    def __init__(self, filename=None, tracking_active=False, track_if_no_movement=False):
+    def __init__(self, filename=None, enabled=False, track_if_no_movement=False):
         """
         Constructor - invoked when you create a new object by writing TrajectoryTracker()
 
-        :param filename: See :attr:`~trajtracker.movement.TrajectoryTracker.filename`
-        :param tracking_active: See :attr:`~trajtracker.movement.TrajectoryTracker.tracking_active`
+        :param filename: The file to which the trajectory information will be saved (CSV).
+        :param enabled: See :attr:`~trajtracker.movement.TrajectoryTracker.enabled`
         :param track_if_no_movement: See :attr:`~trajtracker.movement.TrajectoryTracker.track_if_no_movement`
         """
-        super(TrajectoryTracker, self).__init__()
+        trajtracker._TTrkObject.__init__(self)
+        EnabledDisabledObj.__init__(self, enabled=enabled)
+
         self.reset()
         self._filename = filename
-        self.tracking_active = tracking_active
+        self.enabled = enabled
         self.track_if_no_movement = track_if_no_movement
 
 
     #==============================================================================
     #    Properties
     #==============================================================================
-
-    #----------------------------------------------------
-    @property
-    def tracking_active(self):
-        """
-        Whether tracking is currently active (boolean). When inactive, calls to
-        :func:`~trajtracker.movement.TrajectoryTracker.update_xyt` will be ignored.
-        """
-        return self._tracking_active
-
-    @tracking_active.setter
-    @fromXML(bool)
-    def tracking_active(self, value):
-        _u.validate_attr_type(self, "tracking_active", value, bool)
-        self._tracking_active = value
-        self._log_property_changed("tracking_active")
-
 
     #----------------------------------------------------
     @property
@@ -98,7 +84,7 @@ class TrajectoryTracker(trajtracker._TTrkObject):
         Track a point. If tracking is currently inactive, this function will do nothing.
         """
 
-        if not self._tracking_active:
+        if not self._enabled:
             return
 
         _u.validate_func_arg_type(self, "update_xyt", "x_coord", x_coord, numbers.Number)

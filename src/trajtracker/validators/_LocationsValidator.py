@@ -11,12 +11,12 @@ import trajtracker._utils as _u
 import trajtracker.utils as u
 import trajtracker.validators
 from trajtracker.misc import LocationColorMap
-from trajtracker.validators import _BaseValidator
+from trajtracker.misc import EnabledDisabledObj
 from trajtracker.data import fromXML
 
 
 
-class LocationsValidator(_BaseValidator):
+class LocationsValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
     err_invalid_coordinates = "InvalidCoords"
     arg_color = 'color'  # ExperimentError argument: the color in the invalid location
@@ -32,7 +32,8 @@ class LocationsValidator(_BaseValidator):
         :param position: See :attr:`~trajtracker.validators.LocationsValidator.position`
         :param default_valid: See :attr:`~trajtracker.validators.LocationsValidator.default_valid`
         """
-        super(LocationsValidator, self).__init__(enabled=enabled)
+        trajtracker._TTrkObject.__init__(self)
+        EnabledDisabledObj.__init__(self, enabled=enabled)
 
         self._lcm = LocationColorMap(image, position=position, use_mapping=True, colormap="RGB")
         self.default_valid = default_valid

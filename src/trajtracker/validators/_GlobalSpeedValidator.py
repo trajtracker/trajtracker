@@ -17,7 +17,8 @@ import expyriment as xpy
 import trajtracker
 import trajtracker._utils as _u
 import trajtracker.validators
-from trajtracker.validators import ValidationAxis, ExperimentError, _BaseValidator
+from trajtracker.misc import EnabledDisabledObj
+from trajtracker.validators import ValidationAxis, ExperimentError
 from trajtracker.movement import StimulusAnimator
 from trajtracker.data import fromXML
 
@@ -40,7 +41,7 @@ def _parse_xml_milestones(xml):
 
 
 # noinspection PyAttributeOutsideInit
-class GlobalSpeedValidator(_BaseValidator):
+class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
     err_too_slow = "TooSlowGlobal"
 
@@ -88,7 +89,8 @@ class GlobalSpeedValidator(_BaseValidator):
         :type show_guide: bool
         """
 
-        super(GlobalSpeedValidator, self).__init__(enabled=enabled)
+        trajtracker._TTrkObject.__init__(self)
+        EnabledDisabledObj.__init__(self, enabled=enabled)
 
         self.axis = axis
         self.grace_period = grace_period

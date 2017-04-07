@@ -26,15 +26,17 @@ event.
 :class:`~trajtracker.stimuli.NumberLine`, :class:`~trajtracker.movement.TrajectoryTracker`, etc.
 
 For event-sensitive objects, you can define the events for which a certain operation should occur. For example,
-you can control when a :class:`~trajtracker.movement.TrajectoryTracker` starts and stops tracking
-the trajectory by defining :attr:`~trajtracker.movement.TrajectoryTracker.activate_event` and
-:attr:`~trajtracker.movement.TrajectoryTracker.deactivate_event`.
+you can control when a :class:`~trajtracker.movement.TrajectoryTracker` starts and stops recording
+the trajectory by defining its :attr:`~trajtracker.movement.TrajectoryTracker.enable_event` and
+:attr:`~trajtracker.movement.TrajectoryTracker.disable_event` properties (the same properties also exist for
+validators, and determine when they start/stop validating)
 
 4. :class:`~trajtracker.events.EventManager`: This is the object that coordinates between events, operations,
 and your program. It is mandatory when using TrajTracker's event mechanism. Typically, your program should have
 only one instance of this object. The program notifies the event manager when an event occurs,
 and the event manager dispatches this event to the relevant event-sensitive objects
 and makes sure that they run the appropriate operations.
+
 
 
 Practical information: How to use the event mechanism
@@ -54,8 +56,8 @@ For example:
   stimulus_container = StimulusContainer()
 
   traj_tracker = TrajectoryTracker()
-  traj_tracker.activate_event = trajtracker.events.EVENT_TRIAL_STARTED
-  traj_tracker.deactivate_event = trajtracker.events.EVENT_TRIAL_ENDED
+  traj_tracker.enable_event = trajtracker.events.EVENT_TRIAL_STARTED
+  traj_tracker.disable_event = trajtracker.events.EVENT_TRIAL_ENDED
 
   event_manager.register(traj_tracker)
 
@@ -93,7 +95,7 @@ For a more comprehensive example, check out the "Events" samples provided with T
 
   .. code-block:: python
 
-   traj_tracker.activate_event = trajtracker.events.EVENT_TRIAL_STARTED + 0.1
+   traj_tracker.enable_event = trajtracker.events.EVENT_TRIAL_STARTED + 0.1
 
 - When several operations are invoked together (following a single call to
   :meth:`EventManager.dispatch_event() <trajtracker.events.EventManager.dispatch_event>` or

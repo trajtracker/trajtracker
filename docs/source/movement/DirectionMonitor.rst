@@ -13,5 +13,6 @@ Methods and properties:
 
 .. autoclass:: trajtracker.movement.DirectionMonitor
    :members:
+   :inherited-members:
    :member-order: bysource
 

@@ -25,5 +25,6 @@ Methods and properties:
 
 .. autoclass:: trajtracker.events.EventManager
    :members:
+   :inherited-members:
    :member-order: bysource
 

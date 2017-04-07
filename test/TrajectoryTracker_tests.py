@@ -24,7 +24,7 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
     def test_track(self):
 
         ttrk = TrajectoryTrackerForTesting()
-        ttrk.tracking_active = True
+        ttrk.enabled = True
         ttrk.init_output_file("stam", xy_precision=1, time_precision=1)
 
         ttrk.update_xyt(1, 1.5, 0.1)
@@ -32,7 +32,7 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
         ttrk.save_to_file(0)
 
         ttrk.reset()
-        ttrk.tracking_active = True
+        ttrk.enabled = True
         ttrk.update_xyt(12, 2.5, 0.2)
         ttrk.update_xyt(13, 3.5, 0.3)
         ttrk.save_to_file(1)
@@ -52,10 +52,10 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
         ttrk.init_output_file("stam", xy_precision=1, time_precision=1)
 
         ttrk.update_xyt(1, 1.5, 0.1)
-        ttrk.tracking_active = True
+        ttrk.enabled = True
         ttrk.update_xyt(2, 2.5, 0.2)
         ttrk.update_xyt(3, 3.5, 0.3)
-        ttrk.tracking_active = False
+        ttrk.enabled = False
         ttrk.update_xyt(4, 4.5, 0.4)
         ttrk.save_to_file(0)
 
@@ -66,7 +66,7 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
 
         ttrk = TrajectoryTrackerForTesting()
         ttrk.init_output_file("stam", xy_precision=2, time_precision=3)
-        ttrk.tracking_active = True
+        ttrk.enabled = True
         ttrk.update_xyt(0.2, 0.3, 0.1)
         ttrk.save_to_file(0)
 
@@ -76,7 +76,7 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
     def test_no_track_no_movement(self):
 
         ttrk = TrajectoryTrackerForTesting()
-        ttrk.tracking_active = True
+        ttrk.enabled = True
         ttrk.track_if_no_movement = False
         ttrk.init_output_file("stam", xy_precision=1, time_precision=1)
 
@@ -91,7 +91,7 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
     def test_track_if_movement(self):
 
         ttrk = TrajectoryTrackerForTesting()
-        ttrk.tracking_active = True
+        ttrk.enabled = True
         ttrk.track_if_no_movement = True
         ttrk.init_output_file("stam", xy_precision=1, time_precision=1)
 
@@ -145,11 +145,11 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
 
 
     #------------------------------------------------------------------
-    def test_set_tracking_active(self):
+    def test_set_enabled(self):
         trk = TrajectoryTracker()
-        trk.tracking_active = True
-        self.assertRaises(TypeError, lambda: TrajectoryTracker(tracking_active=""))
-        self.assertRaises(TypeError, lambda: TrajectoryTracker(tracking_active=None))
+        trk.enabled = True
+        self.assertRaises(TypeError, lambda: TrajectoryTracker(enabled=""))
+        self.assertRaises(TypeError, lambda: TrajectoryTracker(enabled=None))
 
 
     #------------------------------------------------------------------
@@ -165,9 +165,11 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
 
         trk = TrajectoryTracker()
         configer = trajtracker.data.XmlConfigUpdater()
-        xml = ET.fromstring('<config track_if_no_movement="True" tracking_active="True"/>')
+        xml = ET.fromstring('<config track_if_no_movement="True" enabled="True" enable_event="A" disable_event="B+1"/>')
         configer.configure_object(xml, trk)
-        self.assertEqual(True, trk.tracking_active)
+        self.assertEqual(True, trk.enabled)
+        self.assertEqual(trajtracker.events.Event("A"), trk.enable_event)
+        self.assertEqual(trajtracker.events.Event("B") + 1, trk.disable_event)
         self.assertEqual(True, trk.track_if_no_movement)
 
 

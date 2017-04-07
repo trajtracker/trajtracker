@@ -7,6 +7,7 @@ TrajTracker - misc package
 
 """
 
+from _EnabledDisabledObj import EnabledDisabledObj
 from _LocationColorMap import LocationColorMap
 from _PictureSet import PictureSet
 

@@ -67,7 +67,7 @@ class StimulusSelector(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetOb
     #--------------------------------------------------
     @property
     def active_stimulus(self):
-        """ The expyriment stimulus currently active """
+        """ Get the expyriment stimulus currently active """
         if self._active_key is None:
             return None
         else:

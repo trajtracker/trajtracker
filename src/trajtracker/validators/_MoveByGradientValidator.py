@@ -11,13 +11,12 @@ import numpy as np
 import trajtracker._utils as _u
 import trajtracker.utils as u
 import trajtracker.validators
-from trajtracker.misc import LocationColorMap
-from trajtracker.validators import _BaseValidator
+from trajtracker.misc import LocationColorMap, EnabledDisabledObj
 from trajtracker.data import fromXML
 
 
 
-class MoveByGradientValidator(_BaseValidator):
+class MoveByGradientValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
     max_irrelevant_color_value = 10
     cyclic_ratio = 5
@@ -37,7 +36,8 @@ class MoveByGradientValidator(_BaseValidator):
         :param max_valid_back_movement: See :attr:`~trajtracker.validators.MoveByGradientValidator.max_valid_back_movement`
         :param cyclic: See :attr:`~trajtracker.validators.MoveByGradientValidator.cyclic`
         """
-        super(MoveByGradientValidator, self).__init__(enabled=enabled)
+        trajtracker._TTrkObject.__init__(self)
+        EnabledDisabledObj.__init__(self, enabled=enabled)
 
         self._lcm = LocationColorMap(image, position=position, use_mapping=True, colormap="RGB")
         self.rgb_should_ascend = rgb_should_ascend

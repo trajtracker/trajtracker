@@ -12,5 +12,6 @@ Methods and properties:
 
 .. autoclass:: trajtracker.movement.LineTrajectoryGenerator
    :members:
+   :inherited-members:
    :member-order: bysource
 

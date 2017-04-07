@@ -12,6 +12,7 @@ Methods and properties:
 
 .. autoclass:: trajtracker.misc.PictureSet
    :members:
+   :inherited-members:
    :member-order: bysource
 
 

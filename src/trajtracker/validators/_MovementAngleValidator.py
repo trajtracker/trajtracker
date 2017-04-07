@@ -17,12 +17,12 @@ import trajtracker
 import trajtracker._utils as _u
 import trajtracker.utils as u
 import trajtracker.validators
-from trajtracker.validators import _BaseValidator
+from trajtracker.misc import EnabledDisabledObj
 from trajtracker.data import fromXML
 
 
 # noinspection PyAttributeOutsideInit
-class MovementAngleValidator(_BaseValidator):
+class MovementAngleValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
 
     err_invalid_angle = "InvalidAngle"
@@ -40,7 +40,8 @@ class MovementAngleValidator(_BaseValidator):
         :param grace_period: See :attr:`~trajtracker.movement.MovementAngleValidator.grace_period`
         :param enabled: See :attr:`~trajtracker.movement.MovementAngleValidator.enabled`
         """
-        super(MovementAngleValidator, self).__init__(enabled=enabled)
+        trajtracker._TTrkObject.__init__(self)
+        EnabledDisabledObj.__init__(self, enabled=enabled)
 
         self.min_angle = min_angle
         self.max_angle = max_angle

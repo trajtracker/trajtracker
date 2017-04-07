@@ -121,3 +121,9 @@ class Event(trajtracker._TTrkObject):
             return self._event_id
         else:
             return "{:} + {:.3g}sec".format(self._event_id, self._offset)
+
+    #----------------------------------------------------
+    def __eq__(self, other):
+        return isinstance(other, Event) and self._event_id == other._event_id and self._offset == other._offset
+
+

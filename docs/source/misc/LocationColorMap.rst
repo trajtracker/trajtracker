@@ -10,6 +10,7 @@ Methods and properties:
 
 .. autoclass:: trajtracker.misc.LocationColorMap
    :members:
+   :inherited-members:
    :member-order: bysource
 
 

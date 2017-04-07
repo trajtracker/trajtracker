@@ -10,5 +10,6 @@ Methods and properties:
 
 .. autoclass:: trajtracker.movement.SpeedMonitor
    :members:
+   :inherited-members:
    :member-order: bysource
 

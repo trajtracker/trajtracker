@@ -17,11 +17,11 @@ import trajtracker
 import trajtracker._utils as _u
 import trajtracker.utils as u
 import trajtracker.validators
-from trajtracker.validators import _BaseValidator
+from trajtracker.misc import EnabledDisabledObj
 from trajtracker.data import fromXML
 
 
-class NCurvesValidator(_BaseValidator):
+class NCurvesValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
 
     err_too_many_curves = "TooManyCurves"
@@ -38,7 +38,8 @@ class NCurvesValidator(_BaseValidator):
         :param enabled: See :attr:`~trajtracker.validators.NCurvesValidator.enabled`
         """
 
-        super(NCurvesValidator, self).__init__(enabled=enabled)
+        trajtracker._TTrkObject.__init__(self)
+        EnabledDisabledObj.__init__(self, enabled=enabled)
 
         if direction_monitor is None:
             direction_monitor = trajtracker.movement.DirectionMonitor(1)
