@@ -63,19 +63,35 @@ def _get_type_name(t):
 #--------------------------------------
 def validate_attr_type(obj, attr_name, value, attr_type, none_allowed=False, type_name=None):
 
-    if (value is None and not none_allowed) or (value is not None and not isinstance(value, attr_type)):
-        if type_name is None:
-            type_name = _get_type_name(attr_type)
+    if none_allowed and value is None:
+        return
 
-        raise TypeError(ErrMsg.attr_invalid_type(_get_type_name(obj), attr_name, type_name, value))
+    if isinstance(attr_type, (type, tuple)):
+        if not isinstance(value, attr_type):
+            if type_name is None:
+                type_name = _get_type_name(attr_type)
+
+            raise TypeError(ErrMsg.attr_invalid_type(_get_type_name(obj), attr_name, type_name, value))
+
+    elif attr_type == "RGB":
+        validate_attr_rgb(obj, attr_name, value)
+
+    elif attr_type == "coord":
+        validate_attr_is_coord(obj, attr_name, value)
+
+    else:
+        raise Exception("trajtracker internal error: unsupported type '{:}'".format(attr_type))
+
 
 #--------------------------------------
+LIST_TYPES = (list, tuple, np.ndarray)
+
 def validate_attr_anylist(obj, attr_name, value, min_length=None, max_length=None, none_allowed=False):
 
     if value is None and none_allowed:
         value = ()
 
-    validate_attr_type(obj, attr_name, value, (list, tuple, np.ndarray), type_name="list/tuple")
+    validate_attr_type(obj, attr_name, value, LIST_TYPES, type_name="list/tuple")
     if min_length is not None and len(value) < min_length:
         raise TypeError(
             "trajtracker error: {:}.{:} cannot be assigned to a collection with {:} elements - a minimal of {:} elements are expected".
@@ -172,12 +188,16 @@ def validate_func_arg_not_negative(obj, func_name, arg_name, value):
         raise ValueError("trajtracker error: Argument '{:}' of {:}() has a negative value ({:})".format(arg_name, _get_func_name(obj, func_name), value))
 
 #--------------------------------------
-def validate_func_arg_anylist(obj, func_name, arg_name, value, min_length=None, max_length=None, none_allowed=False):
+_LIST_TYPES = (list, tuple, np.ndarray)
+
+def validate_func_arg_anylist(obj, func_name, arg_name, value, min_length=None, max_length=None, none_allowed=False,
+                              allow_set=False):
 
     if value is None and none_allowed:
         value = ()
 
-    validate_func_arg_type(obj, func_name, arg_name, value, (list, tuple, np.ndarray), type_name="list/tuple")
+    valid_types = _LIST_TYPES + ((set, ) if allow_set else ())
+    validate_func_arg_type(obj, func_name, arg_name, value, valid_types, type_name="list/tuple")
     if min_length is not None and len(value) < min_length:
         raise TypeError("trajtracker error: Argument {:} of {:}() cannot be set to a collection with {:} elements - a minimal of {:} elements are expected".
                          format(arg_name, _get_func_name(obj, func_name), len(value), min_length))
@@ -215,6 +235,18 @@ def _get_func_name(obj, func_name):
         return func_name
     else:
         return "{:}.{:}".format(_get_type_name(obj), func_name)
+
+
+# ============================================================================
+#   Display
+# ============================================================================
+
+#--------------------------------------
+def display_clear():
+    expyriment._internals.active_exp.screen.clear()
+
+def display_update():
+    expyriment._internals.active_exp.screen.update()
 
 
 #============================================================================
@@ -279,3 +311,16 @@ def parse_rgb_list(xml):
         colors.append(parse_rgb(child.text.strip()))
 
     return colors
+
+#--------------------------------------------------------------------
+def _parse_list_of(value, converter):
+
+    if re.match("^\[.*\]$", value):
+        elems = value[1:-1].split(";")
+        return [converter(e) for e in elems]
+    else:
+        return converter(value)
+
+
+def parse_scalar_or_list(converter):
+    return lambda value: _parse_list_of(value, converter)

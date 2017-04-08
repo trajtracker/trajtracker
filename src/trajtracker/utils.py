@@ -63,6 +63,7 @@ def color_num_to_rgb(value):
         raise ValueError("trajtracker error: invalid argument to color_num_to_rgb(), expecting a 3*integer list/tuple")
 
 
+#--------------------------------------------------------------------------
 def is_rgb(rgb):
     """
     Check if the given value is a valid RGB color (3 integers, each 0-255)

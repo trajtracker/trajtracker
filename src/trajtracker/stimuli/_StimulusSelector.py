@@ -87,9 +87,9 @@ class StimulusSelector(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetOb
         if s is None:
             # Take care of the clear and update
             if clear:
-                expyriment._internals.active_exp.screen.clear()
+                _u.display_clear()
             if update:
-                expyriment._internals.active_exp.screen.update()
+                _u.display_update()
         else:
             s.present(clear=clear, update=update)
 

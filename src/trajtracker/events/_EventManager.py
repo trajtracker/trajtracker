@@ -14,6 +14,7 @@ from operator import itemgetter
 import trajtracker
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
+from trajtracker.events import Event
 
 
 # noinspection PyProtectedMember
@@ -198,6 +199,9 @@ class EventManager(trajtracker._TTrkObject):
             raise TypeError("trajtracker error: EventManager.register_operation() was called with an invalid operation " +
                             "({:}) - expecting a function or another callable object".format(operation))
 
+        if isinstance(cancel_pending_operation_on, Event):
+            cancel_pending_operation_on = cancel_pending_operation_on,
+
         self._id_generator += 1
         operation_id = self._id_generator
 
@@ -216,49 +220,54 @@ class EventManager(trajtracker._TTrkObject):
 
         if event.event_id not in self._operations_by_event:
             self._operations_by_event[event.event_id] = dict()
-            self._operations_by_event[event.event_id][operation_id] = op_info
+
+        self._operations_by_event[event.event_id][operation_id] = op_info
 
         #-- Log
         if self._should_log(self.log_debug):
+            cancel_events_desc = ""
+            if len(cancel_pending_operation_on) > 0:
+                cancel_events = [e.event_id for e in cancel_pending_operation_on]
+                cancel_events_desc = "; cancel pending on " + ",".join(cancel_events)
+
             self._log_write('register {:} operation "{:}" on event {:}{:}; operation ID={:}'.format(
                 "recurring" if recurring else "non-recurring",
                 operation if description is None else description,
                 event,
-                "" if len(cancel_pending_operation_on) == 0 else ("; cancel pending on " + ",".join(cancel_pending_operation_on)),
+                cancel_events_desc,
                 operation_id), True)
 
         return operation_id
 
 
     #--------------------------------------------------------------
-    def unregister_operation(self, operation_id):
+    def unregister_operation(self, operation_ids):
         """
         Unregister a previously-registered operation.
 
         This method is intended for internal use of the trajtracker package. Generally, you should not use
         this method but :func:`~trajtracker.events.EventManager.register`.
 
-        :param operation_id: The ID returned from :func:`~trajtracker.events.EventManager.register_operation`.
-        :return: The operation and the event on which it was registered (as tuple); or None if operation was not found.
+        :param operation_ids: The ID returned from :func:`~trajtracker.events.EventManager.register_operation`.
         """
 
-        _u.validate_func_arg_type(self, "unregister_operation", "operation_id", operation_id, int)
+        if isinstance(operation_ids, int):
+            operation_ids = operation_ids,
+        else:
+            _u.validate_func_arg_anylist(self, "unregister_operation", "operation_id", operation_ids, allow_set=True)
 
-        if operation_id not in self._operations_by_id:
-            return None
-
-        if self._should_log(self.log_debug):
-            self._log_write('unregistering {:} operation "{:}" (ID={:}) from event {:}'.format(
-                "recurring" if recurring else "non-recurring",
-                operation if description is None else description,
-                operation_id,
-                event), True)
-
-        op_info = self._operations_by_id[operation_id]
-        self._remove_operation(operation_id, True)
-
-        return op_info['operation'], op_info['event']
-
+        for op_id in operation_ids:
+            if op_id in self._operations_by_id:
+                if self._should_log(self.log_debug):
+                    op_info = self._operations_by_id[op_id]
+                    self._log_write('unregistering {:} operation "{:}" (ID={:}) from event {:}'.format(
+                        "recurring" if op_info['recurring'] else "non-recurring",
+                        op_info['operation'] if op_info['description'] is None else op_info['description'],
+                        op_id,
+                        op_info['event']), True)
+                self._remove_operation(op_id, True)
+            else:
+                self._log_write_if(self.log_warn, "operation {:} is not in the event manager - not removed", True)
 
     #======================================================================================
     # Internal stuff
