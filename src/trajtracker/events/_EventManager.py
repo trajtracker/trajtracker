@@ -254,7 +254,7 @@ class EventManager(trajtracker._TTrkObject):
         if isinstance(operation_ids, int):
             operation_ids = operation_ids,
         else:
-            _u.validate_func_arg_anylist(self, "unregister_operation", "operation_id", operation_ids, allow_set=True)
+            _u.validate_func_arg_is_collection(self, "unregister_operation", "operation_id", operation_ids, allow_set=True)
 
         for op_id in operation_ids:
             if op_id in self._operations_by_id:

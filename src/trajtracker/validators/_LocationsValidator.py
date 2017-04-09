@@ -109,7 +109,7 @@ class LocationsValidator(trajtracker._TTrkObject, EnabledDisabledObj):
         if u.is_rgb(value):
             value = (value,)
 
-        _u.validate_attr_type(self, attr_name, value, (list, tuple, set))
+        _u.validate_attr_is_collection(self, attr_name, value, allow_set=True)
 
         colors = set()
         for c in value:

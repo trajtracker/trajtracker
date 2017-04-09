@@ -124,7 +124,7 @@ class BaseRSVPStim(trajtracker._TTrkObject):
     def onset_time(self, value):
 
         if value is not None:
-            _u.validate_attr_anylist(self, "onset_time", value, min_length=1)
+            _u.validate_attr_is_collection(self, "onset_time", value, min_length=1)
             for i in range(len(value)):
                 _u.validate_attr_numeric(self, "onset_time[%d]" % i, value[i])
                 _u.validate_attr_not_negative(self, "onset_time[%d]" % i, value[i])
@@ -149,7 +149,7 @@ class BaseRSVPStim(trajtracker._TTrkObject):
 
         elif value is not None:
             is_multiple = True
-            _u.validate_attr_anylist(self, "duration", value, min_length=1)
+            _u.validate_attr_is_collection(self, "duration", value, min_length=1)
             for i in range(len(value)):
                 _u.validate_attr_numeric(self, "duration[%d]" % i, value[i])
                 _u.validate_attr_positive(self, "duration[%d]" % i, value[i])

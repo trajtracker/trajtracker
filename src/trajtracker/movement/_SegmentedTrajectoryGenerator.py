@@ -78,11 +78,11 @@ class SegmentedTrajectoryGenerator(trajtracker._TTrkObject):
     # ---------------------------------------------------------------
     def add_segments(self, segments):
 
-        _u.validate_func_arg_type(self, "add_segments", "segments", segments, (list, tuple))
+        _u.validate_func_arg_is_collection(self, "add_segments", "segments", segments)
 
         for i in range(len(segments)):
             segment = segments[i]
-            _u.validate_func_arg_anylist(self, "add_segments", "segments[%d]" % i, segment, 2, 2)
+            _u.validate_func_arg_is_collection(self, "add_segments", "segments[%d]" % i, segment, 2, 2)
             _u.validate_func_arg_type(self, "add_segments", "segments[%d][1]" % i, segment[1], numbers.Number)
             _u.validate_func_arg_positive(self, "add_segments", "segments[%d][1]" % i, segment[1])
             self.add_segment(segment[0], segment[1])

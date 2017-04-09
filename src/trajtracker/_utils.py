@@ -86,12 +86,18 @@ def validate_attr_type(obj, attr_name, value, attr_type, none_allowed=False, typ
 #--------------------------------------
 LIST_TYPES = (list, tuple, np.ndarray)
 
-def validate_attr_anylist(obj, attr_name, value, min_length=None, max_length=None, none_allowed=False):
+def validate_attr_is_collection(obj, attr_name, value, min_length=None, max_length=None,
+                                none_allowed=False, allow_set=False):
 
     if value is None and none_allowed:
         value = ()
 
-    validate_attr_type(obj, attr_name, value, LIST_TYPES, type_name="list/tuple")
+    val_methods = dir(value)
+    ok = "__len__" in val_methods and "__iter__" in val_methods and (allow_set or "__getitem__" in val_methods)
+    if not ok:
+        raise TypeError("trajtracker error: {:}.{:} was set to a non-{:} value ({:})".format(
+            _get_type_name(obj), attr_name, "collection" if allow_set else "list", value))
+
     if min_length is not None and len(value) < min_length:
         raise TypeError(
             "trajtracker error: {:}.{:} cannot be assigned to a collection with {:} elements - a minimal of {:} elements are expected".
@@ -132,7 +138,7 @@ def validate_attr_is_coord(obj, attr_name, value, change_none_to_0=False):
     if isinstance(value, geometry.XYPoint):
         value = (value.x, value.y)
 
-    validate_attr_anylist(obj, attr_name, value, 2, 2)
+    validate_attr_is_collection(obj, attr_name, value, 2, 2)
     validate_attr_type(obj, "{:}[0]".format(attr_name), value[0], int)
     validate_attr_type(obj, "{:}[1]".format(attr_name), value[1], int)
 
@@ -190,14 +196,18 @@ def validate_func_arg_not_negative(obj, func_name, arg_name, value):
 #--------------------------------------
 _LIST_TYPES = (list, tuple, np.ndarray)
 
-def validate_func_arg_anylist(obj, func_name, arg_name, value, min_length=None, max_length=None, none_allowed=False,
-                              allow_set=False):
+def validate_func_arg_is_collection(obj, func_name, arg_name, value, min_length=None, max_length=None,
+                                    none_allowed=False, allow_set=False):
 
     if value is None and none_allowed:
         value = ()
 
-    valid_types = _LIST_TYPES + ((set, ) if allow_set else ())
-    validate_func_arg_type(obj, func_name, arg_name, value, valid_types, type_name="list/tuple")
+    val_methods = dir(value)
+    ok = "__len__" in val_methods and "__iter__" in val_methods and (allow_set or "__getitem__" in val_methods)
+    if not ok:
+        raise TypeError("trajtracker error: {:}() was called with a non-{:} {:} ({:})".format(
+            _get_func_name(obj, func_name), "collection" if allow_set else "list", arg_name, value))
+
     if min_length is not None and len(value) < min_length:
         raise TypeError("trajtracker error: Argument {:} of {:}() cannot be set to a collection with {:} elements - a minimal of {:} elements are expected".
                          format(arg_name, _get_func_name(obj, func_name), len(value), min_length))

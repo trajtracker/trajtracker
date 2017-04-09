@@ -151,7 +151,7 @@ class CustomTrajectoryGenerator(trajtracker._TTrkObject):
                 x coordinate (int), y coordinate (int), and optional "visible" (bool)
         """
 
-        _u.validate_func_arg_anylist(self, "set_trajectory", "traj_data", traj_data, min_length=1)
+        _u.validate_func_arg_is_collection(self, "set_trajectory", "traj_data", traj_data, min_length=1)
         if traj_id is None:
             raise TypeError("trajtracker error: {:}.set_trajectory(traj_id=None) is invalid".format(type(self).__name__))
 
@@ -164,7 +164,7 @@ class CustomTrajectoryGenerator(trajtracker._TTrkObject):
 
             time_point = traj_data[i]
 
-            _u.validate_func_arg_anylist(self, "set_trajectory", "traj_data[%d]" % i, time_point, min_length=3, max_length=4)
+            _u.validate_func_arg_is_collection(self, "set_trajectory", "traj_data[%d]" % i, time_point, min_length=3, max_length=4)
             _u.validate_func_arg_type(self, "set_trajectory", "traj_data[%d][0]" % i, time_point[0], numbers.Number)
             _u.validate_func_arg_not_negative(self, "set_trajectory", "traj_data[%d][0]" % i, time_point[0])
             _u.validate_func_arg_type(self, "set_trajectory", "traj_data[%d][1]" % i, time_point[1], int)

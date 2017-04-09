@@ -343,7 +343,7 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
         if value is None:
             value = []
 
-        _u.validate_attr_anylist(self, "milestones", value)
+        _u.validate_attr_is_collection(self, "milestones", value)
 
         total_time = 0
         total_distance = 0

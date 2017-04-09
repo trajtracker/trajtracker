@@ -92,7 +92,7 @@ class LocationColorMap(trajtracker._TTrkObject):
         if value is None:
             value = (0, 0)
 
-        _u.validate_attr_anylist(self, "position", value, 2, 2)
+        _u.validate_attr_is_collection(self, "position", value, 2, 2)
         _u.validate_attr_type(self, "position[0]", value[0], numbers.Number)
         _u.validate_attr_type(self, "position[1]", value[1], numbers.Number)
 
