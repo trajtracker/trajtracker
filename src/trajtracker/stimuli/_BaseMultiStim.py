@@ -1,6 +1,6 @@
 """
 
-Base class for RSVP stimuli
+Base class for showing multiple stimuli (e.g., RSVP)
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
@@ -18,17 +18,17 @@ from trajtracker.events import Event
 from trajtracker.events import TRIAL_INITIALIZED, TRIAL_ENDED
 
 
-class BaseRSVPStim(trajtracker._TTrkObject):
+class BaseMultiStim(trajtracker._TTrkObject):
 
 
     def __init__(self, onset_time=None, duration=None, last_stimulus_remains=False):
 
-        super(BaseRSVPStim, self).__init__()
+        super(BaseMultiStim, self).__init__()
 
         self._event_manager = None
         self.trial_configured_event = TRIAL_INITIALIZED
-        self.start_rsvp_event = None
-        self.terminate_rsvp_event = TRIAL_ENDED
+        self.onset_event = None
+        self.terminate_event = TRIAL_ENDED
 
         self.onset_time = onset_time
         self.duration = duration
@@ -43,7 +43,7 @@ class BaseRSVPStim(trajtracker._TTrkObject):
         event_manager.register_operation(event=self._trial_configured_event,
                                          operation=lambda t1, t2: self._init_trial_events(),
                                          recurring=True,
-                                         description="Setup the trial's RSVP")
+                                         description="Setup {:}".format(type(self).__name__))
 
 
     #==============================================================================
@@ -54,7 +54,7 @@ class BaseRSVPStim(trajtracker._TTrkObject):
     @property
     def trial_configured_event(self):
         """
-        An event indicating the time when the per-trial RSVP information was configured.
+        An event indicating the time when the per-trial information was configured.
         By default, this is the TRIAL_INIITALIZED event.
 
         **Note:**
@@ -77,42 +77,44 @@ class BaseRSVPStim(trajtracker._TTrkObject):
 
     #----------------------------------------------------
     @property
-    def start_rsvp_event(self):
+    def onset_event(self):
         """
-        The event on which the RSVP should start appearing. The onset times are indicated relatively to this event.
+        The event which serves as a reference point for displaying stimul. All onset_time's are indicated
+        relatively to this event.
 
-        **Note:** This property is relevant only when working with events (and with an
+        **Note:** This property is relevant only when working with events (with an
         :class:`~trajtracker.events.EventManager`)
         """
-        return self._start_rsvp_event
+        return self._onset_event
 
-    @start_rsvp_event.setter
-    def start_rsvp_event(self, event):
-        _u.validate_attr_type(self, "start_rsvp_event", event, Event, none_allowed=True)
-        self._start_rsvp_event = event
-        self._log_property_changed("start_rsvp_event")
+    @onset_event.setter
+    def onset_event(self, event):
+        _u.validate_attr_type(self, "onset_event", event, Event, none_allowed=True)
+        self._onset_event = event
+        self._log_property_changed("onset_event")
 
 
     #----------------------------------------------------
     @property
-    def terminate_rsvp_event(self):
+    def terminate_event(self):
         """
-        An event that terminates the RSVP, even if it's already started. Default: TRIAL_ENDED.
+        An event that terminates the display of stimuli, including the display of stimuli that are
+        still scheduled to appear. Default: TRIAL_ENDED.
 
         You can set to None to disable termination; however, note that in this case you might get strange
-        behavior if the next trial starts while the RSVP is still playing. To prevent this, you'll have to
+        behavior if the next trial starts while the stimuli are still being shown. To prevent this, you'll have to
         take care yourself of cleaning up pending operations from the event manager.
 
         **Note:** This property is relevant only when working with events (and with an
         :class:`~trajtracker.events.EventManager`)
         """
-        return self._terminate_rsvp_event
+        return self._terminate_event
 
-    @terminate_rsvp_event.setter
-    def terminate_rsvp_event(self, event):
-        _u.validate_attr_type(self, "cancel_rsvp_event", event, Event, none_allowed=True)
-        self._terminate_rsvp_event = event
-        self._log_property_changed("terminate_rsvp_event")
+    @terminate_event.setter
+    def terminate_event(self, event):
+        _u.validate_attr_type(self, "terminate_event", event, Event, none_allowed=True)
+        self._terminate_event = event
+        self._log_property_changed("terminate_event")
 
 
     #----------------------------------------------------

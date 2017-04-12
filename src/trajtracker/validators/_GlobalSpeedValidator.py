@@ -117,26 +117,32 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
         self.guide_line_length = None
         self.do_present_guide = True
 
+        self._time0 = None
+
 
     #========================================================================
     #      Validation API
     #========================================================================
 
     #----------------------------------------------------------------------------------
-    def reset(self, time0=0):
+    def reset(self, time0=None):
         """
         Called when a trial starts - reset any previous movement
+        """
+        pass
 
-        :param time0: The time when the trial started
-        :type time0: number
+    #----------------------------------------------------------------------------------
+    def finger_started_moving(self, time):
+        """
+        Called when the finger starts moving
         """
 
-        self._log_func_enters("reset", [time0])
+        self._log_func_enters("finger_started_moving", [time])
 
-        if time0 is not None and not isinstance(time0, (int, float)):
-            raise ValueError(_u.ErrMsg.invalid_method_arg_type(self.__class__, "reset", "numeric", "time", time0))
+        if not isinstance(time, numbers.Number):
+            raise ValueError(_u.ErrMsg.invalid_method_arg_type(self.__class__, "reset", "numeric", "time", time))
 
-        self._time0 = time0
+        self._time0 = time
 
 
     #----------------------------------------------------------------------------------
@@ -164,7 +170,7 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
         #-- If this is the first call in a trial: do nothing
         if self._time0 is None:
-            self.reset(time_in_trial)
+            self.finger_started_moving(time_in_trial)
             return None
 
         if time_in_trial < self._time0:

@@ -103,7 +103,7 @@ class PictureSet(trajtracker._TTrkObject):
     # Preload one picture
     #
     def _preload_pic(self, img_name, img):
-        img.preload()
+        img._preload()
         img.position = self._position
 
         if self._scale_method != PictureSet.ScaleMethod.None:

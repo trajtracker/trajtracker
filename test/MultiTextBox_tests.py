@@ -2,11 +2,18 @@ import unittest
 
 
 import trajtracker
-from trajtracker.stimuli import RSVPText
+from trajtracker.stimuli import MultiTextBox
 from trajtracker.events import *
 
 
-class RSVPTextTests(unittest.TestCase):
+class MultiTextBoxDbg(MultiTextBox):
+    def _preload(self):
+        # avoid preloading, so not to depend on Expyriment initialization
+        pass
+
+
+
+class MultiTextBoxTests(unittest.TestCase):
 
 
     def setUp(self):
@@ -19,146 +26,146 @@ class RSVPTextTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_create_empty(self):
-        RSVPText()
+        MultiTextBoxDbg()
 
     #---------------------------------------------------
     def test_set_text(self):
-        rsvp = RSVPText(text=['a', 'b'])
-        self.assertEqual(['a', 'b'], rsvp.text)
-        rsvp.text = 'a',
-        rsvp.text = None
+        mtb = MultiTextBoxDbg(text=['a', 'b'])
+        self.assertEqual(['a', 'b'], mtb.text)
+        mtb.text = 'a',
+        mtb.text = None
 
     def test_set_text_invalid(self):
-        self.assertRaises(TypeError, lambda: RSVPText(text='hi'))
-        self.assertRaises(TypeError, lambda: RSVPText(text=5))
-        self.assertRaises(TypeError, lambda: RSVPText(text=[5]))
-        self.assertRaises(TypeError, lambda: RSVPText(text=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(text=[None]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text='hi'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text=5))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text=[5]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text=[None]))
 
     #---------------------------------------------------
     def test_set_text_font(self):
-        rsvp = RSVPText(text_font='Arial')
-        self.assertEqual('Arial', rsvp.text_font)
-        rsvp.text_font = 'Arial','Barial'
-        rsvp.text_font = None
+        mtb = MultiTextBoxDbg(text_font='Arial')
+        self.assertEqual('Arial', mtb.text_font)
+        mtb.text_font = 'Arial','Barial'
+        mtb.text_font = None
 
     def test_set_text_font_invalid(self):
-        self.assertRaises(TypeError, lambda: RSVPText(text_font=5))
-        self.assertRaises(TypeError, lambda: RSVPText(text_font=[5]))
-        self.assertRaises(TypeError, lambda: RSVPText(text_font=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(text_font=[None]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_font=5))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_font=[5]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_font=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_font=[None]))
 
     #---------------------------------------------------
     def test_set_text_size(self):
-        rsvp = RSVPText(text_size=10)
-        self.assertEqual(10, rsvp.text_size)
-        rsvp.text_size = 3, 5
-        rsvp.text_size = None
+        mtb = MultiTextBoxDbg(text_size=10)
+        self.assertEqual(10, mtb.text_size)
+        mtb.text_size = 3, 5
+        mtb.text_size = None
 
     def test_set_text_size_invalid(self):
-        self.assertRaises(TypeError, lambda: RSVPText(text_size='a'))
-        self.assertRaises(TypeError, lambda: RSVPText(text_size=['a']))
-        self.assertRaises(TypeError, lambda: RSVPText(text_size=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(text_size=[None]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_size='a'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_size=['a']))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_size=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_size=[None]))
 
     #---------------------------------------------------
     def test_set_text_bold(self):
-        rsvp = RSVPText(text_bold=True)
+        rsvp = MultiTextBoxDbg(text_bold=True)
         self.assertEqual(True, rsvp.text_bold)
         rsvp.text_bold = True, True
 
     def test_set_text_bold_invalid(self):
-        self.assertRaises(TypeError, lambda: RSVPText(text_bold=None))
-        self.assertRaises(TypeError, lambda: RSVPText(text_bold='a'))
-        self.assertRaises(TypeError, lambda: RSVPText(text_bold=['a']))
-        self.assertRaises(TypeError, lambda: RSVPText(text_bold=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(text_bold=[None]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_bold=None))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_bold='a'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_bold=['a']))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_bold=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_bold=[None]))
 
     #---------------------------------------------------
     def test_set_text_italic(self):
-        rsvp = RSVPText(text_italic=True)
+        rsvp = MultiTextBoxDbg(text_italic=True)
         self.assertEqual(True, rsvp.text_italic)
         rsvp.text_italic = True, True
 
     def test_set_text_italic_invalid(self):
-        self.assertRaises(TypeError, lambda: RSVPText(text_italic=None))
-        self.assertRaises(TypeError, lambda: RSVPText(text_italic='a'))
-        self.assertRaises(TypeError, lambda: RSVPText(text_italic=['a']))
-        self.assertRaises(TypeError, lambda: RSVPText(text_italic=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(text_italic=[None]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_italic=None))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_italic='a'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_italic=['a']))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_italic=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_italic=[None]))
 
     #---------------------------------------------------
     def test_set_text_underline(self):
-        rsvp = RSVPText(text_underline=True)
+        rsvp = MultiTextBoxDbg(text_underline=True)
         self.assertEqual(True, rsvp.text_underline)
         rsvp.text_underline = True, True
 
     def test_set_text_underline_invalid(self):
-        self.assertRaises(TypeError, lambda: RSVPText(text_underline=None))
-        self.assertRaises(TypeError, lambda: RSVPText(text_underline='a'))
-        self.assertRaises(TypeError, lambda: RSVPText(text_underline=['a']))
-        self.assertRaises(TypeError, lambda: RSVPText(text_underline=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(text_underline=[None]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_underline=None))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_underline='a'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_underline=['a']))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_underline=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_underline=[None]))
 
     #---------------------------------------------------
     def test_set_text_colour(self):
-        rsvp = RSVPText(text_colour=(1,2,3))
+        rsvp = MultiTextBoxDbg(text_colour=(1, 2, 3))
         self.assertEqual((1,2,3), rsvp.text_colour)
         rsvp.text_colour = (1, 2, 3), (4, 5, 6)
         rsvp.text_colour = None
 
     def test_set_text_colour_invalid(self):
-        self.assertRaises(TypeError, lambda: RSVPText(text_colour='a'))
-        self.assertRaises(TypeError, lambda: RSVPText(text_colour=['a']))
-        self.assertRaises(TypeError, lambda: RSVPText(text_colour=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(text_colour=[None]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_colour='a'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_colour=['a']))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_colour=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_colour=[None]))
 
     #---------------------------------------------------
     def test_set_background_colour(self):
-        rsvp = RSVPText(background_colour=(1,2,3))
+        rsvp = MultiTextBoxDbg(background_colour=(1, 2, 3))
         self.assertEqual((1,2,3), rsvp.background_colour)
         rsvp.background_colour = (1, 2, 3), (4, 5, 6)
         rsvp.background_colour = None
 
     def test_set_background_colour_invalid(self):
-        self.assertRaises(TypeError, lambda: RSVPText(background_colour='a'))
-        self.assertRaises(TypeError, lambda: RSVPText(background_colour=['a']))
-        self.assertRaises(TypeError, lambda: RSVPText(background_colour=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(background_colour=[None]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(background_colour='a'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(background_colour=['a']))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(background_colour=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(background_colour=[None]))
 
     #---------------------------------------------------
     def test_set_size(self):
-        rsvp = RSVPText(size=(10, 10))
+        rsvp = MultiTextBoxDbg(size=(10, 10))
         self.assertEqual((10, 10), rsvp.size)
         rsvp.size = (1, 2), (4, 5)
         rsvp.size = None
 
     def test_set_size_invalid(self):
-        self.assertRaises(TypeError, lambda: RSVPText(size=(1, )))
-        self.assertRaises(TypeError, lambda: RSVPText(size=('a', 'b')))
-        self.assertRaises(TypeError, lambda: RSVPText(size='a'))
-        self.assertRaises(TypeError, lambda: RSVPText(size=['a']))
-        self.assertRaises(TypeError, lambda: RSVPText(size=[(1,)]))
-        self.assertRaises(TypeError, lambda: RSVPText(size=[('a','b')]))
-        self.assertRaises(TypeError, lambda: RSVPText(size=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(size=[None]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=(1,)))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=('a', 'b')))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size='a'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=['a']))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=[(1,)]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=[('a', 'b')]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=[None]))
 
     #---------------------------------------------------
     def test_set_position(self):
-        rsvp = RSVPText(position=(10, 10))
+        rsvp = MultiTextBoxDbg(position=(10, 10))
         self.assertEqual((10, 10), rsvp.position)
         rsvp.position = (1, 2), (4, 5)
         rsvp.position = None
 
     def test_set_position_invalid(self):
-        self.assertRaises(TypeError, lambda: RSVPText(position=(1, )))
-        self.assertRaises(TypeError, lambda: RSVPText(position=('a', 'b')))
-        self.assertRaises(TypeError, lambda: RSVPText(position='a'))
-        self.assertRaises(TypeError, lambda: RSVPText(position=['a']))
-        self.assertRaises(TypeError, lambda: RSVPText(position=[(1,)]))
-        self.assertRaises(TypeError, lambda: RSVPText(position=[('a','b')]))
-        self.assertRaises(TypeError, lambda: RSVPText(position=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(position=[None]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=(1,)))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=('a', 'b')))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position='a'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=['a']))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=[(1,)]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=[('a', 'b')]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=[None]))
 
     #==============================================================================
     #   Configure RSVP properties
@@ -166,32 +173,32 @@ class RSVPTextTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_set_onset_time(self):
-        rsvp = RSVPText(onset_time=(1, 2))
+        rsvp = MultiTextBoxDbg(onset_time=(1, 2))
         self.assertEqual((1, 2), rsvp.onset_time)
         rsvp.onset_time = None
 
     def test_set_onset_time_invalid(self):
-        self.assertRaises(ValueError, lambda: RSVPText(onset_time=[-5]))
-        self.assertRaises(TypeError, lambda: RSVPText(onset_time=5))
-        self.assertRaises(TypeError, lambda: RSVPText(onset_time='hi'))
-        self.assertRaises(TypeError, lambda: RSVPText(onset_time=['hi']))
-        self.assertRaises(TypeError, lambda: RSVPText(onset_time=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(onset_time=[None]))
+        self.assertRaises(ValueError, lambda: MultiTextBoxDbg(onset_time=[-5]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(onset_time=5))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(onset_time='hi'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(onset_time=['hi']))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(onset_time=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(onset_time=[None]))
 
     #---------------------------------------------------
     def test_set_duration(self):
-        rsvp = RSVPText(duration=(1, 2))
+        rsvp = MultiTextBoxDbg(duration=(1, 2))
         self.assertEqual((1, 2), rsvp.duration)
         rsvp.duration = 5
         rsvp.duration = None
 
     def test_set_duration_invalid(self):
-        self.assertRaises(ValueError, lambda: RSVPText(duration=[-5]))
-        self.assertRaises(ValueError, lambda: RSVPText(duration=[0]))
-        self.assertRaises(TypeError, lambda: RSVPText(duration='hi'))
-        self.assertRaises(TypeError, lambda: RSVPText(duration=['hi']))
-        self.assertRaises(TypeError, lambda: RSVPText(duration=[]))
-        self.assertRaises(TypeError, lambda: RSVPText(duration=[None]))
+        self.assertRaises(ValueError, lambda: MultiTextBoxDbg(duration=[-5]))
+        self.assertRaises(ValueError, lambda: MultiTextBoxDbg(duration=[0]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(duration='hi'))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(duration=['hi']))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(duration=[]))
+        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(duration=[None]))
 
     #==============================================================================
     #   Validation function for RSVP properties
@@ -202,11 +209,11 @@ class RSVPTextTests(unittest.TestCase):
                         text_bold=False, text_italic=False, text_underline=False,
                         onset_time=(0, 1, 2), duration=1, start_event=TRIAL_STARTED):
 
-        return RSVPText(text=text, text_font=text_font, text_size=text_size, text_justification=text_justification,
-                        text_bold=text_bold, text_italic=text_italic, text_underline=text_underline,
-                        text_colour=text_colour, background_colour=background_colour,
-                        size=size, position=position, onset_time=onset_time, duration=duration,
-                        start_rsvp_event=start_event)
+        return MultiTextBoxDbg(text=text, text_font=text_font, text_size=text_size, text_justification=text_justification,
+                            text_bold=text_bold, text_italic=text_italic, text_underline=text_underline,
+                            text_colour=text_colour, background_colour=background_colour,
+                            size=size, position=position, onset_time=onset_time, duration=duration,
+                            onset_event=start_event)
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
@@ -290,13 +297,13 @@ class RSVPTextTests(unittest.TestCase):
         rsvp.start_showing(10)
         self.assertEqual([True], rsvp.stim_visibility)
         self.assertEqual(True, rsvp._stimuli[0].visible)
-        rsvp.update_rsvp(10.99)
+        rsvp.update_display(10.99)
         self.assertEqual([True], rsvp.stim_visibility)
         self.assertEqual(True, rsvp._stimuli[0].visible)
-        rsvp.update_rsvp(11)
+        rsvp.update_display(11)
         self.assertEqual([False], rsvp.stim_visibility)
         self.assertEqual(False, rsvp._stimuli[0].visible)
-        rsvp.update_rsvp(20)
+        rsvp.update_display(20)
         self.assertEqual([False], rsvp.stim_visibility)
 
     #---------------------------------------------------
@@ -305,13 +312,13 @@ class RSVPTextTests(unittest.TestCase):
         rsvp.init_for_trial()
         rsvp.start_showing(10)
         self.assertEqual([False], rsvp.stim_visibility)
-        rsvp.update_rsvp(10.5)
+        rsvp.update_display(10.5)
         self.assertEqual([False], rsvp.stim_visibility)
-        rsvp.update_rsvp(11)
+        rsvp.update_display(11)
         self.assertEqual([True], rsvp.stim_visibility)
-        rsvp.update_rsvp(11.99)
+        rsvp.update_display(11.99)
         self.assertEqual([True], rsvp.stim_visibility)
-        rsvp.update_rsvp(12)
+        rsvp.update_display(12)
         self.assertEqual([False], rsvp.stim_visibility)
 
     #---------------------------------------------------
@@ -328,27 +335,27 @@ class RSVPTextTests(unittest.TestCase):
         self.assertEqual(True, rsvp._stimuli[0].visible)
         self.assertEqual(False, rsvp._stimuli[1].visible)
 
-        rsvp.update_rsvp(10.99)
+        rsvp.update_display(10.99)
         self.assertEqual([True, False], rsvp.stim_visibility)
         self.assertEqual(True, rsvp._stimuli[0].visible)
         self.assertEqual(False, rsvp._stimuli[1].visible)
 
-        rsvp.update_rsvp(11)
+        rsvp.update_display(11)
         self.assertEqual([False, False], rsvp.stim_visibility)
         self.assertEqual(False, rsvp._stimuli[0].visible)
         self.assertEqual(False, rsvp._stimuli[1].visible)
 
-        rsvp.update_rsvp(13)
+        rsvp.update_display(13)
         self.assertEqual([False, True], rsvp.stim_visibility)
         self.assertEqual(False, rsvp._stimuli[0].visible)
         self.assertEqual(True, rsvp._stimuli[1].visible)
 
-        rsvp.update_rsvp(13.99)
+        rsvp.update_display(13.99)
         self.assertEqual([False, True], rsvp.stim_visibility)
         self.assertEqual(False, rsvp._stimuli[0].visible)
         self.assertEqual(True, rsvp._stimuli[1].visible)
 
-        rsvp.update_rsvp(14)
+        rsvp.update_display(14)
         self.assertEqual([False, False], rsvp.stim_visibility)
         self.assertEqual(False, rsvp._stimuli[0].visible)
         self.assertEqual(False, rsvp._stimuli[1].visible)
@@ -361,7 +368,7 @@ class RSVPTextTests(unittest.TestCase):
 
         rsvp.init_for_trial()
         rsvp.start_showing(10)
-        rsvp.update_rsvp(30)
+        rsvp.update_display(30)
         self.assertEqual([False, True], rsvp.stim_visibility)
         self.assertEqual(True, rsvp._stimuli[1].visible)
 
@@ -372,10 +379,10 @@ class RSVPTextTests(unittest.TestCase):
 
         rsvp.init_for_trial()
         rsvp.start_showing(10)
-        rsvp.update_rsvp(10.5)
+        rsvp.update_display(10.5)
 
         self.assertEqual(1, len(rsvp._show_hide_operations))  # SHOW was performed; only the HIDE operation remains
-        rsvp.update_rsvp(15)
+        rsvp.update_display(15)
         self.assertEqual(0, len(rsvp._show_hide_operations))  # No operation remained
 
         rsvp.init_for_trial()

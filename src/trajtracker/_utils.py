@@ -47,6 +47,9 @@ NoneValues = Enum("NoneValues", "Invalid Valid ChangeTo0")
 #--------------------------------------
 def _get_type_name(t):
 
+    if isinstance(t, str):
+        return t
+
     if not isinstance(t, type):
         t = type(t)
 

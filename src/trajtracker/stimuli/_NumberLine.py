@@ -33,7 +33,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
     def __init__(self, position, line_length, max_value, min_value=0,
                  orientation=Orientation.Horizontal,
-                 line_width=1, line_colour=None, end_tick_height=None,
+                 line_width=1, line_colour=None, end_tick_height=None, feedback_stim=None,
                  visible=True):
         """
         Constructor - invoked when you create a new object by writing NumberLine()
@@ -90,6 +90,10 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
                                         # False: whenever the finger is close enough to the line, it's a touch
         self._touch_distance = 0        # Issue a "touch" decision when the finger is closer than this to the line
                                         # _touch_directioned=True and distance<0 means that finger must cross the line and get this far on the other side
+
+        self.feedback_stim = feedback_stim
+        self.feedback_stim_offset = None
+        self.feedback_stim_hide_event = None
 
         self.visible = visible
 
@@ -403,6 +407,8 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
         if touched:
             self._last_touched_coord = touch_coord
+            if self._feedback_stim is not None:
+                self._feedback_stim.visible = True
 
         self._log_func_returns()
 
@@ -739,6 +745,48 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         self._log_property_changed("label_max_text")
 
 
+    ###################################
+    #  Feedback arrow
+    ###################################
+
+    #-----------------------------------------------------------
+    @property
+    def feedback_stim(self):
+        """
+        the stimulus to be used as feedback stimulus
+        """
+        return self._feedback_stim
+
+    @feedback_stim.setter
+    def feedback_stim(self, value):
+        if value is not None and "present" not in dir(value):
+            raise TypeError("trajtracker error: {:}.feedback_stim was set to a non-stimulus value".format(_u._get_type_name(self)))
+        self._feedback_stim = value
+
+    #-----------------------------------------------------------
+    @property
+    def feedback_stim_offset(self):
+        """
+        An offset for :attr:`~trajtracker.stimulu.NumberLine.feedback_stim` - present the stimulus in this offset
+        relatively to the number line's touch location
+        """
+        return self._feedback_stim_offset
+
+    @feedback_stim_offset.setter
+    def feedback_stim_offset(self, value):
+        value = _u.validate_attr_is_coord(self, "feedback_stim_offset", value, change_none_to_0=True)
+        self._feedback_stim_offset = value
+
+    #-----------------------------------------------------------
+    @property
+    def feedback_stim_hide_event(self):
+        return self._feedback_stim_hide_event
+
+    @feedback_stim_hide_event.setter
+    def feedback_stim_hide_event(self, value):
+        _u.validate_attr_type(self, "feedback_stim_hide_event", value, trajtracker.events.Event,
+                              none_allowed=True)
+        self._feedback_stim_hide_event = value
 
 
     ###################################

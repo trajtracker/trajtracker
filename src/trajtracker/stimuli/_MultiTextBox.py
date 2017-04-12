@@ -1,6 +1,6 @@
 """
 
-A text box that changes in RSVP
+Show one or more texts in a text box (e.g. for RSVP)
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
@@ -18,20 +18,20 @@ import trajtracker
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 from trajtracker.data import fromXML
-from trajtracker.stimuli import BaseRSVPStim, StimulusContainer
+from trajtracker.stimuli import BaseMultiStim, StimulusContainer
 
 
 # noinspection PyProtectedMember
-class RSVPText(BaseRSVPStim):
+class MultiTextBox(BaseMultiStim):
 
 
     #----------------------------------------------------
     def __init__(self, text=None, text_font=None, text_size=None, text_bold=False, text_italic=False, text_underline=False,
                  text_justification=None, text_colour=None, background_colour=None, size=None, position=None,
                  onset_time=None, duration=None, last_stimulus_remains=False,
-                 start_rsvp_event=None, terminate_rsvp_event=None):
+                 onset_event=None, terminate_event=None):
 
-        super(RSVPText, self).__init__(onset_time=onset_time, duration=duration, last_stimulus_remains=last_stimulus_remains)
+        super(MultiTextBox, self).__init__(onset_time=onset_time, duration=duration, last_stimulus_remains=last_stimulus_remains)
 
         self._stimuli = []
         self._container = StimulusContainer()
@@ -49,17 +49,28 @@ class RSVPText(BaseRSVPStim):
         self.size = size
         self.position = position
 
-        if start_rsvp_event is not None:
-            self.start_rsvp_event = start_rsvp_event
-        if terminate_rsvp_event is not None:
-            self.terminate_rsvp_event = terminate_rsvp_event
+        if onset_event is not None:
+            self.onset_event = onset_event
+        if terminate_event is not None:
+            self.terminate_event = terminate_event
 
+    #----------------------------------------
+    def _preload(self):
+        """
+        Preload the stimuli - prepare everything.
+        Call this at the trial initialization time. This operation may be time consuming, but
+        the subsequent showing/hiding of texts will be fast.
+        """
+
+        for i in range(len(self._text)):
+            self._stimuli[i].unload()
+            self._stimuli[i]._preload()
 
     #----------------------------------------
     @property
     def stimulus(self):
         """
-        A single stimulus that represents all the stimuli in this RSVP
+        A single stimulus that represents all the stimuli in this MultiTextBox
         :type: StimulusContainer
         """
         return self._container
@@ -69,17 +80,19 @@ class RSVPText(BaseRSVPStim):
     def stim_visibility(self):
         """
         Return an array of booleans, indicating whether each stimulus is presently visible or not.
-        The array has as many elements as :attr:`~trajtracker.stimuli.RSVPText.text`
+        The array has as many elements as :attr:`~trajtracker.stimuli.MultiTextBox.text`
         """
         n_stim = len(self._text)
-        self._create_stimuli(n_stim)
+        self._create_stimuli()
         return [self._stimuli[i].visible for i in range(n_stim)]
 
 
     #----------------------------------------
     # If not enough TextBoxes exist - create additional
     #
-    def _create_stimuli(self, n_stim):
+    def _create_stimuli(self):
+
+        n_stim = len(self._text)
 
         for i in range(len(self._stimuli), n_stim+1):
             is_multiple = self._is_multiple_values(self._size, "coord")
@@ -89,14 +102,14 @@ class RSVPText(BaseRSVPStim):
 
 
     #----------------------------------------------------
-    # Update the RSVP stimuli (before actually showing them)
+    # Update the stimuli (before actually showing them)
     #
     def _configure_stimuli(self):
         self._log_func_enters("_configure_stimuli")
         self._validate()
 
         n_stim = len(self._text)
-        self._create_stimuli(n_stim)
+        self._create_stimuli()
 
         self._set_stimuli_property("text", str, n_stim)
         self._set_stimuli_property("text_font", str, n_stim)
@@ -110,7 +123,7 @@ class RSVPText(BaseRSVPStim):
         self._set_stimuli_property("position", "coord", n_stim)
 
     #----------------------------------------------------
-    # Validate that this RSVP object is ready to go
+    # Validate that the MultiTextBox object is ready to go
     #
     def _validate(self):
 
@@ -129,8 +142,8 @@ class RSVPText(BaseRSVPStim):
         self._validate_property("onset_time", n_stim)
         self._validate_property("duration", n_stim)
 
-        if self._start_rsvp_event is None:
-            raise ValueError('trajtracker error: {:}._start_rsvp_event was not set'.format(type(self).__name__))
+        if self._onset_event is None:
+            raise ValueError('trajtracker error: {:}.onset_event was not set'.format(type(self).__name__))
 
 
     #----------------------------------------------------
@@ -144,7 +157,7 @@ class RSVPText(BaseRSVPStim):
 
         is_multiple_values = getattr(self, "_" + prop_name + "_multiple")
         if is_multiple_values and len(value) < n_stim:
-            raise ValueError('trajtracker error: {:}.{:} has {:} values, but there are {:} RSVP stimuli'.format(
+            raise ValueError('trajtracker error: {:}.{:} has {:} values, but there are {:} texts to present'.format(
                 type(self).__name__, prop_name, len(value), n_stim))
 
     #----------------------------------------------------
@@ -170,6 +183,7 @@ class RSVPText(BaseRSVPStim):
         self._log_func_enters("_init_trial_events")
 
         self._configure_stimuli()
+        self._preload()
 
         n_stim = len(self._text)
 
@@ -178,39 +192,39 @@ class RSVPText(BaseRSVPStim):
         op_ids = set()
 
         for i in range(n_stim):
-            onset_event = self._start_rsvp_event + self._onset_time[i]
+            onset_event = self._onset_event + self._onset_time[i]
             id1 = self._event_manager.register_operation(event=onset_event,
                                                          recurring=False,
-                                                         description="Show RSVP[{:}]({:})".format(i, self._text[i]),
+                                                         description="Show text[{:}]({:})".format(i, self._text[i]),
                                                          operation=TextboxEnablerDisabler(self._stimuli[i], True, i),
-                                                         cancel_pending_operation_on=self.terminate_rsvp_event)
+                                                         cancel_pending_operation_on=self.terminate_event)
             op_ids.add(id1)
 
             if i == n_stim - 1 and self._last_stimulus_remains:
                 break
 
-            offset_event = self._start_rsvp_event + self._onset_time[i] + duration[i]
+            offset_event = self._onset_event + self._onset_time[i] + duration[i]
             id2 = self._event_manager.register_operation(event=offset_event,
                                                          recurring=False,
-                                                         description="Hide RSVP[{:}]({:})".format(i, self._text[i]),
+                                                         description="Hide text[{:}]({:})".format(i, self._text[i]),
                                                          operation=TextboxEnablerDisabler(self._stimuli[i], False, i),
-                                                         cancel_pending_operation_on=self.terminate_rsvp_event)
+                                                         cancel_pending_operation_on=self.terminate_event)
             op_ids.add(id2)
 
         self._registered_ops = op_ids
 
-        if self.terminate_rsvp_event is not None:
-            self._event_manager.register_operation(event=self.terminate_rsvp_event,
+        if self.terminate_event is not None:
+            self._event_manager.register_operation(event=self.terminate_event,
                                                    recurring=False,
-                                                   description="Terminate RSVP",
-                                                   operation=lambda t1, t2: self._terminate_rsvp())
+                                                   description="Terminate MultiText",
+                                                   operation=lambda t1, t2: self._terminate_display())
 
 
     #----------------------------------------------------
-    # (when the event ends) if the RSVP was not yet presented fully, terminate whatever remained
+    # (when the event ends) if not all texts were displayed, terminate whatever remained
     #
-    def _terminate_rsvp(self):
-        self._log_func_enters("_terminate_rsvp")
+    def _terminate_display(self):
+        self._log_func_enters("_terminate_display")
         self._event_manager.unregister_operation(self._registered_ops)
         for stim in self._stimuli:
             stim.visible = False
@@ -225,9 +239,11 @@ class RSVPText(BaseRSVPStim):
 
         self._log_func_enters("init_for_trial")
         if self._event_manager is not None:
-            self._log_write_if(self.log_warn, "init_for_trial() was called although the RSVP was registered to an event manager")
+            self._log_write_if(self.log_warn, "init_for_trial() was called although the {:} was registered to an event manager".format(
+                type(self).__name__))
 
         self._configure_stimuli()
+        self._preload()
 
         n_stim = len(self._text)
 
@@ -246,29 +262,32 @@ class RSVPText(BaseRSVPStim):
     #----------------------------------------------------
     def start_showing(self, time):
         """
-        *When working without events:* set time=0 for the RSVP sequence
+        *When working without events:* this sets time=0 for the texts to show (i.e., the
+        :attr:`~trajtracker.stimuli.MultiTextBox.onset_time` are relatively to this time point).
 
-        This function will also invoke :func:`~trajtracker.stimuli.RSVPText.update_rsvp`.
+        This function will also invoke :func:`~trajtracker.stimuli.MultiTextBox.update_display`.
 
         :param time: The time in the current session/trial. This must be synchronized with the "time"
-                     argument of :func:`~trajtracker.stimuli.RSVPText.update_rsvp`
+                     argument of :func:`~trajtracker.stimuli.MultiTextBox.update_display`
         """
 
         self._log_func_enters("start_showing", (time))
         if self._event_manager is not None:
-            self._log_write_if(self.log_warn, "start_showing() was called although the RSVP was registered to an event manager")
+            self._log_write_if(self.log_warn,
+                               "start_showing() was called although the {:} was registered to an event manager".format(
+                                   type(self).__name__))
 
         self._start_showing_time = time
-        self.update_rsvp(time)
+        self.update_display(time)
 
 
     #----------------------------------------------------
-    def update_rsvp(self, time):
+    def update_display(self, time):
         """
         *When working without events:* set relevant stimuli as visible/invisible.
 
         :param time: The time in the current session/trial. This must be synchronized with the "time"
-                     argument of :func:`~trajtracker.stimuli.RSVPText.start_showing`
+                     argument of :func:`~trajtracker.stimuli.MultiTextBox.start_showing`
         """
 
         while (len(self._show_hide_operations) > 0 and
@@ -434,4 +453,4 @@ class TextboxEnablerDisabler(object):
         self._stimulus.visible = self._visible
 
     def __str__(self):
-        return "RSVP #{:} ({:})".format(self._stimulus_num, self._stimulus.text)
+        return "Text #{:} ({:})".format(self._stimulus_num, self._stimulus.text)

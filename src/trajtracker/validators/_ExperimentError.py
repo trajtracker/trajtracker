@@ -15,7 +15,7 @@ class ExperimentError(BaseException):
     """
 
 
-    def __init__(self, err_code, message, validator, err_args=None):
+    def __init__(self, err_code, message, validator=None, err_args=None):
         self._err_code = err_code
         self._message = message
         self._validator = validator
