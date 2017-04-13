@@ -16,5 +16,6 @@ from _LineTrajectoryGenerator import LineTrajectoryGenerator
 from _SegmentedTrajectoryGenerator import SegmentedTrajectoryGenerator
 from _SpeedMonitor import SpeedMonitor
 from _StartPoint import StartPoint
+from _RectStartPoint import RectStartPoint
 from _StimulusAnimator import StimulusAnimator
 from _TrajectoryTracker import TrajectoryTracker

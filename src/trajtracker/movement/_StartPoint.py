@@ -12,6 +12,7 @@ import numbers
 from enum import Enum
 
 import trajtracker
+import trajtracker.utils as u
 import trajtracker._utils as _u
 from trajtracker.misc import nvshapes
 
@@ -20,7 +21,7 @@ class StartPoint(trajtracker._TTrkObject):
 
     default_exit_area_size = 100
 
-    State = Enum("State", "reset init start error aborted")
+    State = Enum("State", "reset init start error aborted timeout")
 
 
     #-----------------------------------------------------------
@@ -100,6 +101,9 @@ class StartPoint(trajtracker._TTrkObject):
 
     #-----------------------------------------------------------------
     def reset(self):
+        """
+        Reset this object. This method should be called when the trial is initialized.
+        """
         self._log_func_enters("reset")
         self._state = self.State.reset
 
@@ -154,36 +158,46 @@ class StartPoint(trajtracker._TTrkObject):
         return None
 
 
+
     #-----------------------------------------------------------------
-    def wait_until_touched(self, exp, on_loop=None):
+    def wait_until_startpoint_touched(self, exp, on_loop_callback=None, on_loop_present=None,
+                                      event_manager=None, trial_start_time=None, session_start_time=None,
+                                      max_wait_time=None):
         """
-        Wait until the starting point is touched
-
+        Wait until the starting point is touched.
+        
+        The *on_loop_xxx* and *event_manager* parameters define what to do on each iteration of the loop that  
+        waits for the area to be touched. 
+        If neither on_loop_callback nor on_loop_present are provided, the function will wait for 15 ms 
+        on each loop iteration.
+        
+        If several on_loop parameters are provided, they will be invoked in this order:
+        *callback - event manager.on_frame() - present()*.
+        
         :param exp: The Expyriment experiment object
-        :param on_loop: Defines what to do on each iteration on the loop that waits for the area to be touched. This can be:
-                        (1) A callback function to call on each loop. Ideally, this function should include some delaying;
-                        or (2) or a visual object with a present() method, which will be called.
-                        If "None" is provided, the function will wait for 15 ms on each loop iteration.
+        :param on_loop_callback: A function (without arguments) to call on each loop iteration.
+                                If the function returns any value other than *None*, the waiting will
+                                be terminated and that value will be returned.
+        :param on_loop_present: A visual object that will be present()ed on each loop iteration.
+        :param event_manager: The event manager's on_frame() will be called on each loop iteration.
+                              If you provide an event manager, you also have to provide trial_start_time and
+                              session_start_time (whose values were obtained by :func:`trajtracker.utils.get_time`
+        :param max_wait_time: Maximal time (in seconds) to wait
+        :return: True if touched the start area, False if max_wait_time expired
         """
 
-        self._log_func_enters("wait_until_touched", ["exp", on_loop])
+        self._log_func_enters("wait_until_touched", ["exp", on_loop_callback, on_loop_present, event_manager])
 
-        if on_loop is None:
-            on_loop = lambda: exp.clock.wait(15)
-        elif "present" in dir(on_loop):
-            stim = on_loop
-            on_loop = lambda: stim.present()
-        elif type(on_loop) != type(lambda:1):
-            raise TypeError(("trajtracker error: invalid on_loop argument provided to {:}.wait_until_touched() - " +
-                             "expecting either a visual object or a function").format(type(self).__name__))
+        _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time, numbers.Number)
+        _u.validate_func_arg_not_negative(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time)
+        if event_manager is not None:
+            _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "trial_start_time", trial_start_time, numbers.Number)
+            _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "session_start_time", session_start_time, numbers.Number)
+
+        start_wait_time = u.get_time()
 
         state = StartPoint.State.reset
-        first_time = True
         while state != StartPoint.State.init:
-
-            if not first_time:
-                on_loop()
-            first_time = False
 
             if exp.mouse.check_button_pressed(0):
                 finger_pos = exp.mouse.position
@@ -192,37 +206,70 @@ class StartPoint(trajtracker._TTrkObject):
                                                                      wait_for_buttonup=False)
             state = self.check_xy(finger_pos[0], finger_pos[1])
 
+            if start_wait_time is not None and u.get_time() - start_wait_time >= start_wait_time:
+                self._log_func_returns(False)
+                return False
+
+            # Invoke custom operations on each loop iteration
+            if state == StartPoint.State.init:
+
+                if on_loop_callback is not None:
+                    retval = on_loop_callback()
+                    if retval is not None:
+                        return retval
+
+                if event_manager is not None:
+                    curr_time = u.get_time()
+                    event_manager.on_frame(curr_time - trial_start_time, curr_time - session_start_time)
+
+                if on_loop_present is not None:
+                    on_loop_present.present()
+
+                if on_loop_present is None and on_loop_callback is None:
+                    exp.clock.wait(15)
+
+        self._log_func_returns(True)
+        return True
 
     #------------------------------------------------
-    def wait_until_exit(self, exp, on_loop=None):
+    def wait_until_exit(self, exp, on_loop_callback=None, on_loop_present=None, event_manager=None,
+                        trial_start_time=None, session_start_time=None, max_wait_time=None):
         """
         Wait until the finger leaves the starting area
-
+    
+        The *on_loop_xxx* and *event_manager* parameters define what to do on each iteration of the loop that  
+        waits for the area to be touched. 
+        If neither on_loop_callback nor on_loop_present are provided, the function will wait for 15 ms 
+        on each loop iteration.
+        
+        If several on_loop parameters are provided, they will be invoked in this order:
+        *callback - event manager.on_frame() - present()*.
+        
         :param exp: The Expyriment experiment object
-        :param on_loop: Defines what to do on each iteration on the loop that waits for the finger to leave the starting point.
-                        This can be:
-                        (1) A callback function to call on each loop. Ideally, this function should include some delaying;
-                        or (2) or a visual object with a present() method, which will be called.
-                        If "None" is provided, the function will wait for 15 ms on each loop iteration.
+        :param on_loop_callback: A function (without arguments) to call on each loop iteration. 
+                                 If the function returns any value other than *None*, the waiting will
+                                 be terminated and that value will be returned.
+        :param on_loop_present: A visual object that will be present()ed on each loop iteration.
+        :param event_manager: The event manager's on_frame() will be called on each loop iteration.
+                              If you provide an event manager, you also have to provide trial_start_time and
+                              session_start_time (whose values were obtained by :func:`trajtracker.utils.get_time` 
+        :param max_wait_time: Maximal time (in seconds) to wait
         :returns: State.start if left the start area in the correct direction; State.error if not; State.aborted if
-                  the finger was lifted.
+                  the finger was lifted; State.timeout if max_wait_time has expired
         """
 
         self._log_func_enters("wait_until_exit", ["exp", on_loop])
+
+        _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time, numbers.Number)
+        _u.validate_func_arg_not_negative(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time)
+        if event_manager is not None:
+            _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "trial_start_time", trial_start_time, numbers.Number)
+            _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "session_start_time", session_start_time, numbers.Number)
 
         if not exp.mouse.check_button_pressed(0):
             # -- Finger lifted
             self._log_func_returns(self.State.aborted)
             return self.State.aborted
-
-        if on_loop is None:
-            on_loop = lambda: exp.clock.wait(10)
-        elif "present" in dir(on_loop):
-            stim = on_loop
-            on_loop = lambda: stim.present()
-        elif type(on_loop) != type(lambda:1):
-            raise TypeError(("trajtracker error: invalid on_loop argument provided to {:}.wait_until_exit() - " +
-                             "expecting either a visual object or a function").format(type(self).__name__))
 
         #-- Wait
         state = None
@@ -237,7 +284,25 @@ class StartPoint(trajtracker._TTrkObject):
                 self._log_func_returns(self.State.aborted)
                 return self.State.aborted
 
-            on_loop()
+            if start_wait_time is not None and u.get_time() - start_wait_time >= start_wait_time:
+                self._log_func_returns(self.State.timeout)
+                return self.State.timeout
+
+            # Invoke custom operations on each loop iteration
+            if on_loop_callback is not None:
+                retval = on_loop_callback()
+                if retval is not None:
+                    return retval
+
+            if event_manager is not None:
+                curr_time = u.get_time()
+                event_manager.on_frame(curr_time - trial_start_time, curr_time - session_start_time)
+
+            if on_loop_present is not None:
+                on_loop_present.present()
+
+            if on_loop_present is None and on_loop_callback is None:
+                exp.clock.wait(15)
 
         self._log_func_returns(state)
         return state

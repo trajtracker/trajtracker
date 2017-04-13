@@ -92,7 +92,7 @@ def create_numberline(exp_info, config):
                                                     colour=xpy.misc.constants.C_WHITE)
 
     if config.nl_feedback_type != num2pos.FeedbackType.none:
-        exp_info.stimuli.add("feedback", numberline.feedback_stim, False)
+        exp_info.stimuli.add(numberline.feedback_stim, "feedback", False)
 
 #----------------------------------------------------------------
 def create_start_point(exp_info, config):
@@ -103,15 +103,17 @@ def create_start_point(exp_info, config):
     :type config: trajtracker.paradigms.num2pos.Config
     """
 
-    #todo: create a control that takes care of everything, and can also tilt
+    start_area_size = config.start_point_size
+    start_area_position = (0, - (screen_size[1] / 2 - start_area_size[1] / 2))
 
-    start_area = xpy.stimuli.Rectangle(size=(40, 30))
-    start_area.position = (0, - (screen_size[1] / 2 - start_area.size[1] / 2))
+    exp_info.start_point = ttrk.movement.RectStartPoint(size=start_area_size, position=start_area_position,
+                                                        rotation=config.start_point_tilt)
+    exp_info.start_point.start_rect.colour = xpy.misc.constants.C_GREY
 
-    exp_info.start_point = StartPoint(start_area)
+    exp_info.stimuli.add(exp_info.start_point.start_rect, "start_point")
 
-    exp_info.exp_data['TrajZeroCoordX'] = None  # todo
-    exp_info.exp_data['TrajZeroCoordY'] = None
+    exp_info.exp_data['TrajZeroCoordX'] = start_area_position[0]
+    exp_info.exp_data['TrajZeroCoordY'] = start_area_position[1] + start_area_size[1]/2
     exp_info.exp_data['TrajPixelsPerUnit'] = 1
 
 

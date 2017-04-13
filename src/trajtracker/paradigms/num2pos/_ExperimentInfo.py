@@ -101,7 +101,10 @@ class ExperimentInfo(object):
     def start_point(self):
         return self._start_point
 
-    #todo update it
+    @start_point.setter
+    def start_point(self, spoint):
+        self._start_point = spoint
+
 
     #---------------------------------------------------------------
     @property

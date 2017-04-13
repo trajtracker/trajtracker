@@ -760,7 +760,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @feedback_stim.setter
     def feedback_stim(self, value):
         if value is not None and "present" not in dir(value):
-            raise TypeError("trajtracker error: {:}.feedback_stim was set to a non-stimulus value".format(_u._get_type_name(self)))
+            raise TypeError("trajtracker error: {:}.feedback_stim was set to a non-stimulus value".format(_u.get_type_name(self)))
         self._feedback_stim = value
 
     #-----------------------------------------------------------

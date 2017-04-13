@@ -61,6 +61,7 @@ Classes that handle various aspects of finger/mouse movement.
    movement/DirectionMonitor
    movement/SpeedMonitor
    movement/StartPoint
+   movement/RectStartPoint
    movement/TrajectoryTracker
 
 

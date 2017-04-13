@@ -27,7 +27,8 @@ class Config(object):
     def __init__(self, experiment_id, data_source, max_trial_duration, shuffle_trials=True, max_numberline_value=100,
                  nl_feedback_type=FeedbackType.Arrow, stimulus_then_move=False,
                  min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=20,
-                 grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None):
+                 grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None,
+                 start_point_size=(40,30), start_point_tilt=0):
 
         # A unique identifier of this experiment.
         # This string is saved as-is to the results file, to identify the experiment.
@@ -62,6 +63,12 @@ class Config(object):
         # the program will play good.wav for endpoint errors up to 5% of the line length, and bad.wav for
         # any larger error
         self.sound_by_accuracy = sound_by_accuracy
+
+        #todo doc
+        self.start_point_size = start_point_size
+
+        # todo doc
+        self.start_point_tilt = start_point_tilt
 
         #----- Configuration of validators
 

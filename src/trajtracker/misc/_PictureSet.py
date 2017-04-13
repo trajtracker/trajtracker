@@ -20,7 +20,7 @@ class PictureSet(trajtracker._TTrkObject):
     # None: No scaling
     # Stretch: scale width & height
     # Zoom: scale width & height while keeping proportions
-    ScaleMethod = Enum('ScaleMethod', 'None Stretch Zoom')
+    ScaleMethod = Enum('ScaleMethod', 'none Stretch Zoom')
 
     #=======================================================================================
     #    Configure set
@@ -42,7 +42,7 @@ class PictureSet(trajtracker._TTrkObject):
         self._height = height
         self._position = (0,0)
 
-        self._scale_method = PictureSet.ScaleMethod.None
+        self._scale_method = PictureSet.ScaleMethod.none
         self._base_dir = base_dir
         self._pics = {}
         self._unloaded_pic_configs = {}
@@ -106,7 +106,7 @@ class PictureSet(trajtracker._TTrkObject):
         img._preload()
         img.position = self._position
 
-        if self._scale_method != PictureSet.ScaleMethod.None:
+        if self._scale_method != PictureSet.ScaleMethod.none:
             w, h = img.surface_size
             w_proportion = self._width / w
             h_proportion = self._height / h
@@ -121,6 +121,7 @@ class PictureSet(trajtracker._TTrkObject):
         self._pics[img_name] = img
 
         self._unloaded_pic_configs = {}  # Clear the already-loaded configs, to allow more calls to preload()
+
 
     # =======================================================================================
     #    Manipulate pictures
