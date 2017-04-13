@@ -407,12 +407,30 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
 
         if touched:
             self._last_touched_coord = touch_coord
-            if self._feedback_stim is not None:
-                self._feedback_stim.visible = True
+            self._show_feedback_stim()
 
         self._log_func_returns()
 
         return None
+
+    #---------------------------------------------------------
+    def _show_feedback_stim(self):
+        if self._feedback_stim is None:
+            return
+        elif "visible" not in dir(self._feedback_stim):
+            raise trajtracker.InvalidStateError(
+                "The NumberLine's feedback stimulus is invalid, or was not stored in a {:}".format(
+                    _u.get_type_name(trajtracker.stimuli.StimulusContainer)))
+
+        if self._orientation == NumberLine.Orientation.Horizontal:
+            fb_stim_coord = (self._mid_x + self._last_touched_coord, self._mid_y)
+        else:
+            fb_stim_coord = (self._mid_x, self._mid_y + self._last_touched_coord)
+
+        fb_stim_coord = (fb_stim_coord[0] + self._feedback_stim_offset[0], fb_stim_coord[1] + self._feedback_stim_offset[1])
+
+        self._feedback_stim.position = fb_stim_coord
+        self._feedback_stim.visible = True
 
 
     #===================================================================================

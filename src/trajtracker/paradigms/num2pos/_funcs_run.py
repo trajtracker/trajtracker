@@ -16,6 +16,7 @@ import trajtracker as ttrk
 import trajtracker._utils as _u
 from trajtracker.utils import get_time
 from trajtracker.validators import ExperimentError
+from trajtracker.movement import StartPoint
 from trajtracker.paradigms.num2pos import *
 
 
@@ -24,9 +25,15 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 
 # todo: in NumberLine: handle feedback_stim_hide_event and feedback_stim_hide_offset
-# todo: in GlobalSpeedValidator: handle finger_started_moving event
 # todo: add min-trial-duration validation
 # todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
+# todo: support image target (+RSVP), arrow target
+# todo: escape button
+# todo: optionally get subject name and initials
+
+# todo: delete XML support?
+# todo: organize documentation. Have a "using this class" section for each complex class.
+# todo: add logging to all trajtracker functions? Decide on logging policy (trace=enter/exit, detailed flow trace; debug=potentially interesting data, stages within functions; info=configuration, major operations, important data, validation errors)
 # todo later: VOX detector
 
 #----------------------------------------------------------------
@@ -37,13 +44,11 @@ def run_full_experiment(config):
     :type config: trajtracker.paradigms.num2pos.Config 
     """
 
-    exp_info = initialize_exp()
+    exp_info = initialize_exp(config)
 
     create_experiment_objects(exp_info, config)
 
     # todo: ask for subject initials and name?
-
-    exp_info.trials = num2pos.load_data_source(config)
 
     run_trials(exp_info, config)
 
@@ -53,7 +58,7 @@ def run_full_experiment(config):
 
 
 #----------------------------------------------------------------
-def initialize_exp():
+def initialize_exp(config):
     """
     Initialize everything for the experiment
     
@@ -61,7 +66,7 @@ def initialize_exp():
     """
 
     xpy_exp = xpy.control.initialize()
-    expdata = ttrk.paradigms.num2pos.ExperimentInfo(xpy_exp)
+    expdata = ttrk.paradigms.num2pos.ExperimentInfo(xpy_exp, config)
 
     xpy.control.start(xpy_exp)
     if not xpy.misc.is_android_running():
@@ -71,31 +76,9 @@ def initialize_exp():
 
 
 #----------------------------------------------------------------
-def load_data_source(config):
-
-    ds = config.data_source
-
-    if isinstance(ds, str):
-        #-- Load from file
-        loader = ttrk.data.CSVLoader()
-        return loader.load_file(ds)
-
-    _u.validate_func_arg_is_collection(None, "load_data_source", "config.data_source", ds,
-                                       min_length=1, allow_set=True)
-
-    if sum([not isinstance(x, numbers.Number) for x in ds]) == 0:
-        #-- A list of target numbers was provided
-        return {'target': x for x in ds}
-
-    if sum([not isinstance(x, dict) for x in ds]) == 0:
-        #-- An explicit list of trials was provided
-        return ds
-
-    raise TypeError("trajtracker error: invalid config.data_source")
-
-
-#----------------------------------------------------------------
 def run_trials(exp_info, config):
+
+    exp_info.session_start_time = get_time()
 
     trial_num = 0
 
@@ -104,7 +87,7 @@ def run_trials(exp_info, config):
         trial_config = exp_info.trials.pop(0)
         trial_num += 1
 
-        run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config))
+        run_trial_rc = run_trial(exp_info, config, TrialInfo(trial_num, trial_config))
         if run_trial_rc == RunTrialResult.Aborted:
             print("   Trial aborted.")
             continue
@@ -127,35 +110,29 @@ def run_trials(exp_info, config):
 
 
 #----------------------------------------------------------------
-def run_trial(exp_info, trial):
+def run_trial(exp_info, config, trial):
     """
     Run a single trial
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    :type config: trajtracker.paradigms.num2pos.Config 
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo
+     
     :return: True if the trial ended successfully, False if it failed
     """
 
-    init_trial(exp_info, trial)
+    initialize_trial(exp_info, trial)
 
-    exp_info.start_point.wait_until_touched(exp_info, all_stimuli)
-    on_finger_touched_screen(exp_info)
+    exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp, on_loop_present=exp_info.stimuli)
+    on_finger_touched_screen(exp_info, trial)
 
-
-    #-- Wait for the participant to start moving the finger
-    rc = start_point.wait_until_exit(exp_info, on_loop=all_stimuli)
-    if rc == StartPoint.State.aborted:
-        return RunTrialResult.Aborted
-
-    elif rc == StartPoint.State.error:
-        trial_failed(ExperimentError("StartedSideways", "Start the trial by moving straight, not sideways!"), exp_info, trial)
-        return RunTrialResult.Failed
-
-    on_finger_started_moving(exp_info, trial)
+    rc = initiate_trial(exp_info, config, trial)
+    if rc is not None:
+        return rc
 
     while True:  # This loop runs once per frame
 
-        if not exp_info.mouse.check_button_pressed(0):
+        if not exp_info.xpy_exp.mouse.check_button_pressed(0):
             trial_failed(ExperimentError("FingerLifted", "You lifted your finger in mid-trial"), exp_info, trial)
             return RunTrialResult.Failed
 
@@ -172,7 +149,38 @@ def run_trial(exp_info, trial):
 
 
 #----------------------------------------------------------------
-def init_trial(exp_info, trial):
+def initiate_trial(exp_info, config, trial):
+    """
+    Make the trial start - either by the subject, or by the software.
+    The function returns after the finger started moving (or on error)
+
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type config: trajtracker.paradigms.num2pos.Config 
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    
+    :return: None if all OK, RunTrialResult.xxx if trial should terminate
+    """
+
+    if config.stimulus_then_move:
+
+        raise Exception("TBD") #todo
+
+    else:
+        #-- Wait for the participant to start moving the finger
+        rc = exp_info.start_point.wait_until_exit(exp_info.xpy_exp, on_loop_present=exp_info.stimuli)
+        if rc == StartPoint.State.aborted:
+            return RunTrialResult.Aborted
+
+        elif rc == StartPoint.State.error:
+            trial_failed(ExperimentError("StartedSideways", "Start the trial by moving straight, not sideways!"), exp_info, trial)
+            return RunTrialResult.Failed
+
+    on_finger_started_moving(exp_info, config, trial)
+    return None
+
+
+#----------------------------------------------------------------
+def initialize_trial(exp_info, trial):
     """
     Initialize a trial
     
@@ -181,7 +189,7 @@ def init_trial(exp_info, trial):
     """
 
     exp_info.start_point.reset()
-    exp_info.number_line.reset()    # mark the line as yet-untouched
+    exp_info.numberline.reset()    # mark the line as yet-untouched
 
     exp_info.stimuli.present()  # reset the display
 
@@ -189,47 +197,52 @@ def init_trial(exp_info, trial):
 
     exp_info.trial_data = {}
 
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED)
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, get_time() - exp_info.session_start_time)
 
 
 #----------------------------------------------------------------
-def on_finger_touched_screen(exp_info):
+def on_finger_touched_screen(exp_info, trial):
     """
     This function should be called when the finger touches the screen
 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
-    feedback_arrow.visible = False
+    exp_info.numberline.feedback_stim.visible = False
     exp_info.errmsg_textbox.visible = False
 
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_STARTED)
+    trial.start_time = get_time()
+
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_STARTED, 0, trial.start_time - exp_info.session_start_time)
 
     exp_info.stimuli.present()
 
-    exp_info.trial_start_time = get_time()
-
     #-- Reset all trajectory-sensitive objects
     for obj in exp_info.trajectory_sensitive_objects:
-        obj.reset(exp_info.trial_start_time)
+        obj.reset(trial.start_time)
 
 
 #----------------------------------------------------------------
-def on_finger_started_moving(exp_info, trial):
+def on_finger_started_moving(exp_info, config, trial):
     """
     This function should be called when the finger leaves the "start" area and starts moving
 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type config: trajtracker.paradigms.num2pos.Config 
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
 
-    trial.results['time_started_moving'] = get_time() - exp_info.trial_start_time
+    t = get_time()
+    time_in_trial = t - trial.start_time
+    time_in_session = t - exp_info.session_start_time
+    trial.results['time_started_moving'] = time_in_trial
 
-    exp_info.event_manager.dispatch_event(FINGER_STARTED_MOVING)
+    exp_info.event_manager.dispatch_event(FINGER_STARTED_MOVING, time_in_trial, time_in_session)
 
     exp_info.stimuli.present()
 
-    trial.results['time_target_shown'] = get_time() - exp_info.trial_start_time
+    if not config.stimulus_then_move:
+        trial.results['time_target_shown'] = get_time() - trial.start_time
 
 
 #----------------------------------------------------------------
@@ -246,15 +259,15 @@ def update_target(exp_info, trial):
     else:
         target_text = str(trial.target)
 
-    if self.rsvp:
+    if exp_info.config.target_type == 'rsvp_text':
         exp_info.target.text = target_text.split(";")
         if 'onset_time' in trial.csv_data:
             exp_info.target.onset_time = [float(s) for s in trial.csv_data['onset_time'].split(";")]
         if 'duration' in trial.csv_data:
             exp_info.target.onset_time = [float(s) for s in trial.csv_data['duration'].split(";")]
 
-    else:
-        exp_info.target.text = target_text
+    elif exp_info.config.target_type == 'text':
+        exp_info.target.text = [target_text]
 
 
 #------------------------------------------------
@@ -302,13 +315,13 @@ def trial_failed(err, exp_info, trial):
     time_in_session = curr_time - exp_info.session_start_time
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
 
-    err_textbox.unload()
-    err_textbox.text = err
-    err_textbox.visible = True
+    exp_info.errmsg_textbox.unload()
+    exp_info.errmsg_textbox.text = err
+    exp_info.errmsg_textbox.visible = True
 
     exp_info.sound_err.play()
 
-    trial_ended(exp_info, trial, xxxx, "ERR_" + err.err_code)
+    trial_ended(exp_info, trial, time_in_trial, "ERR_" + err.err_code)
 
 
 #------------------------------------------------
@@ -323,11 +336,6 @@ def trial_succeeded(exp_info, trial):
     """
 
     print("   Trial ended successfully.")
-
-    #todo: is this handled by the NL?
-    feedback_arrow.visible = True
-    nl_pos = number_line.position
-    feedback_arrow.position = (number_line.last_touched_coord + nl_pos[0], nl_pos[1] + feedback_arrow.height / 2)
 
     #todo: show the correct location?
 

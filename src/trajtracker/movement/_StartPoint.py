@@ -186,15 +186,16 @@ class StartPoint(trajtracker._TTrkObject):
         :return: True if touched the start area, False if max_wait_time expired
         """
 
-        self._log_func_enters("wait_until_touched", ["exp", on_loop_callback, on_loop_present, event_manager])
+        self._log_func_enters("wait_until_startpoint_touched",
+                              ["exp", on_loop_callback, on_loop_present, event_manager])
 
-        _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time, numbers.Number)
+        _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time, numbers.Number, none_allowed=True)
         _u.validate_func_arg_not_negative(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time)
         if event_manager is not None:
             _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "trial_start_time", trial_start_time, numbers.Number)
             _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "session_start_time", session_start_time, numbers.Number)
 
-        start_wait_time = u.get_time()
+        time_started_waiting = u.get_time()
 
         state = StartPoint.State.reset
         while state != StartPoint.State.init:
@@ -206,7 +207,7 @@ class StartPoint(trajtracker._TTrkObject):
                                                                      wait_for_buttonup=False)
             state = self.check_xy(finger_pos[0], finger_pos[1])
 
-            if start_wait_time is not None and u.get_time() - start_wait_time >= start_wait_time:
+            if max_wait_time is not None and u.get_time() - time_started_waiting >= max_wait_time:
                 self._log_func_returns(False)
                 return False
 
@@ -258,9 +259,9 @@ class StartPoint(trajtracker._TTrkObject):
                   the finger was lifted; State.timeout if max_wait_time has expired
         """
 
-        self._log_func_enters("wait_until_exit", ["exp", on_loop])
+        self._log_func_enters("wait_until_exit", ["exp", on_loop_callback, on_loop_present, event_manager])
 
-        _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time, numbers.Number)
+        _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time, numbers.Number, none_allowed=True)
         _u.validate_func_arg_not_negative(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time)
         if event_manager is not None:
             _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "trial_start_time", trial_start_time, numbers.Number)
@@ -272,6 +273,7 @@ class StartPoint(trajtracker._TTrkObject):
             return self.State.aborted
 
         #-- Wait
+        time_started_waiting = u.get_time()
         state = None
         while state not in [StartPoint.State.start, StartPoint.State.error]:
 
@@ -284,7 +286,7 @@ class StartPoint(trajtracker._TTrkObject):
                 self._log_func_returns(self.State.aborted)
                 return self.State.aborted
 
-            if start_wait_time is not None and u.get_time() - start_wait_time >= start_wait_time:
+            if max_wait_time is not None and u.get_time() - time_started_waiting >= max_wait_time:
                 self._log_func_returns(self.State.timeout)
                 return self.State.timeout
 

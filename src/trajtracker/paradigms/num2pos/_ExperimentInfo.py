@@ -17,11 +17,12 @@ class ExperimentInfo(object):
     """
 
 
-    def __init__(self, xpy_exp):
+    def __init__(self, xpy_exp, config):
 
         #-- Static elements - remain throughout the experiment
 
         self.xpy_exp = xpy_exp  # Expyriment's "Experiment" object
+        self._config = config
 
         self._numberline = None
         self._target = None
@@ -50,6 +51,15 @@ class ExperimentInfo(object):
         self.traj_out_filename = None
 
         self.trials_file_writer = None
+
+
+    #---------------------------------------------------------------
+    @property
+    def config(self):
+        """
+        :type: trajtracker.paradigms.num2pos.Config  
+        """
+        return self._config
 
 
     #---------------------------------------------------------------
@@ -114,7 +124,7 @@ class ExperimentInfo(object):
     @errmsg_textbox.setter
     def errmsg_textbox(self, value):
         self._errmsg_textbox = value
-        self.stimuli.add(errmsg_textbox, "errmsg", visible=False)
+        self.stimuli.add(value, "errmsg", visible=False)
 
 
     #---------------------------------------------------------------

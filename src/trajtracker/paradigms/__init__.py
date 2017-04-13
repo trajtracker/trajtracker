@@ -8,4 +8,4 @@ TrajTracker - paradigms package
 """
 
 
-import trajtracker.paradigms.num2pos as num2pos
+import num2pos

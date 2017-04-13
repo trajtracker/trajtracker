@@ -187,7 +187,7 @@ class GlobalSpeedValidatorTests(unittest.TestCase):
     def test_validate_one_milestone(self):
         v = GlobalSpeedValidator(max_trial_duration=1, origin_coord=0, end_coord=100)
 
-        v.finger_started_moving(0)
+        v.movement_started(0)
         self.assertEqual(0, v.get_expected_coord_at_time(0))
         self.assertEqual(10, v.get_expected_coord_at_time(.1))
         self.assertEqual(80, v.get_expected_coord_at_time(.8))
@@ -207,7 +207,7 @@ class GlobalSpeedValidatorTests(unittest.TestCase):
         v = GlobalSpeedValidator(max_trial_duration=6, origin_coord=0, end_coord=100,
                                  milestones=[(.5, .25), (.5, .75)])
 
-        v.finger_started_moving(0)
+        v.movement_started(0)
 
         self.assertIsNone(v.update_xyt(0, 25, 3))
         self.assertIsNone(v.update_xyt(0, 75, 5))
@@ -230,7 +230,7 @@ class GlobalSpeedValidatorTests(unittest.TestCase):
     #--------------------------------------------------
     def test_validate_grace_period(self):
         v = GlobalSpeedValidator(max_trial_duration=10, origin_coord=0, end_coord=100, grace_period=3)
-        v.finger_started_moving(0)
+        v.movement_started(0)
         self.assertIsNone(v.update_xyt(0, 1, 2))
         self.assertIsNone(v.update_xyt(0, 1, 3))
         self.assertIsNotNone(v.update_xyt(0, 1, 3.0001))
@@ -240,7 +240,7 @@ class GlobalSpeedValidatorTests(unittest.TestCase):
     def test_validate_move_backwards(self):
         v = GlobalSpeedValidator(max_trial_duration=1, origin_coord=100, end_coord=0)
 
-        v.finger_started_moving(0)
+        v.movement_started(0)
 
         self.assertEqual(100, v.get_expected_coord_at_time(0))
         self.assertEqual(90, v.get_expected_coord_at_time(.1))
@@ -259,7 +259,7 @@ class GlobalSpeedValidatorTests(unittest.TestCase):
     #--------------------------------------------------
     def test_validate_x_axis(self):
         v = GlobalSpeedValidator(max_trial_duration=1, origin_coord=0, end_coord=100, axis=ValidationAxis.x)
-        v.finger_started_moving(0)
+        v.movement_started(0)
         self.assertIsNone(v.update_xyt(50, 0, .5))
         self.assertIsNone(v.update_xyt(100, 0, 1))
         self.assertIsNotNone(v.update_xyt(49, 0, .5))
@@ -275,7 +275,7 @@ class GlobalSpeedValidatorTests(unittest.TestCase):
         v.guide_warning_time_delta = .1
         v._guide = DbgGlobalSpeedGuide(v)
 
-        v.finger_started_moving(0)
+        v.movement_started(0)
 
         v.update_xyt(0, 1, .2)
         self.assertEqual(v.guide.LineMode.Grace, v.guide._guide_line.selected_key)
@@ -295,7 +295,7 @@ class GlobalSpeedValidatorTests(unittest.TestCase):
         v = GlobalSpeedValidator(max_trial_duration=1, origin_coord=0, end_coord=100, show_guide=True)
         v._guide = DbgGlobalSpeedGuide(v)
 
-        v.finger_started_moving(0)
+        v.movement_started(0)
         v.update_xyt(0, 99, .5)
         self.assertEqual((0, 50), v.guide._guide_line.active_stimulus.position)
 
@@ -304,7 +304,7 @@ class GlobalSpeedValidatorTests(unittest.TestCase):
         v = GlobalSpeedValidator(max_trial_duration=1, origin_coord=0, end_coord=100, show_guide=True, axis=ValidationAxis.x)
         v._guide = DbgGlobalSpeedGuide(v)
 
-        v.finger_started_moving(0)
+        v.movement_started(0)
         v.update_xyt(99, 0, .5)
         self.assertEqual((50, 0), v.guide._guide_line.active_stimulus.position)
 

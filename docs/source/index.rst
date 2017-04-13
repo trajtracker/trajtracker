@@ -68,7 +68,9 @@ Classes that handle various aspects of finger/mouse movement.
 trajtracker.events
 ------------------
 
-This set of classes allows defining the flow of a trial by using events. Check out :doc:`this overview <events/events_overview>`.
+This set of classes allows defining the flow of a trial by using events.
+
+Before looking at specific classes, check out :doc:`this overview <events/events_overview>`.
 
 **Classes:**
 

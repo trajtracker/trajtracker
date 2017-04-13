@@ -6,6 +6,7 @@ Configuration of the number-to-position experiment
 """
 
 from enum import Enum
+import expyriment as xpy
 import trajtracker as ttrk
 
 
@@ -24,15 +25,19 @@ class Config(object):
     the number-to-position experiment
     """
 
-    def __init__(self, experiment_id, data_source, max_trial_duration, shuffle_trials=True, max_numberline_value=100,
-                 nl_feedback_type=FeedbackType.Arrow, stimulus_then_move=False,
+    def __init__(self, experiment_id, data_source, max_trial_duration, target_type='text', shuffle_trials=True,
+                 max_numberline_value=100, nl_feedback_type=FeedbackType.Arrow,
                  min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=20,
                  grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None,
-                 start_point_size=(40,30), start_point_tilt=0):
+                 stimulus_then_move=False, start_point_size=(40, 30), start_point_tilt=0,
+                 start_point_colour=xpy.misc.constants.C_GREY):
 
         # A unique identifier of this experiment.
         # This string is saved as-is to the results file, to identify the experiment.
         self.experiment_id = experiment_id
+
+
+        #----- Configuration of source data -----
 
         # The trials information. This can be:
         # - The name of a CSV file(string)
@@ -43,17 +48,39 @@ class Config(object):
         # If True, trials will be presented in random order
         self.shuffle_trials = shuffle_trials
 
+        # The type of the target presented.
+        # Different target types require different fields in the CSV data file
+        ['text', 'rsvp_text'].index(target_type)  # validate that the target type is OK
+        self.target_type = target_type
+
+        #----- Configuration of number line -----
+
         # The value at the right end of the number line
         self.max_numberline_value = max_numberline_value
-
-        # True: The software decides when the target appears, and then the finger must start moving
-        # False: The finger moves at will and this is what triggers the appearance of the target
-        self.stimulus_then_move = stimulus_then_move
 
         # The shape of the feedback stimulus that indicates where the finger landed on the number line.
         # If you want a non-default shape as feedback, put here "None" and create the shape yourself in the
         # init function.
         self.nl_feedback_type = nl_feedback_type
+
+
+        #----- Configuration of the "start" rectangle -----
+
+        # True: The software decides when the target appears, and then the finger must start moving
+        # False: The finger moves at will and this is what triggers the appearance of the target
+        self.stimulus_then_move = stimulus_then_move
+
+        # The size of the "start" rectangle: (width, height)
+        self.start_point_size = start_point_size
+
+        # Rotation of the "start" rectangle (clockwise degrees)
+        self.start_point_tilt = start_point_tilt
+
+        # Colour of the "start" rectangle
+        self.start_point_colour = start_point_colour
+
+
+        #----- Configuration of sounds -----
 
         # Use this in order to play a different sound depending on the subject's accuracy.
         # The parameter should be a list/tuple with several elements, each of which is a (endpoint_error, sound)
@@ -64,13 +91,7 @@ class Config(object):
         # any larger error
         self.sound_by_accuracy = sound_by_accuracy
 
-        #todo doc
-        self.start_point_size = start_point_size
-
-        # todo doc
-        self.start_point_tilt = start_point_tilt
-
-        #----- Configuration of validators
+        #----- Configuration of validators -----
 
         # Minimal and maximal valid time for reaching the number line (in seconds)
         self.min_trial_duration = min_trial_duration

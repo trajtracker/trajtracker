@@ -177,7 +177,7 @@ class EventManager(trajtracker._TTrkObject):
         this method but :func:`~trajtracker.events.EventManager.register`.
 
         :param event: Determines when the operation should be invoked
-        :param operation: A function with a single argument, which is the time in the trial.
+        :param operation: A function that gets two arguments - time_in_trial and time_in_session.
                           The function will be called at the time of the requested event.
                           (you can provide any python object that behaves like a function, i.e., supports
                           the () operator).

@@ -118,13 +118,34 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
         self.do_present_guide = True
 
         self._time0 = None
+        self.movement_started_event = None
+        self._registered = False
+
+
+    #-------------------------------------------
+    def on_registered(self, event_manager):
+
+        if self._movement_started_event is None:
+            raise trajtracker.InvalidStateError(
+                "{:} was registered to an event manager before updating movement_started_event".format(
+                    _u.get_type_name(self)))
+
+        if self._registered:
+            raise trajtracker.InvalidStateError(
+                "{:} cannot be registered twice to an event manager".format(_u.get_type_name(self)))
+
+        def callback(time_in_trial, time_in_session):
+            self.movement_started(time_in_trial)
+
+        event_manager.register_operation(self._movement_started_event, callback, recurring=True,
+                                         description="{:}.movement_started()".format(_u.get_type_name(self)))
 
 
     #========================================================================
     #      Validation API
     #========================================================================
 
-    #----------------------------------------------------------------------------------
+    #-------------------------------------------
     def reset(self, time0=None):
         """
         Called when a trial starts - reset any previous movement
@@ -132,9 +153,9 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
         pass
 
     #----------------------------------------------------------------------------------
-    def finger_started_moving(self, time):
+    def movement_started(self, time):
         """
-        Called when the finger starts moving
+        Called when the finger/mouse starts moving
         """
 
         self._log_func_enters("finger_started_moving", [time])
@@ -170,7 +191,7 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
         #-- If this is the first call in a trial: do nothing
         if self._time0 is None:
-            self.finger_started_moving(time_in_trial)
+            self.movement_started(time_in_trial)
             return None
 
         if time_in_trial < self._time0:
@@ -399,6 +420,24 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
         self._milestones = np.array(milestones)
 
+    #-------------------------------------------------------------
+    @property
+    def movement_started_event(self):
+        """
+        An event that is dispatched when movement starts. When the event is dispatched,
+        :func:`~trajtracker.validators.GlobalSpeedValidator.movement_started` will be invoked.
+        """
+        return self._movement_started_event
+
+    @movement_started_event.setter
+    def movement_started_event(self, value):
+        _u.validate_attr_type(self, "time0_event", value, trajtracker.events.Event, none_allowed=True)
+        if self._registered:
+            raise trajtracker.InvalidStateError(
+                "{:}.movement_started cannot be changed after registering this object to the event manager".format(
+                    _u.get_type_name(self)))
+
+        self._movement_started_event = value
 
     #-------------------------------------------------------------
     @property

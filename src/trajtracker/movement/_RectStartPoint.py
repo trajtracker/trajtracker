@@ -25,13 +25,14 @@ EXIT_AREA_HEIGHT = 200
 
 class RectStartPoint(ttrk._TTrkObject):
 
-    def __init__(self, size=None, position=(0,0), rotation=0):
+    def __init__(self, size=None, position=(0,0), rotation=0, colour=xpy.misc.constants.C_GREY):
         super(RectStartPoint, self).__init__()
 
         self._preloaded = False
         self.size = size
         self.position = position
         self.rotation = rotation
+        self.colour = colour
         self._start_rect = None
 
 
@@ -58,8 +59,9 @@ class RectStartPoint(ttrk._TTrkObject):
 
     #-------------------------------------------------
     def _create_start_area(self):
-        start_area = xpy.stimuli.Rectangle(size=self._size, position=self._position)
+        start_area = xpy.stimuli.Rectangle(size=self._size, position=self._position, colour=self._colour)
         start_area.rotate(self._rotation)
+        return start_area
 
 
     # -------------------------------------------------
@@ -88,6 +90,7 @@ class RectStartPoint(ttrk._TTrkObject):
         
         **Note: changing the size/position of this rectangle may result in unexpected behavior** 
         """
+        self.preload()
         return self._start_rect
 
 
@@ -119,7 +122,7 @@ class RectStartPoint(ttrk._TTrkObject):
                                       max_wait_time=None):
         """ See :func:`StartPoint.wait_until_startpoint_touched() <trajtracker.movement.StartPoint.wait_until_startpoint_touched>` """
         self.preload()
-        self._start_point.wait_until_startpoint_touched(
+        return self._start_point.wait_until_startpoint_touched(
             exp, on_loop_callback=on_loop_callback, on_loop_present=on_loop_present,
             event_manager=event_manager, trial_start_time=trial_start_time, session_start_time=session_start_time,
             max_wait_time=max_wait_time)
@@ -130,7 +133,7 @@ class RectStartPoint(ttrk._TTrkObject):
                         max_wait_time=None):
         """ See :func:`StartPoint.wait_until_exit() <trajtracker.movement.StartPoint.wait_until_exit>` """
         self.preload()
-        self._start_point.wait_until_exit(
+        return self._start_point.wait_until_exit(
             exp, on_loop_callback=on_loop_callback, on_loop_present=on_loop_present,
             event_manager=event_manager, trial_start_time=trial_start_time, session_start_time=session_start_time,
             max_wait_time=max_wait_time)
@@ -168,6 +171,8 @@ class RectStartPoint(ttrk._TTrkObject):
 
             self._size = (int(value[0]), int(value[1]))
 
+        self._log_property_changed("size")
+
     #-------------------------------------------------
     @property
     def position(self):
@@ -183,7 +188,7 @@ class RectStartPoint(ttrk._TTrkObject):
     @position.setter
     def position(self, value):
         if self._preloaded:
-            raise ttrk.InvalidStateError("{:}.size cannot be set after the object was preloaded".format(_u.get_type_name(self)))
+            raise ttrk.InvalidStateError("{:}.position cannot be set after the object was preloaded".format(_u.get_type_name(self)))
 
         if value is None:
             self._position = None
@@ -194,6 +199,8 @@ class RectStartPoint(ttrk._TTrkObject):
             _u.validate_attr_numeric(self, "size[1]", value[1])
 
             self._position = (int(value[0]), int(value[1]))
+
+        self._log_property_changed("position")
 
 
     #-------------------------------------------------
@@ -209,8 +216,25 @@ class RectStartPoint(ttrk._TTrkObject):
     @rotation.setter
     def rotation(self, value):
         if self._preloaded:
-            raise ttrk.InvalidStateError("{:}.size cannot be set after the object was preloaded".format(_u.get_type_name(self)))
+            raise ttrk.InvalidStateError("{:}.rotation cannot be set after the object was preloaded".format(_u.get_type_name(self)))
 
         _u.validate_attr_numeric(self, "rotation", value)
         value = value % 360
         self._rotation = value
+
+        self._log_property_changed("rotation")
+
+    #-------------------------------------------------
+    @property
+    def colour(self):
+        return self._colour
+
+    @colour.setter
+    def colour(self, value):
+        if self._preloaded:
+            raise ttrk.InvalidStateError("{:}.colour cannot be set after the object was preloaded".format(_u.get_type_name(self)))
+
+        _u.validate_attr_rgb(self, "colour", value)
+        self._colour = value
+
+        self._log_property_changed("colour")
