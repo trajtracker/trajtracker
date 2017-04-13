@@ -18,7 +18,7 @@ from trajtracker.movement import StartPoint
 
 
 xpy.control.defaults.window_mode = True
-ttrk._TTrkObject.log_to_console = True
+ttrk.log_to_console = True
 
 #-- Experiment constants
 MAX_TRIAL_DURATION = 2

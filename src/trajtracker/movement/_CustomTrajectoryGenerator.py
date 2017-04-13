@@ -67,7 +67,7 @@ class CustomTrajectoryGenerator(trajtracker._TTrkObject):
         traj_inf = self._trajectories[self._active_traj_id]
 
         if time < traj_inf['times'][0]:
-            raise ValueError("trajtracker error in {:}.get_traj_point(time={:}): the active trajectory ({:}) starts from time={:}".format(
+            raise trajtracker.ValueError("{:}.get_traj_point(time={:}): the active trajectory ({:}) starts from time={:}".format(
                 type(self).__name__, time, self._active_traj_id, traj_inf['times'][0]))
 
         #-- Time can't exceed the trajectory duration
@@ -123,7 +123,7 @@ class CustomTrajectoryGenerator(trajtracker._TTrkObject):
     @active_traj_id.setter
     def active_traj_id(self, value):
         if value is not None and value not in self._trajectories:
-            raise ValueError("trajtracker error: invalid {:}.curr_traj_id ({:}) - no trajectory with this ID".format(type(self).__name__, value))
+            raise trajtracker.ValueError("invalid {:}.curr_traj_id ({:}) - no trajectory with this ID".format(type(self).__name__, value))
         self._active_traj_id = value
 
 
@@ -172,7 +172,7 @@ class CustomTrajectoryGenerator(trajtracker._TTrkObject):
 
             time = time_point[0]
             if time <= prev_time:
-                raise ValueError(("trajtracker error: {:}.set_trajectory() called with invalid value for trajectory '{:}' " +
+                raise trajtracker.ValueError(("{:}.set_trajectory() called with invalid value for trajectory '{:}' " +
                                  "- timepoint {:} appeared after {:}").format(type(self).__name__, traj_id, time, prev_time))
 
             prev_time = time

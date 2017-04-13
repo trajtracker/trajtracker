@@ -41,13 +41,18 @@ class StartPoint(trajtracker._TTrkObject):
         self._log_func_enters("__init__", [start_area, exit_area])
 
         if "position" not in dir(start_area):
-            raise ValueError("trajtracker error: invalid start_area provided to {:}.__init__".format(type(self).__name__))
+            raise trajtracker.ValueError("invalid start_area provided to {:}.__init__".format(type(self).__name__))
 
         self._start_area = start_area
         self.exit_area = exit_area
 
         self.reset()
 
+
+    #-----------------------------------------------------------
+    @property
+    def start_area(self):
+        return self._start_area
 
     #-----------------------------------------------------------
     @property
@@ -73,7 +78,7 @@ class StartPoint(trajtracker._TTrkObject):
             self._exit_area = value
             self._log_property_changed("exit_area", value="shape")
         else:
-            raise ValueError("trajtracker error: invalid value for %s.exit_area" % type(self).__name__)
+            raise trajtracker.ValueError("invalid value for %s.exit_area" % type(self).__name__)
 
         self._log_property_changed("exit_area")
 
@@ -93,7 +98,7 @@ class StartPoint(trajtracker._TTrkObject):
             f, t = 215, -45
 
         else:
-            raise ValueError("trajtracker error: unsupported exit area '%s'" % name)
+            raise trajtracker.ValueError("unsupported exit area '%s'" % name)
 
         return nvshapes.Sector(self._start_area.position[0], self._start_area.position[1], 10000, f, t)
 

@@ -25,7 +25,6 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 
 
-# todo: in NumberLine: handle feedback_stim_hide_event and feedback_stim_hide_offset
 # todo: add min-trial-duration validation
 # todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
 # todo: support image target (+RSVP), arrow target
@@ -49,6 +48,8 @@ def run_full_experiment(config):
     exp_info = initialize_exp(config)
 
     create_experiment_objects(exp_info, config)
+
+    register_to_event_manager(exp_info)
 
     # todo: ask for subject initials and name?
 
@@ -221,7 +222,7 @@ def on_finger_touched_screen(exp_info, trial):
 
     #-- Reset all trajectory-sensitive objects
     for obj in exp_info.trajectory_sensitive_objects:
-        obj.reset(trial.start_time)
+        obj.reset(0)
 
 
 #----------------------------------------------------------------

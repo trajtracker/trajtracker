@@ -113,10 +113,7 @@ def create_start_point(exp_info, config):
                                                         rotation=config.start_point_tilt,
                                                         colour=config.start_point_colour)
 
-    exp_info.stimuli.add(exp_info.start_point.start_rect, "start_point")
-    exp_info.start_point.log_level = ttrk._TTrkObject.log_trace #todo
-    print("START area = {:}, EXIT area = {:}".format(exp_info.start_point.start_rect,
-                                                     exp_info.start_point._start_point.exit_area))
+    exp_info.stimuli.add(exp_info.start_point.start_area, "start_point")
 
     exp_info.exp_data['TrajZeroCoordX'] = start_area_position[0]
     exp_info.exp_data['TrajZeroCoordY'] = start_area_position[1] + start_area_size[1]/2
@@ -178,14 +175,15 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
         v = ttrk.validators.MovementAngleValidator(
             min_angle=-90,
             max_angle=90,
-            calc_angle_interval=20,
-            enabled=True)
+            calc_angle_interval=20)
+        v.enable_event = FINGER_STARTED_MOVING
+        v.disable_event = ttrk.events.TRIAL_ENDED
         exp_info.add_validator(v, 'direction')
 
 
     if global_speed_validator:
         v = ttrk.validators.GlobalSpeedValidator(
-            origin_coord=exp_info.start_point.position[1] + exp_info.start_point.start_rect.size[1] / 2,
+            origin_coord=exp_info.start_point.position[1] + exp_info.start_point.start_area.size[1] / 2,
             end_coord=exp_info.numberline.position[1],
             grace_period=config.grace_period,
             max_trial_duration=config.max_trial_duration,
@@ -193,6 +191,8 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
             show_guide=config.speed_guide_enabled)
         v.do_present_guide = False
         v.movement_started_event = FINGER_STARTED_MOVING
+        v.enable_event = FINGER_STARTED_MOVING
+        v.disable_event = ttrk.events.TRIAL_ENDED
         exp_info.add_validator(v, 'global_speed')
 
 
@@ -201,11 +201,16 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
             min_speed=config.min_inst_speed,
             grace_period=config.grace_period,
             calculation_interval=0.05)
+        v.enable_event = FINGER_STARTED_MOVING
+        v.disable_event = ttrk.events.TRIAL_ENDED
         exp_info.add_validator(v, 'inst_speed')
 
 
     if zigzag_validator:
         v = ttrk.validators.NCurvesValidator(max_curves_per_trial=config.max_zigzags)
+        v._direction_monitor.min_angle_change_per_curve = 5  # Less than 5-degree change doesn't count as a curve
+        v.enable_event = FINGER_STARTED_MOVING
+        v.disable_event = ttrk.events.TRIAL_ENDED
         exp_info.add_validator(v, 'zigzag')
 
 
@@ -226,10 +231,14 @@ def create_textbox_target(exp_info, config):
     target.size = (300, 80)
     target.text_size = 50
     target.text_colour = xpy.misc.constants.C_WHITE
+    target.text_justification = "center"
 
     target.onset_event = TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
+    target.onset_time = [0]
+    target.duration = [1000]  # never disappear
 
     exp_info.set_target(target, target.stimulus)
+    exp_info.add_event_sensitive_object(target)
 
 
 #----------------------------------------------------------------
@@ -253,11 +262,8 @@ def register_to_event_manager(exp_info):
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
-    exp_info.event_manager.register(exp_info.start_point)
-    exp_info.event_manager.register(exp_info.target)
-
-    if 'validator_global_speed' in dir(exp_info):
-        exp_info.event_manager.register(exp_info.validator_global_speed)
+    for obj in exp_info.event_sensitive_objects:
+        exp_info.event_manager.register(obj)
 
 
 #------------------------------------------------
@@ -283,7 +289,7 @@ def create_sounds(exp_info, config):
         _u.validate_attr_is_collection(config, "sound_by_accuracy[*]", sound_cfg, 2, 2)
         _u.validate_attr_numeric(config, "sound_by_accuracy[*]", sound_cfg[0])
         if not (0 < sound_cfg[0] <= 1):
-            raise ValueError("trajtracker error: invalid accuracy level ({:}) in config.sound_by_accuracy".format(
+            raise trajtracker.ValueError("invalid accuracy level ({:}) in config.sound_by_accuracy".format(
                 sound_cfg[0]))
         _u.validate_attr_type(config, "sound_by_accuracy[*]", sound_cfg[0], str)
 
@@ -324,7 +330,7 @@ def load_data_source(config):
         #-- An explicit list of trials was provided
         for row in ds:
             if 'target' not in row or not isinstance(row['target'], str):
-                raise ValueError("The data source must contain a 'target' string value per trial")
+                raise trajtracker.ValueError("The data source must contain a 'target' string value per trial")
             if ttrk.data.CSVLoader.FLD_LINE_NUM not in row:
                 row[ttrk.data.CSVLoader.FLD_LINE_NUM] = 0
         return ds

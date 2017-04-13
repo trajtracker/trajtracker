@@ -18,10 +18,10 @@ class StimulusSelector(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetOb
 
     def __init__(self, stimuli=()):
         """
-        Constructor - invoked when you create a new object by writing StimulusSelector()
+        Constructor - invoked when you create a new object by writing ChangingStimulus()
 
         :param stimuli: A list of stimuli to add. Each entry in the list is a (key, stimulus) pair -
-                        see :func:`~trajtracker.stimuli.StimulusSelector.add_stimulus`
+                        see :func:`~trajtracker.stimuli.ChangingStimulus.add_stimulus`
         """
 
         super(StimulusSelector, self).__init__()
@@ -54,14 +54,14 @@ class StimulusSelector(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetOb
         """
         Set one of the stimuli as the active one.
 
-        :param key: The key of the stimulus, as set in :func:`~trajtracker.stimuli.StimulusSelector.add_stimulus`
+        :param key: The key of the stimulus, as set in :func:`~trajtracker.stimuli.ChangingStimulus.add_stimulus`
         """
         if key is None or key in self._stimuli:
             if self._should_log(self.log_trace):
                 self._log_write("Activate,{:}".format(key), True)
             self._active_key = key
         else:
-            raise ValueError("trajtracker error: {:}.select(key={:}) - this stimulus was not defined".format(type(self).__name__, key))
+            raise trajtracker.ValueError("{:}.select(key={:}) - this stimulus was not defined".format(type(self).__name__, key))
 
 
     #--------------------------------------------------

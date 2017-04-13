@@ -59,8 +59,8 @@ class PictureSet(trajtracker._TTrkObject):
         if self._preloaded:
             raise trajtracker.InvalidStateError('Pictures cannot be added to a PictureSet after it was preloaded')
 
-        if pic_name in self._pics or pic_name in self._unloaded_pic_configs:
-            print('trajtracker warning: Picture "{0}" already exists in the PictureSet, definition is overriden'.format(pic_name))
+        if pic_name in self._pics or pic_name in self._unloaded_pic_configs and self._should_log(self.log_warn):
+            self._log_write('WARNING: Picture "{:}" already exists in the PictureSet, definition is overriden'.format(pic_name))
 
         if isinstance(pic_spec, str):
             self._unloaded_pic_configs[pic_name] = pic_spec
@@ -69,7 +69,7 @@ class PictureSet(trajtracker._TTrkObject):
             self._preload_pic(pic_name, pic_spec)
 
         else:
-            raise ValueError('trajtracker error in ImageHolder.set_image() - Invalid file name: %s' % pic_spec)
+            raise trajtracker.ValueError('PictureSet.add_picture() - Invalid file name: %s' % pic_spec)
 
     #------------------------------------------------------------------
     def add_pictures(self, config_string):
@@ -84,8 +84,8 @@ class PictureSet(trajtracker._TTrkObject):
             try:
                 ind = cfg.index('=')
                 self.add_picture(cfg[:ind], cfg[ind + 1:])
-            except ValueError:
-                raise ValueError('trajtracker error in ImageHolder.set_images() - Invalid value given: %s' % cfg)
+            except trajtracker.ValueError:
+                raise trajtracker.ValueError('PictureSet.add_pictures() - Invalid value given: %s' % cfg)
 
     #------------------------------------------------------------------
     def preload(self):

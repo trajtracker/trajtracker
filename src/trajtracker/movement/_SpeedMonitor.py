@@ -47,7 +47,7 @@ class SpeedMonitor(trajtracker._TTrkObject):
         """
 
         if time is not None and not isinstance(time, (int, float)):
-            raise ValueError(_u.ErrMsg.invalid_method_arg_type(self.__class__, "reset", "numeric", "time", time))
+            raise trajtracker.ValueError(_u.ErrMsg.invalid_method_arg_type(self.__class__, "reset", "numeric", "time", time))
 
         self._log_func_enters("reset", [time])
 
@@ -96,7 +96,9 @@ class SpeedMonitor(trajtracker._TTrkObject):
         #-- Validate that times are provided in increasing order
         prev_time = self._recent_points[-1][2] if len(self._recent_points) > 0 else self._time0
         if prev_time is not None and prev_time > time:
-            raise trajtracker.InvalidStateError("{0}.update_xyt() was called with time={1} after it was previously called with time={2}".format(self.__class__, time, prev_time))
+            raise trajtracker.InvalidStateError(
+                "{:}.update_xyt() was called with time={:} after it was previously called with time={:}".format(
+                    _u.get_type_name(self), time, prev_time))
 
 
     #--------------------------------------

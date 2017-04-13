@@ -114,7 +114,7 @@ class LocationsValidator(trajtracker._TTrkObject, EnabledDisabledObj):
         colors = set()
         for c in value:
             if not u.is_rgb(c):
-                raise ValueError(_u.ErrMsg.attr_invalid_type(type(self), attr_name, "color", value))
+                raise trajtracker.ValueError(_u.ErrMsg.attr_invalid_type(type(self), attr_name, "color", value))
             colors.add(u.color_rgb_to_num(c))
 
         return colors

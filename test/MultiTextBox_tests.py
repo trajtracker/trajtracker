@@ -17,7 +17,7 @@ class MultiTextBoxTests(unittest.TestCase):
 
 
     def setUp(self):
-        trajtracker._TTrkObject.log_to_console = True
+        trajtracker.log_to_console = True
 
 
     #==============================================================================

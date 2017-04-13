@@ -30,7 +30,7 @@ class CircularTrajectoryGenerator(trajtracker._TTrkObject):
         super(CircularTrajectoryGenerator, self).__init__()
 
         if full_rotation_duration is not None and degrees_per_sec is not None:
-            raise ValueError("trajtracker error: you cannot provide both full_rotation_duration and degrees_per_sec " +
+            raise trajtracker.ValueError("you cannot provide both full_rotation_duration and degrees_per_sec " +
                              "to the constructor of {:}".format(type(self).__name__))
 
         self._center = None

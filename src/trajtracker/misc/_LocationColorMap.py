@@ -162,7 +162,8 @@ class LocationColorMap(trajtracker._TTrkObject):
                 if color not in value:
                     missing_colors.add(color)
             if len(missing_colors) > 0:
-                raise ValueError("trajtracker error: Invalid value for {0}.color_codes - some colors are missing: {1}".format(self.__class__, missing_colors))
+                raise trajtracker.ValueError("Invalid value for {:}.color_codes - some colors are missing: {:}".format(
+                    _u.get_type_name(self), missing_colors))
 
             self._color_to_code = value.copy()
 
@@ -171,9 +172,9 @@ class LocationColorMap(trajtracker._TTrkObject):
             self._color_to_code = { color: value(color) for color in self._available_colors }
 
         else:
-            raise ValueError(
-                "trajtracker error: {0}.color_codes can only be set to None, 'default', or a dict. Invalid value: {1}".format(
-                    self.__class__, value))
+            raise trajtracker.ValueError(
+                "{:}.color_codes can only be set to None, 'default', or a dict. Invalid value: {:}".format(
+                    _u.get_type_name(self), value))
 
         self._log_property_changed("colormap", value)
 
@@ -210,7 +211,7 @@ class LocationColorMap(trajtracker._TTrkObject):
             use_mapping = self._use_mapping
 
         if self._color_to_code is None and use_mapping:
-            raise ValueError("trajtracker error: a call to %s.get_color_at(use_mapping=True) is invalid because color_codes were not specified" % self.__class__)
+            raise trajtracker.ValueError("a call to %s.get_color_at(use_mapping=True) is invalid because color_codes were not specified" % self.__class__)
 
         if x_coord < self._top_left_x or x_coord >= self._top_left_x+self._width or \
                y_coord < self._top_left_y or y_coord >= self._top_left_y + self._height:

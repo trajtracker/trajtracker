@@ -126,7 +126,7 @@ class MoveByGradientValidator(trajtracker._TTrkObject, EnabledDisabledObj):
     def single_color(self, value):
         _u.validate_attr_type(self, "single_color", value, str, none_allowed=True)
         if value is not None and value not in self._colormaps:
-            raise ValueError("trajtracker error: invalid value for {:}.single_color ({:}) - valid values are {:}".format(
+            raise trajtracker.ValueError("invalid value for {:}.single_color ({:}) - valid values are {:}".format(
                 type(self).__name__, value, ",".join(self._colormaps.keys())))
 
         self._single_color = value

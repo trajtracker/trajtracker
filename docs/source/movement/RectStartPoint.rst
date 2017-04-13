@@ -10,7 +10,7 @@ The differences between the basic :class:`~trajtracker.movement.StartPoint` and 
 
 - The present class also creates the visual rectangle to display on screen.
   The rectangle is created with default visual properties and you can modify it later
-  (access it via :attr:`~trajtracker.movement.RectStartPoint.start_rect` )
+  (access it via :attr:`~trajtracker.movement.RectStartPoint.start_area` )
 - Consequently, unlike :class:`~trajtracker.movement.StartPoint` the present class does not allow
   defining the start & exit area flexibly.
 - The present class lets you also tilt the rectangle (:attr:`~trajtracker.movement.RectStartPoint.rotation`)

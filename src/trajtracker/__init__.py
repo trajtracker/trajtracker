@@ -7,19 +7,31 @@
 
 """
 
+log_to_console = False
 
-class InvalidStateError(StandardError):
+
+class TrajTrackerError(StandardError):
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return "{:}: {:}".format(type(self).__name__, self.message)
+
+class InvalidStateError(TrajTrackerError):
     """ A method was called when the object is an inappropriate state """
+    pass
 
-    def __init__(self, *args, **kwargs):  # real signature unknown
-        pass
-
-
-class BadFormatError(StandardError):
+class BadFormatError(TrajTrackerError):
     """ Data was provided in an invalid format (e.g., in a file) """
+    pass
 
-    def __init__(self, *args, **kwargs):  # real signature unknown
-        pass
+class ValueError(TrajTrackerError):
+    """ An invalid value was encountered """
+    pass
+
+class TypeError(TrajTrackerError):
+    """ a value of invalid type was encountered """
+    pass
 
 
 
@@ -28,10 +40,8 @@ import expyriment as xpy
 
 class _TTrkObject(object):
 
-    log_to_console = False
-
     def __init__(self):
-        self.log_level = self.log_error
+        self.log_level = self.log_warn
 
 
     #-- Log levels (each level will also print the higher log levels)
@@ -52,7 +62,7 @@ class _TTrkObject(object):
     @log_level.setter
     def log_level(self, level):
         if level is None or not isinstance(level, int) or level < _TTrkObject.log_trace or level > _TTrkObject.log_none:
-            raise ValueError("trajtracker error: invalid log_level({:})".format(level))
+            raise trajtracker.ValueError("invalid log_level({:})".format(level))
 
         self._set_log_level(level)
 
@@ -82,7 +92,7 @@ class _TTrkObject(object):
         if len(value) > 100:
             value = value[:100]
 
-        self._log_write("set_obj_attr,{0}.{1},{2}".format(type(self).__name__, attr_name, value))
+        self._log_write("set_obj_attr,{:}.{:},{:}".format(type(self).__name__, attr_name, value))
 
 
     #-------------------------------------------------
@@ -92,7 +102,7 @@ class _TTrkObject(object):
         if prepend_self:
             msg = type(self).__name__ + "," + msg
         xpy._internals.active_exp._event_file_log(msg, 1)
-        if _TTrkObject.log_to_console or print_to_console:
+        if log_to_console or print_to_console:
             print(msg)
 
     #-------------------------------------------------
@@ -100,7 +110,7 @@ class _TTrkObject(object):
         if prepend_self:
             msg = type(self).__name__ + "," + msg
         xpy._internals.active_exp._event_file_log(msg, 1)
-        if _TTrkObject.log_to_console or print_to_console:
+        if log_to_console or print_to_console:
             print(msg)
 
     #-------------------------------------------------

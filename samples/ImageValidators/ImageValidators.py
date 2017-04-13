@@ -18,7 +18,7 @@ from trajtracker.validators import *
 
 
 xpy.control.defaults.window_mode = True
-ttrk._TTrkObject.log_to_console = True
+ttrk.log_to_console = True
 
 
 exp = xpy.control.initialize()

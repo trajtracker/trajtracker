@@ -49,7 +49,7 @@ def color_rgb_to_num(rgb):
     Convert an RGB color (3 integers, each 0-255) to a single int value (between 0 and 0xFFFFFF)
     """
     if not is_rgb(rgb):
-        raise ValueError("trajtracker error: invalid argument to color_rgb_to_num(), expecting a 3*integer list/tuple")
+        raise trajtracker.ValueError("invalid argument to color_rgb_to_num(), expecting a 3*integer list/tuple")
     return (rgb[0]<<16) + (rgb[1]<<8) + rgb[2]
 
 
@@ -60,7 +60,7 @@ def color_num_to_rgb(value):
     if isinstance(value, int) and 0 <= value <= 0xFFFFFF:
         return (int(np.floor(value / 2 ** 16)), int(np.floor(value / 256)) % 256, value % 256)
     else:
-        raise ValueError("trajtracker error: invalid argument to color_num_to_rgb(), expecting a 3*integer list/tuple")
+        raise trajtracker.ValueError("invalid argument to color_num_to_rgb(), expecting a 3*integer list/tuple")
 
 
 #--------------------------------------------------------------------------

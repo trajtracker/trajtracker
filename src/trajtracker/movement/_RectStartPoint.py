@@ -25,11 +25,12 @@ EXIT_AREA_HEIGHT = 200
 
 class RectStartPoint(ttrk._TTrkObject):
 
+    #-------------------------------------------------
     def __init__(self, size=None, position=(0,0), rotation=0, colour=xpy.misc.constants.C_GREY):
         super(RectStartPoint, self).__init__()
 
         self._preloaded = False
-        self._start_rect = None
+        self._start_area = None
 
         self.size = size
         self.position = position
@@ -53,10 +54,10 @@ class RectStartPoint(ttrk._TTrkObject):
         if self._preloaded:
             return
 
-        self._start_rect = self._create_start_area()
+        self._start_area = self._create_start_area()
         exit_area = self._create_exit_area()
 
-        self._start_point = ttrk.movement.StartPoint(self._start_rect, exit_area=exit_area)
+        self._start_point = ttrk.movement.StartPoint(self._start_area, exit_area=exit_area)
         self._start_point.log_level = self.log_level
 
         self._preloaded = True
@@ -88,7 +89,7 @@ class RectStartPoint(ttrk._TTrkObject):
 
     #-------------------------------------------------
     @property
-    def start_rect(self):
+    def start_area(self):
         """
         Access the visual rectangle stimulus (an expyriment.stimuli.Rectangle object) - 
         allows modifying its properties.
@@ -96,7 +97,7 @@ class RectStartPoint(ttrk._TTrkObject):
         **Note: changing the size/position of this rectangle may result in unexpected behavior** 
         """
         self.preload()
-        return self._start_rect
+        return self._start_area
 
 
     #================================================================================

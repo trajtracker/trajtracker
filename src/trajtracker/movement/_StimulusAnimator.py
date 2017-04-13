@@ -90,9 +90,9 @@ class StimulusAnimator(trajtracker._TTrkObject):
     @animated_object.setter
     def animated_object(self, obj):
         if "present" not in dir(obj):
-            raise ValueError("trajtracker error: {0}.animated_object must be an object with a present() method".format(type(self).__name__))
+            raise trajtracker.ValueError("{:}.animated_object must be an object with a present() method".format(type(self).__name__))
         if "position" not in dir(obj):
-            raise ValueError("trajtracker error: {0}.animated_object must be an object with a 'position' property".format(type(self).__name__))
+            raise trajtracker.ValueError("{:}.animated_object must be an object with a 'position' property".format(type(self).__name__))
 
         self._animated_object = obj
         self._log_property_changed("animated_object")
@@ -109,7 +109,7 @@ class StimulusAnimator(trajtracker._TTrkObject):
     def trajectory_generator(self, obj):
 
         if "get_traj_point" not in dir(obj):
-            raise ValueError("trajtracker error: {0}.trajectory_generator must be an object with a get_traj_point() method".format(type(self).__name__))
+            raise trajtracker.ValueError("{:}.trajectory_generator must be an object with a get_traj_point() method".format(_u.get_type_name(self)))
 
         self._trajectory_generator = obj
 

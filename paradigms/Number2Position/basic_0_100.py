@@ -13,7 +13,7 @@ from trajtracker.paradigms import num2pos
 
 if not xpy.misc.is_android_running():
     xpy.control.defaults.window_mode = True
-    ttrk._TTrkObject.log_to_console = True
+    ttrk.log_to_console = True
 
 
 config = num2pos.Config("Num2Pos(0-100*2)", max_trial_duration=2, max_numberline_value=100,

@@ -21,15 +21,18 @@ from trajtracker.data import fromXML
 from trajtracker.stimuli import BaseMultiStim, StimulusContainer
 
 
+#todo add documentation
+
 # noinspection PyProtectedMember
 class MultiTextBox(BaseMultiStim):
 
 
     #----------------------------------------------------
-    def __init__(self, text=None, text_font=None, text_size=None, text_bold=False, text_italic=False, text_underline=False,
-                 text_justification=None, text_colour=None, background_colour=None, size=None, position=None,
+    def __init__(self, text=None, text_font="Arial", text_size=26, text_bold=False, text_italic=False, text_underline=False,
+                 text_justification="center", text_colour=xpy.misc.constants.C_WHITE,
+                 background_colour=xpy.misc.constants.C_BLACK, size=None, position=(0, 0),
                  onset_time=None, duration=None, last_stimulus_remains=False,
-                 onset_event=None, terminate_event=None):
+                 onset_event=None, terminate_event=trajtracker.events.TRIAL_ENDED):
 
         super(MultiTextBox, self).__init__(onset_time=onset_time, duration=duration, last_stimulus_remains=last_stimulus_remains)
 
@@ -51,8 +54,8 @@ class MultiTextBox(BaseMultiStim):
 
         if onset_event is not None:
             self.onset_event = onset_event
-        if terminate_event is not None:
-            self.terminate_event = terminate_event
+
+        self.terminate_event = terminate_event
 
     #----------------------------------------
     def _preload(self):
@@ -64,7 +67,7 @@ class MultiTextBox(BaseMultiStim):
 
         for i in range(len(self._text)):
             self._stimuli[i].unload()
-            self._stimuli[i]._preload()
+            self._stimuli[i].preload()
 
     #----------------------------------------
     @property
@@ -143,7 +146,7 @@ class MultiTextBox(BaseMultiStim):
         self._validate_property("duration", n_stim)
 
         if self._onset_event is None:
-            raise ValueError('trajtracker error: {:}.onset_event was not set'.format(type(self).__name__))
+            raise trajtracker.ValueError('{:}.onset_event was not set'.format(type(self).__name__))
 
 
     #----------------------------------------------------
@@ -153,11 +156,11 @@ class MultiTextBox(BaseMultiStim):
 
         value = getattr(self, prop_name)
         if value is None:
-            raise ValueError('trajtracker error: {:}.{:} was not set'.format(type(self).__name__, prop_name))
+            raise trajtracker.ValueError('{:}.{:} was not set'.format(type(self).__name__, prop_name))
 
         is_multiple_values = getattr(self, "_" + prop_name + "_multiple")
         if is_multiple_values and len(value) < n_stim:
-            raise ValueError('trajtracker error: {:}.{:} has {:} values, but there are {:} texts to present'.format(
+            raise trajtracker.ValueError('{:}.{:} has {:} values, but there are {:} texts to present'.format(
                 type(self).__name__, prop_name, len(value), n_stim))
 
     #----------------------------------------------------

@@ -30,6 +30,7 @@ class ExperimentInfo(object):
         self._errmsg_box = None
         self._trajtracker = None
         self._trajectory_sensitive_objects = []
+        self._event_sensitive_objects = []
 
         self.stimuli = ttrk.stimuli.StimulusContainer()
         self.event_manager = ttrk.events.EventManager()
@@ -70,8 +71,13 @@ class ExperimentInfo(object):
 
     #---------------------------------------------------------------
     def add_validator(self, validator, name):
+
         self._trajectory_sensitive_objects.append(validator)
+        self.add_event_sensitive_object(validator)
+
         setattr(self, "validator_" + name, validator)
+        validator.log_level = ttrk._TTrkObject.log_info
+
 
     #---------------------------------------------------------------
     @property
@@ -146,3 +152,10 @@ class ExperimentInfo(object):
     def trajectory_sensitive_objects(self):
         return self._trajectory_sensitive_objects
 
+    #---------------------------------------------------------------
+    @property
+    def event_sensitive_objects(self):
+        return self._event_sensitive_objects
+
+    def add_event_sensitive_object(self, obj):
+        self._event_sensitive_objects.append(obj)

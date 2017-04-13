@@ -87,7 +87,7 @@ class TrajectoryTracker(trajtracker._TTrkObject, EnabledDisabledObj):
         if not self._enabled:
             return
 
-        _u.update_xyt_validate_and_log(x_coord, y_coord, time_in_trial)
+        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial)
 
         if not self._track_if_no_movement and len(self._trajectory['x']) > 0 and  \
             self._trajectory['x'][-1] == x_coord and \
@@ -98,8 +98,8 @@ class TrajectoryTracker(trajtracker._TTrkObject, EnabledDisabledObj):
         self._trajectory['y'].append(y_coord)
         self._trajectory['time'].append(time_in_trial)
 
-        if self._log_level:
-            self._log_write("Trajectory,Track_xyt,{0},{1},{2}".format(x_coord, y_coord, time_in_trial))
+        if self._should_log(self.log_trace):
+            self._log_write("Trajectory,track_xyt,{:},{:},{:}".format(x_coord, y_coord, time_in_trial))
 
         return None
 
@@ -126,7 +126,7 @@ class TrajectoryTracker(trajtracker._TTrkObject, EnabledDisabledObj):
             self._filename = filename
 
         if self._filename is None:
-            raise ValueError("trajtracker error: filename was not provided to {:}.init_output_file()".format(type(self).__name__))
+            raise trajtracker.ValueError("filename was not provided to {:}.init_output_file()".format(type(self).__name__))
 
         self._xy_precision = xy_precision
         self._time_precision = time_precision

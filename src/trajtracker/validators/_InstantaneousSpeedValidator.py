@@ -47,7 +47,7 @@ class InstantaneousSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
         elif isinstance(movement_monitor, SpeedMonitor):
             self._speed_monitor = movement_monitor
         else:
-            raise ValueError(_u.ErrMsg.invalid_method_arg_type(self.__class__, "__init__", "movement_monitor", "InstMovementMonitor", movement_monitor))
+            raise trajtracker.ValueError(_u.ErrMsg.invalid_method_arg_type(self.__class__, "__init__", "movement_monitor", "InstMovementMonitor", movement_monitor))
 
         self.axis = axis
         self.min_speed = min_speed

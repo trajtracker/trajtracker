@@ -12,12 +12,14 @@ import numpy as np
 from expyriment.misc.geometry import XYPoint
 
 import trajtracker
+# noinspection PyProtectedMember
 import trajtracker._utils as _u
 import trajtracker.utils as u
 from trajtracker.events import Event
 from trajtracker.events import TRIAL_INITIALIZED, TRIAL_ENDED
 
 
+# noinspection PyProtectedMember
 class BaseMultiStim(trajtracker._TTrkObject):
 
 
@@ -120,6 +122,7 @@ class BaseMultiStim(trajtracker._TTrkObject):
     #----------------------------------------------------
     @property
     def onset_time(self):
+        #todo documentation
         return self._onset_time
 
     @onset_time.setter
@@ -139,6 +142,7 @@ class BaseMultiStim(trajtracker._TTrkObject):
     #----------------------------------------------------
     @property
     def duration(self):
+        # todo documentation
         return self._duration
 
     @duration.setter
@@ -164,6 +168,7 @@ class BaseMultiStim(trajtracker._TTrkObject):
     #----------------------------------------------------
     @property
     def last_stimulus_remains(self):
+        # todo documentation
         return self._last_stimulus_remains
 
     @last_stimulus_remains.setter

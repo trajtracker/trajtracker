@@ -338,8 +338,6 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     #      Track movement
     #===================================================================================
 
-    _errmsg_mouseat_non_numeric_coord = "trajtracker error in NumberLine.mouseAt(): a non-numeric {0} coordinate was provided ({1})"
-
     #---------------------------------------------------------
     # noinspection PyUnusedLocal
     def reset(self, time0=None):
@@ -484,16 +482,6 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     #      Congifuration
     #===================================================================================
 
-    _errmsg_set_to_non_numeric = "trajtracker error: invalid attempt to set NumberLine.{0} to a non-numeric value ({1})"
-    _errmsg_set_to_non_positive = "trajtracker error: invalid attempt to set NumberLine.{0} to a non-positive value ({1})"
-    _errmsg_set_to_non_boolean = "trajtracker error: invalid attempt to set NumberLine.{0} to a non-boolean value ({1})"
-    _errmsg_set_to_non_string = "trajtracker error: invalid attempt to set NumberLine.{0} to a non-string value ({1})"
-
-    _errmsg_value_not_collection = "trajtracker error: invalid value for NumberLine.{0} ({1}) - expecting a tuple or list"
-    _errmsg_value_bad_length = "trajtracker error: invalid value for NumberLine.{0} ({1}) - expecting a 2-element tuple"
-    _errmsg_set_to_non_numeric_entry = "trajtracker error: invalid value for NumberLine.{0} - {2} is not a number ({1})"
-    _errmsg_set_to_non_positive_entry = "trajtracker error: invalid value for NumberLine.{0} - {2} is a non-positive number({1})"
-
     #-----------------------------------------------------------
     def validate(self):
         """
@@ -503,17 +491,17 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         """
 
         if self._min_value >= self._max_value:
-            raise ValueError("trajtracker error: NumberLine.min_value({0}) >= NumberLine.max_value({1})".format(self._min_value, self._max_value))
+            raise trajtracker.ValueError("NumberLine.min_value({:}) >= NumberLine.max_value({:})".format(self._min_value, self._max_value))
 
         if self._labels_visible:
             if self._labels_box_size is None:
-                raise ValueError("trajtracker error: NumberLine - labels textbox size was not specified")
+                raise trajtracker.ValueError("NumberLine - labels textbox size was not specified")
             if self._labels_font_name is None or self._labels_font_name == "":
-                raise ValueError("trajtracker error: NumberLine - labels font name was not specified")
+                raise trajtracker.ValueError("NumberLine - labels font name was not specified")
             if self._labels_font_size is None:
-                raise ValueError("trajtracker error: NumberLine - labels font size was not specified")
+                raise trajtracker.ValueError("NumberLine - labels font size was not specified")
             if self._labels_font_colour is None:
-                raise ValueError("trajtracker error: NumberLine - labels font color was not specified")
+                raise trajtracker.ValueError("NumberLine - labels font color was not specified")
 
 
 
@@ -539,7 +527,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         self._validate_unlocked()
 
         if not isinstance(value, trajtracker.stimuli.NumberLine.Orientation):
-            raise ValueError("trajtracker error: invalid value for NumberLine.orientation ({0}) - expecting NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical".format(value))
+            raise trajtracker.ValueError("invalid value for NumberLine.orientation ({:}) - expecting NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical".format(value))
 
         self._orientation = value
         self._log_property_changed("orientation")
@@ -777,7 +765,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
     @feedback_stim.setter
     def feedback_stim(self, value):
         if value is not None and "present" not in dir(value):
-            raise TypeError("trajtracker error: {:}.feedback_stim was set to a non-stimulus value".format(_u.get_type_name(self)))
+            raise trajtracker.TypeError("{:}.feedback_stim was set to a non-stimulus value".format(_u.get_type_name(self)))
         self._feedback_stim = value
 
     #-----------------------------------------------------------
