@@ -76,7 +76,7 @@ class ExperimentInfo(object):
         self.add_event_sensitive_object(validator)
 
         setattr(self, "validator_" + name, validator)
-        validator.log_level = ttrk._TTrkObject.log_info
+        validator.log_level = ttrk.TTrkObject.log_info
 
 
     #---------------------------------------------------------------

@@ -19,8 +19,8 @@ class NCurvesValidatorTests(unittest.TestCase):
         v = NCurvesValidator(max_curves_per_trial=3)
         v.max_curves_per_trial = None
 
-        self.assertRaises(TypeError, lambda: NCurvesValidator(max_curves_per_trial=""))
-        self.assertRaises(ValueError, lambda: NCurvesValidator(max_curves_per_trial=-1))
+        self.assertRaises(trajtracker.TypeError, lambda: NCurvesValidator(max_curves_per_trial=""))
+        self.assertRaises(trajtracker.ValueError, lambda: NCurvesValidator(max_curves_per_trial=-1))
 
     #--------------------------------------------------
     def test_config_from_xml(self):

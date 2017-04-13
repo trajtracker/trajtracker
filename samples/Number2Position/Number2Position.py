@@ -42,7 +42,7 @@ def run_trial():
     target_box.preload()
 
     #-- Wait for the participant to initiate the trial by touching the START point
-    start_point.wait_until_touched(exp, all_stimuli)
+    start_point.wait_until_startpoint_touched(exp, on_loop_present=all_stimuli)
 
     #-- Clean remains from previous trial
     feedback_arrow.visible = False
@@ -53,7 +53,7 @@ def run_trial():
     reset_trajectory_info(time0)
 
     #-- Wait for the participant to start moving the finger
-    rc = start_point.wait_until_exit(exp, on_loop=all_stimuli)
+    rc = start_point.wait_until_exit(exp, on_loop_present=all_stimuli)
     if rc == StartPoint.State.aborted:
         print("   Trial aborted.")
         return False

@@ -14,7 +14,7 @@ import trajtracker._utils as _u
 func_type = type(lambda: None)
 
 
-class CSVLoader(trajtracker._TTrkObject):
+class CSVLoader(trajtracker.TTrkObject):
     """
     Load data from a CSV file. This class can:
 

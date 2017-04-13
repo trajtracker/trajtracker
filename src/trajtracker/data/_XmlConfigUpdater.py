@@ -3,10 +3,10 @@ import inspect, re
 import xml.etree.ElementTree as ET
 import expyriment as xpy
 
-from trajtracker import _TTrkObject, BadFormatError
+from trajtracker import TTrkObject, BadFormatError
 
 
-class XmlConfigUpdater(_TTrkObject):
+class XmlConfigUpdater(TTrkObject):
     """
 
     """

@@ -15,7 +15,7 @@ import trajtracker._utils as _u
 from trajtracker.data import fromXML
 
 
-class SegmentedTrajectoryGenerator(trajtracker._TTrkObject):
+class SegmentedTrajectoryGenerator(trajtracker.TTrkObject):
 
 
     #---------------------------------------------------------------

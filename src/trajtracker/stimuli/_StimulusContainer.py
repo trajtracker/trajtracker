@@ -15,7 +15,7 @@ import trajtracker
 import trajtracker._utils as _u
 
 
-class StimulusContainer(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
+class StimulusContainer(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
 
 
     def __init__(self):

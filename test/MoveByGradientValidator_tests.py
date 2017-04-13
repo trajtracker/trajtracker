@@ -20,22 +20,22 @@ class MoveByGradientValidatorTests(unittest.TestCase):
 
         try:
             val.position = ""
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
         try:
             val.position = 1
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
         try:
             val.position = ("", "")
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
         try:
             val.position = (0.1, 0)
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
     #-------------------------------------------------------
@@ -46,12 +46,12 @@ class MoveByGradientValidatorTests(unittest.TestCase):
 
         try:
             val.enabled = 1
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
         try:
             val.enabled = None
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
 
@@ -65,17 +65,17 @@ class MoveByGradientValidatorTests(unittest.TestCase):
 
         try:
             val.max_valid_back_movement = None
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
         try:
             val.max_valid_back_movement = -1
-        except ValueError:
+        except trajtracker.ValueError:
             pass
 
         try:
             val.max_valid_back_movement = ""
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
 
@@ -86,12 +86,12 @@ class MoveByGradientValidatorTests(unittest.TestCase):
 
         try:
             val.rgb_should_ascend = 0
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
         try:
             val.rgb_should_ascend = None
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
     # --------------------------------------------------

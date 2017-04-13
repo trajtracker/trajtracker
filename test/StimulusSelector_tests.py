@@ -24,7 +24,7 @@ class StimulusSelectorTests(unittest.TestCase):
     def test_select_invalid(self):
         a = DummyStimulus()
         sel = StimulusSelector([["a", a]])
-        self.assertRaises(ValueError, lambda: sel.activate("c"))
+        self.assertRaises(trajtracker.ValueError, lambda: sel.activate("c"))
 
 
 if __name__ == '__main__':

@@ -21,7 +21,7 @@ class SegmentedTrajectoryGeneratorTests(unittest.TestCase):
 
     #--------------------------------------------------
     def test_config_bad_cyclic(self):
-        self.assertRaises(TypeError, lambda: SegmentedTrajectoryGenerator(cyclic=""))
+        self.assertRaises(trajtracker.TypeError, lambda: SegmentedTrajectoryGenerator(cyclic=""))
 
         try:
             SegmentedTrajectoryGenerator().cyclic = None
@@ -32,10 +32,10 @@ class SegmentedTrajectoryGeneratorTests(unittest.TestCase):
     #--------------------------------------------------
     def test_config_bad_segments(self):
         gen = SegmentedTrajectoryGenerator()
-        self.assertRaises(TypeError, lambda: gen.add_segments(""))
-        self.assertRaises(TypeError, lambda: gen.add_segments([()]))
-        self.assertRaises(TypeError, lambda: gen.add_segments([(1,2,3)]))
-        self.assertRaises(TypeError, lambda: gen.add_segments([(None,"")]))
+        self.assertRaises(trajtracker.TypeError, lambda: gen.add_segments(""))
+        self.assertRaises(trajtracker.TypeError, lambda: gen.add_segments([()]))
+        self.assertRaises(trajtracker.TypeError, lambda: gen.add_segments([(1,2,3)]))
+        self.assertRaises(trajtracker.TypeError, lambda: gen.add_segments([(None,"")]))
 
 
     #============================ generate traj ====================

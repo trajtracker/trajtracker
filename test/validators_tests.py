@@ -1,5 +1,6 @@
 import unittest
 
+import trajtracker
 from trajtracker.validators import ValidationAxis
 from trajtracker import BadFormatError
 
@@ -14,7 +15,7 @@ class validators_tests(unittest.TestCase):
         self.assertEqual(ValidationAxis.x, ValidationAxis.parse('x'))
 
     def test_parse_validation_axis_invalid(self):
-        self.assertRaises(TypeError, lambda: ValidationAxis.parse(1))
+        self.assertRaises(trajtracker.TypeError, lambda: ValidationAxis.parse(1))
         self.assertRaises(BadFormatError, lambda: ValidationAxis.parse('1'))
 
 

@@ -15,7 +15,7 @@ import trajtracker._utils as _u
 from trajtracker.data import fromXML
 
 
-class CircularTrajectoryGenerator(trajtracker._TTrkObject):
+class CircularTrajectoryGenerator(trajtracker.TTrkObject):
 
     def __init__(self, center=None, radius=None, degrees_per_sec=None, full_rotation_duration=None,
                  degrees_at_t0=None, clockwise=True):

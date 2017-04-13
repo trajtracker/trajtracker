@@ -18,7 +18,7 @@ from trajtracker.misc import EnabledDisabledObj
 
 
 # noinspection PyAttributeOutsideInit,PyProtectedMember
-class TrajectoryTracker(trajtracker._TTrkObject, EnabledDisabledObj):
+class TrajectoryTracker(trajtracker.TTrkObject, EnabledDisabledObj):
 
 
     #----------------------------------------------------
@@ -30,7 +30,7 @@ class TrajectoryTracker(trajtracker._TTrkObject, EnabledDisabledObj):
         :param enabled: See :attr:`~trajtracker.movement.TrajectoryTracker.enabled`
         :param track_if_no_movement: See :attr:`~trajtracker.movement.TrajectoryTracker.track_if_no_movement`
         """
-        trajtracker._TTrkObject.__init__(self)
+        trajtracker.TTrkObject.__init__(self)
         EnabledDisabledObj.__init__(self, enabled=enabled)
 
         self.reset()

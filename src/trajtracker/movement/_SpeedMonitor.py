@@ -15,7 +15,7 @@ import trajtracker
 import trajtracker._utils as _u
 
 
-class SpeedMonitor(trajtracker._TTrkObject):
+class SpeedMonitor(trajtracker.TTrkObject):
 
 
     #-------------------------------------------------------------------------

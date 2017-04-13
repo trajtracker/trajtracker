@@ -1,5 +1,7 @@
 import unittest
 
+import trajtracker
+
 from trajtracker.events import *
 
 

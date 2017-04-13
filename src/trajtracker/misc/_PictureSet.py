@@ -13,7 +13,7 @@ from expyriment.stimuli import Picture
 
 import trajtracker
 
-class PictureSet(trajtracker._TTrkObject):
+class PictureSet(trajtracker.TTrkObject):
 
     #
     # Defines how images are scaled to the dictionary's size:

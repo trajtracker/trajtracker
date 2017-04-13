@@ -109,7 +109,8 @@ while n_completed < N_TRIALS:
     # good! Mouse/finger started moving upwards. Now we wait for it to reach the target
     traj_tracker.enabled = True
 
-    while True:  # The loop runs once per frame
+    # This loop runs once per frame, and stops only when the finger is lifted or reaches the target circle
+    while True:
 
         if not exp.mouse.check_button_pressed(0):
             # Finger lifted / mouse unclicked: abort the trial
@@ -123,6 +124,7 @@ while n_completed < N_TRIALS:
         traj_tracker.update_xyt(mouse_pos[0], mouse_pos[1], get_time() - trial_start_time)
 
         if target_point.overlapping_with_position(mouse_pos):
+            # Reached the target circle!
             n_completed += 1
             traj_tracker.save_to_file(n_completed)
             progress_msg.unload()

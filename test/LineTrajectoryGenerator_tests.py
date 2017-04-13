@@ -28,11 +28,11 @@ class LineTrajectoryGeneratorTests(unittest.TestCase):
 
     #-----------------------------------------------
     def test_set_bad_coords(self):
-        self.assertRaises(TypeError, lambda: LineTrajectoryGenerator(start_point=""))
-        self.assertRaises(TypeError, lambda: LineTrajectoryGenerator(start_point=(1,)))
+        self.assertRaises(trajtracker.TypeError, lambda: LineTrajectoryGenerator(start_point=""))
+        self.assertRaises(trajtracker.TypeError, lambda: LineTrajectoryGenerator(start_point=(1,)))
 
-        self.assertRaises(TypeError, lambda: LineTrajectoryGenerator(end_point=""))
-        self.assertRaises(TypeError, lambda: LineTrajectoryGenerator(end_point=(1,)))
+        self.assertRaises(trajtracker.TypeError, lambda: LineTrajectoryGenerator(end_point=""))
+        self.assertRaises(trajtracker.TypeError, lambda: LineTrajectoryGenerator(end_point=(1,)))
 
         gen = LineTrajectoryGenerator()
         try:
@@ -53,8 +53,8 @@ class LineTrajectoryGeneratorTests(unittest.TestCase):
 
     #-----------------------------------------------
     def test_set_bad_duration(self):
-        self.assertRaises(TypeError, lambda: LineTrajectoryGenerator(duration=""))
-        self.assertRaises(ValueError, lambda: LineTrajectoryGenerator(duration=-1))
+        self.assertRaises(trajtracker.TypeError, lambda: LineTrajectoryGenerator(duration=""))
+        self.assertRaises(trajtracker.ValueError, lambda: LineTrajectoryGenerator(duration=-1))
 
         gen = LineTrajectoryGenerator()
         try:

@@ -1,6 +1,6 @@
 import unittest
 
-
+import trajtracker
 from trajtracker.movement import RectStartPoint
 from trajtracker.misc import nvshapes
 
@@ -23,10 +23,10 @@ class RectStartPointTests(unittest.TestCase):
         RectStartPointDbg(size=(10, 10))
         RectStartPointDbg(size=None)
 
-        self.assertRaises(TypeError, lambda: RectStartPointDbg(size=""))
-        self.assertRaises(TypeError, lambda: RectStartPointDbg(size=(1, 2, 3)))
-        self.assertRaises(TypeError, lambda: RectStartPointDbg(size=("", 2)))
-        self.assertRaises(TypeError, lambda: RectStartPointDbg(size=(1, "")))
+        self.assertRaises(trajtracker.TypeError, lambda: RectStartPointDbg(size=""))
+        self.assertRaises(trajtracker.TypeError, lambda: RectStartPointDbg(size=(1, 2, 3)))
+        self.assertRaises(trajtracker.TypeError, lambda: RectStartPointDbg(size=("", 2)))
+        self.assertRaises(trajtracker.TypeError, lambda: RectStartPointDbg(size=(1, "")))
 
 
     #------------------------------------------------------------
@@ -34,10 +34,10 @@ class RectStartPointTests(unittest.TestCase):
         RectStartPointDbg(position=(10, 10))
         RectStartPointDbg(position=None)
 
-        self.assertRaises(TypeError, lambda: RectStartPointDbg(position=""))
-        self.assertRaises(TypeError, lambda: RectStartPointDbg(position=(1, 2, 3)))
-        self.assertRaises(TypeError, lambda: RectStartPointDbg(position=("", 2)))
-        self.assertRaises(TypeError, lambda: RectStartPointDbg(position=(1, "")))
+        self.assertRaises(trajtracker.TypeError, lambda: RectStartPointDbg(position=""))
+        self.assertRaises(trajtracker.TypeError, lambda: RectStartPointDbg(position=(1, 2, 3)))
+        self.assertRaises(trajtracker.TypeError, lambda: RectStartPointDbg(position=("", 2)))
+        self.assertRaises(trajtracker.TypeError, lambda: RectStartPointDbg(position=(1, "")))
 
 
     #------------------------------------------------------------
@@ -45,8 +45,8 @@ class RectStartPointTests(unittest.TestCase):
         RectStartPointDbg(rotation=10)
         RectStartPointDbg(rotation=-900)
 
-        self.assertRaises(TypeError, lambda: RectStartPointDbg(rotation=""))
-        self.assertRaises(TypeError, lambda: RectStartPointDbg(rotation=None))
+        self.assertRaises(trajtracker.TypeError, lambda: RectStartPointDbg(rotation=""))
+        self.assertRaises(trajtracker.TypeError, lambda: RectStartPointDbg(rotation=None))
 
 
     #============================================================================

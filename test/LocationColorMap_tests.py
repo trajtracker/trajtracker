@@ -1,5 +1,6 @@
 import unittest
 
+import trajtracker
 from trajtracker.misc import LocationColorMap
 
 # Remember this is upside down.
@@ -55,7 +56,7 @@ class LocationColorMapTests(unittest.TestCase):
         try:
             lcm.colormap = codes
             self.fail("Succeeded setting an invalid value")
-        except ValueError:
+        except trajtracker.ValueError:
             pass
 
     #-------------------------------------------------------------------------
@@ -87,13 +88,13 @@ class LocationColorMapTests(unittest.TestCase):
         try:
             lcm.use_mapping = ""
             self.fail("Succeeded setting an invalid value for LocationColorMap.use_mapping")
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
         try:
             lcm.use_mapping = None
             self.fail("Succeeded setting an invalid value for LocationColorMap.use_mapping")
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
 
@@ -150,17 +151,17 @@ class LocationColorMapTests(unittest.TestCase):
     #-------------------------------------------------------------------------
     def test_invalid_get_color_at_args(self):
         lcm = LocationColorMap(testimage)
-        self.assertRaises(TypeError, lambda: lcm.get_color_at("", 0))
-        self.assertRaises(TypeError, lambda: lcm.get_color_at(0.5, 0))
-        self.assertRaises(TypeError, lambda: lcm.get_color_at(0, ""))
-        self.assertRaises(TypeError, lambda: lcm.get_color_at(0, 0.5))
-        self.assertRaises(TypeError, lambda: lcm.get_color_at(0, 0, use_mapping=""))
+        self.assertRaises(trajtracker.TypeError, lambda: lcm.get_color_at("", 0))
+        self.assertRaises(trajtracker.TypeError, lambda: lcm.get_color_at(0.5, 0))
+        self.assertRaises(trajtracker.TypeError, lambda: lcm.get_color_at(0, ""))
+        self.assertRaises(trajtracker.TypeError, lambda: lcm.get_color_at(0, 0.5))
+        self.assertRaises(trajtracker.TypeError, lambda: lcm.get_color_at(0, 0, use_mapping=""))
 
 
     #-------------------------------------------------------------------------
     def test_colormap_missing(self):
         lcm = LocationColorMap(testimage)
-        self.assertRaises(ValueError, lambda: lcm.get_color_at(0, 0, use_mapping=True))
+        self.assertRaises(trajtracker.ValueError, lambda: lcm.get_color_at(0, 0, use_mapping=True))
 
     #-------------------------------------------------------------------------
     def test_rgb_mapping(self):

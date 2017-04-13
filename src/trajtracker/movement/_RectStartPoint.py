@@ -23,7 +23,7 @@ from trajtracker.misc import nvshapes
 EXIT_AREA_HEIGHT = 200
 
 
-class RectStartPoint(ttrk._TTrkObject):
+class RectStartPoint(ttrk.TTrkObject):
 
     #-------------------------------------------------
     def __init__(self, size=None, position=(0,0), rotation=0, colour=xpy.misc.constants.C_GREY):

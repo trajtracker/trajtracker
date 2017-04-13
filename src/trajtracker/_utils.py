@@ -12,7 +12,10 @@ import xml.etree.ElementTree as ET
 
 import numpy as np
 from enum import Enum
+
 from expyriment.misc import geometry
+
+import trajtracker
 
 
 #--------------------------------------------------------------------------

@@ -148,16 +148,16 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
     def test_set_enabled(self):
         trk = TrajectoryTracker()
         trk.enabled = True
-        self.assertRaises(TypeError, lambda: TrajectoryTracker(enabled=""))
-        self.assertRaises(TypeError, lambda: TrajectoryTracker(enabled=None))
+        self.assertRaises(trajtracker.TypeError, lambda: TrajectoryTracker(enabled=""))
+        self.assertRaises(trajtracker.TypeError, lambda: TrajectoryTracker(enabled=None))
 
 
     #------------------------------------------------------------------
     def test_set_track_if_no_movement(self):
         trk = TrajectoryTracker()
         trk.track_if_no_movement = True
-        self.assertRaises(TypeError, lambda: TrajectoryTracker(track_if_no_movement=""))
-        self.assertRaises(TypeError, lambda: TrajectoryTracker(track_if_no_movement=None))
+        self.assertRaises(trajtracker.TypeError, lambda: TrajectoryTracker(track_if_no_movement=""))
+        self.assertRaises(trajtracker.TypeError, lambda: TrajectoryTracker(track_if_no_movement=None))
 
 
     #--------------------------------------------------

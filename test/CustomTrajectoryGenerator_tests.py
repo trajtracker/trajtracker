@@ -20,8 +20,8 @@ class CustomTrajectoryGeneratorTests(unittest.TestCase):
         gen = CustomTrajectoryGenerator()
         gen.cyclic = True
 
-        self.assertRaises(TypeError, lambda: CustomTrajectoryGenerator(cyclic=1))
-        self.assertRaises(TypeError, lambda: CustomTrajectoryGenerator(cyclic=None))
+        self.assertRaises(ttrk.TypeError, lambda: CustomTrajectoryGenerator(cyclic=1))
+        self.assertRaises(ttrk.TypeError, lambda: CustomTrajectoryGenerator(cyclic=None))
 
 
     #----------------------------------------------------------
@@ -29,8 +29,8 @@ class CustomTrajectoryGeneratorTests(unittest.TestCase):
         gen = CustomTrajectoryGenerator()
         gen.interpolate = True
 
-        self.assertRaises(TypeError, lambda: CustomTrajectoryGenerator(interpolate=1))
-        self.assertRaises(TypeError, lambda: CustomTrajectoryGenerator(interpolate=None))
+        self.assertRaises(ttrk.TypeError, lambda: CustomTrajectoryGenerator(interpolate=1))
+        self.assertRaises(ttrk.TypeError, lambda: CustomTrajectoryGenerator(interpolate=None))
 
     #----------------------------------------------------------
     def test_set_good_trajectory(self):
@@ -50,36 +50,36 @@ class CustomTrajectoryGeneratorTests(unittest.TestCase):
         try:
             gen.active_traj_id = 3
             self.fail()
-        except ValueError:
+        except ttrk.ValueError:
             pass
 
 
     #----------------------------------------------------------
     def test_set_empty_traj(self):
         gen = CustomTrajectoryGenerator()
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, []))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, []))
 
     #----------------------------------------------------------
     def test_set_traj_invalid_time_point(self):
         gen = CustomTrajectoryGenerator()
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [""]))
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [(1, 2)]))
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [(1, 2, 3, 4, 5)]))
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [(None, 0, 0)]))
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [("", 0, 0)]))
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [(0, 0.1, 0)]))
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [(0, None, 0)]))
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [(0, 0, 0.1)]))
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [(0, 0, None)]))
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [(0, 0, 0, None)]))
-        self.assertRaises(TypeError, lambda: gen.set_trajectory(1, [(0, 0, 0, 1)]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [""]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [(1, 2)]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [(1, 2, 3, 4, 5)]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [(None, 0, 0)]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [("", 0, 0)]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [(0, 0.1, 0)]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [(0, None, 0)]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [(0, 0, 0.1)]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [(0, 0, None)]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [(0, 0, 0, None)]))
+        self.assertRaises(ttrk.TypeError, lambda: gen.set_trajectory(1, [(0, 0, 0, 1)]))
 
 
     #----------------------------------------------------------
     def test_set_unordered_time_points(self):
         gen = CustomTrajectoryGenerator()
-        self.assertRaises(ValueError, lambda: gen.set_trajectory(1, [(1, 0, 0), (1, 0, 0)]))
-        self.assertRaises(ValueError, lambda: gen.set_trajectory(1, [(1, 0, 0), (0.5, 0, 0)]))
+        self.assertRaises(ttrk.ValueError, lambda: gen.set_trajectory(1, [(1, 0, 0), (1, 0, 0)]))
+        self.assertRaises(ttrk.ValueError, lambda: gen.set_trajectory(1, [(1, 0, 0), (0.5, 0, 0)]))
 
 
     #==========================================================================
@@ -139,10 +139,10 @@ class CustomTrajectoryGeneratorTests(unittest.TestCase):
 
         gen.cyclic = True
 
-        self.assertRaises(ValueError, lambda: gen.validate())
-        self.assertRaises(ValueError, lambda: gen.get_traj_point(0.5))
+        self.assertRaises(ttrk.ValueError, lambda: gen.validate())
+        self.assertRaises(ttrk.ValueError, lambda: gen.get_traj_point(0.5))
         gen._validation_err = None
-        self.assertRaises(ValueError, lambda: gen.get_traj_point(0.5))
+        self.assertRaises(ttrk.ValueError, lambda: gen.get_traj_point(0.5))
 
         gen.cyclic = False
         gen.validate()

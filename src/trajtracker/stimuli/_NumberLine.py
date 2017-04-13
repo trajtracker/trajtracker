@@ -21,7 +21,7 @@ from trajtracker.utils import get_time
 
 
 # noinspection PyAttributeOutsideInit,PyProtectedMember
-class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
+class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
 
     Orientation = Enum('Orientation', 'Horizontal Vertical')
 

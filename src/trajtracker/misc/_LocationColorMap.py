@@ -19,7 +19,7 @@ from trajtracker.utils import color_rgb_to_num, color_num_to_rgb
 
 
 # noinspection PyAttributeOutsideInit
-class LocationColorMap(trajtracker._TTrkObject):
+class LocationColorMap(trajtracker.TTrkObject):
 
     #-------------------------------------------------
     def __init__(self, image, position=None, use_mapping=False, colormap=None):

@@ -36,11 +36,11 @@ class MultiTextBoxTests(unittest.TestCase):
         mtb.text = None
 
     def test_set_text_invalid(self):
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text='hi'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text=5))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text=[5]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text=[None]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text='hi'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text=5))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text=[5]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text=[None]))
 
     #---------------------------------------------------
     def test_set_text_font(self):
@@ -50,10 +50,10 @@ class MultiTextBoxTests(unittest.TestCase):
         mtb.text_font = None
 
     def test_set_text_font_invalid(self):
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_font=5))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_font=[5]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_font=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_font=[None]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_font=5))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_font=[5]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_font=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_font=[None]))
 
     #---------------------------------------------------
     def test_set_text_size(self):
@@ -63,10 +63,10 @@ class MultiTextBoxTests(unittest.TestCase):
         mtb.text_size = None
 
     def test_set_text_size_invalid(self):
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_size='a'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_size=['a']))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_size=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_size=[None]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_size='a'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_size=['a']))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_size=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_size=[None]))
 
     #---------------------------------------------------
     def test_set_text_bold(self):
@@ -75,11 +75,11 @@ class MultiTextBoxTests(unittest.TestCase):
         rsvp.text_bold = True, True
 
     def test_set_text_bold_invalid(self):
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_bold=None))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_bold='a'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_bold=['a']))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_bold=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_bold=[None]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_bold=None))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_bold='a'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_bold=['a']))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_bold=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_bold=[None]))
 
     #---------------------------------------------------
     def test_set_text_italic(self):
@@ -88,11 +88,11 @@ class MultiTextBoxTests(unittest.TestCase):
         rsvp.text_italic = True, True
 
     def test_set_text_italic_invalid(self):
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_italic=None))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_italic='a'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_italic=['a']))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_italic=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_italic=[None]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_italic=None))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_italic='a'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_italic=['a']))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_italic=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_italic=[None]))
 
     #---------------------------------------------------
     def test_set_text_underline(self):
@@ -101,11 +101,11 @@ class MultiTextBoxTests(unittest.TestCase):
         rsvp.text_underline = True, True
 
     def test_set_text_underline_invalid(self):
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_underline=None))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_underline='a'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_underline=['a']))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_underline=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_underline=[None]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_underline=None))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_underline='a'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_underline=['a']))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_underline=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_underline=[None]))
 
     #---------------------------------------------------
     def test_set_text_colour(self):
@@ -115,10 +115,10 @@ class MultiTextBoxTests(unittest.TestCase):
         rsvp.text_colour = None
 
     def test_set_text_colour_invalid(self):
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_colour='a'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_colour=['a']))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_colour=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(text_colour=[None]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_colour='a'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_colour=['a']))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_colour=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(text_colour=[None]))
 
     #---------------------------------------------------
     def test_set_background_colour(self):
@@ -128,10 +128,10 @@ class MultiTextBoxTests(unittest.TestCase):
         rsvp.background_colour = None
 
     def test_set_background_colour_invalid(self):
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(background_colour='a'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(background_colour=['a']))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(background_colour=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(background_colour=[None]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(background_colour='a'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(background_colour=['a']))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(background_colour=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(background_colour=[None]))
 
     #---------------------------------------------------
     def test_set_size(self):
@@ -141,14 +141,14 @@ class MultiTextBoxTests(unittest.TestCase):
         rsvp.size = None
 
     def test_set_size_invalid(self):
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=(1,)))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=('a', 'b')))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size='a'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=['a']))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=[(1,)]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=[('a', 'b')]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(size=[None]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(size=(1,)))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(size=('a', 'b')))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(size='a'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(size=['a']))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(size=[(1,)]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(size=[('a', 'b')]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(size=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(size=[None]))
 
     #---------------------------------------------------
     def test_set_position(self):
@@ -158,14 +158,14 @@ class MultiTextBoxTests(unittest.TestCase):
         rsvp.position = None
 
     def test_set_position_invalid(self):
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=(1,)))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=('a', 'b')))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position='a'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=['a']))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=[(1,)]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=[('a', 'b')]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(position=[None]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(position=(1,)))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(position=('a', 'b')))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(position='a'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(position=['a']))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(position=[(1,)]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(position=[('a', 'b')]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(position=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(position=[None]))
 
     #==============================================================================
     #   Configure RSVP properties
@@ -178,12 +178,12 @@ class MultiTextBoxTests(unittest.TestCase):
         rsvp.onset_time = None
 
     def test_set_onset_time_invalid(self):
-        self.assertRaises(ValueError, lambda: MultiTextBoxDbg(onset_time=[-5]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(onset_time=5))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(onset_time='hi'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(onset_time=['hi']))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(onset_time=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(onset_time=[None]))
+        self.assertRaises(trajtracker.ValueError, lambda: MultiTextBoxDbg(onset_time=[-5]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(onset_time=5))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(onset_time='hi'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(onset_time=['hi']))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(onset_time=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(onset_time=[None]))
 
     #---------------------------------------------------
     def test_set_duration(self):
@@ -193,12 +193,12 @@ class MultiTextBoxTests(unittest.TestCase):
         rsvp.duration = None
 
     def test_set_duration_invalid(self):
-        self.assertRaises(ValueError, lambda: MultiTextBoxDbg(duration=[-5]))
-        self.assertRaises(ValueError, lambda: MultiTextBoxDbg(duration=[0]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(duration='hi'))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(duration=['hi']))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(duration=[]))
-        self.assertRaises(TypeError, lambda: MultiTextBoxDbg(duration=[None]))
+        self.assertRaises(trajtracker.ValueError, lambda: MultiTextBoxDbg(duration=[-5]))
+        self.assertRaises(trajtracker.ValueError, lambda: MultiTextBoxDbg(duration=[0]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(duration='hi'))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(duration=['hi']))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(duration=[]))
+        self.assertRaises(trajtracker.TypeError, lambda: MultiTextBoxDbg(duration=[None]))
 
     #==============================================================================
     #   Validation function for RSVP properties
@@ -224,65 +224,65 @@ class MultiTextBoxTests(unittest.TestCase):
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_text_font(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_font=None)._validate())
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_font=('A', 'B'))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_font=None)._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_font=('A', 'B'))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_text_size(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_size=None)._validate())
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_size=(1,2))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_size=None)._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_size=(1,2))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_text_bold(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_bold=(True,True))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_bold=(True,True))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_text_italic(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_italic=(True,True))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_italic=(True,True))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_text_underline(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_underline=(True,True))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_underline=(True,True))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_justification(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_justification=None)._validate())
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_justification=('center', 'center'))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_justification=None)._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_justification=('center', 'center'))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_text_colour(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_colour=None)._validate())
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(text_colour=((1, 2, 3), ))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_colour=None)._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(text_colour=((1, 2, 3), ))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_background_colour(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(background_colour=None)._validate())
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(background_colour=((1, 2, 3), ))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(background_colour=None)._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(background_colour=((1, 2, 3), ))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_size(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(size=None)._validate())
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(size=((10, 10), ))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(size=None)._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(size=((10, 10), ))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_position(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(position=None)._validate())
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(position=((10, 10), ))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(position=None)._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(position=((10, 10), ))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_duration(self):
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(duration=None)._validate())
-        self.assertRaises(ValueError, lambda: self._create_good_rsvp(duration=(10, 10))._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(duration=None)._validate())
+        self.assertRaises(trajtracker.ValueError, lambda: self._create_good_rsvp(duration=(10, 10))._validate())
 
     #==============================================================================
     #   Working without event manager

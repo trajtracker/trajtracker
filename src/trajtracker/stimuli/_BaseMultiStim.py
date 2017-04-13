@@ -20,7 +20,7 @@ from trajtracker.events import TRIAL_INITIALIZED, TRIAL_ENDED
 
 
 # noinspection PyProtectedMember
-class BaseMultiStim(trajtracker._TTrkObject):
+class BaseMultiStim(trajtracker.TTrkObject):
 
 
     def __init__(self, onset_time=None, duration=None, last_stimulus_remains=False):
@@ -204,7 +204,7 @@ class BaseMultiStim(trajtracker._TTrkObject):
         multiple_values = False
 
         if value is None and not allow_none:
-                raise TypeError("trajtracker error: {:}.{:} cannot be set to None".format(
+                raise trajtracker.TypeError("trajtracker error: {:}.{:} cannot be set to None".format(
                         type(self).__name__, prop_name))
 
         if value is not None:
@@ -212,7 +212,7 @@ class BaseMultiStim(trajtracker._TTrkObject):
             multiple_values = self._is_multiple_values(value, prop_type)
             if multiple_values:
                 if len(value) == 0:
-                    raise TypeError("trajtracker error: {:}.{:} cannot be set to an empty list".format(
+                    raise trajtracker.TypeError("trajtracker error: {:}.{:} cannot be set to an empty list".format(
                             type(self).__name__, prop_name))
                 for v in value:
                     _u.validate_attr_type(self, prop_name, v, prop_type)
@@ -220,7 +220,7 @@ class BaseMultiStim(trajtracker._TTrkObject):
             elif allow_single_value:
                 _u.validate_attr_type(self, prop_name, value, prop_type, none_allowed=True)
             else:
-                raise TypeError("trajtracker error: {:}.{:} must be set to a list of values; a single {:} is invalid".format(
+                raise trajtracker.TypeError("trajtracker error: {:}.{:} must be set to a list of values; a single {:} is invalid".format(
                     type(self).__name__, prop_name, prop_type.__name__ if isinstance(prop_type, type) else prop_type))
 
         setattr(self, "_" + prop_name, value)

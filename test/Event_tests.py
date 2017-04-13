@@ -1,5 +1,6 @@
 import unittest
 
+import trajtracker
 
 from trajtracker.events import Event
 
@@ -23,7 +24,7 @@ class EventTests(unittest.TestCase):
 
 
     def test_negative_offset(self):
-        self.assertRaises(ValueError, lambda: Event("a") + (-3))
+        self.assertRaises(trajtracker.ValueError, lambda: Event("a") + (-3))
 
 
     #===============================================
@@ -47,15 +48,15 @@ class EventTests(unittest.TestCase):
 
 
     def test_parse_bad_id(self):
-        self.assertRaises(ValueError, lambda: Event.parse(" {} "))
+        self.assertRaises(trajtracker.ValueError, lambda: Event.parse(" {} "))
 
 
     def test_parse_bad_offset(self):
-        self.assertRaises(ValueError, lambda: Event.parse(" a + b "))
+        self.assertRaises(trajtracker.ValueError, lambda: Event.parse(" a + b "))
 
 
     def test_parse_bad_format(self):
-        self.assertRaises(ValueError, lambda: Event.parse(" a - 3 "))
+        self.assertRaises(trajtracker.ValueError, lambda: Event.parse(" a - 3 "))
 
 
 

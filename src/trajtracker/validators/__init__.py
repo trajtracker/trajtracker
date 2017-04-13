@@ -9,7 +9,7 @@ TrajTracker - validators package
 
 import enum
 
-from trajtracker import BadFormatError
+from trajtracker import BadFormatError, TypeError
 
 ValidationAxis = enum.Enum('ValidationAxis', 'x y xy')
 

@@ -12,7 +12,7 @@ import trajtracker
 import trajtracker._utils as _u
 
 
-class StimulusAnimator(trajtracker._TTrkObject):
+class StimulusAnimator(trajtracker.TTrkObject):
 
 
     def __init__(self, animated_object=None, trajectory_generator=None, position_shift=None):

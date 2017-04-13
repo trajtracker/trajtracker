@@ -17,7 +17,7 @@ import trajtracker._utils as _u
 from trajtracker.misc import nvshapes
 
 
-class StartPoint(trajtracker._TTrkObject):
+class StartPoint(trajtracker.TTrkObject):
 
     default_exit_area_size = 100
 
@@ -106,6 +106,12 @@ class StartPoint(trajtracker._TTrkObject):
     #==========================================================================
     #   Runtime API
     #==========================================================================
+
+
+    #-----------------------------------------------------------------
+    @property
+    def state(self):
+        return self._state
 
 
     #-----------------------------------------------------------------

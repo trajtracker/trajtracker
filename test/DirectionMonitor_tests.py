@@ -1,6 +1,8 @@
 import unittest
 
 import numpy as np
+
+import trajtracker
 from trajtracker.movement import DirectionMonitor
 
 
@@ -93,14 +95,14 @@ class DirectionMonitorTests(unittest.TestCase):
 
         dm.update_xyt(0, 0, 0)
 
-        self.assertRaises(TypeError, lambda: dm.update_xyt("", 0, 0))
-        self.assertRaises(TypeError, lambda: dm.update_xyt(None, 0, 0))
+        self.assertRaises(trajtracker.TypeError, lambda: dm.update_xyt("", 0, 0))
+        self.assertRaises(trajtracker.TypeError, lambda: dm.update_xyt(None, 0, 0))
 
-        self.assertRaises(TypeError, lambda: dm.update_xyt(0, "", 0))
-        self.assertRaises(TypeError, lambda: dm.update_xyt(0, None, 0))
+        self.assertRaises(trajtracker.TypeError, lambda: dm.update_xyt(0, "", 0))
+        self.assertRaises(trajtracker.TypeError, lambda: dm.update_xyt(0, None, 0))
 
-        self.assertRaises(TypeError, lambda: dm.update_xyt(0, 0, ""))
-        self.assertRaises(TypeError, lambda: dm.update_xyt(0, 0, None))
+        self.assertRaises(trajtracker.TypeError, lambda: dm.update_xyt(0, 0, ""))
+        self.assertRaises(trajtracker.TypeError, lambda: dm.update_xyt(0, 0, None))
 
 
 

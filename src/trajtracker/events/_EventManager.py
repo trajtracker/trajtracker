@@ -18,7 +18,7 @@ from trajtracker.events import Event
 
 
 # noinspection PyProtectedMember
-class EventManager(trajtracker._TTrkObject):
+class EventManager(trajtracker.TTrkObject):
 
 
     #======================================================================================

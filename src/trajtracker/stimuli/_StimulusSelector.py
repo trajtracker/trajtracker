@@ -14,7 +14,7 @@ import trajtracker._utils as _u
 
 
 # noinspection PyProtectedMember
-class StimulusSelector(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
+class StimulusSelector(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
 
     def __init__(self, stimuli=()):
         """

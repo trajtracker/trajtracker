@@ -21,19 +21,19 @@ class SpeedMonitorTests(unittest.TestCase):
         try:
             m.calculation_interval = ""
             self.fail()
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
         try:
             m.calculation_interval = None
             self.fail()
-        except TypeError:
+        except trajtracker.TypeError:
             pass
 
         try:
             m.calculation_interval = -1
             self.fail()
-        except ValueError:
+        except trajtracker.ValueError:
             pass
 
 

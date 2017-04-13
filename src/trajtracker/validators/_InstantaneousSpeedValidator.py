@@ -19,7 +19,7 @@ from trajtracker.validators import ValidationAxis, ExperimentError
 
 
 # noinspection PyAttributeOutsideInit
-class InstantaneousSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
+class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
     err_too_slow = "TooSlowInstantaneous"
     err_too_fast = "TooFast"
@@ -39,7 +39,7 @@ class InstantaneousSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
         :param calculation_interval: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.calculation_interval`
         """
 
-        trajtracker._TTrkObject.__init__(self)
+        trajtracker.TTrkObject.__init__(self)
         EnabledDisabledObj.__init__(self, enabled=enabled)
 
         if movement_monitor is None:

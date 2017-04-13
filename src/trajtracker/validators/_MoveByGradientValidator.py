@@ -16,7 +16,7 @@ from trajtracker.data import fromXML
 
 
 
-class MoveByGradientValidator(trajtracker._TTrkObject, EnabledDisabledObj):
+class MoveByGradientValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
     max_irrelevant_color_value = 10
     cyclic_ratio = 5
@@ -36,7 +36,7 @@ class MoveByGradientValidator(trajtracker._TTrkObject, EnabledDisabledObj):
         :param max_valid_back_movement: See :attr:`~trajtracker.validators.MoveByGradientValidator.max_valid_back_movement`
         :param cyclic: See :attr:`~trajtracker.validators.MoveByGradientValidator.cyclic`
         """
-        trajtracker._TTrkObject.__init__(self)
+        trajtracker.TTrkObject.__init__(self)
         EnabledDisabledObj.__init__(self, enabled=enabled)
 
         self._lcm = LocationColorMap(image, position=position, use_mapping=True, colormap="RGB")

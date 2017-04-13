@@ -18,7 +18,7 @@ import trajtracker._utils as _u
 import trajtracker.utils as u
 
 
-class DirectionMonitor(trajtracker._TTrkObject):
+class DirectionMonitor(trajtracker.TTrkObject):
 
     Units = Enum("Units", "Degrees Radians")
 

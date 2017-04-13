@@ -15,7 +15,7 @@ import trajtracker._utils as _u
 from trajtracker.data import fromXML
 
 
-class LineTrajectoryGenerator(trajtracker._TTrkObject):
+class LineTrajectoryGenerator(trajtracker.TTrkObject):
 
     #---------------------------------------------------------------
     def __init__(self, start_point=None, end_point=None, duration=None, return_to_start=False, cyclic=False):

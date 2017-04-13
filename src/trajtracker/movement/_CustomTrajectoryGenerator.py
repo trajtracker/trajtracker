@@ -15,7 +15,7 @@ import trajtracker
 import trajtracker._utils as _u
 
 
-class CustomTrajectoryGenerator(trajtracker._TTrkObject):
+class CustomTrajectoryGenerator(trajtracker.TTrkObject):
 
     _all_ok = "OK"
 
@@ -308,8 +308,8 @@ class CustomTrajectoryGenerator(trajtracker._TTrkObject):
             for traj_id in self._trajectories:
                 t0 = self._trajectories[traj_id]['times'][0]
                 if t0 > 0:
-                    self._validation_err = ValueError(
-                        ("trajtracker error: invalid trajectory configuration in {:}: when cyclic=True " +
+                    self._validation_err = trajtracker.ValueError(
+                        ("invalid trajectory configuration in {:}: when cyclic=True " +
                         "all trajectories must start from time=0, but trajectory '{:}' starts from " +
                         "time={:}").format(type(self).__name__, traj_id, t0))
                     raise self._validation_err

@@ -41,7 +41,7 @@ def _parse_xml_milestones(xml):
 
 
 # noinspection PyAttributeOutsideInit
-class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
+class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
     err_too_slow = "TooSlowGlobal"
 
@@ -89,7 +89,7 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
         :type show_guide: bool
         """
 
-        trajtracker._TTrkObject.__init__(self)
+        trajtracker.TTrkObject.__init__(self)
         EnabledDisabledObj.__init__(self, enabled=enabled)
 
         self.axis = axis
@@ -551,7 +551,7 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 # Show a moving line to visualize the validator's speed
 #==========================================================================================
 
-class GlobalSpeedGuide(trajtracker._TTrkObject):
+class GlobalSpeedGuide(trajtracker.TTrkObject):
     """
     This class displays a moving line that visualizes the global speed limit.
 
