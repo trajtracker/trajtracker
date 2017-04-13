@@ -103,5 +103,6 @@ def get_time():
     """
     Get the current time (in seconds).
     This is a wrapper to Expyriment's get_time function
+    :return: float
     """
     return xpy_timer.get_time()
