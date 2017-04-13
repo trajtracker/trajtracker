@@ -27,7 +27,7 @@ if not xpy.misc.is_android_running():
 
 
 #===========================================================================================
-#              Prepare objects
+#              Prepare
 #===========================================================================================
 
 #-- monitor speed & direction
@@ -35,6 +35,7 @@ speed_monitor = ttrk.movement.SpeedMonitor(1)
 direction_monitor = ttrk.movement.DirectionMonitor(min_distance=10, min_angle_change_per_curve=5)
 
 
+#------ Create text boxes for presenting the speed & direction information
 
 screen_width = exp.screen.size[0]
 screen_height = exp.screen.size[1]
@@ -71,6 +72,7 @@ def update_display():
     tb_yspeed.present(clear=False, update=False)
     tb_angle.present(clear=False, update=False)
     tb_curves.present(clear=False)
+
 
 #===========================================================================================
 #              Run the task
