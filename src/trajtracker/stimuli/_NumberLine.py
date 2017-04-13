@@ -375,7 +375,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
         self._log_func_enters("update_xy", [x_coord, y_coord])
 
         if self._last_touched_coord is not None:
-            self._log_func_returns()
+            self._log_func_returns("update_xyt")
             return
 
         #-- Get the relevant coordinates (x or y)
@@ -409,8 +409,7 @@ class NumberLine(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetObj):
             self._last_touched_coord = touch_coord
             self._show_feedback_stim()
 
-        self._log_func_returns()
-
+        self._log_func_returns("update_xyt")
         return None
 
     #---------------------------------------------------------

@@ -72,11 +72,11 @@ class TrajectoryTracker(trajtracker._TTrkObject, EnabledDisabledObj):
         :param time0: ignored
         """
 
+        self._log_func_enters("reset", [time0])
+
         self._trajectory = dict(x=[], y=[], time=[])
         self._last_coord = None
 
-        if self._log_level:
-            self._log_write("TrajectoryTracker,Reset")
 
     #----------------------------------------------------
     def update_xyt(self, x_coord, y_coord, time_in_trial):
@@ -87,10 +87,7 @@ class TrajectoryTracker(trajtracker._TTrkObject, EnabledDisabledObj):
         if not self._enabled:
             return
 
-        _u.validate_func_arg_type(self, "update_xyt", "x_coord", x_coord, numbers.Number)
-        _u.validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number)
-        _u.validate_func_arg_type(self, "update_xyt", "time", time_in_trial, numbers.Number)
-        _u.validate_func_arg_not_negative(self, "update_xyt", "time_in_trial", time_in_trial)
+        _u.update_xyt_validate_and_log(x_coord, y_coord, time_in_trial)
 
         if not self._track_if_no_movement and len(self._trajectory['x']) > 0 and  \
             self._trajectory['x'][-1] == x_coord and \

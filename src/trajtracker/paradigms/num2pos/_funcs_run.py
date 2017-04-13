@@ -7,6 +7,7 @@ Functions to support the number-to-position paradigm
 
 import numbers
 import random
+import csv
 from enum import Enum
 
 import expyriment as xpy
@@ -30,6 +31,7 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 # todo: support image target (+RSVP), arrow target
 # todo: escape button
 # todo: optionally get subject name and initials
+# todo: StartPoint should require LIFTING the finger before touching down (make this optional?)
 
 # todo: delete XML support?
 # todo: organize documentation. Have a "using this class" section for each complex class.
@@ -137,7 +139,7 @@ def run_trial(exp_info, config, trial):
             return RunTrialResult.Failed
 
         #-- Inform relevant objects (validators, trajectory tracker, event manager, etc.) of the progress
-        err = update_movement(exp_info)
+        err = update_movement(exp_info, trial)
         if err is not None:
             trial_failed(err, exp_info, trial)
             return RunTrialResult.Failed
@@ -271,7 +273,7 @@ def update_target(exp_info, trial):
 
 
 #------------------------------------------------
-def update_movement(exp_info):
+def update_movement(exp_info, trial):
     """
     Update the trajectory-sensitive objects about the mouse/finger movement
         
@@ -316,7 +318,7 @@ def trial_failed(err, exp_info, trial):
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
 
     exp_info.errmsg_textbox.unload()
-    exp_info.errmsg_textbox.text = err
+    exp_info.errmsg_textbox.text = err.message
     exp_info.errmsg_textbox.visible = True
 
     exp_info.sound_err.play()
@@ -381,41 +383,42 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code):
     :return: 
     """
 
-    exp_info.stimuli["speed_guide"].activate(None)  # todo:
     exp_info.stimuli.present()
 
-    endpoint = exp_info.numberline.last_touched_value
-    t_move = trial.results['time_started_moving'] if 'time_started_moving' in trial.results else -1
-    t_target = trial.results['time_target_shown'] if 'time_target_shown' in trial.results else -1
+    if exp_info.config.save_results:
 
-    if time_in_trial == 0 or 'time_target_shown' not in trial.results:
-        movement_time = 0
-    else:
-        movement_time = time_in_trial - trial.results['time_target_shown']
+        endpoint = exp_info.numberline.last_touched_value
+        t_move = trial.results['time_started_moving'] if 'time_started_moving' in trial.results else -1
+        t_target = trial.results['time_target_shown'] if 'time_target_shown' in trial.results else -1
 
-    #-- Save data to trials file
-    trial_out_row = {
-        'trialNum':             trial.trial_num,
-        'LineNum':              trial[ttrk.data.CSVLoader.FLD_LINE_NUM],
-        'target':               trial.target,
-        'presentedTarget':      trial['target'], #todo: what about target_text? what about displaying images?
-        'endPoint':             "" if endpoint is None else "{:.3g}".format(endpoint),
-        'status':               success_err_code,
-        'movementTime':         "{:.3g}".format(movement_time),
-        'timeInSession':        "{:.3g}".format(trial.start_time - exp_info.session_start_time),
-        'timeUntilFingerMoved': "{:.3g}".format(t_move),
-        'timeUntilTarget':      "{:.3g}".format(t_target),
-    }
+        if time_in_trial == 0 or 'time_target_shown' not in trial.results:
+            movement_time = 0
+        else:
+            movement_time = time_in_trial - trial.results['time_target_shown']
 
-    if exp_info.trials_file_writer is None:
-        fields = ['trialNum', 'LineNum', 'target', 'presentedTarget', 'status', 'endPoint', 'movementTime',
-                  'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']
-        exp_info.trials_out_fp = open(exp_info.trials_out_filename, 'w')
-        exp_info.trials_file_writer = csv.DictWriter(exp_info.trials_out_fp, fields)
-        exp_info.trials_file_writer.writeheader()
+        #-- Save data to trials file
+        trial_out_row = {
+            'trialNum':             trial.trial_num,
+            'LineNum':              trial.file_line_num,
+            'target':               trial.target,
+            'presentedTarget':      trial.csv_data['target'], #todo: what about target_text? what about displaying images?
+            'endPoint':             "" if endpoint is None else "{:.3g}".format(endpoint),
+            'status':               success_err_code,
+            'movementTime':         "{:.3g}".format(movement_time),
+            'timeInSession':        "{:.3g}".format(trial.start_time - exp_info.session_start_time),
+            'timeUntilFingerMoved': "{:.3g}".format(t_move),
+            'timeUntilTarget':      "{:.3g}".format(t_target),
+        }
 
-    exp_info.trials_file_writer.writerow(trial_out_row)
-    exp_info.trials_out_fp.flush()
+        if exp_info.trials_file_writer is None:
+            fields = ['trialNum', 'LineNum', 'target', 'presentedTarget', 'status', 'endPoint', 'movementTime',
+                      'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']
+            exp_info.trials_out_fp = open(exp_info.trials_out_filename, 'w')
+            exp_info.trials_file_writer = csv.DictWriter(exp_info.trials_out_fp, fields)
+            exp_info.trials_file_writer.writeheader()
+
+        exp_info.trials_file_writer.writerow(trial_out_row)
+        exp_info.trials_out_fp.flush()
 
 
 #------------------------------------------------

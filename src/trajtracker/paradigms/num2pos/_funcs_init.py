@@ -31,6 +31,7 @@ def create_experiment_objects(exp_info, config):
     create_start_point(exp_info, config)
     create_textbox_target(exp_info, config)
     create_errmsg_textbox(exp_info)
+    create_traj_tracker(exp_info)
     create_validators(exp_info, direction_validator=True, global_speed_validator=True,
                       inst_speed_validator=True, zigzag_validator=True, config=config)
     create_sounds(exp_info, config)
@@ -113,6 +114,9 @@ def create_start_point(exp_info, config):
                                                         colour=config.start_point_colour)
 
     exp_info.stimuli.add(exp_info.start_point.start_rect, "start_point")
+    exp_info.start_point.log_level = ttrk._TTrkObject.log_trace #todo
+    print("START area = {:}, EXIT area = {:}".format(exp_info.start_point.start_rect,
+                                                     exp_info.start_point._start_point.exit_area))
 
     exp_info.exp_data['TrajZeroCoordX'] = start_area_position[0]
     exp_info.exp_data['TrajZeroCoordY'] = start_area_position[1] + start_area_size[1]/2
@@ -120,15 +124,14 @@ def create_start_point(exp_info, config):
 
 
 #----------------------------------------------------------------
-def create_traj_tracker(exp_info, config):
+def create_traj_tracker(exp_info):
     """
     Create the object that tracks the trajectory
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type config: trajtracker.paradigms.num2pos.Config
     """
 
-    if not config.save_results:
+    if not exp_info.config.save_results:
         return
 
     curr_time = time.strftime("%Y-%m-%d_%H-%M", time.localtime())

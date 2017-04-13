@@ -96,3 +96,8 @@ class Rectangle(object):
         value = value % 360
         self._rotation = value
         self._rotation_radians = value / 180 * np.pi
+
+
+    #-------------------------------------------------
+    def __str__(self):
+        return "NV-Rectangle(size={:}, position={:}, rotation={:})".format(self._size, self._position, self._rotation)

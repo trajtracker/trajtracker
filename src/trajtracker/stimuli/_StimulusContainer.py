@@ -89,3 +89,6 @@ class StimulusContainer(trajtracker._TTrkObject, trajtracker.events.OnsetOffsetO
     #----------------------------------------------------------
     def __getitem__(self, item):
         return self._stimuli[item]['stimulus']
+
+    def __str__(self):
+        return "{:}[{:}]".format(_u.get_type_name(self), ",".join([str(k) for k in self._stimuli.keys()]))

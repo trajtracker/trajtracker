@@ -119,6 +119,7 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
         self._time0 = None
         self.movement_started_event = None
+        self.movement_ended_event = trajtracker.events.TRIAL_ENDED
         self._registered = False
 
 
@@ -134,11 +135,18 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
             raise trajtracker.InvalidStateError(
                 "{:} cannot be registered twice to an event manager".format(_u.get_type_name(self)))
 
-        def callback(time_in_trial, time_in_session):
+        def callback_start(time_in_trial, time_in_session):
             self.movement_started(time_in_trial)
 
-        event_manager.register_operation(self._movement_started_event, callback, recurring=True,
+        event_manager.register_operation(self._movement_started_event, callback_start, recurring=True,
                                          description="{:}.movement_started()".format(_u.get_type_name(self)))
+
+        def callback_end(t1, t2):
+            if self._show_guide:
+                self._guide.stimulus.visible = False
+
+        event_manager.register_operation(self._movement_ended_event, callback_end, recurring=True,
+                                         description="{:}: hide speed guide".format(_u.get_type_name(self)))
 
 
     #========================================================================
@@ -164,6 +172,9 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
             raise ValueError(_u.ErrMsg.invalid_method_arg_type(self.__class__, "reset", "numeric", "time", time))
 
         self._time0 = time
+
+        if self._show_guide:
+            self._guide.stimulus.visible = True
 
 
     #----------------------------------------------------------------------------------
@@ -431,13 +442,32 @@ class GlobalSpeedValidator(trajtracker._TTrkObject, EnabledDisabledObj):
 
     @movement_started_event.setter
     def movement_started_event(self, value):
-        _u.validate_attr_type(self, "time0_event", value, trajtracker.events.Event, none_allowed=True)
+        _u.validate_attr_type(self, "movement_started_event", value, trajtracker.events.Event, none_allowed=True)
         if self._registered:
             raise trajtracker.InvalidStateError(
-                "{:}.movement_started cannot be changed after registering this object to the event manager".format(
+                "{:}.movement_started_event cannot be changed after registering this object to the event manager".format(
                     _u.get_type_name(self)))
 
         self._movement_started_event = value
+
+    #-------------------------------------------------------------
+    @property
+    def movement_ended_event(self):
+        """
+        An event that is dispatched when movement ends (by default: end of trial).
+        This triggers hiding the guide line.
+        """
+        return self._movement_ended_event
+
+    @movement_ended_event.setter
+    def movement_ended_event(self, value):
+        _u.validate_attr_type(self, "movement_ended_event", value, trajtracker.events.Event)
+        if self._registered:
+            raise trajtracker.InvalidStateError(
+                "{:}.movement_ended_event cannot be changed after registering this object to the event manager".format(
+                    _u.get_type_name(self)))
+
+        self._movement_ended_event = value
 
     #-------------------------------------------------------------
     @property

@@ -29,11 +29,12 @@ class RectStartPoint(ttrk._TTrkObject):
         super(RectStartPoint, self).__init__()
 
         self._preloaded = False
+        self._start_rect = None
+
         self.size = size
         self.position = position
         self.rotation = rotation
         self.colour = colour
-        self._start_rect = None
 
 
     #-------------------------------------------------
@@ -49,10 +50,14 @@ class RectStartPoint(ttrk._TTrkObject):
         before the experiment starts, because the method is more time-consuming than other methods. 
         """
 
+        if self._preloaded:
+            return
+
         self._start_rect = self._create_start_area()
         exit_area = self._create_exit_area()
 
         self._start_point = ttrk.movement.StartPoint(self._start_rect, exit_area=exit_area)
+        self._start_point.log_level = self.log_level
 
         self._preloaded = True
 
@@ -70,8 +75,8 @@ class RectStartPoint(ttrk._TTrkObject):
         # -- Find position of the exit area, considering the rotation
         r = (EXIT_AREA_HEIGHT + self._size[1]) / 2
         rotation_rad = self._rotation / 360 * np.pi * 2
-        x = -np.sin(-rotation_rad) * r
-        y = np.cos(-rotation_rad) * r
+        x = self._position[0] + -np.sin(-rotation_rad) * r
+        y = self._position[1] + np.cos(-rotation_rad) * r
 
         exit_area_width = max(self._size[0] * 2, EXIT_AREA_HEIGHT)
 
@@ -238,3 +243,10 @@ class RectStartPoint(ttrk._TTrkObject):
         self._colour = value
 
         self._log_property_changed("colour")
+
+
+    #--------------------------------------------------------------------------
+    def _set_log_level(self, level):
+        self._log_level = level
+        if "_start_point" in dir(self):
+            self._start_point.log_level = level

@@ -36,3 +36,7 @@ class Circle(object):
     @property
     def position(self):
         return self.x, self.y
+
+    #-------------------------------------------------
+    def __str__(self):
+        return "NV-Circle(radius={:}, position={:})".format(self.radius, (self.x, self.y))

@@ -54,6 +54,10 @@ class _TTrkObject(object):
         if level is None or not isinstance(level, int) or level < _TTrkObject.log_trace or level > _TTrkObject.log_none:
             raise ValueError("trajtracker error: invalid log_level({:})".format(level))
 
+        self._set_log_level(level)
+
+
+    def _set_log_level(self, level):
         self._log_level = level
 
 
@@ -111,9 +115,9 @@ class _TTrkObject(object):
     #-------------------------------------------------
     # Write to log when function returns a value
     #
-    def _log_func_returns(self, retval=None):
+    def _log_func_returns(self, func_name, retval=None):
         if self._should_log(self.log_trace):
-            self._log_write("func_returns,{:}".format(retval), prepend_self=True)
+            self._log_write("func_returns,{:},{:}".format(func_name, retval), prepend_self=True)
 
 
 

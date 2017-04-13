@@ -57,3 +57,8 @@ class Sector(object):
     @property
     def position(self):
         return self.x, self.y
+
+
+    def __str__(self):
+        return "NV-Sector(radius={:}, position={:}, angles={:} to {:})".format(
+            self.radius, (self.x, self.y), self.from_angle, self.to_angle)

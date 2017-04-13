@@ -28,7 +28,7 @@ class ExperimentInfo(object):
         self._target = None
         self._start_point = None
         self._errmsg_box = None
-        self._trajtracker = []
+        self._trajtracker = None
         self._trajectory_sensitive_objects = []
 
         self.stimuli = ttrk.stimuli.StimulusContainer()
