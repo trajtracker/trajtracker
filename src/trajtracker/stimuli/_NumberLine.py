@@ -387,6 +387,8 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
             touch_coord = y_coord - self._mid_y
 
         distance = line_coord - mouse_coord  # positive value: mouse coord < line coord
+        if self._should_log(self.log_trace):
+            self._log_write("Touch distance from numberline: {:}".format(distance), True)
 
         if not self._touch_directioned:
             #-- Direction doesn't matter. Just check the distance from the number line.
@@ -396,6 +398,12 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
             #-- Finger must approach the line from its initial direction, which was not set: set it now
             self._initial_mouse_dir = np.sign(distance)
             touched = False
+            if self._should_log(self.log_debug):
+                if self.orientation == NumberLine.Orientation.Horizontal:
+                    sdir = "below" if self._initial_mouse_dir == 1 else "above"
+                else:
+                    sdir = "left of" if self._initial_mouse_dir == 1 else "right of"
+                self._log_write("Screen was initially touched {:} of the number line, time_in_trial={:}".format(sdir, time_in_trial), True)
 
         else:
             # Fix sign of distance, such that distance>0 means that the finger is still approaching the number line
@@ -406,6 +414,8 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
         if touched:
             self._last_touched_coord = touch_coord
             self._show_feedback_stim()
+            self._log_write_if(self.log_info, "The number line was touched at {:}, time_in_trial={:}".format(
+                self.last_touched_value, time_in_trial))
 
         self._log_func_returns("update_xyt")
         return None

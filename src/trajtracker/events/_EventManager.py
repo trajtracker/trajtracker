@@ -93,7 +93,9 @@ class EventManager(trajtracker.TTrkObject):
 
         #-- Dispatch base events
         if event.extends is not None:
-            self.dispatch_event(event.extends, time_in_trial, time_in_session)
+            self._dispatch_event(event.extends, time_in_trial, time_in_session)
+
+        self._log_write_if(self.log_info, "Dispatching event {:}, time_in_session={:}".format(event.event_id, time_in_session))
 
         if event.event_id not in self._operations_by_event:
             return
@@ -241,7 +243,7 @@ class EventManager(trajtracker.TTrkObject):
 
 
     #--------------------------------------------------------------
-    def unregister_operation(self, operation_ids):
+    def unregister_operation(self, operation_ids, warn_if_op_missing=True):
         """
         Unregister a previously-registered operation.
 
@@ -249,6 +251,7 @@ class EventManager(trajtracker.TTrkObject):
         this method but :func:`~trajtracker.events.EventManager.register`.
 
         :param operation_ids: The ID returned from :func:`~trajtracker.events.EventManager.register_operation`.
+        :param warn_if_op_missing: Print a warning to log if an operation ID is not registered in the event manager
         """
 
         if isinstance(operation_ids, int):
@@ -266,8 +269,8 @@ class EventManager(trajtracker.TTrkObject):
                         op_id,
                         op_info['event']), True)
                 self._remove_operation(op_id, True)
-            else:
-                self._log_write_if(self.log_warn, "operation {:} is not in the event manager - not removed", True)
+            elif warn_if_op_missing:
+                self._log_write_if(self.log_warn, "operation {:} is not in the event manager - not removed".format(op_id), True)
 
     #======================================================================================
     # Internal stuff

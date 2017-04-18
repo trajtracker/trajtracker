@@ -16,3 +16,7 @@ class Arrow(xpy.stimuli.Shape):
         self.add_vertices([(10, 20), (-6, 0), (0, 20), (-9, 0), (0, -20), (-6, 0)])
         self.colour = colour
 
+
+    @property
+    def size(self):
+        return (20, 40)

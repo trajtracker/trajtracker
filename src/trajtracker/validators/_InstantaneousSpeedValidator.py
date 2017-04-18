@@ -23,11 +23,13 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
     err_too_slow = "TooSlowInstantaneous"
     err_too_fast = "TooFast"
+    err_stopped = "FingerStopped"
     arg_speed = 'speed'  # ExperimentError argument: the speed observed
+    arg_stopped_duration = "stopped_duration"
 
     #-----------------------------------------------------------------------------------
     def __init__(self, axis=ValidationAxis.y, enabled=True, min_speed=None, max_speed=None,
-                 grace_period=0, calculation_interval=0, movement_monitor=None):
+                 max_stop_duration=None, grace_period=0, calculation_interval=0, movement_monitor=None):
         """
         Constructor - invoked when you create a new object by writing InstantaneousSpeedValidator()
 
@@ -35,6 +37,7 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         :param enabled: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.enabled`
         :param min_speed: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.min_speed`
         :param max_speed: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.max_speed`
+        :param max_stop_duration: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.max_stop_duration`
         :param grace_period: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.grace_period`
         :param calculation_interval: See :attr:`~trajtracker.validators.InstantaneousSpeedValidator.calculation_interval`
         """
@@ -54,6 +57,7 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         self.max_speed = max_speed
         self.grace_period = grace_period
         self.calculation_interval = calculation_interval
+        self.max_stop_duration = max_stop_duration
 
         self.reset()
 
@@ -118,6 +122,11 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
             if self._max_speed is not None and speed > self._max_speed:
                 return trajtracker.validators.create_experiment_error(self, self.err_too_fast, "You moved too fast", {self.arg_speed: speed})
 
+            t_stopped = self._speed_monitor.stopped_duration
+            if self._max_stop_duration is not None and t_stopped is not None and t_stopped > self._max_stop_duration:
+                return trajtracker.validators.create_experiment_error(self, self.err_stopped, "Do not stop moving",
+                                                                      {self.arg_stopped_duration: t_stopped})
+
         return None
 
 
@@ -149,6 +158,9 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         """
         The minimal valid instantaneous speed (coords/sec).
         Only positive values are valid. None = minimal speed will not be enforced.
+        
+        If the finger completely stopped moving, speed information is N/A and this validation will not be triggered.
+        To disallow full stops, use :attr:`~trajtracker.validators.InstantaneousSpeedValidator.max_stop_duration`
         """
         return self._min_speed
 
@@ -205,3 +217,20 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
     def calculation_interval(self, value):
         self._speed_monitor.calculation_interval = value
         self._log_property_changed("calculation_interval")
+
+    #-----------------------------------------------------------------------------------
+    @property
+    def max_stop_duration(self):
+        """
+        The maximal allowed duration of a finger/mouse stop in mid-trial
+        
+        :type: Number 
+        """
+        return self._max_stop_duration
+
+    @max_stop_duration.setter
+    def max_stop_duration(self, value):
+        _u.validate_attr_type(self, "max_stop_duration", value, numbers.Number, none_allowed=True)
+        _u.validate_attr_positive(self, "max_stop_duration", value)
+        self._max_stop_duration = value
+        self._log_property_changed("max_stop_duration")

@@ -204,7 +204,7 @@ class MultiTextBoxTests(unittest.TestCase):
     #   Validation function for RSVP properties
     #==============================================================================
 
-    def _create_good_rsvp(self, text=('a', 'b', 'c'), text_font='Arial', text_size=1, text_justification="center",
+    def _create_good_rsvp(self, text=('a', 'b', 'c'), text_font='Arial', text_size=1, text_justification=1,
                         text_colour=(255, 255, 255), background_colour=(0, 0, 0), size=(20, 20), position=(0, 0),
                         text_bold=False, text_italic=False, text_underline=False,
                         onset_time=(0, 1, 2), duration=1, start_event=TRIAL_STARTED):

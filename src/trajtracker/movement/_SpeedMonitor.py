@@ -53,6 +53,8 @@ class SpeedMonitor(trajtracker.TTrkObject):
 
         self._recent_points = []
         self._pre_recent_point = None
+        self._last_moved_time = None
+        self._last_stopped_time = None
         self._time0 = time
 
 
@@ -75,14 +77,25 @@ class SpeedMonitor(trajtracker.TTrkObject):
         if self._time0 is None:
             self._time0 = time
 
-        #-- Find distance to recent coordinate
-        if len(self._recent_points) > 0:
-            last_loc = self._recent_points[-1]
-            if time == last_loc[2]:
-                return
-            distance = np.sqrt((x_coord-last_loc[0]) ** 2 + (y_coord-last_loc[1]) ** 2)
-        else:
+        if len(self._recent_points) == 0:
             distance = 0
+
+        else:
+            #-- Find distance to the last observed coordinate
+            last_loc = self._recent_points[-1]
+            if time <= last_loc[2]:
+                return  # The time did not move forward: ignore this data
+
+            if x_coord == last_loc[0] and y_coord == last_loc[1]:
+                # The coordinates did not change: ignore this data for speed calculation, but remember
+                # for how long the finger is stopped
+                self._last_stopped_time = time
+                return
+
+            distance = np.sqrt((x_coord-last_loc[0]) ** 2 + (y_coord-last_loc[1]) ** 2)
+
+        self._last_moved_time = time
+        self._last_stopped_time = None
 
         self._remove_recent_points_older_than(time - self._calculation_interval)
 
@@ -183,6 +196,20 @@ class SpeedMonitor(trajtracker.TTrkObject):
             return None
         else:
             return self._recent_points[-1][2] - self._pre_recent_point[2]
+
+
+    #-------------------------------------------------------------------------
+    @property
+    def stopped_duration(self):
+        """ 
+        If the finger is stopped, this tells you for how long it's been so.
+        If the finger is moving, or didn't start moving yet, this will return 0.
+        """
+
+        if self._last_stopped_time is None or self._last_moved_time is None:
+            return 0
+        else:
+            return self._last_stopped_time - self._last_moved_time
 
 
     #====================================================================================

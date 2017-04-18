@@ -145,7 +145,7 @@ class DirectionMonitor(trajtracker.TTrkObject):
         #-- Compare the angular acceleration's direction between existing curve and new data
         if curr_curve_direction == self._curr_curve_direction:
 
-            #-- Angular acceleration remained in the same direction: we're still in the same curve
+            #-- Angular acceleration remained in the same direction: we're still in the same curve as before
             self._clear_possible_curve()
 
         else:
@@ -170,6 +170,11 @@ class DirectionMonitor(trajtracker.TTrkObject):
                 self._curr_curve_direction = curr_curve_direction
                 self._curr_curve_start_angle = self._curr_angle
                 self._curr_curve_start_index = len(self._recent_near_coords) - 1
+
+                if self._should_log(self.log_debug):
+                    self._log_write(
+                        "A new curve (a change of {:} degrees was detected, direction={:}, starting at time = {:} s)".format(
+                            change_in_angle_along_curve, curr_curve_direction, self._recent_near_coords[-1][2]), True)
 
                 self._clear_possible_curve()
 
@@ -268,6 +273,8 @@ class DirectionMonitor(trajtracker.TTrkObject):
         _u.validate_attr_not_negative(self, "min_distance", value)
         self._min_distance = value
         self._log_property_changed("min_distance")
+        if value < 20 and self._should_log(self.log_warn):
+            self._log_write("WARNING: min_distance was set to a small value ({:}), this may result in incorrect directions", True)
 
 
     #-------------------------------------

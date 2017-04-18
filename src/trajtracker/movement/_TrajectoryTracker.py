@@ -35,6 +35,7 @@ class TrajectoryTracker(trajtracker.TTrkObject, EnabledDisabledObj):
 
         self.reset()
         self._filename = filename
+        self._out_file_initialized = False
         self.enabled = enabled
         self.track_if_no_movement = track_if_no_movement
 
@@ -135,6 +136,8 @@ class TrajectoryTracker(trajtracker.TTrkObject, EnabledDisabledObj):
         fh.write('trial,time,x,y\n')
         fh.close()
 
+        self._out_file_initialized = True
+
         if self._log_level:
             self._log_write("Trajectory,InitOutputFile,%s" % self._filename)
 
@@ -146,7 +149,7 @@ class TrajectoryTracker(trajtracker.TTrkObject, EnabledDisabledObj):
         :param trial_num:
         :return: The number of rows printed to the file
         """
-        if self._filename is None:
+        if not self._out_file_initialized:
             raise trajtracker.InvalidStateError('TrajectoryTracker.save_to_file() was called before calling init_output_file()')
 
         fh = self._open_file(self._filename, 'a')

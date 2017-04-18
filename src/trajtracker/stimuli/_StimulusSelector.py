@@ -97,13 +97,18 @@ class StimulusSelector(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj
     #--------------------------------------------------
     @property
     def position(self):
-        """ The position of the active stimulus """
+        """ 
+        The position of the active stimulus. When you update this, positions of *all* stimuli will be updated.  
+        """
         s = self.active_stimulus
         return None if s is None else s.position
 
     @position.setter
     def position(self, value):
-        s = self.active_stimulus
-        if s is not None:
+        value = _u.validate_attr_is_coord(self, "position", value, change_none_to_0=True)
+
+        for s in self._stimuli.values():
             s.position = value
-        self._log_property_changed("position")
+
+        if self._should_log(self.log_trace):
+            self._log_write("set_obj_attr,{:}.position,{:}".format(type(self).__name__, value))

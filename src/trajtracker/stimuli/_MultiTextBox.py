@@ -29,7 +29,7 @@ class MultiTextBox(BaseMultiStim):
 
     #----------------------------------------------------
     def __init__(self, text=None, text_font="Arial", text_size=26, text_bold=False, text_italic=False, text_underline=False,
-                 text_justification="center", text_colour=xpy.misc.constants.C_WHITE,
+                 text_justification=1, text_colour=xpy.misc.constants.C_WHITE,
                  background_colour=xpy.misc.constants.C_BLACK, size=None, position=(0, 0),
                  onset_time=None, duration=None, last_stimulus_remains=False,
                  onset_event=None, terminate_event=trajtracker.events.TRIAL_ENDED):
@@ -56,18 +56,6 @@ class MultiTextBox(BaseMultiStim):
             self.onset_event = onset_event
 
         self.terminate_event = terminate_event
-
-    #----------------------------------------
-    def _preload(self):
-        """
-        Preload the stimuli - prepare everything.
-        Call this at the trial initialization time. This operation may be time consuming, but
-        the subsequent showing/hiding of texts will be fast.
-        """
-
-        for i in range(len(self._text)):
-            self._stimuli[i].unload()
-            self._stimuli[i].preload()
 
     #----------------------------------------
     @property
@@ -107,15 +95,19 @@ class MultiTextBox(BaseMultiStim):
     #----------------------------------------------------
     # Update the stimuli (before actually showing them)
     #
-    def _configure_stimuli(self):
+    def _configure_and_preload(self):
         self._log_func_enters("_configure_stimuli")
         self._validate()
 
         n_stim = len(self._text)
+
+        for i in range(len(self._stimuli)):
+            self._stimuli[i].unload()
+
         self._create_stimuli()
 
+        self._set_stimulus_font(n_stim)
         self._set_stimuli_property("text", str, n_stim)
-        self._set_stimuli_property("text_font", str, n_stim)
         self._set_stimuli_property("text_bold", bool, n_stim)
         self._set_stimuli_property("text_italic", bool, n_stim)
         self._set_stimuli_property("text_underline", bool, n_stim)
@@ -124,6 +116,10 @@ class MultiTextBox(BaseMultiStim):
         self._set_stimuli_property("background_colour", "RGB", n_stim)
         self._set_stimuli_property("size", "coord", n_stim)
         self._set_stimuli_property("position", "coord", n_stim)
+
+        for i in range(len(self._text)):
+            self._stimuli[i].preload()
+
 
     #----------------------------------------------------
     # Validate that the MultiTextBox object is ready to go
@@ -175,6 +171,18 @@ class MultiTextBox(BaseMultiStim):
         for i in range(n_stim):
             setattr(self._stimuli[i], prop_name, values[i])
 
+    #------------------------------------------
+    def _set_stimulus_font(self, n_stim):
+
+        if self._is_multiple_values(self._text_font, str):
+            fonts = [xpy.misc.find_font(f) for f in self._text_font]
+        else:
+            fonts = [xpy.misc.find_font(self._text_font)] * n_stim
+
+        for i in range(n_stim):
+            self._stimuli[i].text_font = fonts[i]
+
+
     #==============================================================================
     #  For working with events: no public API
     #==============================================================================
@@ -185,8 +193,7 @@ class MultiTextBox(BaseMultiStim):
     def _init_trial_events(self):
         self._log_func_enters("_init_trial_events")
 
-        self._configure_stimuli()
-        self._preload()
+        self._configure_and_preload()
 
         n_stim = len(self._text)
 
@@ -228,7 +235,7 @@ class MultiTextBox(BaseMultiStim):
     #
     def _terminate_display(self):
         self._log_func_enters("_terminate_display")
-        self._event_manager.unregister_operation(self._registered_ops)
+        self._event_manager.unregister_operation(self._registered_ops, warn_if_op_missing=False)
         for stim in self._stimuli:
             stim.visible = False
 
@@ -245,8 +252,7 @@ class MultiTextBox(BaseMultiStim):
             self._log_write_if(self.log_warn, "init_for_trial() was called although the {:} was registered to an event manager".format(
                 type(self).__name__))
 
-        self._configure_stimuli()
-        self._preload()
+        self._configure_and_preload()
 
         n_stim = len(self._text)
 
@@ -335,6 +341,7 @@ class MultiTextBox(BaseMultiStim):
     #-----------------------------------------------------------------
     @property
     def text_size(self):
+        """ The font size (int) """
         return self._text_size
 
     @text_size.setter
@@ -346,6 +353,7 @@ class MultiTextBox(BaseMultiStim):
     #-----------------------------------------------------------------
     @property
     def text_bold(self):
+        """ Whether the text is bold (bool) """
         return self._text_bold
 
     @text_bold.setter
@@ -357,6 +365,7 @@ class MultiTextBox(BaseMultiStim):
     #-----------------------------------------------------------------
     @property
     def text_italic(self):
+        """ Whether the text is in italic font (bool) """
         return self._text_italic
 
     @text_italic.setter
@@ -368,6 +377,7 @@ class MultiTextBox(BaseMultiStim):
     #-----------------------------------------------------------------
     @property
     def text_underline(self):
+        """ Whether the text is underlined (bool) """
         return self._text_underline
 
     @text_underline.setter
@@ -379,11 +389,12 @@ class MultiTextBox(BaseMultiStim):
     #-----------------------------------------------------------------
     @property
     def text_justification(self):
+        """ The horizontal justification of the text. 0=left, 1=center, 2=right. """
         return self._text_justification
 
     @text_justification.setter
     def text_justification(self, value):
-        self._set_property("text_justification", value, str)
+        self._set_property("text_justification", value, int)
         self._log_property_changed("text_justification")
 
     #-----------------------------------------------------------------

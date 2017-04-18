@@ -28,6 +28,8 @@ def create_experiment_objects(exp_info, config):
     """
 
     create_numberline(exp_info, config)
+    exp_info.numberline.log_level = ttrk.TTrkObject.log_debug
+
     create_start_point(exp_info, config)
     create_textbox_target(exp_info, config)
     create_errmsg_textbox(exp_info)
@@ -93,6 +95,8 @@ def create_numberline(exp_info, config):
         numberline.feedback_stim = xpy.stimuli.Line(start_point=(0, 0), end_point=(0, 20), line_width=2,
                                                     colour=xpy.misc.constants.C_WHITE)
 
+    numberline.feedback_stim_offset = (0, numberline.feedback_stim.size[1]/2)
+
     if config.nl_feedback_type != FeedbackType.none:
         exp_info.stimuli.add(numberline.feedback_stim, "feedback", False)
 
@@ -137,6 +141,8 @@ def create_traj_tracker(exp_info):
 
     traj_file_path = xpy.io.defaults.datafile_directory + "/" + exp_info.traj_out_filename
     exp_info.trajtracker = ttrk.movement.TrajectoryTracker(traj_file_path)
+    exp_info.trajtracker.enable_event = FINGER_STARTED_MOVING
+    exp_info.trajtracker.disable_event = ttrk.events.TRIAL_ENDED
 
 
 #----------------------------------------------------------------
@@ -208,10 +214,11 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
 
     if zigzag_validator:
         v = ttrk.validators.NCurvesValidator(max_curves_per_trial=config.max_zigzags)
-        v._direction_monitor.min_angle_change_per_curve = 5  # Less than 5-degree change doesn't count as a curve
+        v._direction_monitor.min_angle_change_per_curve = 10  # Changes smaller than 10 degrees don't count as curves
         v.enable_event = FINGER_STARTED_MOVING
         v.disable_event = ttrk.events.TRIAL_ENDED
         exp_info.add_validator(v, 'zigzag')
+        v._direction_monitor.log_level = ttrk.TTrkObject.log_debug #todo
 
 
 #----------------------------------------------------------------
@@ -226,12 +233,11 @@ def create_textbox_target(exp_info, config):
 
     target = ttrk.stimuli.MultiTextBox()
 
-    target.text_font = "Arial"
     target.position = (0, exp_info.screen_size[1] / 2 - 50)
     target.size = (300, 80)
     target.text_size = 50
     target.text_colour = xpy.misc.constants.C_WHITE
-    target.text_justification = "center"
+    target.text_justification = 1 # center
 
     target.onset_event = TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
     target.onset_time = [0]

@@ -42,7 +42,7 @@ class NCurvesValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         EnabledDisabledObj.__init__(self, enabled=enabled)
 
         if direction_monitor is None:
-            direction_monitor = trajtracker.movement.DirectionMonitor(1)
+            direction_monitor = trajtracker.movement.DirectionMonitor(20)
 
         self._direction_monitor = direction_monitor
         self.max_curves_per_trial = max_curves_per_trial

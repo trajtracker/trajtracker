@@ -90,6 +90,7 @@ class ExperimentInfo(object):
             raise ttrk.InvalidStateError("ExperimentInfo.numberline cannot be set twice")
         self._numberline = nl
         self.stimuli.add(nl, "numberline")
+        self._trajectory_sensitive_objects.append(nl)
 
     #---------------------------------------------------------------
     @property
@@ -144,6 +145,7 @@ class ExperimentInfo(object):
             raise ttrk.InvalidStateError("ExperimentInfo.trajtracker cannot be set twice")
 
         self._trajectory_sensitive_objects.append(tracker)
+        self._event_sensitive_objects.append(tracker)
         self._trajtracker = tracker
 
 

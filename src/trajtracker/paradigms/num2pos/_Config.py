@@ -27,7 +27,7 @@ class Config(object):
 
     def __init__(self, experiment_id, data_source, max_trial_duration, target_type='text', shuffle_trials=True,
                  max_numberline_value=100, nl_feedback_type=FeedbackType.Arrow,
-                 min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=20,
+                 min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=10,
                  grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None,
                  stimulus_then_move=False, start_point_size=(40, 30), start_point_tilt=0,
                  start_point_colour=xpy.misc.constants.C_GREY):

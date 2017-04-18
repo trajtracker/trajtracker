@@ -8,6 +8,7 @@ Functions to support the number-to-position paradigm
 import numbers
 import random
 import csv
+import numpy as np
 from enum import Enum
 
 import expyriment as xpy
@@ -81,19 +82,22 @@ def initialize_exp(config):
 #----------------------------------------------------------------
 def run_trials(exp_info, config):
 
+    exp_info.trajtracker.init_output_file()
+
     exp_info.session_start_time = get_time()
 
-    trial_num = 0
+    trial_num = 1
 
     while len(exp_info.trials) > 0:
 
         trial_config = exp_info.trials.pop(0)
-        trial_num += 1
 
         run_trial_rc = run_trial(exp_info, config, TrialInfo(trial_num, trial_config))
         if run_trial_rc == RunTrialResult.Aborted:
             print("   Trial aborted.")
             continue
+
+        trial_num += 1
 
         exp_info.exp_data['nTrialsCompleted'] += 1
 
@@ -316,7 +320,7 @@ def trial_failed(err, exp_info, trial):
 
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_FAILED, time_in_trial, time_in_session)
 
     exp_info.errmsg_textbox.unload()
     exp_info.errmsg_textbox.text = err.message
@@ -414,7 +418,8 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code):
         if exp_info.trials_file_writer is None:
             fields = ['trialNum', 'LineNum', 'target', 'presentedTarget', 'status', 'endPoint', 'movementTime',
                       'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']
-            exp_info.trials_out_fp = open(exp_info.trials_out_filename, 'w')
+            filename = xpy.io.defaults.datafile_directory + "/" + exp_info.trials_out_filename
+            exp_info.trials_out_fp = open(filename, 'w')
             exp_info.trials_file_writer = csv.DictWriter(exp_info.trials_out_fp, fields)
             exp_info.trials_file_writer.writeheader()
 

@@ -45,7 +45,7 @@ class TypeError(TrajTrackerError):
 
 
 #============================================================================
-#   Import the TrajTracker packages
+#   Import the TrajTracker modules
 #============================================================================
 
 from __TTrkObject import TTrkObject
