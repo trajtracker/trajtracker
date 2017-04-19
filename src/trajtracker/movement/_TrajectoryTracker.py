@@ -10,7 +10,7 @@ import numbers
 
 import expyriment
 
-import trajtracker
+import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 from trajtracker.data import fromXML
@@ -18,7 +18,7 @@ from trajtracker.misc import EnabledDisabledObj
 
 
 # noinspection PyAttributeOutsideInit,PyProtectedMember
-class TrajectoryTracker(trajtracker.TTrkObject, EnabledDisabledObj):
+class TrajectoryTracker(ttrk.TTrkObject, EnabledDisabledObj):
 
 
     #----------------------------------------------------
@@ -30,7 +30,7 @@ class TrajectoryTracker(trajtracker.TTrkObject, EnabledDisabledObj):
         :param enabled: See :attr:`~trajtracker.movement.TrajectoryTracker.enabled`
         :param track_if_no_movement: See :attr:`~trajtracker.movement.TrajectoryTracker.track_if_no_movement`
         """
-        trajtracker.TTrkObject.__init__(self)
+        ttrk.TTrkObject.__init__(self)
         EnabledDisabledObj.__init__(self, enabled=enabled)
 
         self.reset()
@@ -99,7 +99,7 @@ class TrajectoryTracker(trajtracker.TTrkObject, EnabledDisabledObj):
         self._trajectory['y'].append(y_coord)
         self._trajectory['time'].append(time_in_trial)
 
-        if self._should_log(self.log_trace):
+        if self._should_log(ttrk.log_trace):
             self._log_write("Trajectory,track_xyt,{:},{:},{:}".format(x_coord, y_coord, time_in_trial))
 
         return None
@@ -127,7 +127,7 @@ class TrajectoryTracker(trajtracker.TTrkObject, EnabledDisabledObj):
             self._filename = filename
 
         if self._filename is None:
-            raise trajtracker.ValueError("filename was not provided to {:}.init_output_file()".format(type(self).__name__))
+            raise ttrk.ValueError("filename was not provided to {:}.init_output_file()".format(type(self).__name__))
 
         self._xy_precision = xy_precision
         self._time_precision = time_precision
@@ -150,7 +150,7 @@ class TrajectoryTracker(trajtracker.TTrkObject, EnabledDisabledObj):
         :return: The number of rows printed to the file
         """
         if not self._out_file_initialized:
-            raise trajtracker.InvalidStateError('TrajectoryTracker.save_to_file() was called before calling init_output_file()')
+            raise ttrk.InvalidStateError('TrajectoryTracker.save_to_file() was called before calling init_output_file()')
 
         fh = self._open_file(self._filename, 'a')
 

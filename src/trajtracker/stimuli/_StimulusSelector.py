@@ -8,13 +8,13 @@ Stimulus selector: show one of several stimuli
 
 import expyriment
 
-import trajtracker
+import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 
 
 # noinspection PyProtectedMember
-class StimulusSelector(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
+class StimulusSelector(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
     def __init__(self, stimuli=()):
         """
@@ -57,11 +57,11 @@ class StimulusSelector(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj
         :param key: The key of the stimulus, as set in :func:`~trajtracker.stimuli.ChangingStimulus.add_stimulus`
         """
         if key is None or key in self._stimuli:
-            if self._should_log(self.log_trace):
+            if self._should_log(ttrk.log_trace):
                 self._log_write("Activate,{:}".format(key), True)
             self._active_key = key
         else:
-            raise trajtracker.ValueError("{:}.select(key={:}) - this stimulus was not defined".format(type(self).__name__, key))
+            raise ttrk.ValueError("{:}.select(key={:}) - this stimulus was not defined".format(type(self).__name__, key))
 
 
     #--------------------------------------------------
@@ -110,5 +110,5 @@ class StimulusSelector(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj
         for s in self._stimuli.values():
             s.position = value
 
-        if self._should_log(self.log_trace):
+        if self._should_log(ttrk.log_trace):
             self._log_write("set_obj_attr,{:}.position,{:}".format(type(self).__name__, value))

@@ -37,7 +37,7 @@ in_ring_validator.invalid_colors = ((255, 255, 255))
 direction_validator = \
     MoveByGradientValidator("gradient.bmp", position=(0, 0), cyclic=True, max_valid_back_movement=5)
 direction_validator.single_color = "B"   # use only the blue scale
-direction_validator.log_level = direction_validator.log_debug
+direction_validator.log_level = ttrk.log_debug
 
 #-- Messages shown to subject
 

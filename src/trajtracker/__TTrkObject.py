@@ -1,24 +1,27 @@
+"""
 
+Base class for all TrajTracker objects
+
+@author: Dror Dotan
+@copyright: Copyright (c) 2017, Dror Dotan
+"""
+
+
+import time
 
 import expyriment as xpy
 
-import trajtracker
+import trajtracker as ttrk
 
 
 class TTrkObject(object):
 
+    #--------------------------------------------
     def __init__(self):
-        self.log_level = self.log_warn
+        self.log_level = ttrk.default_log_level
 
 
-    #-- Log levels (each level will also print the higher log levels)
-    log_trace = 1
-    log_debug = 2
-    log_info = 3
-    log_warn = 4
-    log_error = 5
-    log_none = 6
-
+    #--------------------------------------------
     @property
     def log_level(self):
         """
@@ -28,8 +31,8 @@ class TTrkObject(object):
 
     @log_level.setter
     def log_level(self, level):
-        if level is None or not isinstance(level, int) or level < TTrkObject.log_trace or level > TTrkObject.log_none:
-            raise trajtracker.ValueError("invalid log_level({:})".format(level))
+        if level is None or not isinstance(level, int) or level < ttrk.log_trace or level > ttrk.log_none:
+            raise ttrk.ValueError("invalid log_level({:})".format(level))
 
         self._set_log_level(level)
 
@@ -50,7 +53,7 @@ class TTrkObject(object):
     #
     def _log_property_changed(self, attr_name, value=None):
 
-        if not self._should_log(self.log_trace):
+        if not self._should_log(ttrk.log_trace):
             return
 
         if value is None:
@@ -64,27 +67,29 @@ class TTrkObject(object):
 
     #-------------------------------------------------
     def _log_write_if(self, log_level, msg, prepend_self=False, print_to_console=False):
-        if not self._should_log(log_level):
-            return
-        if prepend_self:
-            msg = type(self).__name__ + "," + msg
-        xpy._internals.active_exp._event_file_log(msg, 1)
-        if trajtracker.log_to_console or print_to_console:
-            print(msg)
+        if self._should_log(log_level):
+            self._log_write(msg, prepend_self, print_to_console)
+
 
     #-------------------------------------------------
     def _log_write(self, msg, prepend_self=False, print_to_console=False):
+
         if prepend_self:
             msg = type(self).__name__ + "," + msg
+
         xpy._internals.active_exp._event_file_log(msg, 1)
-        if trajtracker.log_to_console or print_to_console:
-            print(msg)
+
+        if ttrk.log_to_console or print_to_console:
+            t = time.time()
+            stime = time.strftime('%H:%m:%S', time.localtime(t)) + "{:.3f}".format(t % 1)[1:]
+            print(stime + ": " + msg)
+
 
     #-------------------------------------------------
     # Write to log when entering a function
     #
     def _log_func_enters(self, func_name, args=()):
-        if self._should_log(self.log_trace):
+        if self._should_log(ttrk.log_trace):
             args = ",".join([str(a) for a in args])
             self._log_write("enter_func,{:}({:})".format(func_name, args), prepend_self=True)
 
@@ -93,6 +98,6 @@ class TTrkObject(object):
     # Write to log when function returns a value
     #
     def _log_func_returns(self, func_name, retval=None):
-        if self._should_log(self.log_trace):
+        if self._should_log(ttrk.log_trace):
             self._log_write("func_returns,{:},{:}".format(func_name, retval), prepend_self=True)
 

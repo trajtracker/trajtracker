@@ -27,7 +27,9 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 
 # todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
-# todo: support image target (+RSVP), arrow target
+# todo: in Pedro's experiments: feedback arrow color depends on accuracy (red-orange-green)
+# todo: in Pedro's experiments: a line shows the correct location. It's the same mechanism that shows a target arrow (and here shows a line)
+# todo: support image target (+RSVP)
 # todo: escape button
 # todo: optionally get subject name and initials
 
@@ -267,20 +269,18 @@ def update_target(exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
 
-    if 'target_text' in trial.csv_data:
-        trial.presented_target = trial.csv_data['target_text']
+    if CsvConfigFields.PresentedTarget in trial.csv_data:
+        trial.presented_target = trial.csv_data[CsvConfigFields.PresentedTarget]
     else:
         trial.presented_target = str(trial.target)
 
-    if exp_info.config.target_type == 'rsvp_text':
-        exp_info.target.text = trial.presented_target.split(";")
-        if 'onset_time' in trial.csv_data:
-            exp_info.target.onset_time = [float(s) for s in trial.csv_data['onset_time'].split(";")]
-        if 'duration' in trial.csv_data:
-            exp_info.target.onset_time = [float(s) for s in trial.csv_data['duration'].split(";")]
+    exp_info.target.text = trial.presented_target.split(";")
 
-    elif exp_info.config.target_type == 'text':
-        exp_info.target.text = [trial.presented_target]
+    if CsvConfigFields.OnsetTime in trial.csv_data:
+        exp_info.target.onset_time = [float(s) for s in trial.csv_data[CsvConfigFields.OnsetTime].split(";")]
+
+    if CsvConfigFields.Duration in trial.csv_data:
+        exp_info.target.onset_time = [float(s) for s in trial.csv_data[CsvConfigFields.Duration].split(";")]
 
 
 #------------------------------------------------

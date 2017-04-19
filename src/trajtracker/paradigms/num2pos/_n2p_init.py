@@ -15,7 +15,7 @@ import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 
-from trajtracker.paradigms.num2pos import FeedbackType, Arrow, FINGER_STARTED_MOVING
+from trajtracker.paradigms.num2pos import FeedbackType, Arrow, FINGER_STARTED_MOVING, CsvConfigFields
 
 
 #----------------------------------------------------------------
@@ -28,7 +28,7 @@ def create_experiment_objects(exp_info, config):
     """
 
     create_numberline(exp_info, config)
-    exp_info.numberline.log_level = ttrk.TTrkObject.log_debug
+    exp_info.numberline.log_level = ttrk.log_debug
 
     create_start_point(exp_info, config)
     create_textbox_target(exp_info, config)
@@ -218,7 +218,6 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
         v.enable_event = FINGER_STARTED_MOVING
         v.disable_event = ttrk.events.TRIAL_ENDED
         exp_info.add_validator(v, 'zigzag')
-        v._direction_monitor.log_level = ttrk.TTrkObject.log_debug #todo
 
 
 #----------------------------------------------------------------
@@ -330,13 +329,13 @@ def load_data_source(config):
 
     if sum([not isinstance(x, Number) for x in ds]) == 0:
         #-- A list of numbers was provided: simulate it as a CSV
-        return [{'target': str(x), ttrk.data.CSVLoader.FLD_LINE_NUM: 0} for x in ds]
+        return [{CsvConfigFields.Target: str(x), ttrk.data.CSVLoader.FLD_LINE_NUM: 0} for x in ds]
 
     if sum([not isinstance(x, dict) for x in ds]) == 0:
         #-- An explicit list of trials was provided
         for row in ds:
-            if 'target' not in row or not isinstance(row['target'], str):
-                raise trajtracker.ValueError("The data source must contain a 'target' string value per trial")
+            if CsvConfigFields.Target not in row or not isinstance(row[CsvConfigFields.Target], str):
+                raise trajtracker.ValueError("The data source must contain a '{:}' string value per trial".format(CsvConfigFields.Target))
             if ttrk.data.CSVLoader.FLD_LINE_NUM not in row:
                 row[ttrk.data.CSVLoader.FLD_LINE_NUM] = 0
         return ds

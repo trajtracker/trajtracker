@@ -9,11 +9,22 @@
 
 import expyriment as xpy
 
+#-- Log levels (each level will also print the higher log levels)
+log_trace = 1
+log_debug = 2
+log_info = 3
+log_warn = 4
+log_error = 5
+log_none = 6
 
 
 #-- When set to True, this will print all log messages to the console (on top of printing them
 #-- to the log file)
 log_to_console = False
+
+#-- The default logging level for all trajtracker objects.
+#-- If you change this, only objects created from now on will be affected.
+default_log_level = log_warn
 
 
 #============================================================================

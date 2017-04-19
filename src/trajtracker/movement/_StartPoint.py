@@ -11,13 +11,13 @@ from __future__ import division
 import numbers
 from enum import Enum
 
-import trajtracker
+import trajtracker as ttrk
 import trajtracker.utils as u
 import trajtracker._utils as _u
 from trajtracker.misc import nvshapes
 
 
-class StartPoint(trajtracker.TTrkObject):
+class StartPoint(ttrk.TTrkObject):
 
     default_exit_area_size = 100
 
@@ -41,7 +41,7 @@ class StartPoint(trajtracker.TTrkObject):
         self._log_func_enters("__init__", [start_area, exit_area])
 
         if "position" not in dir(start_area):
-            raise trajtracker.ValueError("invalid start_area provided to {:}.__init__".format(type(self).__name__))
+            raise ttrk.ValueError("invalid start_area provided to {:}.__init__".format(type(self).__name__))
 
         self._start_area = start_area
         self.exit_area = exit_area
@@ -78,7 +78,7 @@ class StartPoint(trajtracker.TTrkObject):
             self._exit_area = value
             self._log_property_changed("exit_area", value="shape")
         else:
-            raise trajtracker.ValueError("invalid value for %s.exit_area" % type(self).__name__)
+            raise ttrk.ValueError("invalid value for %s.exit_area" % type(self).__name__)
 
         self._log_property_changed("exit_area")
 
@@ -98,7 +98,7 @@ class StartPoint(trajtracker.TTrkObject):
             f, t = 215, -45
 
         else:
-            raise trajtracker.ValueError("unsupported exit area '%s'" % name)
+            raise ttrk.ValueError("unsupported exit area '%s'" % name)
 
         return nvshapes.Sector(self._start_area.position[0], self._start_area.position[1], 10000, f, t)
 
@@ -158,7 +158,7 @@ class StartPoint(trajtracker.TTrkObject):
             # waiting for a touch inside start_area
             if self._start_area.overlapping_with_position((x_coord, y_coord)):
                 self._state = self.State.init
-                if self._should_log(self.log_info):
+                if self._should_log(ttrk.log_info):
                     self._log_write("touched in start area: ({:},{:}). Setting state=init".format(x_coord, y_coord), True)
                 self._log_func_returns("check_xy", True)
                 return True
@@ -172,19 +172,19 @@ class StartPoint(trajtracker.TTrkObject):
             if self._start_area.overlapping_with_position((x_coord, y_coord)):
                 # still in the start area
                 self._log_func_returns("check_xy", False)
-                if self._should_log(self.log_debug):
+                if self._should_log(ttrk.log_debug):
                     self._log_write("still in start area: ({:},{:})".format(x_coord, y_coord), True)
                 return False
 
             elif self._exit_area.overlapping_with_position((x_coord, y_coord)):
                 # Left the start area into the exit area
-                if self._should_log(self.log_info):
+                if self._should_log(ttrk.log_info):
                     self._log_write("touched in exit area: ({:},{:}). Setting state=start".format(x_coord, y_coord), True)
                 self._state = self.State.start
 
             else:
                 # Left the start area into another (invalid) area
-                if self._should_log(self.log_info):
+                if self._should_log(ttrk.log_info):
                     self._log_write("touched in invalid area: ({:},{:}). Setting state=error".format(x_coord, y_coord), True)
                 self._state = self.State.error
 
@@ -233,7 +233,7 @@ class StartPoint(trajtracker.TTrkObject):
             _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "session_start_time", session_start_time, numbers.Number)
 
         if self._state != StartPoint.State.reset:
-            raise trajtracker.InvalidStateError(
+            raise ttrk.InvalidStateError(
                 "{:}.wait_until_startpoint_touched() was called without calling reset() first".format(_u.get_type_name(self)))
 
         time_started_waiting = u.get_time()
@@ -248,7 +248,7 @@ class StartPoint(trajtracker.TTrkObject):
             if not exp.mouse.check_button_pressed(0) and self._state == StartPoint.State.reset:
                 # Mouse/finger is UP
                 self._state = StartPoint.State.mouse_up
-                if self._should_log(self.log_info):
+                if self._should_log(ttrk.log_info):
                     self._log_write("Mouse unclicked. Setting state=mouse_up", True)
 
             elif exp.mouse.check_button_pressed(0) and self._state == StartPoint.State.mouse_up:

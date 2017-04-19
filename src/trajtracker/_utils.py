@@ -13,6 +13,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from enum import Enum
 
+import expyriment as xpy
 from expyriment.misc import geometry
 
 import trajtracker
@@ -285,10 +286,10 @@ def _get_func_name(obj, func_name):
 
 #--------------------------------------
 def display_clear():
-    expyriment._internals.active_exp.screen.clear()
+    xpy._internals.active_exp.screen.clear()
 
 def display_update():
-    expyriment._internals.active_exp.screen.update()
+    xpy._internals.active_exp.screen.update()
 
 
 #============================================================================

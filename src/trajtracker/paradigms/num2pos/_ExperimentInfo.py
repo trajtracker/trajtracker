@@ -76,7 +76,7 @@ class ExperimentInfo(object):
         self.add_event_sensitive_object(validator)
 
         setattr(self, "validator_" + name, validator)
-        validator.log_level = ttrk.TTrkObject.log_info
+        validator.log_level = ttrk.log_info
 
 
     #---------------------------------------------------------------
@@ -110,7 +110,7 @@ class ExperimentInfo(object):
             raise ttrk.InvalidStateError("ExperimentInfo.target cannot be set twice")
 
         self._target = target
-        self.stimuli.add(target_stim, "target", visible=False)
+        self.stimuli.add(target_stim, "target")
 
 
     #---------------------------------------------------------------

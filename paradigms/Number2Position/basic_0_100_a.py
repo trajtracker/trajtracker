@@ -1,6 +1,8 @@
 """
 
-A simple version of the number-to-position experiment: 0-100 number line, each target appears twice
+A simple version of the number-to-position experiment:
+- 0-100 number line
+- Each target appears twice
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan

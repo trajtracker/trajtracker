@@ -11,14 +11,14 @@ import numbers
 import numpy as np
 from operator import itemgetter
 
-import trajtracker
+import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 from trajtracker.events import Event
 
 
 # noinspection PyProtectedMember
-class EventManager(trajtracker.TTrkObject):
+class EventManager(ttrk.TTrkObject):
 
 
     #======================================================================================
@@ -75,14 +75,14 @@ class EventManager(trajtracker.TTrkObject):
                        :func:`~trajtracker.events.EventManager.on_frame`
         """
 
-        _u.validate_func_arg_type(self, "dispatch_event", "event", event, trajtracker.events.Event)
+        _u.validate_func_arg_type(self, "dispatch_event", "event", event, ttrk.events.Event)
         _u.validate_func_arg_type(self, "dispatch_event", "time_in_trial", time_in_trial, numbers.Number)
         _u.validate_func_arg_type(self, "dispatch_event", "time_in_session", time_in_session, numbers.Number)
 
-        if event.offset > 0 and self._should_log(self.log_warn):
+        if event.offset > 0 and self._should_log(ttrk.log_warn):
             self._log_write("dispatch_event warning: you dispatched event {:}, which has offset > 0; the offset parameter is ignored".format(event), True)
 
-        if event._extended and self._should_log(self.log_warn):
+        if event._extended and self._should_log(ttrk.log_warn):
             self._log_write("dispatch_event warning: you dispatched event {:}, which has some sub-events".format(event))
 
         self._dispatch_event(event, time_in_trial, time_in_session)
@@ -95,7 +95,7 @@ class EventManager(trajtracker.TTrkObject):
         if event.extends is not None:
             self._dispatch_event(event.extends, time_in_trial, time_in_session)
 
-        self._log_write_if(self.log_info, "Dispatching event {:}, time_in_session={:}".format(event.event_id, time_in_session))
+        self._log_write_if(ttrk.log_info, "Dispatching event {:}, time_in_session={:}".format(event.event_id, time_in_session))
 
         if event.event_id not in self._operations_by_event:
             return
@@ -193,10 +193,10 @@ class EventManager(trajtracker.TTrkObject):
                         :func:`~trajtracker.events.EventManager.unregister_operation()`.
         """
 
-        _u.validate_func_arg_type(self, "register_operation", "event", event, trajtracker.events.Event)
+        _u.validate_func_arg_type(self, "register_operation", "event", event, ttrk.events.Event)
         _u.validate_func_arg_type(self, "register_operation", "recurring", recurring, bool)
         _u.validate_func_arg_type(self, "register_operation", "cancel_pending_operation_on", cancel_pending_operation_on,
-                                  (trajtracker.events.Event, list, tuple, set, np.ndarray))
+                                  (ttrk.events.Event, list, tuple, set, np.ndarray))
         if "__call__" not in dir(operation):
             raise TypeError("trajtracker error: EventManager.register_operation() was called with an invalid operation " +
                             "({:}) - expecting a function or another callable object".format(operation))
@@ -226,7 +226,7 @@ class EventManager(trajtracker.TTrkObject):
         self._operations_by_event[event.event_id][operation_id] = op_info
 
         #-- Log
-        if self._should_log(self.log_debug):
+        if self._should_log(ttrk.log_debug):
             cancel_events_desc = ""
             if len(cancel_pending_operation_on) > 0:
                 cancel_events = [e.event_id for e in cancel_pending_operation_on]
@@ -261,7 +261,7 @@ class EventManager(trajtracker.TTrkObject):
 
         for op_id in operation_ids:
             if op_id in self._operations_by_id:
-                if self._should_log(self.log_debug):
+                if self._should_log(ttrk.log_debug):
                     op_info = self._operations_by_id[op_id]
                     self._log_write('unregistering {:} operation "{:}" (ID={:}) from event {:}'.format(
                         "recurring" if op_info['recurring'] else "non-recurring",
@@ -270,7 +270,7 @@ class EventManager(trajtracker.TTrkObject):
                         op_info['event']), True)
                 self._remove_operation(op_id, True)
             elif warn_if_op_missing:
-                self._log_write_if(self.log_warn, "operation {:} is not in the event manager - not removed".format(op_id), True)
+                self._log_write_if(ttrk.log_warn, "operation {:} is not in the event manager - not removed".format(op_id), True)
 
     #======================================================================================
     # Internal stuff
@@ -298,7 +298,7 @@ class EventManager(trajtracker.TTrkObject):
         op_desc = str(op_info['operation']) if op_info['description'] is None else op_info['description']
 
         # -- Invoke it
-        if self._should_log(self.log_trace):
+        if self._should_log(ttrk.log_trace):
             self._log_write("Invoking operation (id={:}, operation={:}, event={:})".format(
                 operation_id, op_desc, op_info['event']), True)
         op = op_info['operation']

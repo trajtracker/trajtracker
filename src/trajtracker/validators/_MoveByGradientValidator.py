@@ -8,9 +8,11 @@
 
 import numpy as np
 
+import trajtracker as ttrk
 import trajtracker._utils as _u
 import trajtracker.utils as u
 import trajtracker.validators
+
 from trajtracker.misc import LocationColorMap, EnabledDisabledObj
 from trajtracker.data import fromXML
 
@@ -232,7 +234,7 @@ class MoveByGradientValidator(trajtracker.TTrkObject, EnabledDisabledObj):
                 self._last_color = color
                 return None
 
-        if self._should_log(self.log_debug):
+        if self._should_log(ttrk.log_debug):
             self._log_write("InvalidDirection,last_color={:},curr_color={:}".format(self._last_color, color), True)
 
         return trajtracker.validators.create_experiment_error(self, self.err_gradient, "You moved in an invalid direction")

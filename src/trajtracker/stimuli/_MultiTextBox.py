@@ -14,7 +14,7 @@ from operator import itemgetter
 
 import expyriment as xpy
 
-import trajtracker
+import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 from trajtracker.data import fromXML
@@ -32,7 +32,7 @@ class MultiTextBox(BaseMultiStim):
                  text_justification=1, text_colour=xpy.misc.constants.C_WHITE,
                  background_colour=xpy.misc.constants.C_BLACK, size=None, position=(0, 0),
                  onset_time=None, duration=None, last_stimulus_remains=False,
-                 onset_event=None, terminate_event=trajtracker.events.TRIAL_ENDED):
+                 onset_event=None, terminate_event=ttrk.events.TRIAL_ENDED):
 
         super(MultiTextBox, self).__init__(onset_time=onset_time, duration=duration, last_stimulus_remains=last_stimulus_remains)
 
@@ -87,10 +87,12 @@ class MultiTextBox(BaseMultiStim):
 
         for i in range(len(self._stimuli), n_stim+1):
             is_multiple = self._is_multiple_values(self._size, "coord")
-            stim = xpy.stimuli.TextBox("", self._size[i] if is_multiple else self._size)
+            stim = self._create_textbox(self._size[i] if is_multiple else self._size)
             self._stimuli.append(stim)
             self._container.add(stim, visible=False)
 
+    def _create_textbox(self, size):
+        return xpy.stimuli.TextBox("", size)
 
     #----------------------------------------------------
     # Update the stimuli (before actually showing them)
@@ -141,9 +143,6 @@ class MultiTextBox(BaseMultiStim):
         self._validate_property("onset_time", n_stim)
         self._validate_property("duration", n_stim)
 
-        if self._onset_event is None:
-            raise trajtracker.ValueError('{:}.onset_event was not set'.format(type(self).__name__))
-
 
     #----------------------------------------------------
     # Validate that one property is defined OK
@@ -152,11 +151,11 @@ class MultiTextBox(BaseMultiStim):
 
         value = getattr(self, prop_name)
         if value is None:
-            raise trajtracker.ValueError('{:}.{:} was not set'.format(type(self).__name__, prop_name))
+            raise ttrk.ValueError('{:}.{:} was not set'.format(type(self).__name__, prop_name))
 
         is_multiple_values = getattr(self, "_" + prop_name + "_multiple")
         if is_multiple_values and len(value) < n_stim:
-            raise trajtracker.ValueError('{:}.{:} has {:} values, but there are {:} texts to present'.format(
+            raise ttrk.ValueError('{:}.{:} has {:} values, but there are {:} texts to present'.format(
                 type(self).__name__, prop_name, len(value), n_stim))
 
     #----------------------------------------------------
@@ -193,6 +192,9 @@ class MultiTextBox(BaseMultiStim):
     def _init_trial_events(self):
         self._log_func_enters("_init_trial_events")
 
+        if self._onset_event is None:
+            raise ttrk.ValueError('{:}.onset_event was not set'.format(type(self).__name__))
+
         self._configure_and_preload()
 
         n_stim = len(self._text)
@@ -206,7 +208,7 @@ class MultiTextBox(BaseMultiStim):
             id1 = self._event_manager.register_operation(event=onset_event,
                                                          recurring=False,
                                                          description="Show text[{:}]({:})".format(i, self._text[i]),
-                                                         operation=TextboxEnablerDisabler(self._stimuli[i], True, i),
+                                                         operation=TextboxEnableDisableOp(self, self._stimuli[i], True, i),
                                                          cancel_pending_operation_on=self.terminate_event)
             op_ids.add(id1)
 
@@ -217,7 +219,7 @@ class MultiTextBox(BaseMultiStim):
             id2 = self._event_manager.register_operation(event=offset_event,
                                                          recurring=False,
                                                          description="Hide text[{:}]({:})".format(i, self._text[i]),
-                                                         operation=TextboxEnablerDisabler(self._stimuli[i], False, i),
+                                                         operation=TextboxEnableDisableOp(self, self._stimuli[i], False, i),
                                                          cancel_pending_operation_on=self.terminate_event)
             op_ids.add(id2)
 
@@ -249,7 +251,7 @@ class MultiTextBox(BaseMultiStim):
 
         self._log_func_enters("init_for_trial")
         if self._event_manager is not None:
-            self._log_write_if(self.log_warn, "init_for_trial() was called although the {:} was registered to an event manager".format(
+            self._log_write_if(ttrk.log_warn, "init_for_trial() was called although the {:} was registered to an event manager".format(
                 type(self).__name__))
 
         self._configure_and_preload()
@@ -282,7 +284,7 @@ class MultiTextBox(BaseMultiStim):
 
         self._log_func_enters("start_showing", (time))
         if self._event_manager is not None:
-            self._log_write_if(self.log_warn,
+            self._log_write_if(ttrk.log_warn,
                                "start_showing() was called although the {:} was registered to an event manager".format(
                                    type(self).__name__))
 
@@ -306,7 +308,7 @@ class MultiTextBox(BaseMultiStim):
             stim_num = operation[2]
             visible = operation[1]
 
-            if self._should_log(self.log_trace):
+            if self._should_log(ttrk.log_trace):
                 self._log_write("{:} stimulus #{:} ({:})".format(
                     "showing" if visible else "hiding", stim_num, self._text[stim_num]))
             self._stimuli[stim_num].visible = visible
@@ -456,15 +458,24 @@ class MultiTextBox(BaseMultiStim):
 
 
 #=====================================================================
-class TextboxEnablerDisabler(object):
+# The operation that is registered to the event manager
+#
+class TextboxEnableDisableOp(object):
 
-    def __init__(self, stimulus, visible, stimulus_num):
+    #---------------------------------
+    def __init__(self, multi_text_box, stimulus, visible, stimulus_num):
+        self._multi_text_box = multi_text_box
         self._stimulus = stimulus
         self._visible = visible
         self._stimulus_num = stimulus_num
 
+    #---------------------------------
     def __call__(self, *args, **kwargs):
+        self._multi_text_box._log_write_if(ttrk.log_info, "Set text#{:} ({:}) {:}".format(
+            self._stimulus_num, self._stimulus.text, "visible" if self._visible else "invisible"))
+
         self._stimulus.visible = self._visible
 
+    #---------------------------------
     def __str__(self):
         return "Text #{:} ({:})".format(self._stimulus_num, self._stimulus.text)

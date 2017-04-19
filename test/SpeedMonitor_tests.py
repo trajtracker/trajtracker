@@ -45,7 +45,7 @@ class SpeedMonitorTests(unittest.TestCase):
     def test_time_moves_backwards(self):
         m = SpeedMonitor(10)
         m.update_xyt(1, 1, 1)
-        m.update_xyt(1, 1, 2)
+        m.update_xyt(1, 2, 2)
         self.assertRaises(trajtracker.InvalidStateError, lambda: m.update_xyt(1, 1, 1))
 
     #---------------------------------------------------------
@@ -116,7 +116,7 @@ class SpeedMonitorTests(unittest.TestCase):
         self.assertIsNone(m.yspeed)
         self.assertIsNone(m.xyspeed)
 
-        m.update_xyt(10, 2, 30)
+        m.update_xyt(10, 3, 31)
         self.assertIsNotNone(m.xspeed)
         self.assertIsNotNone(m.yspeed)
         self.assertIsNotNone(m.xyspeed)

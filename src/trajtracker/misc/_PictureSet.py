@@ -59,7 +59,7 @@ class PictureSet(trajtracker.TTrkObject):
         if self._preloaded:
             raise trajtracker.InvalidStateError('Pictures cannot be added to a PictureSet after it was preloaded')
 
-        if pic_name in self._pics or pic_name in self._unloaded_pic_configs and self._should_log(self.log_warn):
+        if pic_name in self._pics or pic_name in self._unloaded_pic_configs and self._should_log(ttrk.log_warn):
             self._log_write('WARNING: Picture "{:}" already exists in the PictureSet, definition is overriden'.format(pic_name))
 
         if isinstance(pic_spec, str):

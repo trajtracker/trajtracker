@@ -14,14 +14,14 @@ import numpy as np
 
 import expyriment as xpy
 
-import trajtracker
+import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 from trajtracker.utils import get_time
 
 
 # noinspection PyAttributeOutsideInit,PyProtectedMember
-class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
+class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
     Orientation = Enum('Orientation', 'Horizontal Vertical')
 
@@ -387,7 +387,7 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
             touch_coord = y_coord - self._mid_y
 
         distance = line_coord - mouse_coord  # positive value: mouse coord < line coord
-        if self._should_log(self.log_trace):
+        if self._should_log(ttrk.log_trace):
             self._log_write("Touch distance from numberline: {:}".format(distance), True)
 
         if not self._touch_directioned:
@@ -398,7 +398,7 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
             #-- Finger must approach the line from its initial direction, which was not set: set it now
             self._initial_mouse_dir = np.sign(distance)
             touched = False
-            if self._should_log(self.log_debug):
+            if self._should_log(ttrk.log_debug):
                 if self.orientation == NumberLine.Orientation.Horizontal:
                     sdir = "below" if self._initial_mouse_dir == 1 else "above"
                 else:
@@ -414,7 +414,7 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
         if touched:
             self._last_touched_coord = touch_coord
             self._show_feedback_stim()
-            self._log_write_if(self.log_info, "The number line was touched at {:}, time_in_trial={:}".format(
+            self._log_write_if(ttrk.log_info, "The number line was touched at {:}, time_in_trial={:}".format(
                 self.last_touched_value, time_in_trial))
 
         self._log_func_returns("update_xyt")
@@ -425,9 +425,9 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
         if self._feedback_stim is None:
             return
         elif "visible" not in dir(self._feedback_stim):
-            raise trajtracker.InvalidStateError(
+            raise ttrk.InvalidStateError(
                 "The NumberLine's feedback stimulus is invalid, or was not stored in a {:}".format(
-                    _u.get_type_name(trajtracker.stimuli.StimulusContainer)))
+                    _u.get_type_name(ttrk.stimuli.StimulusContainer)))
 
         if self._orientation == NumberLine.Orientation.Horizontal:
             fb_stim_coord = (self._mid_x + self._last_touched_coord, self._mid_y)
@@ -501,24 +501,24 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
         """
 
         if self._min_value >= self._max_value:
-            raise trajtracker.ValueError("NumberLine.min_value({:}) >= NumberLine.max_value({:})".format(self._min_value, self._max_value))
+            raise ttrk.ValueError("NumberLine.min_value({:}) >= NumberLine.max_value({:})".format(self._min_value, self._max_value))
 
         if self._labels_visible:
             if self._labels_box_size is None:
-                raise trajtracker.ValueError("NumberLine - labels textbox size was not specified")
+                raise ttrk.ValueError("NumberLine - labels textbox size was not specified")
             if self._labels_font_name is None or self._labels_font_name == "":
-                raise trajtracker.ValueError("NumberLine - labels font name was not specified")
+                raise ttrk.ValueError("NumberLine - labels font name was not specified")
             if self._labels_font_size is None:
-                raise trajtracker.ValueError("NumberLine - labels font size was not specified")
+                raise ttrk.ValueError("NumberLine - labels font size was not specified")
             if self._labels_font_colour is None:
-                raise trajtracker.ValueError("NumberLine - labels font color was not specified")
+                raise ttrk.ValueError("NumberLine - labels font color was not specified")
 
 
 
     #-----------------------------------------------------------
     def _validate_unlocked(self):
         if self._preloaded:
-            raise trajtracker.InvalidStateError('An attempt was made to change the visual properties of a NumberLine after it was already plotted')
+            raise ttrk.InvalidStateError('An attempt was made to change the visual properties of a NumberLine after it was already plotted')
 
 
     ###################################
@@ -538,8 +538,8 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
     def orientation(self, value):
         self._validate_unlocked()
 
-        if not isinstance(value, trajtracker.stimuli.NumberLine.Orientation):
-            raise trajtracker.ValueError("invalid value for NumberLine.orientation ({:}) - expecting NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical".format(value))
+        if not isinstance(value, ttrk.stimuli.NumberLine.Orientation):
+            raise ttrk.ValueError("invalid value for NumberLine.orientation ({:}) - expecting NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical".format(value))
 
         self._orientation = value
         self._log_property_changed("orientation")
@@ -777,7 +777,7 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
     @feedback_stim.setter
     def feedback_stim(self, value):
         if value is not None and "present" not in dir(value):
-            raise trajtracker.TypeError("{:}.feedback_stim was set to a non-stimulus value".format(_u.get_type_name(self)))
+            raise ttrk.TypeError("{:}.feedback_stim was set to a non-stimulus value".format(_u.get_type_name(self)))
         self._feedback_stim = value
 
     #-----------------------------------------------------------
@@ -801,7 +801,7 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
 
     @feedback_stim_hide_event.setter
     def feedback_stim_hide_event(self, value):
-        _u.validate_attr_type(self, "feedback_stim_hide_event", value, trajtracker.events.Event,
+        _u.validate_attr_type(self, "feedback_stim_hide_event", value, ttrk.events.Event,
                               none_allowed=True)
         self._feedback_stim_hide_event = value
 

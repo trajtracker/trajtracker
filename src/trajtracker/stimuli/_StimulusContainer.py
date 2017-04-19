@@ -10,12 +10,12 @@ from operator import itemgetter
 
 import expyriment as xpy
 
-import trajtracker
+import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 
 
-class StimulusContainer(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
+class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
 
     def __init__(self):
@@ -41,13 +41,22 @@ class StimulusContainer(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetOb
         visible_stims = [stim for stim in self._stimuli.values() if stim['stimulus'].visible]
         visible_stims.sort(key=itemgetter('order'))
 
-        if self._should_log(self.log_trace):
+        if self._should_log(ttrk.log_trace):
             self._log_write("Present,stimuli={:}".format(";".join([str(s['id']) for s in visible_stims])))
 
-        for i in range(len(visible_stims)):
-            c = clear if i == 0 else False
-            u = update if i == len(visible_stims)-1 else False
-            visible_stims[i]['stimulus'].present(clear=c, update=u)
+        if len(visible_stims) == 0:
+            #-- If no stimuli to present: just clear/update
+            if clear:
+                _u.display_clear()
+            if update:
+                _u.display_update()
+
+        else:
+            #-- Present all stimuli
+            for i in range(len(visible_stims)):
+                c = clear and i == 0
+                u = update and i == len(visible_stims) - 1
+                visible_stims[i]['stimulus'].present(clear=c, update=u)
 
 
     #----------------------------------------------------------
