@@ -22,8 +22,8 @@ This class is used in slightly different ways depending on whether or not you us
 :class:`~trajtracker.events.EventManager` in your application.
 
 
-Using this class with an EventManager
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Using MultiTextBox with an EventManager
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Add :attr:`~trajtracker.stimuli.MultiTextBox.stimulus` into your :class:`~trajtracker.stimuli.StimulusContainer`
 
@@ -41,8 +41,8 @@ Using this class with an EventManager
   will have no effect.
 
 
-Using this class without an EventManager
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Using MultiTextBox without an EventManager
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - On the beginning of each trial, update the visual properties of the textbox (text, font, size, position, etc.).
   You do not need to configure :attr:`~trajtracker.stimuli.MultiTextBox.start_rsvp_event` and

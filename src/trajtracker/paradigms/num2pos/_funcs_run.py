@@ -26,12 +26,10 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 
 
-# todo: add min-trial-duration validation
 # todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
 # todo: support image target (+RSVP), arrow target
 # todo: escape button
 # todo: optionally get subject name and initials
-# todo: StartPoint should require LIFTING the finger before touching down (make this optional?)
 
 # todo: delete XML support?
 # todo: organize documentation. Have a "using this class" section for each complex class.
@@ -151,6 +149,14 @@ def run_trial(exp_info, config, trial):
 
         #-- Check if the number line was reached
         if exp_info.numberline.touched:
+
+            movement_time = get_time() - trial.results['time_started_moving'] - trial.start_time
+            if movement_time < config.min_trial_duration:
+                trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
+                                             "Please move more slowly"),
+                             exp_info, trial)
+                return RunTrialResult.Failed
+
             trial_succeeded(exp_info, trial)
             return RunTrialResult.Succeeded
 
@@ -262,19 +268,19 @@ def update_target(exp_info, trial):
     """
 
     if 'target_text' in trial.csv_data:
-        target_text = trial.csv_data['target_text']
+        trial.presented_target = trial.csv_data['target_text']
     else:
-        target_text = str(trial.target)
+        trial.presented_target = str(trial.target)
 
     if exp_info.config.target_type == 'rsvp_text':
-        exp_info.target.text = target_text.split(";")
+        exp_info.target.text = trial.presented_target.split(";")
         if 'onset_time' in trial.csv_data:
             exp_info.target.onset_time = [float(s) for s in trial.csv_data['onset_time'].split(";")]
         if 'duration' in trial.csv_data:
             exp_info.target.onset_time = [float(s) for s in trial.csv_data['duration'].split(";")]
 
     elif exp_info.config.target_type == 'text':
-        exp_info.target.text = [target_text]
+        exp_info.target.text = [trial.presented_target]
 
 
 #------------------------------------------------
@@ -344,7 +350,7 @@ def trial_succeeded(exp_info, trial):
 
     print("   Trial ended successfully.")
 
-    #todo: show the correct location?
+    #todo: show the correct location too?
 
     curr_time = get_time()
     time_in_trial = curr_time - trial.start_time
@@ -396,17 +402,17 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code):
         t_move = trial.results['time_started_moving'] if 'time_started_moving' in trial.results else -1
         t_target = trial.results['time_target_shown'] if 'time_target_shown' in trial.results else -1
 
-        if time_in_trial == 0 or 'time_target_shown' not in trial.results:
+        if time_in_trial == 0 or 'time_started_moving' not in trial.results:
             movement_time = 0
         else:
-            movement_time = time_in_trial - trial.results['time_target_shown']
+            movement_time = time_in_trial - trial.results['time_started_moving']
 
         #-- Save data to trials file
         trial_out_row = {
             'trialNum':             trial.trial_num,
             'LineNum':              trial.file_line_num,
             'target':               trial.target,
-            'presentedTarget':      trial.csv_data['target'], #todo: what about target_text? what about displaying images?
+            'presentedTarget':      trial.presented_target,
             'endPoint':             "" if endpoint is None else "{:.3g}".format(endpoint),
             'status':               success_err_code,
             'movementTime':         "{:.3g}".format(movement_time),

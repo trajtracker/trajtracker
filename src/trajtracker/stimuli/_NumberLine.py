@@ -529,7 +529,9 @@ class NumberLine(trajtracker.TTrkObject, trajtracker.events.OnsetOffsetObj):
     #-----------------------------------------------------------
     @property
     def orientation(self):
-        """ The number line's orientation (NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical) """
+        """ 
+        The number line's orientation (NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical) 
+        """
         return self._orientation
 
     @orientation.setter
