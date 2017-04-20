@@ -20,16 +20,16 @@ from trajtracker.paradigms.num2pos import Arrow, FINGER_STARTED_MOVING, CsvConfi
 
 
 #----------------------------------------------------------------
-def create_experiment_objects(exp_info, config):
+def create_experiment_objects(exp_info):
     """
     Create the full default configuration for the experiment.
 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type config: trajtracker.paradigms.num2pos.Config
     """
 
+    config = exp_info.config
+
     create_numberline(exp_info, config)
-    exp_info.numberline.log_level = ttrk.log_debug
 
     create_start_point(exp_info, config)
     create_textbox_target(exp_info, config)
@@ -153,9 +153,10 @@ def create_traj_tracker(exp_info):
     if not exp_info.config.save_results:
         return
 
-    curr_time = time.strftime("%Y-%m-%d_%H-%M", time.localtime())
+    curr_time = time.strftime("%Y%m%d_%H%M", time.localtime())
     exp_info.trials_out_filename = "trials_{:}_{:}.csv".format(exp_info.xpy_exp.subject, curr_time)
     exp_info.traj_out_filename = "trajectory_{:}_{:}.csv".format(exp_info.xpy_exp.subject, curr_time)
+    exp_info.session_out_filename = "session_{:}_{:}.xml".format(exp_info.xpy_exp.subject, curr_time)
 
     traj_file_path = xpy.io.defaults.datafile_directory + "/" + exp_info.traj_out_filename
     exp_info.trajtracker = ttrk.movement.TrajectoryTracker(traj_file_path)

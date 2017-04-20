@@ -9,7 +9,10 @@ import numbers
 import random
 import csv
 import numpy as np
+import time
 from enum import Enum
+import xml.etree.cElementTree as ET
+
 
 import expyriment as xpy
 
@@ -38,50 +41,30 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 # todo later: VOX detector
 
 #----------------------------------------------------------------
-def run_full_experiment(config):
+def run_full_experiment(config, xpy_exp, subj_id, subj_name=""):
     """
     A default implementation for running a complete experiment, end-to-end
     
     :type config: trajtracker.paradigms.num2pos.Config 
     """
 
-    exp_info = initialize_exp(config)
+    exp_info = ttrk.paradigms.num2pos.ExperimentInfo(config, xpy_exp, subj_id, subj_name)
 
-    create_experiment_objects(exp_info, config)
+    create_experiment_objects(exp_info)
 
     register_to_event_manager(exp_info)
 
-    # todo: ask for subject initials and name?
-
-    run_trials(exp_info, config)
+    run_trials(exp_info)
 
     save_session_file(exp_info)
 
-    xpy.control.end()
-
 
 #----------------------------------------------------------------
-def initialize_exp(config):
-    """
-    Initialize everything for the experiment
-    
-    :return: trajtracker.paradigms.num2pos.ExperimentInfo
-    """
+def run_trials(exp_info):
 
-    xpy_exp = xpy.control.initialize()
-    expdata = ttrk.paradigms.num2pos.ExperimentInfo(xpy_exp, config)
+    exp_info.session_start_localtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
-    xpy.control.start(xpy_exp)
-    if not xpy.misc.is_android_running():
-        xpy_exp.mouse.show_cursor()
-
-    return expdata
-
-
-#----------------------------------------------------------------
-def run_trials(exp_info, config):
-
-    if config.shuffle_trials:
+    if exp_info.config.shuffle_trials:
         random.shuffle(exp_info.trials)
 
     exp_info.trajtracker.init_output_file()
@@ -94,7 +77,7 @@ def run_trials(exp_info, config):
 
         trial_config = exp_info.trials.pop(0)
 
-        run_trial_rc = run_trial(exp_info, config, TrialInfo(trial_num, trial_config))
+        run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config))
         if run_trial_rc == RunTrialResult.Aborted:
             print("   Trial aborted.")
             continue
@@ -111,7 +94,7 @@ def run_trials(exp_info, config):
 
             exp_info.exp_data['nTrialsFailed'] += 1
             exp_info.trials.append(trial_config)
-            if config.shuffle_trials:
+            if exp_info.config.shuffle_trials:
                 random.shuffle(exp_info.trials)
 
         else:
@@ -119,12 +102,11 @@ def run_trials(exp_info, config):
 
 
 #----------------------------------------------------------------
-def run_trial(exp_info, config, trial):
+def run_trial(exp_info, trial):
     """
     Run a single trial
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
-    :type config: trajtracker.paradigms.num2pos.Config 
     :type trial: trajtracker.paradigms.num2pos.TrialInfo
      
     :return: True if the trial ended successfully, False if it failed
@@ -135,7 +117,7 @@ def run_trial(exp_info, config, trial):
     exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp, on_loop_present=exp_info.stimuli)
     on_finger_touched_screen(exp_info, trial)
 
-    rc = initiate_trial(exp_info, config, trial)
+    rc = initiate_trial(exp_info, trial)
     if rc is not None:
         return rc
 
@@ -158,7 +140,7 @@ def run_trial(exp_info, config, trial):
         if exp_info.numberline.touched:
 
             movement_time = get_time() - trial.results['time_started_moving'] - trial.start_time
-            if movement_time < config.min_trial_duration:
+            if movement_time < exp_info.config.min_trial_duration:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
                                              "Please move more slowly"),
                              exp_info, trial)
@@ -169,21 +151,20 @@ def run_trial(exp_info, config, trial):
 
 
 #----------------------------------------------------------------
-def initiate_trial(exp_info, config, trial):
+def initiate_trial(exp_info, trial):
     """
     Make the trial start - either by the subject, or by the software.
     The function returns after the finger started moving (or on error)
 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type config: trajtracker.paradigms.num2pos.Config 
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     
     :return: None if all OK, RunTrialResult.xxx if trial should terminate
     """
 
-    if config.stimulus_then_move:
+    if exp_info.config.stimulus_then_move:
 
-        raise Exception("TBD") #todo
+        raise Exception("TBD")  #todo
 
     else:
         #-- Wait for the participant to start moving the finger
@@ -195,7 +176,7 @@ def initiate_trial(exp_info, config, trial):
             trial_failed(ExperimentError("StartedSideways", "Start the trial by moving straight, not sideways!"), exp_info, trial)
             return RunTrialResult.Failed
 
-    on_finger_started_moving(exp_info, config, trial)
+    on_finger_started_moving(exp_info, trial)
     return None
 
 
@@ -226,6 +207,7 @@ def on_finger_touched_screen(exp_info, trial):
     This function should be called when the finger touches the screen
 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo
     """
 
     exp_info.errmsg_textbox.visible = False
@@ -243,12 +225,11 @@ def on_finger_touched_screen(exp_info, trial):
 
 
 #----------------------------------------------------------------
-def on_finger_started_moving(exp_info, config, trial):
+def on_finger_started_moving(exp_info, trial):
     """
     This function should be called when the finger leaves the "start" area and starts moving
 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type config: trajtracker.paradigms.num2pos.Config 
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
 
@@ -261,7 +242,7 @@ def on_finger_started_moving(exp_info, config, trial):
 
     exp_info.stimuli.present()
 
-    if not config.stimulus_then_move:
+    if not exp_info.config.stimulus_then_move:
         trial.results['time_target_shown'] = get_time() - trial.start_time
 
 
@@ -294,6 +275,7 @@ def update_movement(exp_info, trial):
     Update the trajectory-sensitive objects about the mouse/finger movement
         
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo
     :return: None if all is OK; or an ExperimentError object if one of the validators issued an error
     """
 
@@ -443,5 +425,55 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code):
 
 #------------------------------------------------
 def save_session_file(exp_info):
-    pass
-    #todo
+    """
+    Save the session.xml file 
+    """
+
+    root = ET.Element("data")
+
+    #-- Software version
+    source_node = ET.SubElement(root, "source")
+    ET.SubElement(source_node, "software", name="TrajTracker", version=ttrk.version())
+    ET.SubElement(source_node, "paradigm", name="NL", version=version())
+    ET.SubElement(source_node, "experiment", name=exp_info.config.experiment_id)
+
+    #-- Subject info
+    subj_node = ET.SubElement(root, "subject", id=exp_info.subject_id, expyriment_id=str(exp_info.xpy_exp.subject))
+    ET.SubElement(subj_node, "name").text = exp_info.subject_name
+
+    #-- Session data
+    session_node = ET.SubElement(root, "session", start_time=exp_info.session_start_localtime)
+
+    results_node = ET.SubElement(session_node, "exp_level_results")
+
+    for key, value in exp_info.exp_data.items():
+        value_type = "number" if isinstance(value, numbers.Number) else "string"
+        if isinstance(value, float):
+            value = "{:.6f}".format(value)
+        ET.SubElement(results_node, "data", name=key, value=str(value), type=value_type)
+
+    files_node = ET.SubElement(session_node, "files")
+    ET.SubElement(files_node, "file", type="trials", name=exp_info.trials_out_filename)
+    ET.SubElement(files_node, "file", type="trajectory", name=exp_info.traj_out_filename)
+
+    indent_xml(root)
+    tree = ET.ElementTree(root)
+    tree.write(xpy.io.defaults.datafile_directory + "/" + exp_info.session_out_filename, encoding="UTF-8")
+
+
+#------------------------------------------------------------
+def indent_xml(elem, level=0):
+    i = "\n" + level * "  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent_xml(elem, level + 1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
+

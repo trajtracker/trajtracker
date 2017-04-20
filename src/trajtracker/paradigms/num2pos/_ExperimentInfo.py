@@ -17,12 +17,14 @@ class ExperimentInfo(object):
     """
 
 
-    def __init__(self, xpy_exp, config):
+    def __init__(self, config, xpy_exp, subject_id, subject_name):
 
         #-- Static elements - remain throughout the experiment
 
         self.xpy_exp = xpy_exp  # Expyriment's "Experiment" object
         self._config = config
+        self.subject_id = subject_id
+        self.subject_name = subject_name
 
         self._numberline = None
         self._target = None
@@ -44,11 +46,13 @@ class ExperimentInfo(object):
 
         self.trials = None
         self.session_start_time = None
+        self.session_start_localtime = None
 
         #-- Results: per experiment, per trial
 
         self.exp_data = {}
 
+        self.session_out_filename = None
         self.trials_out_filename = None
         self.traj_out_filename = None
 
