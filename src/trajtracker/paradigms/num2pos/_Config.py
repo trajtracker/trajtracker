@@ -14,10 +14,6 @@ import trajtracker as ttrk
 #-- the number line
 FINGER_STARTED_MOVING = ttrk.events.Event("FINGER_STARTED_MOVING")
 
-#-- 3 possibilities for the feedback that indicates where the finger landed on the number line.
-#-- If you want a different shape as feedback, create it by yourself.
-FeedbackType = Enum('FeedbackType', 'none Arrow Line')
-
 
 class Config(object):
     """
@@ -25,8 +21,10 @@ class Config(object):
     the number-to-position experiment
     """
 
-    def __init__(self, experiment_id, data_source, max_trial_duration, target_type='text', shuffle_trials=True,
-                 max_numberline_value=100, nl_feedback_type=FeedbackType.Arrow,
+    def __init__(self, experiment_id, data_source, max_trial_duration, target_type='text',
+                 shuffle_trials=True, max_numberline_value=100,
+                 show_feedback=True, feedback_arrow_colors=xpy.misc.constants.C_GREEN,
+                 feedback_accuracy_levels=None, post_response_target=False,
                  min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=10,
                  grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None,
                  stimulus_then_move=False, start_point_size=(40, 30), start_point_tilt=0,
@@ -58,10 +56,19 @@ class Config(object):
         # The value at the right end of the number line
         self.max_numberline_value = max_numberline_value
 
-        # The shape of the feedback stimulus that indicates where the finger landed on the number line.
-        # If you want a non-default shape as feedback, put here "None" and create the shape yourself in the
-        # init function.
-        self.nl_feedback_type = nl_feedback_type
+        # Whether to show a feedback arrow (where the finger landed on the number line)
+        self.show_feedback = show_feedback
+
+        # Use this to show the feedback arrow in different colors, depending on the response accuracy.
+        # Define a list of numbers between 0 and 1 (percentages of the number line length)
+        self.feedback_accuracy_levels = feedback_accuracy_levels
+
+        # Color of the feedback arrow (or a list of colors, in case you defined feedback_accuracy_levels;
+        # in this case, the first color corresponds with best accuracy)
+        self.feedback_arrow_colors = feedback_arrow_colors
+
+        # Whether to show the correct target location after the response was made
+        self.post_response_target = post_response_target
 
 
         #----- Configuration of the "start" rectangle -----

@@ -63,9 +63,9 @@ from __TTrkObject import TTrkObject
 
 import trajtracker._utils as _utils
 
-import trajtracker.misc as misc
-import trajtracker.data as data
-import trajtracker.events as events
-import trajtracker.stimuli as stimuli
-import trajtracker.movement as movement
-import trajtracker.validators as validators
+from . import misc
+from . import data
+from . import events
+from . import stimuli
+from . import movement
+from . import validators

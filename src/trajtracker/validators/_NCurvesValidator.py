@@ -48,6 +48,11 @@ class NCurvesValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         self.max_curves_per_trial = max_curves_per_trial
 
 
+    #-------------------------------------
+    @property
+    def direction_monitor(self):
+        return self._direction_monitor
+
 
     #=================================================================
     #    Validate

@@ -23,8 +23,24 @@ if not xpy.misc.is_android_running():
 ttrk.default_log_level = ttrk.log_info
 
 
-config = num2pos.Config("Num2Pos(D+U)", max_trial_duration=2, max_numberline_value=100,
-                        speed_guide_enabled=True, data_source="basic_0_100_b.csv")
+accuracy_levels = [.05, .1]
+
+config = num2pos.Config("Num2Pos(D+U)",
+                        max_trial_duration=2,
+                        max_numberline_value=100,
+                        speed_guide_enabled=True,
+                        data_source="basic_0_100_b.csv",  # Read targets from this CSV file
+
+                        post_response_target=True,         # After response was made, show the correct location
+                        feedback_arrow_colors=[xpy.misc.constants.C_GREEN,
+                                               xpy.misc.constants.C_EXPYRIMENT_ORANGE,
+                                               xpy.misc.constants.C_RED],
+                        feedback_accuracy_levels=accuracy_levels,
+                        sound_by_accuracy=((accuracy_levels[0], 'feedback-accuracy-0.wav'),
+                                           (accuracy_levels[1], 'feedback-accuracy-1.wav'),
+                                           (1, 'feedback-accuracy-2.wav'))
+
+                        )
 
 
 #----------------------------------------------------------------

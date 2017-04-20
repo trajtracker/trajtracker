@@ -25,10 +25,9 @@ from trajtracker.paradigms.num2pos import *
 RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 
-
+# todo: bug - speed guide doesn't appear
 # todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
-# todo: in Pedro's experiments: feedback arrow color depends on accuracy (red-orange-green)
-# todo: in Pedro's experiments: a line shows the correct location. It's the same mechanism that shows a target arrow (and here shows a line)
+# todo: show correct location after response
 # todo: support image target (+RSVP)
 # todo: escape button
 # todo: optionally get subject name and initials
@@ -81,6 +80,9 @@ def initialize_exp(config):
 
 #----------------------------------------------------------------
 def run_trials(exp_info, config):
+
+    if config.shuffle_trials:
+        random.shuffle(exp_info.trials)
 
     exp_info.trajtracker.init_output_file()
 
@@ -138,6 +140,9 @@ def run_trial(exp_info, config, trial):
         return rc
 
     while True:  # This loop runs once per frame
+
+        #-- Update all displayable elements
+        exp_info.stimuli.present()
 
         if not exp_info.xpy_exp.mouse.check_button_pressed(0):
             trial_failed(ExperimentError("FingerLifted", "You lifted your finger in mid-trial"), exp_info, trial)
@@ -208,9 +213,9 @@ def initialize_trial(exp_info, trial):
 
     exp_info.stimuli.present()  # reset the display
 
-    update_target(exp_info, trial)
+    update_target_stimulus(exp_info, trial)
 
-    exp_info.trial_data = {}
+    exp_info.numberline.target = trial.target
 
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, get_time() - exp_info.session_start_time)
 
@@ -223,8 +228,8 @@ def on_finger_touched_screen(exp_info, trial):
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
-    exp_info.numberline.feedback_stim.visible = False
     exp_info.errmsg_textbox.visible = False
+    exp_info.target_pointer.visible = False
 
     trial.start_time = get_time()
 
@@ -261,7 +266,7 @@ def on_finger_started_moving(exp_info, config, trial):
 
 
 #----------------------------------------------------------------
-def update_target(exp_info, trial):
+def update_target_stimulus(exp_info, trial):
     """
     Update the target objects when the trial is initialized
 
@@ -350,7 +355,10 @@ def trial_succeeded(exp_info, trial):
 
     print("   Trial ended successfully.")
 
-    #todo: show the correct location too?
+    if exp_info.config.post_response_target:
+        c = exp_info.numberline.response_coords
+        exp_info.target_pointer.position = c[0], c[1] + exp_info.target_pointer_height / 2
+        exp_info.target_pointer.visible = True
 
     curr_time = get_time()
     time_in_trial = curr_time - trial.start_time
@@ -374,7 +382,7 @@ def play_success_sound(exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
 
-    endpoint_err = np.abs(exp_info.numberline.last_touched_value - trial.target)
+    endpoint_err = np.abs(exp_info.numberline.response_value - trial.target)
     endpoint_err_ratio = min(1, endpoint_err / (exp_info.numberline.max_value - exp_info.numberline.min_value))
     sound_ind = np.where(endpoint_err_ratio <= exp_info.sounds_ok_max_ep_err)[0][0]
     exp_info.sounds_ok[sound_ind].play()
@@ -398,7 +406,7 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code):
 
     if exp_info.config.save_results:
 
-        endpoint = exp_info.numberline.last_touched_value
+        endpoint = exp_info.numberline.response_value
         t_move = trial.results['time_started_moving'] if 'time_started_moving' in trial.results else -1
         t_target = trial.results['time_target_shown'] if 'time_target_shown' in trial.results else -1
 

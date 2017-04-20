@@ -26,13 +26,14 @@ class ExperimentInfo(object):
 
         self._numberline = None
         self._target = None
+        self._target_pointer = None
         self._start_point = None
         self._errmsg_box = None
         self._trajtracker = None
         self._trajectory_sensitive_objects = []
         self._event_sensitive_objects = []
 
-        self.stimuli = ttrk.stimuli.StimulusContainer()
+        self.stimuli = ttrk.stimuli.StimulusContainer("main")
         self.event_manager = ttrk.events.EventManager()
 
         self.sound_err = None
@@ -91,12 +92,13 @@ class ExperimentInfo(object):
         self._numberline = nl
         self.stimuli.add(nl, "numberline")
         self._trajectory_sensitive_objects.append(nl)
+        self._event_sensitive_objects.append(nl)
 
     #---------------------------------------------------------------
     @property
     def target(self):
         """
-        The target object
+        The target stimulus (text)
         """
         return self._target
 
@@ -112,6 +114,22 @@ class ExperimentInfo(object):
         self._target = target
         self.stimuli.add(target_stim, "target")
 
+
+    #---------------------------------------------------------------
+    @property
+    def target_pointer(self):
+        """
+        A stimulus to directly indicate the target location on the number line
+        """
+        return self._target_pointer
+
+    @target_pointer.setter
+    def target_pointer(self, value):
+        if self._target_pointer is not None:
+            raise ttrk.InvalidStateError("ExperimentInfo.target_pointer cannot be set twice")
+
+        self._target_pointer = value
+        self.stimuli.add(value, "target_pointer", visible=False)
 
     #---------------------------------------------------------------
     @property

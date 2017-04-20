@@ -132,7 +132,7 @@ def trial_succeeded():
 
     feedback_arrow.visible = True
     nl_pos = number_line.position
-    feedback_arrow.position = (number_line.last_touched_coord + nl_pos[0], nl_pos[1] + feedback_arrow.height / 2)
+    feedback_arrow.position = (number_line.response_coord + nl_pos[0], nl_pos[1] + feedback_arrow.height / 2)
 
     speed_guide.activate(None)
 
@@ -150,7 +150,7 @@ if not xpy.misc.is_android_running():
 #-- Initialize the objects for the number-to-position experiment
 #---------------------------------------------------------------
 
-all_stimuli = ttrk.stimuli.StimulusContainer()
+all_stimuli = ttrk.stimuli.StimulusContainer("main")
 trajectory_sensitive_objects = []
 
 #-- Number line

@@ -104,9 +104,7 @@ def validate_attr_is_collection(obj, attr_name, value, min_length=None, max_leng
     if value is None and none_allowed:
         value = ()
 
-    val_methods = dir(value)
-    ok = "__len__" in val_methods and "__iter__" in val_methods and (allow_set or "__getitem__" in val_methods)
-    if not ok:
+    if not is_collection(value, allow_set):
         raise trajtracker.TypeError("{:}.{:} was set to a non-{:} value ({:})".format(
             get_type_name(obj), attr_name, "collection" if allow_set else "list", value))
 
@@ -219,9 +217,7 @@ def validate_func_arg_is_collection(obj, func_name, arg_name, value, min_length=
     if value is None and none_allowed:
         value = ()
 
-    val_methods = dir(value)
-    ok = "__len__" in val_methods and "__iter__" in val_methods and (allow_set or "__getitem__" in val_methods)
-    if not ok:
+    if not is_collection(value, allow_set):
         raise trajtracker.TypeError("{:}() was called with a non-{:} {:} ({:})".format(
             _get_func_name(obj, func_name), "collection" if allow_set else "list", arg_name, value))
 
@@ -271,6 +267,27 @@ def update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial, time_used
 #============================================================================
 #   Misc
 #============================================================================
+
+
+#--------------------------------------
+def is_collection(value, allow_set=True):
+    val_methods = dir(value)
+    return "__len__" in val_methods and "__iter__" in val_methods and \
+           (allow_set or "__getitem__" in val_methods)
+
+
+#--------------------------------------
+def is_coord(value, allow_float=False):
+
+    if isinstance(value, geometry.XYPoint):
+        return True
+
+    if not is_collection(value) or len(value) != 2:
+        return False
+
+    elem_type = numbers.Number if allow_float else int
+    return isinstance(value[0], elem_type) and isinstance(value[1], elem_type)
+
 
 #--------------------------------------
 def _get_func_name(obj, func_name):

@@ -18,10 +18,15 @@ import trajtracker._utils as _u
 class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
 
-    def __init__(self):
+    def __init__(self, name=None):
+        """
+        Constructor
+        
+        :param name: A name that identifies this container (this is used only to print in log messages)   
+        """
         super(StimulusContainer, self).__init__()
-
         self._stimuli = {}
+        self._name = name
 
 
     #==============================================================================
@@ -46,6 +51,9 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         if len(visible_stims) == 0:
             #-- If no stimuli to present: just clear/update
+            if self._should_log(ttrk.log_debug):
+                self._log_write("{:}.present(clear={:}, update={:}): no visible stimuli".format(self._myname(), clear, update))
+
             if clear:
                 _u.display_clear()
             if update:
@@ -57,6 +65,9 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
                 c = clear and i == 0
                 u = update and i == len(visible_stims) - 1
                 visible_stims[i]['stimulus'].present(clear=c, update=u)
+
+                if self._should_log(ttrk.log_debug):
+                    self._log_write("{:}.present(clear={:}, update={:}) stimulus #{:}".format(self._myname(), visible_stims[i]['order'], c, u), True)
 
 
     #----------------------------------------------------------
@@ -101,3 +112,10 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
     def __str__(self):
         return "{:}[{:}]".format(_u.get_type_name(self), ",".join([str(k) for k in self._stimuli.keys()]))
+
+    #----------------------------------------------------------
+    def _myname(self):
+        if self._name is None:
+            return _u.get_type_name(self)
+        else:
+            return "{:}({:})".format(_u.get_type_name(self), self._name)

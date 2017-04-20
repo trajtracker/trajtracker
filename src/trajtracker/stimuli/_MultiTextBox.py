@@ -37,7 +37,7 @@ class MultiTextBox(BaseMultiStim):
         super(MultiTextBox, self).__init__(onset_time=onset_time, duration=duration, last_stimulus_remains=last_stimulus_remains)
 
         self._stimuli = []
-        self._container = StimulusContainer()
+        self._container = StimulusContainer("MultiTextBox")
         self._event_manager = None
 
         self.text = text

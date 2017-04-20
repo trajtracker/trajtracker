@@ -33,7 +33,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
     def __init__(self, position, line_length, max_value, min_value=0,
                  orientation=Orientation.Horizontal,
-                 line_width=1, line_colour=None, end_tick_height=None, feedback_stim=None,
+                 line_width=1, line_colour=None, end_tick_height=None, feedback_stimuli=(),
                  visible=True):
         """
         Constructor - invoked when you create a new object by writing NumberLine()
@@ -58,6 +58,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         :type max_value: number
         :type end_tick_height: number
 
+        :param feedback_stimuli: See :attr:`~trajtracker.stimuli.NumberLine.feedback_stimuli`
         """
 
         super(NumberLine, self).__init__()
@@ -91,15 +92,19 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         self._touch_distance = 0        # Issue a "touch" decision when the finger is closer than this to the line
                                         # _touch_directioned=True and distance<0 means that finger must cross the line and get this far on the other side
 
-        self.feedback_stim = feedback_stim
+        self.feedback_stimuli = feedback_stimuli
+        self.feedback_stim_chooser = None
         self.feedback_stim_offset = None
         self.feedback_stim_hide_event = None
+        self._feedback_stim_selector = ttrk.stimuli.StimulusSelector()   # dummy selector
+        self._feedback_stim_selector.visible = False
 
         self.visible = visible
 
         self._visual_objects = {}
 
         self.reset()
+        self.target = None
 
 
     #-----------------------------------------------------------------------------------
@@ -136,10 +141,19 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         self.label_max_text = text_max
 
 
+    #--------------------------------------------------------------
+    def on_registered(self, event_manager):
+        event_manager.register_operation(event=self.feedback_stim_hide_event,
+                                         operation=lambda t1, t2: self.hide_feedback_stim(),
+                                         recurring=True,
+                                         description="Hide the NumberLine's feedback stimulus")
+
+
     #===================================================================================
     #      Plotting
     #===================================================================================
 
+    #--------------------------------------------------------------
     def preload(self):
         """
         Pre-load the number line - prepare for plotting
@@ -186,7 +200,10 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         self.preload()
 
-        self._canvas.present(clear, update)
+        self._canvas.present(clear, update and not self._feedback_stim_selector.visible)
+
+        if self._feedback_stim_selector.visible:
+            self._feedback_stim_selector.present(False, update)
 
         return get_time() - start_time
 
@@ -339,6 +356,20 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
     #===================================================================================
 
     #---------------------------------------------------------
+    @property
+    def target(self):
+        """
+        The target number. Setting this is needed only if you want to use  
+        :attr:`~trajtracker.stimuli.NumberLine.response_bias`
+        """
+        return self._target
+
+    @target.setter
+    def target(self, value):
+        _u.validate_attr_type(self, "target", value, numbers.Number, none_allowed=True)
+        self._target = value
+
+    #---------------------------------------------------------
     # noinspection PyUnusedLocal
     def reset(self, time0=None):
         """
@@ -349,7 +380,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         """
 
         self._last_mouse_coord = None    # Last coordinate where mouse was observed (x or y, depending on the number line orientation)
-        self._last_touched_coord = None  # Last coordinate where the number line was touched (x or y, depending on the number line orientation)
+        self._response_relative_coord = None  # Last coordinate where the number line was touched (x or y, depending on the number line orientation)
         self._initial_mouse_dir = None   # +1 or -1: indicates the first click position relatively to the number line
 
 
@@ -372,7 +403,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         _u.validate_func_arg_type(self, "update_xy", "y_coord", y_coord, int)
         self._log_func_enters("update_xy", [x_coord, y_coord])
 
-        if self._last_touched_coord is not None:
+        if self._response_relative_coord is not None:
             self._log_func_returns("update_xyt")
             return
 
@@ -412,32 +443,113 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
             touched = distance < self._touch_distance
 
         if touched:
-            self._last_touched_coord = touch_coord
+            self._response_relative_coord = touch_coord
             self._show_feedback_stim()
             self._log_write_if(ttrk.log_info, "The number line was touched at {:}, time_in_trial={:}".format(
-                self.last_touched_value, time_in_trial))
+                self.response_value, time_in_trial))
 
         self._log_func_returns("update_xyt")
         return None
 
     #---------------------------------------------------------
     def _show_feedback_stim(self):
-        if self._feedback_stim is None:
+
+        if len(self._feedback_stimuli) == 0:
+            # No feedback stimulus
             return
-        elif "visible" not in dir(self._feedback_stim):
+
+        if len(self._feedback_stimuli) == 1 or self._feedback_stim_chooser is None:
+            # A fixed feedback stimulus
+            fb_stim_ind = 0
+        else:
+            # Select the feedback stimulus
+            fb_stim_ind = self._feedback_stim_chooser(self)
+
+        self._feedback_stim_selector.activate(fb_stim_ind)
+
+        if "visible" not in dir(self._feedback_stim_selector):
             raise ttrk.InvalidStateError(
                 "The NumberLine's feedback stimulus is invalid, or was not stored in a {:}".format(
                     _u.get_type_name(ttrk.stimuli.StimulusContainer)))
 
-        if self._orientation == NumberLine.Orientation.Horizontal:
-            fb_stim_coord = (self._mid_x + self._last_touched_coord, self._mid_y)
-        else:
-            fb_stim_coord = (self._mid_x, self._mid_y + self._last_touched_coord)
-
+        fb_stim_coord = self.response_coords
         fb_stim_coord = (fb_stim_coord[0] + self._feedback_stim_offset[0], fb_stim_coord[1] + self._feedback_stim_offset[1])
 
-        self._feedback_stim.position = fb_stim_coord
-        self._feedback_stim.visible = True
+        self._feedback_stim_selector.position = fb_stim_coord
+        self._feedback_stim_selector.visible = True
+
+
+    #---------------------------------------------------------
+    def hide_feedback_stim(self):
+        """
+        Hide a previously-showed feedback stimulus
+        """
+        self._feedback_stim_selector.visible = False
+
+
+    #===================================================================================
+    #      Convert coordinates
+    #===================================================================================
+
+    #---------------------------------------------------------
+    def value_to_coord(self, value):
+        """
+        Get the coordinate for a given value on the number line
+        This is either the x or y coordinate, depending on the number line orientation
+
+        :type value: Number
+        :return: int
+        """
+
+        _u.validate_func_arg_type(self, "value_to_coord", "value", value, numbers.Number)
+
+        #-- Convert the value to a 0-1 scale
+        numberline_len = self._max_value - self._min_value
+        value01 = (value - self._min_value) / numberline_len
+
+        #-- Convert to coordinates
+        mid_coord = self._mid_x if self.orientation == NumberLine.Orientation.Horizontal else self._mid_y
+        return mid_coord + (value01 - 0.5) * self.line_length
+
+
+    #---------------------------------------------------------
+    def value_to_coords(self, value):
+        """
+        Get the (x,y) coordinate corresponding with a given value on the number line
+
+        :type value: Number
+        :return: tuple
+        """
+
+        c = self.value_to_coord(value)
+
+        if self.orientation == NumberLine.Orientation.Horizontal:
+            return c, self._mid_y
+        else:
+            return self._mid_x, c
+
+
+    #---------------------------------------------------------
+    def coord_to_value(self, coord):
+        """
+        Get the numberline value for a given screen coordinate
+
+        :param coord: The x or y coordinate, (depending on the number line's :attr:`~trajtracker.stimuli.NumberLine.orientation`).
+                      If you specify an (x,y) tuple, either x or y will be used, as appropriate 
+        :return: float
+        """
+
+        if _u.is_coord(coord, allow_float=True):
+            coord = coord[0] if self.orientation == NumberLine.Orientation.Horizontal else coord[1]
+        else:
+            _u.validate_func_arg_type(self, "coord_to_value", "coord", coord, numbers.Number)
+
+        #-- Convert the coordinate into a position using a 0-1 scale
+        mid_coord = self._mid_x if self.orientation == NumberLine.Orientation.Horizontal else self._mid_y
+        pos01 = (coord - mid_coord) / self.line_length + 0.5
+
+        # noinspection PyUnresolvedReferences
+        return pos01 * (self._max_value - self._min_value) + self._min_value
 
 
     #===================================================================================
@@ -452,12 +564,12 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         :type: bool
         """
-        return self._last_touched_coord is not None
+        return self._response_relative_coord is not None
 
 
     #---------------------------------------------------------
     @property
-    def last_touched_coord(self):
+    def response_coord(self):
         """
         Get the coordinate where the mouse/finger last touched the number line.
         This is either the x or y coordinate, depending on the number line orientation
@@ -465,12 +577,34 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         :type: int
         """
-        return self._last_touched_coord
+
+        if self._response_relative_coord is None:
+            return None
+
+        return self._response_relative_coord + (self._mid_x if self.orientation == NumberLine.Orientation.Horizontal else self._mid_y)
 
 
     #---------------------------------------------------------
     @property
-    def last_touched_value(self):
+    def response_coords(self):
+        """
+        Get the (x,y) coordinates where the mouse/finger last touched the number line.
+        Returns None if the line was not touched yet.
+        
+        :type: tuple 
+        """
+        if not self.touched:
+            return None
+
+        if self._orientation == NumberLine.Orientation.Horizontal:
+            return self._mid_x + self._response_relative_coord, self._mid_y
+        else:
+            return self._mid_x, self._mid_y + self._response_relative_coord
+
+
+    #---------------------------------------------------------
+    @property
+    def response_value(self):
         """
         The position where the mouse/finger last touched the number line.
         The value returned is in the number line's scale.
@@ -478,14 +612,23 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         :type: float
         """
-        if self._last_touched_coord is None:
+        if self._response_relative_coord is None:
             return None
 
         #-- Convert the coordinate into a position using a 0-1 scale
-        pos01 = self._last_touched_coord / self.line_length + 0.5
+        pos01 = self._response_relative_coord / self.line_length + 0.5
 
         # noinspection PyUnresolvedReferences
         return pos01 * (self._max_value - self._min_value) + self._min_value
+
+
+    #---------------------------------------------------------
+    @property
+    def response_bias(self):
+        """
+        The delta between the touch position and the target position (positive = rightward bias) 
+        """
+        return None if (self._target is None or not self.touched) else self._target - self.response_value
 
 
     #===================================================================================
@@ -768,17 +911,121 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
     #-----------------------------------------------------------
     @property
-    def feedback_stim(self):
+    def feedback_stimuli(self):
         """
-        the stimulus to be used as feedback stimulus
+        A list of stimuli to be used as feedback (showing where the mouse/finger landed on the line).
+        
+        The number line will take care of showing a feedback stimulus when appropriate. You hide them 
+        by calling :func:`~trajtracker.stimuli.NumberLine.hide_feedback_stim` or, if you
+        use the :doc:`events mechanism <../events/events_overview>` , 
+        by setting :attr:`~trajtracker.stimuli.NumberLine.feedback_stim_hide_event`.
+        
+        The actual display is updated when :func:`~trajtracker.stimuli.NumberLine.present` is called). 
+        put it in a stimulus container.
+        
+        When using more than one feedback stimulus, specify a 
+        :attr:`~trajtracker.stimuli.NumberLine.feedback_stim_chooser`, otherwise the first feedback
+        stimulus will always be used.
+        
+        Use :attr:`~trajtracker.stimuli.NumberLine.feedback_stim_offset` if needed.
         """
-        return self._feedback_stim
+        return list(self._feedback_stimuli)
 
-    @feedback_stim.setter
-    def feedback_stim(self, value):
-        if value is not None and "present" not in dir(value):
-            raise ttrk.TypeError("{:}.feedback_stim was set to a non-stimulus value".format(_u.get_type_name(self)))
-        self._feedback_stim = value
+
+    @feedback_stimuli.setter
+    def feedback_stimuli(self, stimuli):
+        _u.validate_attr_is_collection(self, "feedback_stimuli", stimuli, none_allowed=True)
+        if stimuli is None:
+            stimuli = []
+        else:
+            stimuli = list(stimuli)
+
+        for stim in stimuli:
+            if "present" not in dir(stim):
+                raise ttrk.TypeError("{:}.feedback_stimuli was set with a non-stimulus value".format(_u.get_type_name(self)))
+
+        self._feedback_stimuli = stimuli
+
+        #-- Also put the stimuli in a selector, so we can switch between them
+        self._feedback_stim_selector = ttrk.stimuli.StimulusSelector()
+        self._feedback_stim_selector.visible = False
+        for i in range(len(stimuli)):
+            self._feedback_stim_selector.add_stimulus(i, stimuli[i])
+
+
+    #-----------------------------------------------------------
+    @property
+    def feedback_stim_chooser(self):
+        """
+        A function that selects the stimulus to show as finger-landing feedback.
+        
+        When several :attr:`~trajtracker.stimuli.Numberline.feedback_stimuli` are provided, this function
+        is used to select the stimulus that will be shown as feedback.
+        
+        The function gets the numberline as an argument and returns the index of the stimulus to show.
+         
+        When setting this attribute, you can specify a list of numbers between 0 and 1 (order doesn't matter). 
+        Each number represents a response accuracy error (as a value between 0 and 1 - percentage of the 
+        number line length); the feedback stimulus will be selected by the response accuracy.
+        Note that if you use this method, the number of :attr:`~trajtracker.stimuli.Numberline.feedback_stimuli` 
+        must be *larger* than the number of accuracy levels specified here, because there is an implicit, 
+        additional accuracy level ("worse than all specified accuracies").
+        """
+        return self._feedback_stim_chooser
+
+
+    @feedback_stim_chooser.setter
+    def feedback_stim_chooser(self, value):
+
+        if value is None or isinstance(value, type(lambda: 1)):
+
+            #-- A selector function was provided
+            pass
+
+        elif _u.is_collection(value, allow_set=False) and sum([not isinstance(x, numbers.Number) for x in value]) == 0:
+
+            #-- A list of numbers was provided
+            accuracy_levels = list(value)
+            accuracy_levels.sort()
+            if sum([not (0 < x < 2) for x in accuracy_levels]) > 0:
+                raise ttrk.ValueError("{:}.feedback_stimulus_selector was set with invalid accuracy levels (accuracy should be on a 0-1 scale)".format(
+                    _u.get_type_name(self)))
+
+            def fb_selector(numberline):
+                return NumberLine._choose_feedback_stim_by_accuracy(numberline, accuracy_levels)
+
+            value = fb_selector
+
+        else:
+            raise ttrk.TypeError("{:}.feedback_stimulus_selector was set to an invalid value".format(_u.get_type_name(self)))
+
+        self._feedback_stim_chooser = value
+
+
+    #------------------------------------------
+    # This implementation of feedback_stim_selector selects a feedback stimulus based on the response accuracy
+    #
+    @staticmethod
+    def _choose_feedback_stim_by_accuracy(numberline, accuracy_levels):
+
+        if len(accuracy_levels) >= len(numberline.feedback_stimuli):
+            raise ValueError(("Invadlid configuration of {:}: there are {:} feedback_stimuli - " +
+                              "expecting {:} accuracy levels for feedback_stim_selector ({:} levels provided)").format(
+                _u.get_type_name(NumberLine),
+                len(numberline.feedback_stimuli),
+                len(numberline.feedback_stimuli)-1,
+                len(accuracy_levels)
+            ))
+
+        response_err = np.abs(numberline.response_bias)
+        err_ratio = min(1, response_err / (numberline.max_value - numberline.min_value))
+
+        for ind in range(len(accuracy_levels)):
+            if err_ratio <= accuracy_levels[ind]:
+                return ind
+
+        return len(accuracy_levels)
+
 
     #-----------------------------------------------------------
     @property
@@ -797,6 +1044,9 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
     #-----------------------------------------------------------
     @property
     def feedback_stim_hide_event(self):
+        """
+        Hide the :attr:`~trajtracker.stimuli.NumberLine.feedback_stimulus` when this event occurs.
+        """
         return self._feedback_stim_hide_event
 
     @feedback_stim_hide_event.setter
@@ -883,3 +1133,4 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         self._touch_directioned = value
         self._log_property_changed("touch_directioned")
+

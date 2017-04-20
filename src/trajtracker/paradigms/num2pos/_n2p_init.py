@@ -8,6 +8,7 @@ Functions to support the number-to-position paradigm
 import time
 from numbers import Number
 from operator import itemgetter
+import numpy as np
 
 import expyriment as xpy
 
@@ -15,7 +16,7 @@ import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 
-from trajtracker.paradigms.num2pos import FeedbackType, Arrow, FINGER_STARTED_MOVING, CsvConfigFields
+from trajtracker.paradigms.num2pos import Arrow, FINGER_STARTED_MOVING, CsvConfigFields
 
 
 #----------------------------------------------------------------
@@ -87,19 +88,36 @@ def create_numberline(exp_info, config):
 
     #-- Feedback arrow/line
 
-    numberline.feedback_stim_hide_event = ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
+    if config.show_feedback:
 
-    if config.nl_feedback_type == FeedbackType.Arrow:
-        numberline.feedback_stim = Arrow()
-    elif config.nl_feedback_type == FeedbackType.Line:
-        numberline.feedback_stim = xpy.stimuli.Line(start_point=(0, 0), end_point=(0, 20), line_width=2,
-                                                    colour=xpy.misc.constants.C_WHITE)
+        if len(config.feedback_arrow_colors) == 0:
+            raise ValueError("Invalid configuration: feedback_arrow_colors is an empty list")
 
-    numberline.feedback_stim_offset = (0, numberline.feedback_stim.size[1]/2)
+        multicolor = len(config.feedback_arrow_colors) > 1
 
-    if config.nl_feedback_type != FeedbackType.none:
-        exp_info.stimuli.add(numberline.feedback_stim, "feedback", False)
+        colors = config.feedback_arrow_colors
+        colors = colors if _u.is_collection(colors) else [colors]
+        numberline.feedback_stimuli = [Arrow(c) for c in colors]
+        [s.preload() for s in numberline.feedback_stimuli]
 
+        numberline.feedback_stim_offset = (0, numberline.feedback_stimuli[0].size[1] / 2)
+        numberline.feedback_stim_hide_event = ttrk.events.TRIAL_STARTED
+
+        i = 0
+        for stim in numberline.feedback_stimuli:
+            exp_info.stimuli.add(stim, "feedback" if multicolor else "feedback(accuracy level %d)" % i, False)
+            i += 1
+
+        if config.feedback_accuracy_levels is not None:
+            numberline.feedback_stim_chooser = config.feedback_accuracy_levels
+
+    #-- For directly showing the target
+
+    target_pointer_length = 20
+    exp_info.target_pointer = xpy.stimuli.Line(start_point=(0, 0), end_point=(0, target_pointer_length),
+                                               line_width=2, colour=xpy.misc.constants.C_WHITE)
+    exp_info.target_pointer.preload()
+    exp_info.target_pointer_height = target_pointer_length
 
 #----------------------------------------------------------------
 def create_start_point(exp_info, config):
@@ -214,7 +232,7 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
 
     if zigzag_validator:
         v = ttrk.validators.NCurvesValidator(max_curves_per_trial=config.max_zigzags)
-        v._direction_monitor.min_angle_change_per_curve = 10  # Changes smaller than 10 degrees don't count as curves
+        v.direction_monitor.min_angle_change_per_curve = 10  # Changes smaller than 10 degrees don't count as curves
         v.enable_event = FINGER_STARTED_MOVING
         v.disable_event = ttrk.events.TRIAL_ENDED
         exp_info.add_validator(v, 'zigzag')
@@ -230,13 +248,19 @@ def create_textbox_target(exp_info, config):
     :type config: trajtracker.paradigms.num2pos.Config
     """
 
+    POSITION_FROM_TOP = 5
+
+    screen_top = exp_info.screen_size[1] / 2
+    height = screen_top - exp_info.numberline.position[1] - POSITION_FROM_TOP - 1
+    y = int(screen_top - POSITION_FROM_TOP - height/2)
+
     target = ttrk.stimuli.MultiTextBox()
 
-    target.position = (0, exp_info.screen_size[1] / 2 - 50)
-    target.size = (300, 80)
+    target.position = (0, y)
+    target.size = (600, height)
     target.text_size = 50
     target.text_colour = xpy.misc.constants.C_WHITE
-    target.text_justification = 1 # center
+    target.text_justification = 1  # center
 
     target.onset_event = TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
     target.onset_time = [0]
@@ -296,11 +320,11 @@ def create_sounds(exp_info, config):
         if not (0 < sound_cfg[0] <= 1):
             raise trajtracker.ValueError("invalid accuracy level ({:}) in config.sound_by_accuracy".format(
                 sound_cfg[0]))
-        _u.validate_attr_type(config, "sound_by_accuracy[*]", sound_cfg[0], str)
+        _u.validate_attr_type(config, "sound_by_accuracy[*]", sound_cfg[1], str)
 
     #-- Load sounds and save configuration
 
-    cfg = list(config.sound_by_accuracy)
+    cfg = [list(x) for x in config.sound_by_accuracy]
     cfg.sort(key=itemgetter(0))
     cfg[-1][0] = 1
 
@@ -313,6 +337,7 @@ def load_sound(filename):
     sound = xpy.stimuli.Audio("sounds/" + filename)
     sound.preload()
     return sound
+
 
 #----------------------------------------------------------------
 def load_data_source(config):

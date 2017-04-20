@@ -182,28 +182,60 @@ class NumberLineTestCase(unittest.TestCase):
 
 
     #-----------------------------------------------------------------
-    def test_last_touch_coord(self):
+    def test_response_coord(self):
         nl = NumberLine((0,0), 100, 40, orientation=NumberLine.Orientation.Horizontal)
 
-        self.assertIsNone(nl.last_touched_coord)
-        self.assertIsNone(nl.last_touched_value)
+        self.assertIsNone(nl.response_coord)
+        self.assertIsNone(nl.response_value)
 
         nl.reset()
         nl.update_xyt(0, -1)
         nl.update_xyt(0, 1)
 
-        self.assertEqual(0, nl.last_touched_coord)
-        self.assertEqual(20, nl.last_touched_value)
+        self.assertEqual(0, nl.response_coord)
+        self.assertEqual(20, nl.response_value)
 
         nl.reset()
-        self.assertIsNone(nl.last_touched_coord)
-        self.assertIsNone(nl.last_touched_value)
+        self.assertIsNone(nl.response_coord)
+        self.assertIsNone(nl.response_value)
 
         nl.update_xyt(25, -1)
         nl.update_xyt(25, 1)
 
-        self.assertEqual(25, nl.last_touched_coord)
-        self.assertEqual(30, nl.last_touched_value)
+        self.assertEqual(25, nl.response_coord)
+        self.assertEqual(30, nl.response_value)
+
+    #-----------------------------------------------------------------
+    def test_value_to_coord(self):
+        nl = NumberLine((10, 50), 100, 50, orientation=NumberLine.Orientation.Horizontal)
+        self.assertEqual(-20, nl.value_to_coord(10))
+        self.assertEqual(-42, nl.value_to_coord(-1))
+
+        nl = NumberLine((50, 10), 100, 50, orientation=NumberLine.Orientation.Vertical)
+        self.assertEqual(-20, nl.value_to_coord(10))
+        self.assertEqual(-42, nl.value_to_coord(-1))
+
+    #-----------------------------------------------------------------
+    def test_value_to_coords(self):
+        nl = NumberLine((10, 50), 100, 50, orientation=NumberLine.Orientation.Horizontal)
+        self.assertEqual((-20, 50), nl.value_to_coords(10))
+        self.assertEqual((-42, 50), nl.value_to_coords(-1))
+
+        nl = NumberLine((50, 10), 100, 50, orientation=NumberLine.Orientation.Vertical)
+        self.assertEqual((50, -20), nl.value_to_coords(10))
+        self.assertEqual((50, -42), nl.value_to_coords(-1))
+
+
+    #-----------------------------------------------------------------
+    # noinspection PyTypeChecker
+    def test_coord_to_value(self):
+        nl = NumberLine((10, 50), 100, 50, orientation=NumberLine.Orientation.Horizontal)
+        self.assertTrue(nl.coord_to_value(-20) - 10 < .0000001)
+        self.assertTrue(nl.coord_to_value(-42) - (-1) < .000001)
+
+        nl = NumberLine((50, 10), 100, 50, orientation=NumberLine.Orientation.Vertical)
+        self.assertTrue(nl.coord_to_value(-20) - 10 < .0000001)
+        self.assertTrue(nl.coord_to_value(-42) - (-1) < .000001)
 
 
 
