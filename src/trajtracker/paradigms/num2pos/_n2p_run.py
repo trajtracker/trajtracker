@@ -33,7 +33,6 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 # todo: show correct location after response
 # todo: support image target (+RSVP)
 # todo: escape button
-# todo: optionally get subject name and initials
 
 # todo: delete XML support?
 # todo: organize documentation. Have a "using this class" section for each complex class.
@@ -260,7 +259,7 @@ def update_target_stimulus(exp_info, trial):
     else:
         trial.presented_target = str(trial.target)
 
-    exp_info.target.text = trial.presented_target.split(";")
+    exp_info.target.texts = trial.presented_target.split(";")
 
     if CsvConfigFields.OnsetTime in trial.csv_data:
         exp_info.target.onset_time = [float(s) for s in trial.csv_data[CsvConfigFields.OnsetTime].split(";")]
@@ -316,7 +315,7 @@ def trial_failed(err, exp_info, trial):
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_FAILED, time_in_trial, time_in_session)
 
     exp_info.errmsg_textbox.unload()
-    exp_info.errmsg_textbox.text = err.message
+    exp_info.errmsg_textbox.texts = err.message
     exp_info.errmsg_textbox.visible = True
 
     exp_info.sound_err.play()
@@ -439,7 +438,7 @@ def save_session_file(exp_info):
 
     #-- Subject info
     subj_node = ET.SubElement(root, "subject", id=exp_info.subject_id, expyriment_id=str(exp_info.xpy_exp.subject))
-    ET.SubElement(subj_node, "name").text = exp_info.subject_name
+    ET.SubElement(subj_node, "name").texts = exp_info.subject_name
 
     #-- Session data
     session_node = ET.SubElement(root, "session", start_time=exp_info.session_start_localtime)
@@ -465,8 +464,8 @@ def save_session_file(exp_info):
 def indent_xml(elem, level=0):
     i = "\n" + level * "  "
     if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + "  "
+        if not elem.texts or not elem.texts.strip():
+            elem.texts = i + "  "
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
         for elem in elem:

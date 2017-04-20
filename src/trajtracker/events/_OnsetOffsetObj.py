@@ -6,7 +6,6 @@ Objects that can define onset and offset relatively to an event
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
-from trajtracker.data import fromXML
 from trajtracker.events import Event
 import trajtracker._utils as _u
 
@@ -27,7 +26,6 @@ class OnsetOffsetObj(object):
         return self._onset
 
     @onset.setter
-    @fromXML(Event.parse)
     def onset(self, value):
         _u.validate_attr_type(self, "onset", value, Event, none_allowed=True)
         self._onset = value
@@ -42,7 +40,6 @@ class OnsetOffsetObj(object):
         return self._offset
 
     @offset.setter
-    @fromXML(Event.parse)
     def offset(self, value):
         _u.validate_attr_type(self, "offset", value, Event, none_allowed=True)
         self._offset = value

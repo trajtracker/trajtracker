@@ -52,9 +52,9 @@ class MultiTextBoxTests(unittest.TestCase):
     #---------------------------------------------------
     def test_set_text(self):
         mtb = MultiTextBoxDbg(text=['a', 'b'])
-        self.assertEqual(['a', 'b'], mtb.text)
-        mtb.text = 'a',
-        mtb.text = None
+        self.assertEqual(['a', 'b'], mtb.texts)
+        mtb.texts = 'a',
+        mtb.texts = None
 
     def test_set_text_invalid(self):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text='hi'))

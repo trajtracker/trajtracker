@@ -40,7 +40,7 @@ class MultiTextBox(BaseMultiStim):
         self._container = StimulusContainer("MultiTextBox")
         self._event_manager = None
 
-        self.text = text
+        self.texts = text
         self.text_font = text_font
         self.text_size = text_size
         self.text_bold = text_bold
@@ -73,7 +73,7 @@ class MultiTextBox(BaseMultiStim):
         Return an array of booleans, indicating whether each stimulus is presently visible or not.
         The array has as many elements as :attr:`~trajtracker.stimuli.MultiTextBox.text`
         """
-        n_stim = len(self._text)
+        n_stim = len(self._texts)
         self._create_stimuli()
         return [self._stimuli[i].visible for i in range(n_stim)]
 
@@ -83,7 +83,7 @@ class MultiTextBox(BaseMultiStim):
     #
     def _create_stimuli(self):
 
-        n_stim = len(self._text)
+        n_stim = len(self._texts)
 
         for i in range(len(self._stimuli), n_stim+1):
             is_multiple = self._is_multiple_values(self._size, "coord")
@@ -101,7 +101,7 @@ class MultiTextBox(BaseMultiStim):
         self._log_func_enters("_configure_stimuli")
         self._validate()
 
-        n_stim = len(self._text)
+        n_stim = len(self._texts)
 
         for i in range(len(self._stimuli)):
             self._stimuli[i].unload()
@@ -109,7 +109,7 @@ class MultiTextBox(BaseMultiStim):
         self._create_stimuli()
 
         self._set_stimulus_font(n_stim)
-        self._set_stimuli_property("text", str, n_stim)
+        self._set_stimuli_property("texts", str, n_stim, stim_prop_name="text")
         self._set_stimuli_property("text_bold", bool, n_stim)
         self._set_stimuli_property("text_italic", bool, n_stim)
         self._set_stimuli_property("text_underline", bool, n_stim)
@@ -119,7 +119,7 @@ class MultiTextBox(BaseMultiStim):
         self._set_stimuli_property("size", "coord", n_stim)
         self._set_stimuli_property("position", "coord", n_stim)
 
-        for i in range(len(self._text)):
+        for i in range(len(self._texts)):
             self._stimuli[i].preload()
 
 
@@ -128,8 +128,8 @@ class MultiTextBox(BaseMultiStim):
     #
     def _validate(self):
 
-        n_stim = len(self._text)
-        self._validate_property("text")
+        n_stim = len(self._texts)
+        self._validate_property("texts")
         self._validate_property("text_font", n_stim)
         self._validate_property("text_size", n_stim)
         self._validate_property("text_bold", n_stim)
@@ -161,14 +161,17 @@ class MultiTextBox(BaseMultiStim):
     #----------------------------------------------------
     # Set a single property of all self._stimuli
     #
-    def _set_stimuli_property(self, prop_name, prop_type, n_stim):
+    def _set_stimuli_property(self, prop_name, prop_type, n_stim, stim_prop_name=None):
+
+        if stim_prop_name is None:
+            stim_prop_name = prop_name
 
         values = getattr(self, prop_name)
         if not self._is_multiple_values(values, prop_type):
             values = [values] * n_stim
 
         for i in range(n_stim):
-            setattr(self._stimuli[i], prop_name, values[i])
+            setattr(self._stimuli[i], stim_prop_name, values[i])
 
     #------------------------------------------
     def _set_stimulus_font(self, n_stim):
@@ -197,7 +200,7 @@ class MultiTextBox(BaseMultiStim):
 
         self._configure_and_preload()
 
-        n_stim = len(self._text)
+        n_stim = len(self._texts)
 
         duration = self._duration if self._duration_multiple else ([self._duration] * n_stim)
 
@@ -207,7 +210,7 @@ class MultiTextBox(BaseMultiStim):
             onset_event = self._onset_event + self._onset_time[i]
             id1 = self._event_manager.register_operation(event=onset_event,
                                                          recurring=False,
-                                                         description="Show text[{:}]({:})".format(i, self._text[i]),
+                                                         description="Show text[{:}]({:})".format(i, self._texts[i]),
                                                          operation=TextboxEnableDisableOp(self, self._stimuli[i], True, i),
                                                          cancel_pending_operation_on=self.terminate_event)
             op_ids.add(id1)
@@ -218,7 +221,7 @@ class MultiTextBox(BaseMultiStim):
             offset_event = self._onset_event + self._onset_time[i] + duration[i]
             id2 = self._event_manager.register_operation(event=offset_event,
                                                          recurring=False,
-                                                         description="Hide text[{:}]({:})".format(i, self._text[i]),
+                                                         description="Hide text[{:}]({:})".format(i, self._texts[i]),
                                                          operation=TextboxEnableDisableOp(self, self._stimuli[i], False, i),
                                                          cancel_pending_operation_on=self.terminate_event)
             op_ids.add(id2)
@@ -248,6 +251,11 @@ class MultiTextBox(BaseMultiStim):
 
     #----------------------------------------------------
     def init_for_trial(self):
+        """
+        Initialize when a trial starts.
+        
+        Do not use this function if you are working with the events mechanism. 
+        """
 
         self._log_func_enters("init_for_trial")
         if self._event_manager is not None:
@@ -256,7 +264,7 @@ class MultiTextBox(BaseMultiStim):
 
         self._configure_and_preload()
 
-        n_stim = len(self._text)
+        n_stim = len(self._texts)
 
         show_ops = zip(self._onset_time[:n_stim], [True] * n_stim, range(n_stim))
 
@@ -278,6 +286,8 @@ class MultiTextBox(BaseMultiStim):
 
         This function will also invoke :func:`~trajtracker.stimuli.MultiTextBox.update_display`.
 
+        Do not use this function if you are working with the events mechanism.
+         
         :param time: The time in the current session/trial. This must be synchronized with the "time"
                      argument of :func:`~trajtracker.stimuli.MultiTextBox.update_display`
         """
@@ -295,8 +305,10 @@ class MultiTextBox(BaseMultiStim):
     #----------------------------------------------------
     def update_display(self, time):
         """
-        *When working without events:* set relevant stimuli as visible/invisible.
+        Set relevant stimuli as visible/invisible.
 
+        Do not use this function if you are working with the events mechanism.
+         
         :param time: The time in the current session/trial. This must be synchronized with the "time"
                      argument of :func:`~trajtracker.stimuli.MultiTextBox.start_showing`
         """
@@ -310,7 +322,7 @@ class MultiTextBox(BaseMultiStim):
 
             if self._should_log(ttrk.log_trace):
                 self._log_write("{:} stimulus #{:} ({:})".format(
-                    "showing" if visible else "hiding", stim_num, self._text[stim_num]))
+                    "showing" if visible else "hiding", stim_num, self._texts[stim_num]))
             self._stimuli[stim_num].visible = visible
 
 
@@ -320,14 +332,14 @@ class MultiTextBox(BaseMultiStim):
 
     #-----------------------------------------------------------------
     @property
-    def text(self):
-        return self._text
+    def texts(self):
+        return self._texts
 
-    @text.setter
+    @texts.setter
     @fromXML(_u.parse_scalar_or_list(str))
-    def text(self, value):
-        self._set_property("text", value, str, allow_single_value=False)
-        self._log_property_changed("text")
+    def texts(self, value):
+        self._set_property("texts", value, str, allow_single_value=False)
+        self._log_property_changed("texts")
 
     #-----------------------------------------------------------------
     @property
