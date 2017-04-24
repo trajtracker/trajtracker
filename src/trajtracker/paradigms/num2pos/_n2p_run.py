@@ -30,7 +30,6 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 # bugs:
 # todo: show correct location after response: stim shown in mid screen
-# todo: target text size is not applied. Why?
 
 # features:
 # todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
@@ -341,7 +340,7 @@ def trial_succeeded(exp_info, trial):
     print("   Trial ended successfully.")
 
     if exp_info.config.post_response_target:
-        c = exp_info.numberline.response_coords
+        c = exp_info.numberline.value_to_coords(trial.target)
         exp_info.target_pointer.position = c[0], c[1] + exp_info.target_pointer_height / 2
         exp_info.target_pointer.visible = True
 

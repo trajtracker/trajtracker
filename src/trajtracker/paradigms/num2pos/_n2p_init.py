@@ -92,6 +92,8 @@ def create_numberline(exp_info, config):
 
     if config.show_feedback:
 
+        ttrk.log_write("The finger landing position will be presented after each trial")
+
         if len(config.feedback_arrow_colors) == 0:
             raise ValueError("Invalid configuration: feedback_arrow_colors is an empty list")
 
@@ -115,11 +117,10 @@ def create_numberline(exp_info, config):
 
     #-- For directly showing the target
 
-    target_pointer_length = 20
-    exp_info.target_pointer = xpy.stimuli.Line(start_point=(0, 0), end_point=(0, target_pointer_length),
-                                               line_width=2, colour=xpy.misc.constants.C_WHITE)
+    exp_info.target_pointer = xpy.stimuli.Rectangle(size=(3, 30),
+                                                    colour=xpy.misc.constants.C_WHITE)
     exp_info.target_pointer.preload()
-    exp_info.target_pointer_height = target_pointer_length
+    exp_info.target_pointer_height = exp_info.target_pointer.size[1]
 
 #----------------------------------------------------------------
 def create_start_point(exp_info, config):
