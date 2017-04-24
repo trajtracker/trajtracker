@@ -15,6 +15,7 @@ import expyriment as xpy
 import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
+import trajtracker.utils as u
 
 from trajtracker.paradigms.num2pos import Arrow, FINGER_STARTED_MOVING, CsvConfigFields
 
@@ -79,9 +80,10 @@ def create_numberline(exp_info, config):
     # -- The labels at the end of the line
     numberline.labels_visible = True
     numberline.labels_font_name = "Arial"
-    numberline.labels_font_size = 26
-    numberline.labels_font_colour = xpy.misc.constants.C_GREY
     numberline.labels_box_size = (100, 30)
+    hsr = u.get_font_height_to_size_ratio(numberline.labels_font_name)
+    numberline.labels_font_size = int(numberline.labels_box_size[1] / hsr)
+    numberline.labels_font_colour = xpy.misc.constants.C_GREY
     numberline.labels_offset = (0, 20)
 
     exp_info.numberline = numberline
@@ -218,7 +220,6 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
         v.movement_started_event = FINGER_STARTED_MOVING
         v.enable_event = FINGER_STARTED_MOVING
         v.disable_event = ttrk.events.TRIAL_ENDED
-        v.guide.log_level = ttrk.log_trace
         exp_info.add_validator(v, 'global_speed')
         exp_info.stimuli.add(v.guide.stimulus, "speed_guide", visible=False)
 
@@ -253,6 +254,8 @@ def create_textbox_target(exp_info, config):
 
     POSITION_FROM_TOP = 5
 
+    ttrk.log_write("Using text target", print_to_console=True)
+
     screen_top = exp_info.screen_size[1] / 2
     height = screen_top - exp_info.numberline.position[1] - POSITION_FROM_TOP - 1
     y = int(screen_top - POSITION_FROM_TOP - height/2)
@@ -260,10 +263,18 @@ def create_textbox_target(exp_info, config):
     target = ttrk.stimuli.MultiTextBox()
 
     target.position = (0, y)
+    target.text_font = "Arial"
     target.size = (600, height)
-    target.text_size = 50
     target.text_colour = xpy.misc.constants.C_WHITE
     target.text_justification = 1  # center
+
+    if not (0 < config.text_target_height <= 1):
+        raise ttrk.ValueError("Invalid config.text_target_height ({:}): value must be between 0 and 1, check out the documentation".format(config.text_target_height))
+
+    hsr = u.get_font_height_to_size_ratio(target.text_font)
+    font_size = int(height / hsr * config.text_target_height)
+    target.text_size = font_size
+    ttrk.log_write("Target font size = {:}, height = {:.1f} pixels".format(font_size, font_size*hsr), print_to_console=True)
 
     target.onset_event = TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
     target.onset_time = [0]

@@ -23,7 +23,7 @@ def get_subject_name_id():
         default_id = ""
     else:
         name_elems = subj_name.lower().split(" ")
-        default_id = "".join([e[0] for e in name_elems])
+        default_id = "".join([e[0] for e in name_elems if len(e) > 0])
 
     id_input = xpy.io.TextInput("Subject ID (initials) - mandatory:", length=10,
                                 message_colour=xpy.misc.constants.C_WHITE)

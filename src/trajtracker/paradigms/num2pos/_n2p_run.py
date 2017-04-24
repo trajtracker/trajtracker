@@ -28,11 +28,16 @@ from trajtracker.paradigms.num2pos import *
 RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 
+# bugs:
+# todo: show correct location after response: stim shown in mid screen
+# todo: target text size is not applied. Why?
+
+# features:
 # todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
-# todo: show correct location after response
 # todo: support image target (+RSVP)
 # todo: escape button
 
+# future:
 # todo: delete XML support?
 # todo: organize documentation. Have a "using this class" section for each complex class.
 # todo: add logging to all trajtracker functions? Decide on logging policy (trace=enter/exit, detailed flow trace; debug=potentially interesting data, stages within functions; info=configuration, major operations, important data, validation errors)

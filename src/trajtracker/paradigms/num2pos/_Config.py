@@ -22,7 +22,7 @@ class Config(object):
     """
 
     def __init__(self, experiment_id, data_source, max_trial_duration, target_type='text',
-                 shuffle_trials=True, max_numberline_value=100,
+                 text_target_height=1.0, shuffle_trials=True, max_numberline_value=100,
                  show_feedback=True, feedback_arrow_colors=xpy.misc.constants.C_GREEN,
                  feedback_accuracy_levels=None, post_response_target=False,
                  min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=10,
@@ -48,8 +48,13 @@ class Config(object):
 
         # The type of the target presented.
         # Different target types require different fields in the CSV data file
-        ['text', 'rsvp_text'].index(target_type)  # validate that the target type is OK
+        ['text', 'image'].index(target_type)  # validate that the target type is OK
         self.target_type = target_type
+
+        # The height of the text target, specified as percentage of the available distance
+        # between the number line and the top of the screen (value between 0 and 1).
+        # The actual target size will be printed in the output
+        self.text_target_height = text_target_height
 
         #----- Configuration of number line -----
 

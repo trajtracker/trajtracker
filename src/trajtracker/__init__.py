@@ -59,11 +59,13 @@ class TypeError(TrajTrackerError):
     pass
 
 
+from _ttrk_funcs import log_write
+
 #============================================================================
 #   Import the TrajTracker modules
 #============================================================================
 
-from __TTrkObject import TTrkObject
+from _TTrkObject import TTrkObject
 
 import trajtracker._utils as _utils
 

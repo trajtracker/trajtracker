@@ -111,6 +111,7 @@ class MultiTextBox(BaseMultiStim):
         self._set_stimulus_font(n_stim)
         self._set_stimuli_property("texts", str, n_stim, stim_prop_name="text")
         self._set_stimuli_property("text_bold", bool, n_stim)
+        self._set_stimuli_property("text_size", int, n_stim)
         self._set_stimuli_property("text_italic", bool, n_stim)
         self._set_stimuli_property("text_underline", bool, n_stim)
         self._set_stimuli_property("text_justification", str, n_stim)

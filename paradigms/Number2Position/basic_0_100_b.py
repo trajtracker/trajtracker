@@ -37,9 +37,11 @@ accuracy_levels = [.05, .1]
 
 config = num2pos.Config("Num2Pos(D+U)",
                         max_trial_duration=2,
-                        max_numberline_value=100,
                         speed_guide_enabled=True,
+                        max_numberline_value=100,
                         data_source="basic_0_100_b.csv",  # Read targets from this CSV file
+                        target_type='text',
+                        text_target_height=0.5,
 
                         post_response_target=True,         # After response was made, show the correct location
                         feedback_arrow_colors=[xpy.misc.constants.C_GREEN,

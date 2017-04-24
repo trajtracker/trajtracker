@@ -77,12 +77,7 @@ class TTrkObject(object):
         if prepend_self:
             msg = type(self).__name__ + "," + msg
 
-        xpy._internals.active_exp._event_file_log(msg, 1)
-
-        if ttrk.log_to_console or print_to_console:
-            t = time.time()
-            stime = time.strftime('%H:%m:%S', time.localtime(t)) + "{:.3f}".format(t % 1)[1:]
-            print(stime + ": " + msg)
+        ttrk.log_write(msg)
 
 
     #-------------------------------------------------

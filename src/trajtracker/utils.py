@@ -10,7 +10,11 @@ from __future__ import division
 from numpy import pi
 import numpy as np
 
-from expyriment.misc import _timer as xpy_timer
+import pygame
+from pygame.ftfont import Font
+from pygame import freetype
+
+from expyriment.misc import _timer as xpy_timer, find_font
 
 #--------------------------------------------------------------------------
 def get_angle(xy1, xy2, as_degrees=False):
@@ -106,3 +110,18 @@ def get_time():
     :return: float
     """
     return xpy_timer.get_time()
+
+
+#--------------------------------------------------------------------------
+def get_font_height_to_size_ratio(font_name):
+    """
+    Find the ratio between a font size and the corresponding textbox height in pixels.
+    The returned ratio is height/size
+    
+    :type font_name: str 
+    """
+
+    freetype.init()
+    font = Font(find_font(font_name), size=100)
+    size = font.size("hfbpqgXQ,")
+    return size[1] / 100.0
