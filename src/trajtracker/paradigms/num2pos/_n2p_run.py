@@ -28,9 +28,6 @@ from trajtracker.paradigms.num2pos import *
 RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 
-# bugs:
-# todo: show correct location after response: stim shown in mid screen
-
 # features:
 # todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
 # todo: support image target (+RSVP)
