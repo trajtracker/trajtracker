@@ -218,7 +218,9 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
         v.movement_started_event = FINGER_STARTED_MOVING
         v.enable_event = FINGER_STARTED_MOVING
         v.disable_event = ttrk.events.TRIAL_ENDED
+        v.guide.log_level = ttrk.log_trace
         exp_info.add_validator(v, 'global_speed')
+        exp_info.stimuli.add(v.guide.stimulus, "speed_guide", visible=False)
 
 
     if inst_speed_validator:

@@ -7,7 +7,16 @@ A simple version of the number-to-position experiment:
 - The color of the feedback arrow changes according to the response accuracy (endpoint error), 
   and so does the acknowledgement sound.
 - The correct location is shown with the feedback
- 
+
+
+Changing during the trial (first decade, then decade+unit) is acheived by defining TWO stimuli per trial.
+Both are defined in a single MultiTextBox object (exp_info.target). To define when one stimulus changes
+into the other, the MultiTextBox defines "onset_time" and "duration" for each of the two per-trial stimuli.
+
+Defining onset_time and duration could have been done by adding two columns with this name to the
+basic_0_100_b.csv file. However, here I used a different method: I defined MultiTextBox.onset_time and
+MultiTextBox.duration in advance, only once, when initializing the experiment. To allow this, I had to 
+copy the trajtracker.paradigms.num2pos.run_full_experiment() function and make a small modification.
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
@@ -30,7 +39,7 @@ config = num2pos.Config("Num2Pos(D+U)",
                         max_trial_duration=2,
                         max_numberline_value=100,
                         speed_guide_enabled=True,
-                        data_source=[15, 30, 70, 43],  # todo "basic_0_100_b.csv",  # Read targets from this CSV file
+                        data_source="basic_0_100_b.csv",  # Read targets from this CSV file
 
                         post_response_target=True,         # After response was made, show the correct location
                         feedback_arrow_colors=[xpy.misc.constants.C_GREEN,
@@ -57,29 +66,23 @@ if not xpy.misc.is_android_running():
 
 
 #-- Run the experiment
-#-- The lines below (until the "End of copied code" message) were copied here from the run_full_experiment()
-#-- in the num2pos package.
-#-- The reason we copied it is so we can change the default configuration of the target stimulus:
-#-- We update the onset time and duration of the stimulus, which is required when presenting a changing stimulus.
 
-#-- An alternative (and easier) solution could have been to add "onset_time" and "duration" columns to
-#-- the CSV input file: the "num2pos" package can handle this configuration.
+# The lines below (until the "End of copied code" comment) were copied here from
+# trajtracker.paradigms.num2pos.run_full_experiment()
 
 exp_info = ttrk.paradigms.num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
-
 num2pos.create_experiment_objects(exp_info)
 
-# -- The next 2 lines are the code that was changed relatively to the default implementation
+#-- These 2 lines were not in the original version of run_full_experiment(), I added them only here.
+#-- Making this small modification is the reason that I copied run_full_experiment()
 exp_info.target.onset_time = [0, 0.1]
 exp_info.target.duration = [0.1, 2]
 
 num2pos.register_to_event_manager(exp_info)
-
 num2pos.run_trials(exp_info)
-
 num2pos.save_session_file(exp_info)
 
-#<< End of copied code
+#End of copied code
 
 
 #-- Shutdown Expyriment

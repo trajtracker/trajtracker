@@ -115,7 +115,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         self.show_guide = show_guide
         self.guide_warning_time_delta = 0
         self.guide_line_length = None
-        self.do_present_guide = True
 
         self._time0 = None
         self.movement_started_event = None
@@ -124,12 +123,16 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
 
     #-------------------------------------------
+    # Register to event manager
+    #
     def on_registered(self, event_manager):
 
         if self._movement_started_event is None:
             raise trajtracker.InvalidStateError(
                 "{:} was registered to an event manager before updating movement_started_event".format(
                     _u.get_type_name(self)))
+
+        #-- Intercept the event that indicates when the movement started
 
         if self._registered:
             raise trajtracker.InvalidStateError(
@@ -140,6 +143,8 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
         event_manager.register_operation(self._movement_started_event, callback_start, recurring=True,
                                          description="{:}.movement_started()".format(_u.get_type_name(self)))
+
+        # -- Intercept the event that indicates when the movement terminates
 
         def callback_end(t1, t2):
             if self._show_guide:
@@ -473,8 +478,9 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
     def show_guide(self):
         """
         Whether to visualize the speed limit as a moving line (bool).
-        If you show the guide, please note the way it's being presented -
-        See :attr:`~trajtracker.validators.GlobalSpeedValidator.do_present_guide`
+        
+        **Note:** Even when this is TRUE, you need to present() the guide line (*validator.guide.stimulus*)  
+        yourself by putting it in a :class:`~trajtracker.stimuli.StimulusContainer`
         """
         return self._show_guide
 
@@ -516,25 +522,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
             _u.validate_attr_positive(self, "guide_line_length", value)
         self._guide_line_length = value
         self._guide = GlobalSpeedGuide(self)
-
-
-    #-------------------------------------------------------
-    @property
-    def do_present_guide(self):
-        """
-        If the guide line is shown, this determines the mechanism used to present it:
-
-        - True: the validator itself will call present() for the stimulus
-        - False: the validator will update the stimulus position and color, but the main program
-           should take care of present()ing validator.guide.stimulus
-        """
-        return None if self._guide is None else self._guide.do_present
-
-    @do_present_guide.setter
-    @fromXML(bool)
-    def do_present_guide(self, value):
-        if self._guide is not None:
-            self._guide.do_present = value
 
 
     #-------------------------------------------------------------
@@ -655,7 +642,6 @@ class GlobalSpeedGuide(trajtracker.TTrkObject):
 
         pos = (coord, 0) if self._validator.axis == ValidationAxis.x else (0, coord)
         self._guide_line.position = pos
-        self._guide_line.present(clear=False, update=False)
 
 
     #--------------------------------------------------------------------------
@@ -679,23 +665,6 @@ class GlobalSpeedGuide(trajtracker.TTrkObject):
         _u.validate_attr_type(self, "visible", value, bool)
         self._visible = value
         self._log_property_changed("visible")
-
-
-    #-------------------------------------------------------
-    @property
-    def do_present(self):
-        """
-        Whether the line will be present()ed by the validator.
-        If False: the line's positon will be updated, but you need to take care yourself to continuously
-        present() the object returned by self.stimulus
-         """
-        return self._do_present
-
-    @do_present.setter
-    def do_present(self, value):
-        _u.validate_attr_type(self, "do_present", value, bool)
-        self._do_present = value
-        self._log_property_changed("do_present")
 
 
     #-------------------------------------------------------
