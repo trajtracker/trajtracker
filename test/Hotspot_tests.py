@@ -6,8 +6,26 @@ from trajtracker.movement import Hotspot
 from trajtracker.events import EventManager
 
 
-class HotspotTests(unittest.TestCase):
 
+class CallbackObj(object):
+
+    def __init__(self):
+        self.called = 0
+
+    def __call__(self, *args, **kwargs):
+        self.called += 1
+
+
+class DbgEventManager(object):
+
+    def __init__(self):
+        self.dispatched = 0
+
+    def dispatch_event(self, event, time_in_trial, time_in_session):
+        self.dispatched += 1
+
+
+class HotspotTests(unittest.TestCase):
 
     #==========================================================================
     # Configuration
@@ -46,7 +64,74 @@ class HotspotTests(unittest.TestCase):
     # Touch
     #==========================================================================
 
-    #todo: add tests
+    #------------------------------------------------
+    def test_call_action(self):
+        cb = CallbackObj()
+        spot = Hotspot(area=Rectangle((10, 10)), on_touched_callback=cb)
+
+        # Action not invoked
+        spot.update_xyt((20, 20), 1)
+        self.assertEquals(0, cb.called)
+
+        # Action invoked
+        spot.update_xyt((4, 4), 1)
+        self.assertEquals(1, cb.called)
+
+
+    #------------------------------------------------
+    def test_dispatch_event(self):
+        em = DbgEventManager()
+        spot = Hotspot(em, area=Rectangle((10, 10)), on_touched_dispatch_event="a")
+
+        spot.update_xyt((4, 4), 1, 1)
+        self.assertEquals(1, em.dispatched)
+
+
+    #------------------------------------------------
+    def test_call_action_delayed(self):
+        cb = CallbackObj()
+        spot = Hotspot(area=Rectangle((10, 10)), on_touched_callback=cb, min_touch_duration=10)
+
+        spot.update_xyt((20, 20), 0)   # not touched
+
+        # touching for less than 10 sec: not called
+        spot.update_xyt((4, 4), 1)
+        spot.update_xyt((1, 1), 10)
+        self.assertEquals(0, cb.called)
+
+        # touching for 10 sec - should call
+        spot.update_xyt((1, 1), 11)
+        self.assertEquals(1, cb.called)
+
+        # touching for longer - not called again
+        spot.update_xyt((1, 1), 12)
+        spot.update_xyt((1, 1), 13)
+        self.assertEquals(1, cb.called)
+
+    #------------------------------------------------
+    def test_call_action_delayed_aborted(self):
+        cb = CallbackObj()
+        spot = Hotspot(area=Rectangle((10, 10)), on_touched_callback=cb, min_touch_duration=10)
+
+        spot.update_xyt((20, 20), 0)  # not touched
+
+        # touching for less than 10 sec, then aborting touch
+        spot.update_xyt((4, 4), 1)
+        spot.update_xyt((1, 1), 10)
+        spot.update_xyt((1, 10), 15)
+        self.assertEquals(0, cb.called)
+
+        # touching again - time count is restarted
+        spot.update_xyt((1, 1), 16)
+        spot.update_xyt((1, 1), 25)
+        self.assertEquals(0, cb.called)
+        spot.update_xyt((1, 1), 26)
+        self.assertEquals(1, cb.called)
+
+
+
+
+            #todo: add tests
 
 if __name__ == '__main__':
     unittest.main()

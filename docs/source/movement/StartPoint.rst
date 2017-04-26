@@ -22,14 +22,25 @@ Using this class:
 
 - Define a start area and an :attr:`~trajtracker.movement.StartPoint.exit_area`.
 - When the trial is initialized, call :func:`~trajtracker.movement.StartPoint.reset`
-- Repeatedly call :func:`~trajtracker.movement.StartPoint.check_xy` to monitor the subject behavior
+
+Then, you can go in two ways. The convenient way consists of two steps:
+
+- When the trial is initialized, call :func:`~trajtracker.movement.StartPoint.wait_until_startpoint_touched`
+  to detect when the subject touches the starting point.
+
+- Then, call :func:`~trajtracker.movement.StartPoint.wait_until_exit` to detect when the subject
+  starts moving the mouse/finger.
+
+Alternatively, if you want to create a slighly different flow, you can skip the two functions above
+and repeatedly call :func:`~trajtracker.movement.StartPoint.check_xy` .
+This may monitor the subject behavior in more detail.
 
 
 Related classes:
 ----------------
 
 :class:`~trajtracker.movement.RectStartPoint` is a more specific implementation of *StartPoint*:
-it lets you easily define a rectangular "start" area, with optional tilt.
+it lets you easily define a rectangular "start" area and tilt it.
 
 
 Methods and properties:

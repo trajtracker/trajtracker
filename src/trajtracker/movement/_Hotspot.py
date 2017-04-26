@@ -44,7 +44,10 @@ class Hotspot(ttrk.TTrkObject):
         :return: 
         """
 
-        _u.update_xyt_validate_and_log(self, position, time_in_session, time_in_trial)
+        if self._on_touched_dispatch_event is None:
+            _u.update_xyt_validate_and_log(self, position, time_in_trial)
+        else:
+            _u.update_xyt_validate_and_log(self, position, time_in_trial, time_in_session)
 
         now_touching = self._area.overlapping_with_position(position)
 
@@ -77,7 +80,7 @@ class Hotspot(ttrk.TTrkObject):
             if time_in_session is None:
                 raise ttrk.ValueError("When {:} is dispatching an event, update_xyt() should get time_in_session".format(_u.get_type_name(self)))
 
-            self._event_manager.dispatch_event(self._on_touched_dispatch_event, time_in_trial, time_in_session)
+            self._event_manager.dispatch_event(ttrk.events.Event(self._on_touched_dispatch_event), time_in_trial, time_in_session)
 
 
     #==============================================================================
@@ -154,6 +157,8 @@ class Hotspot(ttrk.TTrkObject):
 
     @on_touched_callback.setter
     def on_touched_callback(self, value):
-        _u.validate_attr_type(self, "on_touched_callback", value, type(lambda: 1), none_allowed=True)
+        if value is not None and not "__call__" in dir(value):
+            raise ttrk.TypeError("{:}.on_touched_callback was set to a non-callable value!".format(_u.get_type_name(self)))
+
         self._on_touched_callback = value
         self._log_property_changed("on_touched_callback")

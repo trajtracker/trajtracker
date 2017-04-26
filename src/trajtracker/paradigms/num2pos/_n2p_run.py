@@ -31,7 +31,7 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 # features:
 # todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
-# todo: support image target (+RSVP)
+# todo: support image target (+RSVP). Also support multiple targets (both text and pictures in the same trial)
 # todo: escape button
 
 # future:
