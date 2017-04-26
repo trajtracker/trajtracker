@@ -111,6 +111,18 @@ class StartPoint(ttrk.TTrkObject):
     #-----------------------------------------------------------------
     @property
     def state(self):
+        """
+        The current state of starting the trial - a value of the **StartPoint.State** enum
+        
+        - *State.reset* - The trial was just initialized, finger/mouse did not touch the screen yet
+        - *State.mouse_up* - The mouse was unclicked (or finger lifted from the screen) since the trial was initialized.
+                             This is to enforce that the subject raises the finger before starting a new trial.
+        - *State.init* - The finger touched the screen (or mouse clicked), indicating that the trial started 
+        - *State.start* - The finger/mouse left the start area in a valid way (into the exit area) 
+        - *State.error* -  The finger/mouse left the start area in an invalid way (not into the exit area)
+        - *State.aborted* - The trial was aborted - finger lifted before it started moving 
+        - *State.timeout* - The timeout for starting a trial has expired 
+        """
         return self._state
 
 
@@ -131,11 +143,6 @@ class StartPoint(ttrk.TTrkObject):
 
         :return: bool - whether the state was changed 
         """
-
-        #todo write somewhere:
-        #State.init - if the finger/mouse touched in the start area for the first time
-        #State.start - if the finger/mouse left the start area in a valid way (into the exit area)
-        #State.error - if the finger/mouse left the start area in an invalid way (not to the exit area)
 
         if x_coord == self._last_checked_coords[0] and y_coord == self._last_checked_coords[1]:
             # save time - don't retest the same coordinates

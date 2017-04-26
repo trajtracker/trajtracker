@@ -302,7 +302,7 @@ class EventManager(ttrk.TTrkObject):
             self._log_write("Invoking operation (id={:}, operation={:}, event={:})".format(
                 operation_id, op_desc, op_info['event']), True)
         op = op_info['operation']
-        op(time_in_trial, time_in_session)  # todo really?
+        op(time_in_trial, time_in_session)
 
         #-- After a one-time operation was invoked, remove it
         if not op_info['recurring']:

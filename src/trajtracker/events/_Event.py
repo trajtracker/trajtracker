@@ -14,8 +14,6 @@ import trajtracker._utils as _u
 
 # noinspection PyProtectedMember
 class Event(trajtracker.TTrkObject):
-    # todo: change example to a text box and trial starts
-
 
     #----------------------------------------------------
     def __init__(self, event_id, extends=None):
