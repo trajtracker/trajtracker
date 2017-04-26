@@ -237,7 +237,7 @@ def validate_func_arg_positive(obj, func_name, arg_name, value):
 
 
 #--------------------------------------
-def validate_func_arg_is_coord(obj, func_name, arg_name, value, change_none_to_0=False):
+def validate_func_arg_is_coord(obj, func_name, arg_name, value, change_none_to_0=False, allow_float=False):
 
     if value is None and change_none_to_0:
         return (0, 0)
@@ -245,23 +245,29 @@ def validate_func_arg_is_coord(obj, func_name, arg_name, value, change_none_to_0
     if isinstance(value, geometry.XYPoint):
         value = (value.x, value.y)
 
+    elem_type = numbers.Number if allow_float else int
     validate_func_arg_is_collection(obj, func_name, arg_name, value, 2, 2)
-    validate_func_arg_type(obj, func_name, "{:}[0]".format(arg_name), value[0], int)
-    validate_func_arg_type(obj, func_name, "{:}[1]".format(arg_name), value[1], int)
+    validate_func_arg_type(obj, func_name, "{:}[0]".format(arg_name), value[0], elem_type)
+    validate_func_arg_type(obj, func_name, "{:}[1]".format(arg_name), value[1], elem_type)
 
     return value
 
 
 #--------------------------------------------------------------------
-def update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial, time_used=True):
+DONT_VALIDATE = "DONT_VALIDATE"
+def update_xyt_validate_and_log(self, position, time_in_trial=DONT_VALIDATE, time_in_session=DONT_VALIDATE):
 
-    validate_func_arg_type(self, "update_xyt", "x_coord", x_coord, numbers.Number, type_name="numeric")
-    validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number, type_name="numeric")
+    self._log_func_enters("update_xyt", [position, time_in_trial, time_in_session])
 
-    if time_used:
-        validate_func_arg_type(self, "update_xyt", "time_in_trial", time_in_trial, numbers.Number, type_name="numeric")
+    validate_func_arg_is_coord(self, "update_xyt", "position", position, allow_float=True)
 
-    self._log_func_enters("update_xyt", [x_coord, y_coord, time_in_trial])
+    if time_in_trial != DONT_VALIDATE:
+        validate_func_arg_type(self, "update_xyt", "time_in_trial", time_in_trial, numbers.Number)
+        validate_func_arg_not_negative(self, "update_xyt", "time_in_trial", time_in_trial)
+
+    if time_in_session != DONT_VALIDATE:
+        validate_func_arg_type(self, "update_xyt", "time_in_session", time_in_session, numbers.Number)
+        validate_func_arg_not_negative(self, "update_xyt", "time_in_session", time_in_session)
 
 
 #============================================================================

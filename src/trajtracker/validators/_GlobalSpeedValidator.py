@@ -183,21 +183,17 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
 
     #----------------------------------------------------------------------------------
-    def update_xyt(self, x_coord, y_coord, time_in_trial):
+    def update_xyt(self, position, time_in_trial, time_in_session=None):
         """
         Validate movement.
 
-        :param x_coord:
-        :type x_coord: int
-
-        :param y_coord:
-        :type y_coord: int
-
+        :type position: tuple (x,y)
         :param time_in_trial: Time from start of trial
+        :param time_in_session: ignored
         :returns: None if all OK; ExperimentError object if error
         """
 
-        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial)
+        _u.update_xyt_validate_and_log(self, position, time_in_trial)
         self._assert_initialized(self._origin_coord, "origin_coord")
         self._assert_initialized(self._end_coord, "end_coord")
         self._assert_initialized(self._max_trial_duration, "max_trial_duration")
@@ -215,7 +211,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         time_in_trial -= self._time0
 
         #-- Get the expected and actual coordinates
-        coord = x_coord if self._axis == ValidationAxis.x else y_coord
+        coord = position[0] if self._axis == ValidationAxis.x else position[1]
         expected_coord = int(self.get_expected_coord_at_time(time_in_trial))
         d_coord = coord - expected_coord
 

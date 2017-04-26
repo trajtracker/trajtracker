@@ -41,15 +41,15 @@ class NCurvesValidatorTests(unittest.TestCase):
     #-------------------------------------------
     def test_validate(self):
         val = NCurvesValidator(direction_monitor=DirectionMonitorDbg(2), max_curves_per_trial=2)
-        self.assertIsNone(val.update_xyt(0, 0, 0))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
 
         val.max_curves_per_trial = 1
-        self.assertIsNotNone(val.update_xyt(0, 0, 0))
+        self.assertIsNotNone(val.update_xyt((0, 0), 0))
 
     #-------------------------------------------
     def test_disabled(self):
         val = NCurvesValidator(direction_monitor=DirectionMonitorDbg(2), max_curves_per_trial=1, enabled=False)
-        self.assertIsNone(val.update_xyt(0, 0, 0))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
 
 
 
@@ -62,7 +62,7 @@ class DirectionMonitorDbg(object):
     def reset(self):
         pass
 
-    def update_xyt(self, x_coord, y_coord, time):
+    def update_xyt(self, (x_coord, y_coord), time):
         pass
 
     @property

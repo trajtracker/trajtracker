@@ -198,7 +198,7 @@ def initialize_trial(exp_info, trial):
 
     exp_info.numberline.target = trial.target
 
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, get_time() - exp_info.session_start_time)
+    exp_info.event_manager.on_touched_dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, get_time() - exp_info.session_start_time)
 
 
 #----------------------------------------------------------------
@@ -215,7 +215,7 @@ def on_finger_touched_screen(exp_info, trial):
 
     trial.start_time = get_time()
 
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_STARTED, 0, trial.start_time - exp_info.session_start_time)
+    exp_info.event_manager.on_touched_dispatch_event(ttrk.events.TRIAL_STARTED, 0, trial.start_time - exp_info.session_start_time)
 
     exp_info.stimuli.present()
 
@@ -238,7 +238,7 @@ def on_finger_started_moving(exp_info, trial):
     time_in_session = t - exp_info.session_start_time
     trial.results['time_started_moving'] = time_in_trial
 
-    exp_info.event_manager.dispatch_event(FINGER_STARTED_MOVING, time_in_trial, time_in_session)
+    exp_info.event_manager.on_touched_dispatch_event(FINGER_STARTED_MOVING, time_in_trial, time_in_session)
 
     exp_info.stimuli.present()
 
@@ -372,17 +372,16 @@ def update_movement(exp_info, trial):
     :return: None if all is OK; or an ExperimentError object if one of the validators issued an error
     """
 
-    finger_position = exp_info.xpy_exp.mouse.position
-
     curr_time = get_time()
     time_in_trial = curr_time - trial.start_time
+    time_in_session = curr_time - exp_info.session_start_time
 
     for obj in exp_info.trajectory_sensitive_objects:
-        err = obj.update_xyt(finger_position[0], finger_position[1], time_in_trial)
+        err = obj.update_xyt(exp_info.xpy_exp.mouse.position, time_in_trial, time_in_session)
         if err is not None:
             return err
 
-    exp_info.event_manager.on_frame(time_in_trial, curr_time - exp_info.session_start_time)
+    exp_info.event_manager.on_frame(time_in_trial, time_in_session)
 
     return None
 
@@ -406,7 +405,7 @@ def trial_failed(err, exp_info, trial):
 
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_FAILED, time_in_trial, time_in_session)
+    exp_info.event_manager.on_touched_dispatch_event(ttrk.events.TRIAL_FAILED, time_in_trial, time_in_session)
 
     exp_info.errmsg_textbox.unload()
     exp_info.errmsg_textbox.text = err.message
@@ -438,7 +437,7 @@ def trial_succeeded(exp_info, trial):
     curr_time = get_time()
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
+    exp_info.event_manager.on_touched_dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
 
     play_success_sound(exp_info, trial)
 

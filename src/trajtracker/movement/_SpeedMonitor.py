@@ -60,22 +60,21 @@ class SpeedMonitor(trajtracker.TTrkObject):
 
     #-------------------------------------------------------------------------
     # noinspection PyIncorrectDocstring
-    def update_xyt(self, x_coord, y_coord, time):
+    def update_xyt(self, position, time_in_trial, time_in_session=None):
         """
         Call this method whenever the finger/mouse moves
 
-        :param time: use the same time scale provided to reset()
+        :param time_in_trial: use the same time scale provided to reset()
+        :param time_in_session: ignored
         """
 
-        _u.validate_func_arg_type(self, "update_xyt", "x_coord", x_coord, numbers.Number)
-        _u.validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number)
-        _u.validate_func_arg_type(self, "update_xyt", "time", time, numbers.Number)
-        self._validate_time(time)
+        _u.update_xyt_validate_and_log(self, position, time_in_trial)
+        self._validate_time(time_in_trial)
 
-        self._log_func_enters("update_xyt", [x_coord, y_coord, time])
+        x_coord, y_coord = position
 
         if self._time0 is None:
-            self._time0 = time
+            self._time0 = time_in_trial
 
         if len(self._recent_points) == 0:
             distance = 0
@@ -83,24 +82,24 @@ class SpeedMonitor(trajtracker.TTrkObject):
         else:
             #-- Find distance to the last observed coordinate
             last_loc = self._recent_points[-1]
-            if time <= last_loc[2]:
+            if time_in_trial <= last_loc[2]:
                 return  # The time did not move forward: ignore this data
 
             if x_coord == last_loc[0] and y_coord == last_loc[1]:
                 # The coordinates did not change: ignore this data for speed calculation, but remember
                 # for how long the finger is stopped
-                self._last_stopped_time = time
+                self._last_stopped_time = time_in_trial
                 return
 
             distance = np.sqrt((x_coord-last_loc[0]) ** 2 + (y_coord-last_loc[1]) ** 2)
 
-        self._last_moved_time = time
+        self._last_moved_time = time_in_trial
         self._last_stopped_time = None
 
-        self._remove_recent_points_older_than(time - self._calculation_interval)
+        self._remove_recent_points_older_than(time_in_trial - self._calculation_interval)
 
         #-- Remember current coords & time
-        self._recent_points.append((x_coord, y_coord, time, distance))
+        self._recent_points.append((x_coord, y_coord, time_in_trial, distance))
 
 
     #--------------------------------------

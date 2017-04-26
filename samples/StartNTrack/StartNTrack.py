@@ -121,7 +121,7 @@ while n_completed < N_TRIALS:
         mouse_pos = exp.mouse.position
 
         # save trajectory data
-        traj_tracker.update_xyt(mouse_pos[0], mouse_pos[1], get_time() - trial_start_time)
+        traj_tracker.update_xyt(mouse_pos, get_time() - trial_start_time)
 
         if target_point.overlapping_with_position(mouse_pos):
             # Reached the target circle!

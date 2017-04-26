@@ -68,38 +68,38 @@ class MovementAngleValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
 
     #-----------------------------------------------------------------------------------
-    def update_xyt(self, x_coord, y_coord, time_in_trial):
+    def update_xyt(self, position, time_in_trial, time_in_session=None):
         """
         Given a current position, check whether the movement complies with the speed limits.
 
-        :param x_coord: Current x coordinate (in the predefined coordinate system)
-        :param y_coord: Current y coordinate (in the predefined coordinate system)
+        :param position: Current (x,y) coordinates
         :param time_in_trial: Time, in seconds. The zero point doesn't matter, as long as you're consistent until reset() is called.
+        :param time_in_session: ignored
         :return: None if all OK, ExperimentError if error
         """
 
         if not self._enabled or self._min_angle == self._max_angle or self._min_angle is None or self._max_angle is None:
             return None
 
-        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial)
+        _u.update_xyt_validate_and_log(self, position, time_in_trial)
         self._validate_time(time_in_trial)
 
-        curr_xyt = (x_coord, y_coord, time_in_trial)
+        curr_xyt = position + (time_in_trial,)
 
         if time_in_trial <= self._grace_period:
             self._prev_locations.append(curr_xyt)
             return None
 
-        can_compute_angle = self._remove_far_enough_prev_locations(x_coord, y_coord)
+        can_compute_angle = self._remove_far_enough_prev_locations(position[0], position[1])
 
         #-- Remember current coords & time
         self._prev_locations.append(curr_xyt)
 
         x0, y0, t0 = self._prev_locations[0]
 
-        if can_compute_angle and (x0, y0) != (x_coord, y_coord):
+        if can_compute_angle and (x0, y0) != position:
             #-- Validate direction
-            angle = u.get_angle((x0, y0), (x_coord, y_coord))
+            angle = u.get_angle((x0, y0), position)
             if self._angle_is_ok(angle):
                 #-- all is OK
                 return None

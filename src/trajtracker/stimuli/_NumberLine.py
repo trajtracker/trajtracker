@@ -386,22 +386,18 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
     #---------------------------------------------------------
     # noinspection PyUnusedLocal
-    def update_xyt(self, x_coord, y_coord, time_in_trial=None):
+    def update_xyt(self, position, time_in_trial=None, time_in_session=None):
         """
         This function is called when mouse/touch has moved. It checks whether the movement implies touching the number line.
 
-        :param x_coord:
-        :type x_coord: int
-
-        :param y_coord:
-        :type y_coord: int
+        :param position:
+        :type position: tuple (x,y)
 
         :param time_in_trial: ignored.
         """
 
-        _u.validate_func_arg_type(self, "update_xy", "x_coord", x_coord, int)
-        _u.validate_func_arg_type(self, "update_xy", "y_coord", y_coord, int)
-        self._log_func_enters("update_xy", [x_coord, y_coord])
+        _u.update_xyt_validate_and_log(self, position)
+        x_coord, y_coord = position
 
         if self._response_relative_coord is not None:
             self._log_func_returns("update_xyt")

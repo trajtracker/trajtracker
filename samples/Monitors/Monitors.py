@@ -96,8 +96,8 @@ while get_time() - start_time < 60:   # continue for 60 sec
 
         #-- Update the monitors on each frame, so they can continuously track the speed
         #-- and direction of movement
-        speed_monitor.update_xyt(exp.mouse.position[0], exp.mouse.position[1], curr_time - start_time)
-        direction_monitor.update_xyt(exp.mouse.position[0], exp.mouse.position[1], curr_time - start_time)
+        speed_monitor.update_xyt(exp.mouse.position, curr_time - start_time)
+        direction_monitor.update_xyt(exp.mouse.position, curr_time - start_time)
 
         # Update the text information only every 100 ms (because this is time consuming)
         if get_time() - last_updated_texts_time >= 0.1:

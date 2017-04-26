@@ -99,7 +99,7 @@ def reset_trajectory_info(trial_start_time):
 def update_trajectory(finger_position, time_in_trial):
 
     for obj in trajectory_sensitive_objects:
-        err = obj.update_xyt(finger_position[0], finger_position[1], time_in_trial)
+        err = obj.update_xyt(finger_position, time_in_trial)
         if err is not None:
             return err
 

@@ -77,22 +77,19 @@ class DirectionMonitor(ttrk.TTrkObject):
 
     #-------------------------------------------------------------------------
     # noinspection PyIncorrectDocstring
-    def update_xyt(self, x_coord, y_coord, time):
+    def update_xyt(self, position, time_in_trial, time_in_session=None):
         """
         Call this method whenever the finger/mouse moves
+        
+        :param time_in_session: ignored
         """
 
-        _u.validate_func_arg_type(self, "update_xyt", "x_coord", x_coord, numbers.Number)
-        _u.validate_func_arg_type(self, "update_xyt", "y_coord", y_coord, numbers.Number)
-        _u.validate_func_arg_type(self, "update_xyt", "time", time, numbers.Number)
-        _u.validate_func_arg_not_negative(self, "update_xyt", "time", time)
+        _u.update_xyt_validate_and_log(self, position, time_in_trial)
 
-        self._log_func_enters("update_xyt", [x_coord, y_coord, time])
-
-        self._remove_far_enough_recent_coords(x_coord, y_coord)
+        self._remove_far_enough_recent_coords(position[0], position[1])
 
         # remember coordinates
-        self._recent_near_coords.append((x_coord, y_coord, time))
+        self._recent_near_coords.append(position + (time_in_trial,))
 
         last_angle = self._curr_angle
         self._calc_curr_angle()

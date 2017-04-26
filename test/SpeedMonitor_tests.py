@@ -44,15 +44,15 @@ class SpeedMonitorTests(unittest.TestCase):
     #---------------------------------------------------------
     def test_time_moves_backwards(self):
         m = SpeedMonitor(10)
-        m.update_xyt(1, 1, 1)
-        m.update_xyt(1, 2, 2)
-        self.assertRaises(trajtracker.InvalidStateError, lambda: m.update_xyt(1, 1, 1))
+        m.update_xyt((1, 1), 1)
+        m.update_xyt((1, 2), 2)
+        self.assertRaises(trajtracker.InvalidStateError, lambda: m.update_xyt((1, 1), 1))
 
     #---------------------------------------------------------
     def test_time_moves_backwards_from_reset(self):
         m = SpeedMonitor(10)
         m.reset(1)
-        self.assertRaises(trajtracker.InvalidStateError, lambda: m.update_xyt(1, 1, 0.5))
+        self.assertRaises(trajtracker.InvalidStateError, lambda: m.update_xyt((1, 1), 0.5))
 
 
     #=====================================================================================
@@ -62,12 +62,12 @@ class SpeedMonitorTests(unittest.TestCase):
     #---------------------------------------------------------
     def test_interval_0(self):
         m = SpeedMonitor(0)
-        m.update_xyt(0, 0, 0)
-        m.update_xyt(0, 0.5, 1)
+        m.update_xyt((0, 0), 0)
+        m.update_xyt((0, 0.5), 1)
         self.assertEqual(0.5, m.yspeed)
-        m.update_xyt(0, 1.5, 2)
+        m.update_xyt((0, 1.5), 2)
         self.assertEqual(1, m.yspeed)
-        m.update_xyt(0, 2.6, 3)
+        m.update_xyt((0, 2.6), 3)
         self.assertEqual(1.1, m.yspeed)
 
 
@@ -75,48 +75,48 @@ class SpeedMonitorTests(unittest.TestCase):
     #---------------------------------------------------------
     def test_x_speed(self):
         m = SpeedMonitor(0.5)
-        m.update_xyt(0, 0, 1)
-        m.update_xyt(10, 2, 2)
+        m.update_xyt((0, 0), 1)
+        m.update_xyt((10, 2), 2)
         self.assertEqual(10, m.xspeed)
 
 
     #---------------------------------------------------------
     def test_y_speed(self):
         m = SpeedMonitor(0.5)
-        m.update_xyt(0, 0, 1)
-        m.update_xyt(10, 2, 2)
+        m.update_xyt((0, 0), 1)
+        m.update_xyt((10, 2), 2)
         self.assertEqual(2, m.yspeed)
 
 
     #---------------------------------------------------------
     def test_xy_speed(self):
         m = SpeedMonitor(0.5)
-        m.update_xyt(0, 0, 1)
-        m.update_xyt(0, 2, 2)
-        m.update_xyt(2, 2, 3)
+        m.update_xyt((0, 0), 1)
+        m.update_xyt((0, 2), 2)
+        m.update_xyt((2, 2), 3)
         self.assertEqual(2, m.xyspeed)
 
         m.reset()
-        m.update_xyt(0, 0, 1)
-        m.update_xyt(1, 1, 2)
-        m.update_xyt(2, 2, 3)
+        m.update_xyt((0, 0), 1)
+        m.update_xyt((1, 1), 2)
+        m.update_xyt((2, 2), 3)
         self.assertEqual(np.sqrt(2), m.xyspeed)
 
 
     #---------------------------------------------------------
     def test_speed_na_before_calc_interval(self):
         m = SpeedMonitor(10)
-        m.update_xyt(0, 0, 20)
+        m.update_xyt((0, 0), 20)
         self.assertIsNone(m.xspeed)
         self.assertIsNone(m.yspeed)
         self.assertIsNone(m.xyspeed)
 
-        m.update_xyt(10, 2, 29)
+        m.update_xyt((10, 2), 29)
         self.assertIsNone(m.xspeed)
         self.assertIsNone(m.yspeed)
         self.assertIsNone(m.xyspeed)
 
-        m.update_xyt(10, 3, 31)
+        m.update_xyt((10, 3), 31)
         self.assertIsNotNone(m.xspeed)
         self.assertIsNotNone(m.yspeed)
         self.assertIsNotNone(m.xyspeed)

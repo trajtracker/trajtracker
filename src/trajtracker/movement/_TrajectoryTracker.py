@@ -80,15 +80,18 @@ class TrajectoryTracker(ttrk.TTrkObject, EnabledDisabledObj):
 
 
     #----------------------------------------------------
-    def update_xyt(self, x_coord, y_coord, time_in_trial):
+    def update_xyt(self, position, time_in_trial, time_in_session=None):
         """
         Track a point. If tracking is currently inactive, this function will do nothing.
+        
+        :param time_in_session: ignored
         """
 
         if not self._enabled:
             return
 
-        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial)
+        _u.update_xyt_validate_and_log(self, position, time_in_trial)
+        x_coord, y_coord = position
 
         if not self._track_if_no_movement and len(self._trajectory['x']) > 0 and  \
             self._trajectory['x'][-1] == x_coord and \
@@ -100,7 +103,7 @@ class TrajectoryTracker(ttrk.TTrkObject, EnabledDisabledObj):
         self._trajectory['time'].append(time_in_trial)
 
         if self._should_log(ttrk.log_trace):
-            self._log_write("Trajectory,track_xyt,{:},{:},{:}".format(x_coord, y_coord, time_in_trial))
+            self._log_write("Track trajectory: pos=({:},{:}), time={:}".format(x_coord, y_coord, time_in_trial), True)
 
         return None
 

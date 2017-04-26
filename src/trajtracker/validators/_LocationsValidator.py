@@ -124,23 +124,26 @@ class LocationsValidator(trajtracker.TTrkObject, EnabledDisabledObj):
     #   Validate
     #======================================================================
 
+    #----------------------------------------------------------
     def reset(self, time0=None):
         pass
 
 
-    def update_xyt(self, x_coord, y_coord, time_in_trial=None):
+    #----------------------------------------------------------
+    def update_xyt(self, position, time_in_trial=None, time_in_session=None):
         """
         Check whether the given coordinate is a valid one
 
         :param time_in_trial: ignored
+        :param time_in_session: ignored
         :return: None if all OK, ExperimentError if error
         """
-        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial, False)
+        _u.update_xyt_validate_and_log(self, position)
 
         if not self._enabled:
             return None
 
-        color = self._lcm.get_color_at(x_coord, y_coord)
+        color = self._lcm.get_color_at(position[0], position[1])
         if self._default_valid:
             ok = color not in self._invalid_colors
         else:

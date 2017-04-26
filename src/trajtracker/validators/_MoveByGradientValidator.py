@@ -192,19 +192,22 @@ class MoveByGradientValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
 
     #-----------------------------------------------------------------
-    def update_xyt(self, x_coord, y_coord, time_in_trial=None):
+    def update_xyt(self, position, time_in_trial=None, time_in_session=None):
         """
         Validate the movement
 
+        :param position: (x,y) coordinates
+        :param time_in_trial: ignored
+        :param time_in_session: ignored
         :return: None if all OK, ExperimentError if error
         """
 
         if not self._enabled:
             return None
 
-        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial, False)
+        _u.update_xyt_validate_and_log(self, position)
 
-        color = self._lcm.get_color_at(x_coord, y_coord)
+        color = self._lcm.get_color_at(position[0], position[1])
         if color is None:  # color N/A -- can't validate
             self._last_color = None
             return None

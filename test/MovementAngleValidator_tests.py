@@ -11,18 +11,18 @@ class DirectionValidatorTestCase(unittest.TestCase):
     #------------------------------------------
     def test_validation_disabled(self):
         val = MovementAngleValidator(min_angle=0, max_angle=180, enabled=False)
-        val.update_xyt(0, 0, 0)
-        self.assertIsNone(val.update_xyt(-1, 0, 1))
+        val.update_xyt((0, 0), 0)
+        self.assertIsNone(val.update_xyt((-1, 0), 1))
 
     #------------------------------------------
     def test_validation_basic(self):
         val = MovementAngleValidator(min_angle=0, max_angle=180)
         val.reset()
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNone(val.update_xyt(1, 0, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNone(val.update_xyt((1, 0), 1))
         val.reset()
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNotNone(val.update_xyt(-1, 0, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNotNone(val.update_xyt((-1, 0), 1))
 
     #------------------------------------------
     def test_config(self):
@@ -71,91 +71,91 @@ class DirectionValidatorTestCase(unittest.TestCase):
         try:
             setattr(validator, attr_name, value)
             self.fail("Succeeded setting {0} to {1}".format(attr_name, type(value)))
-        except(Exception):
+        except Exception:
             pass
 
     def assertSetSucceeds(self, validator, attr_name, value):
         try:
             setattr(validator, attr_name, value)
-        except(Exception):
+        except Exception:
             self.fail("Failed setting {0} to {1} ({2})".format(attr_name, type(value), value))
 
     #------------------------------------------
     def test_range_crosses_zero(self):
         val = MovementAngleValidator(min_angle=-45, max_angle=45)
 
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNotNone(val.update_xyt(1.01, 1, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNotNone(val.update_xyt((1.01, 1), 1))
 
         val.reset()
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNotNone(val.update_xyt(-1.01, 1, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNotNone(val.update_xyt((-1.01, 1), 1))
 
         val.reset()
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNone(val.update_xyt(0.99, 1, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNone(val.update_xyt((0.99, 1), 1))
 
         val.reset()
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNone(val.update_xyt(-0.99, 1, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNone(val.update_xyt((-0.99, 1), 1))
 
     #------------------------------------------
     def test_min_gt_max(self):
         val = MovementAngleValidator(min_angle=45, max_angle=-45)
 
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNone(val.update_xyt(1.01, 1, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNone(val.update_xyt((1.01, 1), 1))
 
         val.reset()
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNone(val.update_xyt(-1.01, 1, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNone(val.update_xyt((-1.01, 1), 1))
 
         val.reset()
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNotNone(val.update_xyt(0.99, 1, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNotNone(val.update_xyt((0.99, 1), 1))
 
         val.reset()
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNotNone(val.update_xyt(-0.99, 1, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNotNone(val.update_xyt((-0.99, 1), 1))
 
     #------------------------------------------
     # Movement exactly towards min_angle or max_angle - is considered as valid
     def test_threshold_is_valid(self):
         val = MovementAngleValidator(min_angle=-45, max_angle=45)
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNone(val.update_xyt(1, 1, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNone(val.update_xyt((1, 1), 1))
 
         val = MovementAngleValidator(min_angle=45, max_angle=-45)
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNone(val.update_xyt(1, 1, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNone(val.update_xyt((1, 1), 1))
 
     #------------------------------------------
     def test_movement_continues(self):
         val = MovementAngleValidator(min_angle=-45, max_angle=45)
 
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNone(val.update_xyt(0, 1, 1))
-        self.assertIsNotNone(val.update_xyt(1.01, 2, 1))
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNone(val.update_xyt((0, 1), 1))
+        self.assertIsNotNone(val.update_xyt((1.01, 2), 1))
 
     #------------------------------------------
     def test_grace(self):
         val = MovementAngleValidator(min_angle=-45, max_angle=45, grace_period=1)
 
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNone(val.update_xyt(0, -1, 1))  # in grace period
-        self.assertIsNotNone(val.update_xyt(0, -2, 1.01))   # Now we get the error
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNone(val.update_xyt((0, -1), 1))  # in grace period
+        self.assertIsNotNone(val.update_xyt((0, -2), 1.01))   # Now we get the error
 
     #------------------------------------------
     def test_min_distance(self):
         val = MovementAngleValidator(min_angle=-45, max_angle=45)
         val.calc_angle_interval = 1.5
 
-        self.assertIsNone(val.update_xyt(0, 0, 0))
-        self.assertIsNone(val.update_xyt(0, -1, 0.1))  # Too close to calculate direction
+        self.assertIsNone(val.update_xyt((0, 0), 0))
+        self.assertIsNone(val.update_xyt((0, -1), 0.1))  # Too close to calculate direction
 
-        self.assertIsNotNone(val.update_xyt(0, -2, 0.2))   # Now we get the error
+        self.assertIsNotNone(val.update_xyt((0, -2), 0.2))   # Now we get the error
 
-        self.assertIsNone(val.update_xyt(0, 1, 0.3))   # Moving back in a valid direction
+        self.assertIsNone(val.update_xyt((0, 1), 0.3))   # Moving back in a valid direction
 
 
     # --------------------------------------------------

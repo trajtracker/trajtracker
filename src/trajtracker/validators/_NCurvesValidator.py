@@ -71,18 +71,18 @@ class NCurvesValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
 
     #-----------------------------------------------------------
-    def update_xyt(self, x_coord, y_coord, time_in_trial):
+    def update_xyt(self, position, time_in_trial, time_in_session=None):
         """
         Validate the number of curves in the trial
 
-        :param x_coord: Current x coordinate (in the predefined coordinate system)
-        :param y_coord: Current y coordinate (in the predefined coordinate system)
+        :param position: Current (x,y) coordinates
         :param time_in_trial: Time, in seconds. The zero point doesn't matter, as long as you're consistent until reset() is called.
+        :param time_in_session: ignored
         :return: None if all OK, ExperimentError if error
         """
 
-        _u.update_xyt_validate_and_log(self, x_coord, y_coord, time_in_trial)
-        self._direction_monitor.update_xyt(x_coord, y_coord, time_in_trial)
+        _u.update_xyt_validate_and_log(self, position, time_in_trial)
+        self._direction_monitor.update_xyt(position, time_in_trial)
 
         if not self.enabled:
             return None

@@ -77,10 +77,10 @@ while time < 30000:  # continue for 30 seconds
 
         if button_was_pressed:
             # Check movement
-            if in_ring_validator.update_xyt(finger_pos[0], finger_pos[1], time):
+            if in_ring_validator.update_xyt(finger_pos, time):
                 location_err.present(update=False, clear=False)
                 print("Location error")
-            elif direction_validator.update_xyt(finger_pos[0], finger_pos[1], time):
+            elif direction_validator.update_xyt(finger_pos, time):
                 direction_err.present(update=False, clear=False)
                 print("Direction error")
 
