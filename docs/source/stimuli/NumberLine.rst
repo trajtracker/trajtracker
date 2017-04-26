@@ -41,7 +41,7 @@ Using this class
   :func:`~trajtracker.stimuli.NumberLine.present` ).
 
   Hide the feedback stimulus by calling :func:`~trajtracker.stimuli.NumberLine.hide_feedback_stim` or,
-  if you use the :doc:`events mechanism <events/events_overview>` , by setting
+  if you use the :doc:`events mechanism <../events/events_overview>` , by setting
   :attr:`~trajtracker.stimuli.NumberLine.feedback_stim_hide_event` .
 
 - Draw the number line on screen with :func:`~trajtracker.stimuli.NumberLine.plot` or

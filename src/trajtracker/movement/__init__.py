@@ -12,6 +12,7 @@ TrajTracker - movement package
 from _CircularTrajectoryGenerator import CircularTrajectoryGenerator
 from _CustomTrajectoryGenerator import CustomTrajectoryGenerator
 from _DirectionMonitor import DirectionMonitor
+from _Hotspot import Hotspot
 from _LineTrajectoryGenerator import LineTrajectoryGenerator
 from _SegmentedTrajectoryGenerator import SegmentedTrajectoryGenerator
 from _SpeedMonitor import SpeedMonitor

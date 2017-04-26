@@ -45,8 +45,7 @@ Using MultiTextBox without an EventManager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - On the beginning of each trial, update the visual properties of the textbox (text, font, size, position, etc.).
-  You do not need to configure :attr:`~trajtracker.stimuli.MultiTextBox.start_rsvp_event` and
-  :attr:`~trajtracker.stimuli.MultiTextBox.terminate_rsvp_event`.
+  You do not need to configure the events.
 
 - After these properties were set, call :func:`~trajtracker.stimuli.MultiTextBox.init_for_trial`.
 

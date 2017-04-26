@@ -12,13 +12,13 @@ import trajtracker as ttrk
 import trajtracker._utils as _u
 
 
-class TouchSensitiveArea(ttrk.TTrkObject):
+class Hotspot(ttrk.TTrkObject):
 
     #----------------------------------------------------
     def __init__(self, event_manager=None, area=None, min_touch_duration=0,
                  on_touched_dispatch_event=None, on_touched_callback=None):
 
-        super(TouchSensitiveArea, self).__init__()
+        super(Hotspot, self).__init__()
 
         self._event_manager = event_manager
         self.area = area
@@ -34,7 +34,6 @@ class TouchSensitiveArea(ttrk.TTrkObject):
     #==============================================================================
 
 
-    # todo: serious things: update_xyt should (1) get time_in_session, to allow dispatching events (2) get position as tuple
     #----------------------------------------------------------------------------
     def update_xyt(self, position, time_in_trial, time_in_session=None):
         """
@@ -91,7 +90,7 @@ class TouchSensitiveArea(ttrk.TTrkObject):
         """
         The area that should be touched
         
-        :type: Any shape - from expyriment, or from :doc:`trajtracker <../misc/nvshapes>`,
+        :type: Any shape - from expyriment, or from :doc:`trajtracker <../misc/shapes>`,
                            or any other class with an *overlapping_with_position()* method
         """
         return self._area
@@ -114,7 +113,7 @@ class TouchSensitiveArea(ttrk.TTrkObject):
 
     @min_touch_duration.setter
     def min_touch_duration(self, value):
-        _u.validate_attr_type(self, "min_touch_duration", value, float, none_allowed=True)
+        _u.validate_attr_type(self, "min_touch_duration", value, numbers.Number, none_allowed=True)
         _u.validate_attr_not_negative(self, "min_touch_duration", value)
         value = 0 if value is None else value
 
@@ -126,7 +125,7 @@ class TouchSensitiveArea(ttrk.TTrkObject):
     @property
     def on_touched_dispatch_event(self):
         """
-        An event to dispatch when the area is touched.
+        An event to dispatch when the hotspot is touched.
          
         To use this, you must set event_manager in the constructor
         
@@ -137,7 +136,7 @@ class TouchSensitiveArea(ttrk.TTrkObject):
     @on_touched_dispatch_event.setter
     def on_touched_dispatch_event(self, value):
         _u.validate_attr_type(self, "on_touched_dispatch_event", value, str, none_allowed=True)
-        if self._event_manager is None:
+        if value is not None and self._event_manager is None:
             raise ttrk.ValueError("{:}.on_touched_dispatch_event cannot be set without an event manager".format(_u.get_type_name(self)))
 
         self._on_touched_dispatch_event = value
@@ -147,7 +146,7 @@ class TouchSensitiveArea(ttrk.TTrkObject):
     @property
     def on_touched_callback(self):
         """
-        A function to call when the area is touched.
+        A function to call when the hotspot is touched.
         
         The function should expect time_in_trial as a single argument. 
         """
@@ -155,6 +154,6 @@ class TouchSensitiveArea(ttrk.TTrkObject):
 
     @on_touched_callback.setter
     def on_touched_callback(self, value):
-        _u.validate_attr_type(self, "on_touched_callback", value, lambda: 1, none_allowed=True)
+        _u.validate_attr_type(self, "on_touched_callback", value, type(lambda: 1), none_allowed=True)
         self._on_touched_callback = value
         self._log_property_changed("on_touched_callback")

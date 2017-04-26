@@ -59,6 +59,7 @@ Classes that handle various aspects of finger/mouse movement.
    :glob:
 
    movement/DirectionMonitor
+   movement/Hotspot
    movement/SpeedMonitor
    movement/StartPoint
    movement/RectStartPoint
