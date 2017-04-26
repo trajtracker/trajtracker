@@ -48,7 +48,7 @@ class Config(object):
 
         # The type of the target presented.
         # Different target types require different fields in the CSV data file
-        ['text', 'image'].index(target_type)  # validate that the target type is OK
+        ['text', 'picture'].index(target_type)  # validate that the target type is OK
         self.target_type = target_type
 
         # The height of the text target, specified as percentage of the available distance

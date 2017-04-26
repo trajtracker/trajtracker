@@ -19,6 +19,7 @@ import expyriment as xpy
 import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
+import trajtracker.utils as u
 from trajtracker.utils import get_time
 from trajtracker.validators import ExperimentError
 from trajtracker.movement import StartPoint
@@ -254,19 +255,112 @@ def update_target_stimulus(exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
 
-    if CsvConfigFields.PresentedTarget in trial.csv_data:
-        trial.presented_target = trial.csv_data[CsvConfigFields.PresentedTarget]
+    if exp_info.config.target_type == 'text':
+        update_target_stimulus_text(exp_info, trial)
+    else:
+        raise Exception("Invalid config.target_type ({:})".format(exp_info.config.target_type))
+
+
+#----------------------------------------------------------------
+def update_target_stimulus_text(exp_info, trial):
+    """
+    Update properties of the text stimuli according to the current trial info
+    
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    """
+    if "presented_target" in trial.csv_data:
+        #-- Set the text to show as target (or several, semicolon-separated texts, in case of RSVP)
+        trial.presented_target = trial.csv_data["presented_target"]
     else:
         trial.presented_target = str(trial.target)
 
     exp_info.target.texts = trial.presented_target.split(";")
 
-    if CsvConfigFields.OnsetTime in trial.csv_data:
-        exp_info.target.onset_time = [float(s) for s in trial.csv_data[CsvConfigFields.OnsetTime].split(";")]
+    _update_target_stimulus_attr(exp_info, trial, 'text_font')
+    _update_target_stimulus_attr(exp_info, trial, 'text_size', int)
+    _update_target_stimulus_attr(exp_info, trial, 'text_bold', bool)
+    _update_target_stimulus_attr(exp_info, trial, 'text_italic', bool)
+    _update_target_stimulus_attr(exp_info, trial, 'text_underline', bool)
+    _update_target_stimulus_attr(exp_info, trial, 'text_justification', ttrk.data.csv_formats.parse_text_justification)
+    _update_target_stimulus_attr(exp_info, trial, 'text_colour', ttrk.data.csv_formats.parse_rgb)
+    _update_target_stimulus_attr(exp_info, trial, 'background_colour', ttrk.data.csv_formats.parse_rgb)
+    _update_target_stimulus_attr(exp_info, trial, 'size', ttrk.data.csv_formats.parse_size)
+    _update_target_stimulus_attr(exp_info, trial, 'position', ttrk.data.csv_formats.parse_coord)
+    _update_target_stimulus_position(exp_info, trial, 'x')
+    _update_target_stimulus_position(exp_info, trial, 'y')
 
-    if CsvConfigFields.Duration in trial.csv_data:
-        exp_info.target.onset_time = [float(s) for s in trial.csv_data[CsvConfigFields.Duration].split(";")]
+    _update_target_stimulus_attr(exp_info, trial, 'onset_time', float)
+    _update_target_stimulus_attr(exp_info, trial, 'duration', float)
 
+
+#------------------------------------------------
+def _update_target_stimulus_attr(exp_info, trial, attr_name, type_cast_function=None):
+    """
+    Update one attribute of the target object from the CSV file
+    
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    """
+
+    if type_cast_function is None:
+        type_cast_function = str
+
+    if attr_name not in trial.csv_data:
+        return
+
+    value = trial.csv_data[attr_name]
+    if ";" in value:
+        value = [type_cast_function(s) for s in value.split(";")]
+        if len(value) < exp_info.target.n_stim:
+            raise Exception("Invalid value for column '{:}' in the data file {:}: the column has {:} values, expecting {:}".format(
+                attr_name, exp_info.config.data_source, len(value), exp_info.target.n_stim))
+    else:
+        value = type_cast_function(value)
+
+    setattr(exp_info.target, attr_name, value)
+
+#------------------------------------------------
+def _update_target_stimulus_position(exp_info, trial, x_or_y):
+    """
+    Update the stimulus position according to "position.x" or "position.y" columns
+    
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo
+    """
+
+    if x_or_y != "x" and x_or_y != "y":
+        raise Exception("Invalid x_or_y argument ({:})".format(x_or_y))
+
+    csv_col = "position.%s" % x_or_y
+    if csv_col not in trial.csv_data:
+        return
+
+    n_stim = exp_info.target.n_stim
+
+    #-- Get the x/y coordinates as an array
+    value = trial.csv_data[csv_col]
+    if ";" in value:
+        coord = [int(s) for s in value.split(";")]
+    else:
+        coord = [int(value)] * n_stim
+
+    if len(coord) < n_stim:
+        raise Exception(
+            "Invalid value for column '{:}' in the data file {:}: the column has {:} values, expecting {:}".format(
+                attr_name, exp_info.config.data_source, len(value), n_stim))
+
+    pos = exp_info.target.position
+    if not isinstance(pos, list):
+        pos = [pos] * n_stim
+
+    for i in range(min(len(pos), len(coord))):
+        if x_or_y == "x":
+            pos[i] = coord[i], pos[i][1]
+        else:
+            pos[i] = pos[i][0], coord[i]
+
+    exp_info.target.position = pos
 
 #------------------------------------------------
 def update_movement(exp_info, trial):
