@@ -39,7 +39,7 @@ config = num2pos.Config("Num2Pos(D+U)",
                         max_trial_duration=2,
                         speed_guide_enabled=True,
                         max_numberline_value=100,
-                        data_source="digital_0_100_b.csv",  # Read targets from this CSV file
+                        data_source="number_to_position_2.csv",  # Read targets from this CSV file
                         text_target_height=0.5,
 
                         post_response_target=True,         # After response was made, show the correct location
