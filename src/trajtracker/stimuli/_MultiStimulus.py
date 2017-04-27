@@ -126,6 +126,9 @@ class MultiStimulus(BaseMultiStim):
 
         for stim_id, stim in value.items():
             _u.validate_attr_type(self, "available_stim(key)", stim_id, str)
+            if "is_preloaded" not in dir(stim) or "present" not in dir(stim):
+                raise ttrk.TypeError(
+                    "Invalid stimulus in {:}.add_stimulus() - {:}".format(_u.get_type_name(self), stim))
             if not stim.is_preloaded:
                 stim.preload()
             self._container.add(stim, stim_id, visible=False)
@@ -144,6 +147,8 @@ class MultiStimulus(BaseMultiStim):
         """
 
         _u.validate_func_arg_type(self, "add_stimulus", "stim_id", stim_id, str)
+        if "is_preloaded" not in dir(stimulus) or "present" not in dir(stimulus):
+            raise ttrk.TypeError("Invalid stimulus in {:}.add_stimulus() - {:}".format(_u.get_type_name(self), stimulus))
 
         if stim_id in self._available_stimuli and self._should_log(ttrk.log_warn):
             self._log_write(

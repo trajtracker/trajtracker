@@ -9,7 +9,7 @@ from trajtracker.events import *
 
 
 #--------------------------------------------------
-class PictureDbg(Picture):
+class StimDbg(object):
     # noinspection PyMissingConstructor
     def __init__(self):
         self._is_preloaded = False
@@ -33,7 +33,7 @@ class PictureDbg(Picture):
 
 #===================================================================
 
-class MultiPictureTests(unittest.TestCase):
+class MultiStimulusTests(unittest.TestCase):
 
     def setUp(self):
         ttrk.log_to_console = True
@@ -45,28 +45,27 @@ class MultiPictureTests(unittest.TestCase):
 
     #----------------------------------------------------------------
     def test_set_available_pics(self):
-        mp = MultiStimulus(available_stimuli=dict(a=PictureDbg(), b=PictureDbg()))
+        mp = MultiStimulus(available_stimuli=dict(a=StimDbg(), b=StimDbg()))
 
         self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(available_stimuli=""))
         self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(available_stimuli=dict(a=3)))
         self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(available_stimuli=dict(a=None)))
-        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(available_stimuli={1: PictureDbg()}))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(available_stimuli={1: StimDbg()}))
 
     #----------------------------------------------------------------
     def test_add_pict(self):
         mp = MultiStimulus()
-        mp.add_stimulus('c', PictureDbg())
+        mp.add_stimulus('c', StimDbg())
 
         self.assertRaises(ttrk.TypeError, lambda: mp.add_stimulus('c', 3))
-        self.assertRaises(ttrk.TypeError, lambda: mp.add_stimulus(3, PictureDbg()))
+        self.assertRaises(ttrk.TypeError, lambda: mp.add_stimulus(3, StimDbg()))
 
     #----------------------------------------------------------------
     def test_set_shown_pics(self):
-        MultiStimulus(available_stimuli=dict(a=PictureDbg(), b=PictureDbg()))
+        MultiStimulus(available_stimuli=dict(a=StimDbg(), b=StimDbg()))
         MultiStimulus(shown_stimuli=['a', 'b'])
         self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(shown_stimuli=[1]))
         self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(shown_stimuli=[None]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(shown_stimuli=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(shown_stimuli=2))
 
 
@@ -84,7 +83,6 @@ class MultiPictureTests(unittest.TestCase):
         self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=['a']))
         self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=[(1,)]))
         self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=[('a', 'b')]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=[None]))
 
 
@@ -130,7 +128,7 @@ class MultiPictureTests(unittest.TestCase):
                                onset_time=(0, 1, 2), duration=1, start_event=TRIAL_STARTED):
 
         if available_pictures == "default":
-            available_pictures = dict(a=PictureDbg(), b=PictureDbg())
+            available_pictures = dict(a=StimDbg(), b=StimDbg())
 
         return MultiStimulus(available_stimuli=available_pictures, shown_stimuli=shown_pictures,
                              position=position, onset_time=onset_time, duration=duration,

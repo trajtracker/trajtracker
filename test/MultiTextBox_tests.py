@@ -60,7 +60,6 @@ class MultiTextBoxTests(unittest.TestCase):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text='hi'))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text=5))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text=[5]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text=[None]))
 
     #---------------------------------------------------
@@ -73,7 +72,6 @@ class MultiTextBoxTests(unittest.TestCase):
     def test_set_text_font_invalid(self):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_font=5))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_font=[5]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_font=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_font=[None]))
 
     #---------------------------------------------------
@@ -86,7 +84,6 @@ class MultiTextBoxTests(unittest.TestCase):
     def test_set_text_size_invalid(self):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_size='a'))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_size=['a']))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_size=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_size=[None]))
 
     #---------------------------------------------------
@@ -99,7 +96,6 @@ class MultiTextBoxTests(unittest.TestCase):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_bold=None))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_bold='a'))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_bold=['a']))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_bold=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_bold=[None]))
 
     #---------------------------------------------------
@@ -112,7 +108,6 @@ class MultiTextBoxTests(unittest.TestCase):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_italic=None))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_italic='a'))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_italic=['a']))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_italic=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_italic=[None]))
 
     #---------------------------------------------------
@@ -125,7 +120,6 @@ class MultiTextBoxTests(unittest.TestCase):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_underline=None))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_underline='a'))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_underline=['a']))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_underline=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_underline=[None]))
 
     #---------------------------------------------------
@@ -138,7 +132,6 @@ class MultiTextBoxTests(unittest.TestCase):
     def test_set_text_colour_invalid(self):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_colour='a'))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_colour=['a']))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_colour=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text_colour=[None]))
 
     #---------------------------------------------------
@@ -151,7 +144,6 @@ class MultiTextBoxTests(unittest.TestCase):
     def test_set_background_colour_invalid(self):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(background_colour='a'))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(background_colour=['a']))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(background_colour=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(background_colour=[None]))
 
     #---------------------------------------------------
@@ -168,7 +160,6 @@ class MultiTextBoxTests(unittest.TestCase):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(size=['a']))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(size=[(1,)]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(size=[('a', 'b')]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(size=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(size=[None]))
 
     #---------------------------------------------------
@@ -185,7 +176,6 @@ class MultiTextBoxTests(unittest.TestCase):
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(position=['a']))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(position=[(1,)]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(position=[('a', 'b')]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(position=[]))
         self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(position=[None]))
 
     #==============================================================================
