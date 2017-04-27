@@ -31,7 +31,6 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 # features:
 # todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
-# todo: support image target (+RSVP). Also support multiple targets (both text and pictures in the same trial)
 # todo: escape button
 
 # future:
@@ -260,13 +259,13 @@ def update_text_target_for_trial(exp_info, trial):
         exp_info.text_target.texts = []
         return
 
-    if "text.presented_target" in trial.csv_data:
+    if "text.target" in trial.csv_data:
         #-- Set the text to show as target (or several, semicolon-separated texts, in case of RSVP)
-        trial.presented_target = trial.csv_data["text.presented_target"]
+        trial.text_target = trial.csv_data["text.target"]
     else:
-        trial.presented_target = str(trial.target)
+        trial.text_target = str(trial.target)
 
-    exp_info.text_target.texts = trial.presented_target.split(";")
+    exp_info.text_target.texts = trial.text_target.split(";")
 
     _update_target_stimulus_attr(exp_info, trial, 'text.font', 'text_font', "text")
     _update_target_stimulus_attr(exp_info, trial, 'text.text_size', 'text_size', "text", int)
@@ -303,9 +302,9 @@ def update_generic_target_for_trial(exp_info, trial):
         exp_info.generic_target.shown_stimuli = []
         return
 
-    trial.presented_target = trial.csv_data["genstim.stim_ids"]  # todo: but what if we show both text and non-text stimuli in the same trial?
+    trial.generic_target = trial.csv_data["genstim.target"]
 
-    exp_info.generic_target.shown_stimuli = trial.csv_data['genstim.stim_ids'].split(";")
+    exp_info.generic_target.shown_stimuli = trial.csv_data['genstim.target'].split(";")
     _update_target_stimulus_attr(exp_info, trial, 'genstim.position', 'position', "genstim",
                                  ttrk.data.csv_formats.parse_coord)
     _update_target_stimulus_position(exp_info, trial, 'genstim', 'x')
@@ -516,12 +515,21 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code):
         else:
             movement_time = time_in_trial - trial.results['time_started_moving']
 
+        if trial.use_text_targets and trial.use_generic_targets:
+            presented_target = 'text="{:}";generic="{:}"'.format(trial.text_target, trial.generic_target)
+        elif trial.use_text_targets:
+            presented_target = trial.text_target
+        elif trial.use_generic_targets:
+            presented_target = trial.generic_target
+        else:
+            presented_target = ""
+
         #-- Save data to trials file
         trial_out_row = {
             'trialNum':             trial.trial_num,
             'LineNum':              trial.file_line_num,
             'target':               trial.target,
-            'presentedTarget':      trial.presented_target,
+            'presentedTarget':      presented_target,
             'endPoint':             "" if endpoint is None else "{:.3g}".format(endpoint),
             'status':               success_err_code,
             'movementTime':         "{:.3g}".format(movement_time),

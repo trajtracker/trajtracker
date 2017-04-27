@@ -1,4 +1,4 @@
-target,text.presented_target,text.position.x
+target,text.target,text.position.x
 0,0+x;0+0,-50
 1,0+x;0+1,-50
 2,0+x;0+2,-50

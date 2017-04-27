@@ -1,4 +1,12 @@
+"""
 
+A simple quantity-to-position experiment. This is identical with digital_0_100_b.py, 
+except that the stimuli are dot clouds rather than symbolic numbers, and they do not change
+during a trial.
+
+@author: Dror Dotan
+@copyright: Copyright (c) 2017, Dror Dotan
+"""
 
 import numbers
 import numpy as np
@@ -8,12 +16,19 @@ import expyriment as xpy
 import trajtracker as ttrk
 from trajtracker.paradigms import num2pos
 
+
+#----------------------------------------------------------------
+
 if not xpy.misc.is_android_running():
     xpy.control.defaults.window_mode = True
     ttrk.log_to_console = True
 
 ttrk.default_log_level = ttrk.log_info
 
+
+#-----------------------------------
+#    Basic configuration
+#-----------------------------------
 
 accuracy_levels = [.05, .1]
 
@@ -37,9 +52,13 @@ config = num2pos.Config("Q2Pos(D+U)",
                                            (1, 'feedback-accuracy-2.wav'))
                         )
 
+#=================================================================================
+#  Functions for creating the visual stimuli - one dot cloud per target number
+#=================================================================================
 
 #----------------------------------------------------------------
-#-- Create stimuli: grey circle with dots in random positions
+# Create stimuli: grey circle with dots in random positions
+#
 def create_stimuli(min_value, max_value):
 
     stimuli = {}
@@ -60,6 +79,8 @@ def create_stimuli(min_value, max_value):
 
 
 #----------------------------------------------------------------
+# Find a random position for a dot, which does not overlap with any of the previous dots
+#
 def randomize_dot_position(other_dots, new_dot, radius, dot_desc):
 
     for i in range(10000):
@@ -73,15 +94,19 @@ def randomize_dot_position(other_dots, new_dot, radius, dot_desc):
 
 
 #----------------------------------------------------------------
+# Select a random position for the dot.
 def get_random_pos(radius):
-    #-- choose a random distance from the middle. The probability to choose a distance
-    #-- is proportional to its distance**2
+
+    # Random distance from the middle (to get even dot distribution, the probability is
+    # proportional to distance**2)
     r = np.sqrt(random.random() * radius**2)
-    alpha = random.random() * np.pi * 2
+
+    alpha = random.random() * np.pi * 2  # Random angle
+
     x = int(r * np.cos(alpha))
     y = int(r * np.sin(alpha))
-    return (x,y)
 
+    return (x,y)
 
 
 #=================================================================================
