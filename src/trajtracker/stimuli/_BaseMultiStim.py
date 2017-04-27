@@ -103,6 +103,7 @@ class BaseMultiStim(ttrk.TTrkObject):
     def stimulus(self):
         """
         A single stimulus that represents all the stimuli in this MultiTextBox
+        
         :type: StimulusContainer
         """
         return self._container
@@ -113,7 +114,7 @@ class BaseMultiStim(ttrk.TTrkObject):
     def stim_visibility(self):
         """
         Return an array of booleans, indicating whether each stimulus is presently visible or not.
-        The array has as many elements as :attr:`~trajtracker.stimuli.MultiTextBox.text`
+        The array has as many elements as the number of stimuli (text/picture) presented.
         """
         return [self._stimuli[i].visible for i in range(self.n_stim)]
 
@@ -232,7 +233,7 @@ class BaseMultiStim(ttrk.TTrkObject):
                      argument of :func:`~trajtracker.stimuli.MultiTextBox.update_display`
         """
 
-        self._log_func_enters("start_showing", (time))
+        self._log_func_enters("start_showing", [time])
         if self._event_manager is not None:
             self._log_write_if(ttrk.log_warn,
                                "start_showing() was called although the {:} was registered to an event manager".format(
@@ -253,7 +254,7 @@ class BaseMultiStim(ttrk.TTrkObject):
         """
 
         while (len(self._show_hide_operations) > 0 and
-                       time >= self._start_showing_time + self._show_hide_operations[0][0]):
+               time >= self._start_showing_time + self._show_hide_operations[0][0]):
 
             operation = self._show_hide_operations.pop(0)
             stim_num = operation[2]
@@ -338,7 +339,11 @@ class BaseMultiStim(ttrk.TTrkObject):
     #----------------------------------------------------
     @property
     def onset_time(self):
-        #todo documentation
+        """
+        The onset time of each stimulus, relatively to the **onset_event**.
+        
+        :type: list/tuple of numbers 
+        """
         return self._onset_time
 
     @onset_time.setter
@@ -358,7 +363,13 @@ class BaseMultiStim(ttrk.TTrkObject):
     #----------------------------------------------------
     @property
     def duration(self):
-        # todo documentation
+        """
+        The duration of showing each stimulus.
+        
+        A stimulus disappears when the duration expired or when a **terminate_event** was dispatched.
+
+        :type: list/tuple of numbers 
+        """
         return self._duration
 
     @duration.setter
@@ -384,7 +395,10 @@ class BaseMultiStim(ttrk.TTrkObject):
     #----------------------------------------------------
     @property
     def last_stimulus_remains(self):
-        # todo documentation
+        """
+        Whether the last stimulus presented in the sequence should remain on screen (True), or has
+        a limited duration similarly to the previous stimuli (False)
+        """
         return self._last_stimulus_remains
 
     @last_stimulus_remains.setter
@@ -441,9 +455,6 @@ class BaseMultiStim(ttrk.TTrkObject):
 
             multiple_values = self._is_multiple_values(value, prop_type)
             if multiple_values:
-                if len(value) == 0:
-                    raise ttrk.TypeError("trajtracker error: {:}.{:} cannot be set to an empty list".format(
-                            type(self).__name__, prop_name))
                 for v in value:
                     _u.validate_attr_type(self, prop_name, v, prop_type)
                 value = list(value)

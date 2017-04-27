@@ -38,7 +38,6 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 # todo: delete XML support?
 # todo: organize documentation. Have a "using this class" section for each complex class.
 # todo: add logging to all trajtracker functions? Decide on logging policy (trace=enter/exit, detailed flow trace; debug=potentially interesting data, stages within functions; info=configuration, major operations, important data, validation errors)
-# todo later: VOX detector
 
 #----------------------------------------------------------------
 def run_full_experiment(config, xpy_exp, subj_id, subj_name=""):
@@ -77,7 +76,7 @@ def run_trials(exp_info):
 
         trial_config = exp_info.trials.pop(0)
 
-        run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config))
+        run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config, exp_info.config))
         if run_trial_rc == RunTrialResult.Aborted:
             print("   Trial aborted.")
             continue
@@ -194,11 +193,12 @@ def initialize_trial(exp_info, trial):
 
     exp_info.stimuli.present()  # reset the display
 
-    update_target_stimulus(exp_info, trial)
+    update_text_target_for_trial(exp_info, trial)
+    update_generic_target_for_trial(exp_info, trial)
 
     exp_info.numberline.target = trial.target
 
-    exp_info.event_manager.on_touched_dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, get_time() - exp_info.session_start_time)
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, get_time() - exp_info.session_start_time)
 
 
 #----------------------------------------------------------------
@@ -215,7 +215,7 @@ def on_finger_touched_screen(exp_info, trial):
 
     trial.start_time = get_time()
 
-    exp_info.event_manager.on_touched_dispatch_event(ttrk.events.TRIAL_STARTED, 0, trial.start_time - exp_info.session_start_time)
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_STARTED, 0, trial.start_time - exp_info.session_start_time)
 
     exp_info.stimuli.present()
 
@@ -238,7 +238,7 @@ def on_finger_started_moving(exp_info, trial):
     time_in_session = t - exp_info.session_start_time
     trial.results['time_started_moving'] = time_in_trial
 
-    exp_info.event_manager.on_touched_dispatch_event(FINGER_STARTED_MOVING, time_in_trial, time_in_session)
+    exp_info.event_manager.dispatch_event(FINGER_STARTED_MOVING, time_in_trial, time_in_session)
 
     exp_info.stimuli.present()
 
@@ -247,81 +247,104 @@ def on_finger_started_moving(exp_info, trial):
 
 
 #----------------------------------------------------------------
-def update_target_stimulus(exp_info, trial):
-    """
-    Update the target objects when the trial is initialized
-
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    """
-
-    if exp_info.config.target_type == 'text':
-        update_target_stimulus_text(exp_info, trial)
-    else:
-        raise Exception("Invalid config.target_type ({:})".format(exp_info.config.target_type))
-
-
-#----------------------------------------------------------------
-def update_target_stimulus_text(exp_info, trial):
+def update_text_target_for_trial(exp_info, trial):
     """
     Update properties of the text stimuli according to the current trial info
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
-    if "presented_target" in trial.csv_data:
+
+    if not trial.use_text_targets:
+        # No text in this trial
+        exp_info.text_target.texts = []
+        return
+
+    if "text.presented_target" in trial.csv_data:
         #-- Set the text to show as target (or several, semicolon-separated texts, in case of RSVP)
-        trial.presented_target = trial.csv_data["presented_target"]
+        trial.presented_target = trial.csv_data["text.presented_target"]
     else:
         trial.presented_target = str(trial.target)
 
-    exp_info.target.texts = trial.presented_target.split(";")
+    exp_info.text_target.texts = trial.presented_target.split(";")
 
-    _update_target_stimulus_attr(exp_info, trial, 'text_font')
-    _update_target_stimulus_attr(exp_info, trial, 'text_size', int)
-    _update_target_stimulus_attr(exp_info, trial, 'text_bold', bool)
-    _update_target_stimulus_attr(exp_info, trial, 'text_italic', bool)
-    _update_target_stimulus_attr(exp_info, trial, 'text_underline', bool)
-    _update_target_stimulus_attr(exp_info, trial, 'text_justification', ttrk.data.csv_formats.parse_text_justification)
-    _update_target_stimulus_attr(exp_info, trial, 'text_colour', ttrk.data.csv_formats.parse_rgb)
-    _update_target_stimulus_attr(exp_info, trial, 'background_colour', ttrk.data.csv_formats.parse_rgb)
-    _update_target_stimulus_attr(exp_info, trial, 'size', ttrk.data.csv_formats.parse_size)
-    _update_target_stimulus_attr(exp_info, trial, 'position', ttrk.data.csv_formats.parse_coord)
-    _update_target_stimulus_position(exp_info, trial, 'x')
-    _update_target_stimulus_position(exp_info, trial, 'y')
+    _update_target_stimulus_attr(exp_info, trial, 'text.font', 'text_font', "text")
+    _update_target_stimulus_attr(exp_info, trial, 'text.text_size', 'text_size', "text", int)
+    _update_target_stimulus_attr(exp_info, trial, 'text.bold', 'text_bold', "text", bool)
+    _update_target_stimulus_attr(exp_info, trial, 'text.italic', 'text_italic', "text", bool)
+    _update_target_stimulus_attr(exp_info, trial, 'text.underline', 'text_underline', "text", bool)
+    _update_target_stimulus_attr(exp_info, trial, 'text.justification', 'text_justification', "text",
+                                 ttrk.data.csv_formats.parse_text_justification)
+    _update_target_stimulus_attr(exp_info, trial, 'text.text_colour', 'text_colour', "text",
+                                 ttrk.data.csv_formats.parse_rgb)
+    _update_target_stimulus_attr(exp_info, trial, 'text.background_colour', 'background_colour', "text",
+                                 ttrk.data.csv_formats.parse_rgb)
+    _update_target_stimulus_attr(exp_info, trial, 'text.size', 'size', "text", ttrk.data.csv_formats.parse_size)
+    _update_target_stimulus_attr(exp_info, trial, 'text.position', 'position', "text",
+                                 ttrk.data.csv_formats.parse_coord)
+    _update_target_stimulus_position(exp_info, trial, 'text', 'x')
+    _update_target_stimulus_position(exp_info, trial, 'text', 'y')
 
-    _update_target_stimulus_attr(exp_info, trial, 'onset_time', float)
-    _update_target_stimulus_attr(exp_info, trial, 'duration', float)
+    _update_target_stimulus_attr(exp_info, trial, 'text.onset_time', 'onset_time', "text", float)
+    _update_target_stimulus_attr(exp_info, trial, 'text.duration', 'duration', "text", float)
 
 
-#------------------------------------------------
-def _update_target_stimulus_attr(exp_info, trial, attr_name, type_cast_function=None):
+# ----------------------------------------------------------------
+def update_generic_target_for_trial(exp_info, trial):
     """
-    Update one attribute of the target object from the CSV file
-    
+    Update properties of the generic stimuli according to the current trial info
+
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
 
+    if not trial.use_generic_targets:
+        # No text in this trial
+        exp_info.generic_target.shown_stimuli = []
+        return
+
+    trial.presented_target = trial.csv_data["genstim.stim_ids"]  # todo: but what if we show both text and non-text stimuli in the same trial?
+
+    exp_info.generic_target.shown_stimuli = trial.csv_data['genstim.stim_ids'].split(";")
+    _update_target_stimulus_attr(exp_info, trial, 'genstim.position', 'position', "genstim",
+                                 ttrk.data.csv_formats.parse_coord)
+    _update_target_stimulus_position(exp_info, trial, 'genstim', 'x')
+    _update_target_stimulus_position(exp_info, trial, 'genstim', 'y')
+
+
+#------------------------------------------------
+def _update_target_stimulus_attr(exp_info, trial, csv_name, attr_name, text_or_generic, type_cast_function=None):
+    """
+    Update one attribute of the target object from the CSV file
+    
+    :param text_or_generic: 
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    """
+
+    if text_or_generic != "text" and text_or_generic != "genstim":
+        raise Exception("Invalid text_or_generic argument ({:})".format(text_or_generic))
+
     if type_cast_function is None:
         type_cast_function = str
 
-    if attr_name not in trial.csv_data:
+    if csv_name not in trial.csv_data:
         return
 
-    value = trial.csv_data[attr_name]
+    value = trial.csv_data[csv_name]
     if ";" in value:
         value = [type_cast_function(s) for s in value.split(";")]
-        if len(value) < exp_info.target.n_stim:
+        if len(value) < exp_info.text_target.n_stim:
             raise Exception("Invalid value for column '{:}' in the data file {:}: the column has {:} values, expecting {:}".format(
-                attr_name, exp_info.config.data_source, len(value), exp_info.target.n_stim))
+                attr_name, exp_info.config.data_source, len(value), exp_info.text_target.n_stim))
     else:
         value = type_cast_function(value)
 
-    setattr(exp_info.target, attr_name, value)
+    target_holder = exp_info.text_target if text_or_generic == "text" else exp_info.generic_target
+    setattr(exp_info.text_target, attr_name, value)
 
 #------------------------------------------------
-def _update_target_stimulus_position(exp_info, trial, x_or_y):
+def _update_target_stimulus_position(exp_info, trial, text_or_generic, x_or_y):
     """
     Update the stimulus position according to "position.x" or "position.y" columns
     
@@ -332,11 +355,15 @@ def _update_target_stimulus_position(exp_info, trial, x_or_y):
     if x_or_y != "x" and x_or_y != "y":
         raise Exception("Invalid x_or_y argument ({:})".format(x_or_y))
 
-    csv_col = "position.%s" % x_or_y
+    if text_or_generic != "text" and text_or_generic != "genstim":
+        raise Exception("Invalid text_or_generic argument ({:})".format(text_or_generic))
+
+    csv_col = "%s.position.%s" % (text_or_generic, x_or_y)
     if csv_col not in trial.csv_data:
         return
 
-    n_stim = exp_info.target.n_stim
+    target_holder = exp_info.text_target if text_or_generic == "text" else exp_info.generic_target
+    n_stim = target_holder.n_stim
 
     #-- Get the x/y coordinates as an array
     value = trial.csv_data[csv_col]
@@ -350,7 +377,7 @@ def _update_target_stimulus_position(exp_info, trial, x_or_y):
             "Invalid value for column '{:}' in the data file {:}: the column has {:} values, expecting {:}".format(
                 attr_name, exp_info.config.data_source, len(value), n_stim))
 
-    pos = exp_info.target.position
+    pos = target_holder.position
     if not isinstance(pos, list):
         pos = [pos] * n_stim
 
@@ -360,7 +387,7 @@ def _update_target_stimulus_position(exp_info, trial, x_or_y):
         else:
             pos[i] = pos[i][0], coord[i]
 
-    exp_info.target.position = pos
+    target_holder.position = pos
 
 #------------------------------------------------
 def update_movement(exp_info, trial):
@@ -405,7 +432,7 @@ def trial_failed(err, exp_info, trial):
 
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
-    exp_info.event_manager.on_touched_dispatch_event(ttrk.events.TRIAL_FAILED, time_in_trial, time_in_session)
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_FAILED, time_in_trial, time_in_session)
 
     exp_info.errmsg_textbox.unload()
     exp_info.errmsg_textbox.text = err.message
@@ -437,7 +464,7 @@ def trial_succeeded(exp_info, trial):
     curr_time = get_time()
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
-    exp_info.event_manager.on_touched_dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
 
     play_success_sound(exp_info, trial)
 

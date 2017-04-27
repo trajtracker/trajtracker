@@ -20,6 +20,9 @@ import trajtracker.utils as u
 from trajtracker.paradigms.num2pos import Arrow, FINGER_STARTED_MOVING, CsvConfigFields
 
 
+stimulus_distance_from_top = 5
+numberline_distance_from_top = 80
+
 #----------------------------------------------------------------
 def create_experiment_objects(exp_info):
     """
@@ -34,6 +37,7 @@ def create_experiment_objects(exp_info):
 
     create_start_point(exp_info, config)
     create_textbox_target(exp_info, config)
+    create_generic_target(exp_info, config)
     create_errmsg_textbox(exp_info)
     create_traj_tracker(exp_info)
     create_validators(exp_info, direction_validator=True, global_speed_validator=True,
@@ -65,13 +69,13 @@ def create_numberline(exp_info, config):
     _u.validate_func_arg_type(None, "create_numberline", "max_value", config.max_numberline_value, Number)
 
     numberline = ttrk.stimuli.NumberLine(
-        position=(0, exp_info.screen_size[1] / 2 - 80),
+        position=(0, exp_info.screen_size[1] / 2 - numberline_distance_from_top),
         line_length=int(exp_info.screen_size[0] * 0.85),
         min_value=0,
         max_value=config.max_numberline_value)
 
     # -- Graphical properties of the number line
-    numberline.position = (0, exp_info.screen_size[1] / 2 - 80)
+    numberline.position = (0, exp_info.screen_size[1] / 2 - numberline_distance_from_top)
     numberline.line_length = exp_info.screen_size[0] * 0.85
     numberline.line_width = 2
     numberline.end_tick_height = 5
@@ -253,13 +257,9 @@ def create_textbox_target(exp_info, config):
     :type config: trajtracker.paradigms.num2pos.Config
     """
 
-    POSITION_FROM_TOP = 5
-
-    ttrk.log_write("Using text target", print_to_console=True)
-
     screen_top = exp_info.screen_size[1] / 2
-    height = screen_top - exp_info.numberline.position[1] - POSITION_FROM_TOP - 1
-    y = int(screen_top - POSITION_FROM_TOP - height/2)
+    height = screen_top - exp_info.numberline.position[1] - stimulus_distance_from_top - 1
+    y = int(screen_top - stimulus_distance_from_top - height / 2)
 
     target = ttrk.stimuli.MultiTextBox()
 
@@ -281,9 +281,25 @@ def create_textbox_target(exp_info, config):
     target.onset_time = [0]
     target.duration = [1000]  # never disappear
 
-    exp_info.set_target(target, target.stimulus)
+    exp_info.set_text_target(target)
     exp_info.add_event_sensitive_object(target)
 
+
+#----------------------------------------------------------------
+def create_generic_target(exp_info, config):
+
+    screen_top = exp_info.screen_size[1] / 2
+    height = screen_top - exp_info.numberline.position[1] - stimulus_distance_from_top - 1
+    y = int(screen_top - stimulus_distance_from_top - height / 2)
+
+    target = ttrk.stimuli.MultiStimulus(position=(0, y))
+
+    target.onset_event = TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
+    target.onset_time = [0]
+    target.duration = [1000]  # never disappear
+
+    exp_info.set_generic_target(target)
+    exp_info.add_event_sensitive_object(target)
 
 #----------------------------------------------------------------
 def create_errmsg_textbox(exp_info):

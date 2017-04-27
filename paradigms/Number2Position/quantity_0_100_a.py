@@ -1,0 +1,117 @@
+
+
+import numbers
+import numpy as np
+import random
+
+import expyriment as xpy
+import trajtracker as ttrk
+from trajtracker.paradigms import num2pos
+
+if not xpy.misc.is_android_running():
+    xpy.control.defaults.window_mode = True
+    ttrk.log_to_console = True
+
+ttrk.default_log_level = ttrk.log_info
+
+
+accuracy_levels = [.05, .1]
+
+config = num2pos.Config("Q2Pos(D+U)",
+                        max_trial_duration=2,
+                        speed_guide_enabled=True,
+                        max_numberline_value=100,
+                        data_source="quantity_0_100_a.csv",  # Read targets from this CSV file
+                        text_target_height=0.5,
+
+                        use_text_targets=False,
+                        use_generic_targets=True,
+
+                        post_response_target=True,         # After response was made, show the correct location
+                        feedback_arrow_colors=[xpy.misc.constants.C_GREEN,
+                                               xpy.misc.constants.C_EXPYRIMENT_ORANGE,
+                                               xpy.misc.constants.C_RED],
+                        feedback_accuracy_levels=accuracy_levels,
+                        sound_by_accuracy=((accuracy_levels[0], 'feedback-accuracy-0.wav'),
+                                           (accuracy_levels[1], 'feedback-accuracy-1.wav'),
+                                           (1, 'feedback-accuracy-2.wav'))
+                        )
+
+
+#----------------------------------------------------------------
+#-- Create stimuli: grey circle with dots in random positions
+def create_stimuli(min_value, max_value):
+
+    stimuli = {}
+
+    for n in range(min_value, max_value):
+        main_circle = xpy.stimuli.Circle(radius=35, colour=xpy.misc.constants.C_GREY)
+        dots = []
+
+        for i in range(n):
+            dot = xpy.stimuli.Circle(radius=2, colour=xpy.misc.constants.C_BLACK)
+            randomize_dot_position(dots, dot, main_circle.radius-3, "%d(dot#%d)" % (n, i))
+            dot.radius = 1
+            dot.plot(main_circle)
+
+        stimuli[str(n)] = main_circle
+
+    return stimuli
+
+
+#----------------------------------------------------------------
+def randomize_dot_position(other_dots, new_dot, radius, dot_desc):
+
+    for i in range(10000):
+        new_pos = get_random_pos(radius)
+        is_overlap = sum([d.overlapping_with_position(new_pos) for d in other_dots]) > 0
+        if not is_overlap:
+            new_dot.position = new_pos
+            return
+
+    raise Exception("Can't find position for stimuls %s" % dot_desc)
+
+
+#----------------------------------------------------------------
+def get_random_pos(radius):
+    #-- choose a random distance from the middle. The probability to choose a distance
+    #-- is proportional to its distance**2
+    r = np.sqrt(random.random() * radius**2)
+    alpha = random.random() * np.pi * 2
+    x = int(r * np.cos(alpha))
+    y = int(r * np.sin(alpha))
+    return (x,y)
+
+
+
+#=================================================================================
+#           Run experiment
+#=================================================================================
+
+#-- Initialize Expyriment
+
+exp = xpy.control.initialize()
+xpy.control.start(exp)
+
+if not xpy.misc.is_android_running():
+    exp.mouse.show_cursor()
+
+
+stimuli = create_stimuli(0, 100)
+
+#-- Get subject info
+(subj_id, subj_name) = ttrk.paradigms.general.get_subject_name_id()
+
+
+#-- Run the experiment
+
+exp_info = ttrk.paradigms.num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
+ttrk.paradigms.num2pos.create_experiment_objects(exp_info)
+exp_info.generic_target.available_stimuli = stimuli
+
+ttrk.paradigms.num2pos.register_to_event_manager(exp_info)
+ttrk.paradigms.num2pos.run_trials(exp_info)
+ttrk.paradigms.num2pos.save_session_file(exp_info)
+
+#-- Shutdown Expyriment
+xpy.control.end()

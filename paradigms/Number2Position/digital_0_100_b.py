@@ -39,8 +39,7 @@ config = num2pos.Config("Num2Pos(D+U)",
                         max_trial_duration=2,
                         speed_guide_enabled=True,
                         max_numberline_value=100,
-                        data_source="basic_0_100_b.csv",  # Read targets from this CSV file
-                        target_type='text',
+                        data_source="digital_0_100_b.csv",  # Read targets from this CSV file
                         text_target_height=0.5,
 
                         post_response_target=True,         # After response was made, show the correct location
@@ -77,8 +76,8 @@ num2pos.create_experiment_objects(exp_info)
 
 #-- These 2 lines were not in the original version of run_full_experiment(), I added them only here.
 #-- Making this small modification is the reason that I copied run_full_experiment()
-exp_info.target.onset_time = [0, 0.1]
-exp_info.target.duration = [0.1, 2]
+exp_info.text_target.onset_time = [0, 0.1]
+exp_info.text_target.duration = [0.1, 2]
 
 num2pos.register_to_event_manager(exp_info)
 num2pos.run_trials(exp_info)

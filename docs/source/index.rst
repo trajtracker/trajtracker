@@ -73,8 +73,6 @@ This set of classes allows defining the flow of a trial by using events.
 
 Before looking at specific classes, check out :doc:`this overview <events/events_overview>`.
 
-**Classes:**
-
 .. toctree::
    :maxdepth: 1
    :glob:

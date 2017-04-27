@@ -27,7 +27,8 @@ class ExperimentInfo(object):
         self.subject_name = subject_name
 
         self._numberline = None
-        self._target = None
+        self._text_target = None
+        self._generic_target = None
         self._target_pointer = None
         self._start_point = None
         self._errmsg_box = None
@@ -100,23 +101,46 @@ class ExperimentInfo(object):
 
     #---------------------------------------------------------------
     @property
-    def target(self):
+    def text_target(self):
         """
-        The target stimulus (text)
+        Target stimulus (MultiTextBox)
         """
-        return self._target
+        return self._text_target
 
-    def set_target(self, target, target_stim):
+    def set_text_target(self, target):
         """
-        Set the target.
+        Set the text target.
+        
         :param target: The object representing the target placeholder on screen (this is not necessarity a visual object)
-        :param target_stim: The stimulus to display as a target
+        :type target: trajtracker.stimuli.MultiTextBox
         """
-        if self._target is not None:
-            raise ttrk.InvalidStateError("ExperimentInfo.target cannot be set twice")
+        if self._text_target is not None:
+            raise ttrk.InvalidStateError("ExperimentInfo.text_target cannot be set twice")
 
-        self._target = target
-        self.stimuli.add(target_stim, "target")
+        self._text_target = target
+        self.stimuli.add(target.stimulus, "text_target")
+
+
+    #---------------------------------------------------------------
+    @property
+    def generic_target(self):
+        """
+        Target stimulus (MultiStimulis)
+        """
+        return self._generic_target
+
+    def set_generic_target(self, target):
+        """
+        Set the generic target (e.g., for pictures).
+        
+        :param target: The object representing the target placeholder on screen (this is not necessarity a visual object)
+        :type target: trajtracker.stimuli.MultiPicture
+        """
+        if self._generic_target is not None:
+            raise ttrk.InvalidStateError("ExperimentInfo.generic_target cannot be set twice")
+
+        self._generic_target = target
+        self.stimuli.add(target.stimulus, "generic_target")
 
 
     #---------------------------------------------------------------

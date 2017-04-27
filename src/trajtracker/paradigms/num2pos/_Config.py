@@ -21,7 +21,8 @@ class Config(object):
     the number-to-position experiment
     """
 
-    def __init__(self, experiment_id, data_source, max_trial_duration, target_type='text',
+    def __init__(self, experiment_id, data_source, max_trial_duration,
+                 use_text_targets=True, use_generic_targets=False,
                  text_target_height=1.0, shuffle_trials=True, max_numberline_value=100,
                  show_feedback=True, feedback_arrow_colors=xpy.misc.constants.C_GREEN,
                  feedback_accuracy_levels=None, post_response_target=False,
@@ -46,10 +47,11 @@ class Config(object):
         # If True, trials will be presented in random order
         self.shuffle_trials = shuffle_trials
 
-        # The type of the target presented.
-        # Different target types require different fields in the CSV data file
-        ['text', 'picture'].index(target_type)  # validate that the target type is OK
-        self.target_type = target_type
+        # Whether to use generic targets (e.g. pictures) and text targets.
+        # Each of these values can be True, False, or None (which means that a column by this name is
+        # expected in the CSV file)
+        self.use_text_targets = use_text_targets
+        self.use_generic_targets = use_generic_targets
 
         # The height of the text target, specified as percentage of the available distance
         # between the number line and the top of the screen (value between 0 and 1).

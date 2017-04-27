@@ -11,5 +11,5 @@ from _BaseMultiStim import BaseMultiStim
 from _NumberLine import NumberLine
 from _StimulusContainer import StimulusContainer
 from _StimulusSelector import StimulusSelector
-from _MultiPicture import MultiPicture
+from _MultiStimulus import MultiStimulus
 from _MultiTextBox import MultiTextBox

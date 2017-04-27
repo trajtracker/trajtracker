@@ -3,7 +3,7 @@ import unittest
 from expyriment.stimuli import Picture
 
 import trajtracker as ttrk
-from trajtracker.stimuli import MultiPicture
+from trajtracker.stimuli import MultiStimulus
 from trajtracker.events import *
 
 
@@ -40,52 +40,52 @@ class MultiPictureTests(unittest.TestCase):
 
     #----------------------------------------------------------------
     def test_create_empty(self):
-        MultiPicture()
+        MultiStimulus()
 
 
     #----------------------------------------------------------------
     def test_set_available_pics(self):
-        mp = MultiPicture(available_pictures=dict(a=PictureDbg(), b=PictureDbg()))
+        mp = MultiStimulus(available_stimuli=dict(a=PictureDbg(), b=PictureDbg()))
 
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(available_pictures=""))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(available_pictures=dict(a=3)))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(available_pictures=dict(a=None)))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(available_pictures={1: PictureDbg()}))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(available_stimuli=""))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(available_stimuli=dict(a=3)))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(available_stimuli=dict(a=None)))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(available_stimuli={1: PictureDbg()}))
 
     #----------------------------------------------------------------
     def test_add_pict(self):
-        mp = MultiPicture()
-        mp.add_picture('c', PictureDbg())
+        mp = MultiStimulus()
+        mp.add_stimulus('c', PictureDbg())
 
-        self.assertRaises(ttrk.TypeError, lambda: mp.add_picture('c', 3))
-        self.assertRaises(ttrk.TypeError, lambda: mp.add_picture(3, PictureDbg()))
+        self.assertRaises(ttrk.TypeError, lambda: mp.add_stimulus('c', 3))
+        self.assertRaises(ttrk.TypeError, lambda: mp.add_stimulus(3, PictureDbg()))
 
     #----------------------------------------------------------------
     def test_set_shown_pics(self):
-        MultiPicture(available_pictures=dict(a=PictureDbg(), b=PictureDbg()))
-        MultiPicture(shown_pictures=['a', 'b'])
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(shown_pictures=[1]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(shown_pictures=[None]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(shown_pictures=[]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(shown_pictures=2))
+        MultiStimulus(available_stimuli=dict(a=PictureDbg(), b=PictureDbg()))
+        MultiStimulus(shown_stimuli=['a', 'b'])
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(shown_stimuli=[1]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(shown_stimuli=[None]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(shown_stimuli=[]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(shown_stimuli=2))
 
 
     #---------------------------------------------------
     def test_set_position(self):
-        mp = MultiPicture(position=(10, 10))
+        mp = MultiStimulus(position=(10, 10))
         self.assertEqual((10, 10), mp.position)
         mp.position = (1, 2), (4, 5)
         mp.position = None
 
     def test_set_position_invalid(self):
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(position=(1,)))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(position=('a', 'b')))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(position='a'))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(position=['a']))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(position=[(1,)]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(position=[('a', 'b')]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(position=[]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(position=[None]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=(1,)))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=('a', 'b')))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position='a'))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=['a']))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=[(1,)]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=[('a', 'b')]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=[]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(position=[None]))
 
 
     #==============================================================================
@@ -94,32 +94,32 @@ class MultiPictureTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_set_onset_time(self):
-        rsvp = MultiPicture(onset_time=(1, 2))
+        rsvp = MultiStimulus(onset_time=(1, 2))
         self.assertEqual((1, 2), rsvp.onset_time)
         rsvp.onset_time = None
 
     def test_set_onset_time_invalid(self):
-        self.assertRaises(ttrk.ValueError, lambda: MultiPicture(onset_time=[-5]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(onset_time=5))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(onset_time='hi'))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(onset_time=['hi']))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(onset_time=[]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(onset_time=[None]))
+        self.assertRaises(ttrk.ValueError, lambda: MultiStimulus(onset_time=[-5]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(onset_time=5))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(onset_time='hi'))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(onset_time=['hi']))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(onset_time=[]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(onset_time=[None]))
 
     #---------------------------------------------------
     def test_set_duration(self):
-        rsvp = MultiPicture(duration=(1, 2))
+        rsvp = MultiStimulus(duration=(1, 2))
         self.assertEqual((1, 2), rsvp.duration)
         rsvp.duration = 5
         rsvp.duration = None
 
     def test_set_duration_invalid(self):
-        self.assertRaises(ttrk.ValueError, lambda: MultiPicture(duration=[-5]))
-        self.assertRaises(ttrk.ValueError, lambda: MultiPicture(duration=[0]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(duration='hi'))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(duration=['hi']))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(duration=[]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiPicture(duration=[None]))
+        self.assertRaises(ttrk.ValueError, lambda: MultiStimulus(duration=[-5]))
+        self.assertRaises(ttrk.ValueError, lambda: MultiStimulus(duration=[0]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(duration='hi'))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(duration=['hi']))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(duration=[]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiStimulus(duration=[None]))
 
     #==============================================================================
     #   Validation function for RSVP properties
@@ -132,9 +132,9 @@ class MultiPictureTests(unittest.TestCase):
         if available_pictures == "default":
             available_pictures = dict(a=PictureDbg(), b=PictureDbg())
 
-        return MultiPicture(available_pictures=available_pictures, shown_pictures=shown_pictures,
-                            position=position, onset_time=onset_time, duration=duration,
-                            onset_event=start_event)
+        return MultiStimulus(available_stimuli=available_pictures, shown_stimuli=shown_pictures,
+                             position=position, onset_time=onset_time, duration=duration,
+                             onset_event=start_event)
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
