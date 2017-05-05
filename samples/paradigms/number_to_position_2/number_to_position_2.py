@@ -7,14 +7,14 @@ A simple version of the number-to-position experiment:
 - The color of the feedback arrow changes according to the response accuracy (endpoint error), 
   and so does the acknowledgement sound.
 - The correct location is shown with the feedback
-
+- Support both stimulus-then-move and move-then-stimulus modes
 
 Changing during the trial (first decade, then decade+unit) is acheived by defining TWO stimuli per trial.
 Both are defined in a single MultiTextBox object (exp_info.target). To define when one stimulus changes
 into the other, the MultiTextBox defines "onset_time" and "duration" for each of the two per-trial stimuli.
 
 Defining onset_time and duration could have been done by adding two columns with this name to the
-basic_0_100_b.csv file. However, here I used a different method: I defined MultiTextBox.onset_time and
+number_to_position_2.csv file. However, here I used a different method: I defined MultiTextBox.onset_time and
 MultiTextBox.duration in advance, only once, when initializing the experiment. To allow this, I had to 
 copy the trajtracker.paradigms.num2pos.run_full_experiment() function and make a small modification.
 
@@ -27,7 +27,7 @@ import trajtracker as ttrk
 from trajtracker.paradigms import num2pos
 
 #-- Change this to True to switch into stimulus-then-move mode
-STIMULUS_THEN_MOVE = True
+STIMULUS_THEN_MOVE = False
 
 if not xpy.misc.is_android_running():
     xpy.control.defaults.window_mode = True

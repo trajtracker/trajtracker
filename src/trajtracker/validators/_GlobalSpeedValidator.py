@@ -115,6 +115,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         self.show_guide = show_guide
         self.guide_warning_time_delta = 0
         self.guide_line_length = None
+        self._should_set_guide_visible = False
 
         self._time0 = None
         self.movement_started_event = None
@@ -138,6 +139,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
             raise trajtracker.InvalidStateError(
                 "{:} cannot be registered twice to an event manager".format(_u.get_type_name(self)))
 
+        # noinspection PyUnusedLocal
         def callback_start(time_in_trial, time_in_session):
             self.movement_started(time_in_trial)
 
@@ -146,9 +148,11 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
         # -- Intercept the event that indicates when the movement terminates
 
+        # noinspection PyUnusedLocal
         def callback_end(t1, t2):
             if self._show_guide:
                 self._guide.stimulus.visible = False
+                self._should_set_guide_visible = False
 
         event_manager.register_operation(self._movement_ended_event, callback_end, recurring=True,
                                          description="{:}: hide speed guide".format(_u.get_type_name(self)))
@@ -159,6 +163,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
     #========================================================================
 
     #-------------------------------------------
+    # noinspection PyMethodMayBeStatic
     def reset(self, time0=None):
         """
         Called when a trial starts - reset any previous movement
@@ -179,10 +184,13 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         self._time0 = time
 
         if self._show_guide:
-            self._guide.stimulus.visible = True
+            #-- Guide should appear. Don't present it immediately, because its position is
+            #-- not updated yet; just mark that it should be changed to visible
+            self._should_set_guide_visible = True
 
 
     #----------------------------------------------------------------------------------
+    # noinspection PyUnusedLocal
     def update_xyt(self, position, time_in_trial, time_in_session=None):
         """
         Validate movement.
@@ -219,6 +227,9 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         if time_in_trial <= self._grace_period:
             if self._show_guide:
                 self._guide.show(expected_coord, GlobalSpeedGuide.LineMode.Grace)
+            if self._should_set_guide_visible:
+                self._guide.stimulus.visible = True
+                self._should_set_guide_visible = False
             return None
 
         #-- Actual coordinate must be ahead of the expected minimum
@@ -235,6 +246,10 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
             # set guide color accordingly
             self._guide.show(expected_coord, GlobalSpeedGuide.LineMode.OK if reached_expected_soon else GlobalSpeedGuide.LineMode.Error)
+
+            if self._should_set_guide_visible:
+                self._guide.stimulus.visible = True
+                self._should_set_guide_visible = False
 
         return None
 
@@ -529,7 +544,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._guide
 
 
-
 #==========================================================================================
 # Show a moving line to visualize the validator's speed
 #==========================================================================================
@@ -589,6 +603,7 @@ class GlobalSpeedGuide(trajtracker.TTrkObject):
         self._guide_line.add_stimulus(self.LineMode.OK, self._create_line(start_pt, end_pt, self._colour_ok))
 
     #--------------------------------------------------
+    # noinspection PyProtectedMember
     def _get_line_length(self):
         if self._validator.guide_line_length is not None:
             return self._validator.guide_line_length
@@ -602,7 +617,7 @@ class GlobalSpeedGuide(trajtracker.TTrkObject):
     #--------------------------------------------------
     def _create_line(self, start_pt, end_pt, color, r2=False):
         line = xpy.stimuli.Line(start_point=start_pt, end_point=end_pt, line_width=self._line_width, colour=color)
-        line.position = (0,0)
+        line.position = (0, 0)
         line.preload()
 
         if self._validator.axis == ValidationAxis.x:
@@ -613,7 +628,7 @@ class GlobalSpeedGuide(trajtracker.TTrkObject):
         line.plot(canvas)
         canvas.preload()
 
-        return (canvas,line) if r2 else canvas
+        return (canvas, line) if r2 else canvas
 
 
     #=====================================================================================
@@ -637,6 +652,7 @@ class GlobalSpeedGuide(trajtracker.TTrkObject):
         self._guide_line.activate(line_mode)
 
         pos = (coord, 0) if self._validator.axis == ValidationAxis.x else (0, coord)
+        print("pos={:}".format(pos))
         self._guide_line.position = pos
 
 
