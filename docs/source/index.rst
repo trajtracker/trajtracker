@@ -102,6 +102,17 @@ other modules
 
 
 
+
+Off-the-shelf paradigms
+=======================
+
+TrajTracker also offers ready-to-use experimental paradigms: sets of functions that allow
+creating your own experiment with almost no programming.:
+
+* :doc:`Number-to-position mapping <paradigms/num2pos/num2pos>` experiments
+* Dual-choice experiments: coming up soon
+
+
 Indices and tables
 ==================
 
