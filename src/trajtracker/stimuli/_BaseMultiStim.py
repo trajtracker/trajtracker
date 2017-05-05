@@ -29,6 +29,7 @@ class BaseMultiStim(ttrk.TTrkObject):
         super(BaseMultiStim, self).__init__()
 
         self._event_manager = None
+        self._registered_ops = []
         self.trial_configured_event = TRIAL_INITIALIZED
         self.onset_event = None
         self.terminate_event = TRIAL_ENDED
@@ -174,13 +175,13 @@ class BaseMultiStim(ttrk.TTrkObject):
             self._event_manager.register_operation(event=self._terminate_event,
                                                    recurring=False,
                                                    description="Terminate " + _u.get_type_name(self),
-                                                   operation=lambda t1, t2: self._terminate_display())
+                                                   operation=lambda t1, t2: self.terminate_display())
 
 
     #----------------------------------------------------
     # (when the event ends) if not all texts were displayed, terminate whatever remained
     #
-    def _terminate_display(self):
+    def terminate_display(self):
         self._log_func_enters("_terminate_display")
         self._event_manager.unregister_operation(self._registered_ops, warn_if_op_missing=False)
         for stim in self._stimuli:

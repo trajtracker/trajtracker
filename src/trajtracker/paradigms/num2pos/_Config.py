@@ -27,8 +27,9 @@ class Config(object):
                  show_feedback=True, feedback_arrow_colors=xpy.misc.constants.C_GREEN,
                  feedback_accuracy_levels=None, post_response_target=False,
                  min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=10,
-                 grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None,
-                 stimulus_then_move=False, start_point_size=(40, 30), start_point_tilt=0,
+                 grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None, sounds_dir="sounds",
+                 stimulus_then_move=False, finger_moves_min_time=None, finger_moves_max_time=None,
+                 start_point_size=(40, 30), start_point_tilt=0,
                  start_point_colour=xpy.misc.constants.C_GREY):
 
         # A unique identifier of this experiment.
@@ -84,6 +85,11 @@ class Config(object):
         # False: The finger moves at will and this is what triggers the appearance of the target
         self.stimulus_then_move = stimulus_then_move
 
+        # The minimal/maximal time in which the finger should start moving.
+        # The time is specified relatively to the time when the finger touched the screen
+        self.finger_moves_min_time = finger_moves_min_time
+        self.finger_moves_max_time = finger_moves_max_time
+
         # The size of the "start" rectangle: (width, height)
         self.start_point_size = start_point_size
 
@@ -104,6 +110,8 @@ class Config(object):
         # the program will play good.wav for endpoint errors up to 5% of the line length, and bad.wav for
         # any larger error
         self.sound_by_accuracy = sound_by_accuracy
+
+        self.sounds_dir = sounds_dir
 
         #----- Configuration of validators -----
 

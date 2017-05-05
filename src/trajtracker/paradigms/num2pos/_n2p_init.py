@@ -277,7 +277,7 @@ def create_textbox_target(exp_info, config):
     target.text_size = font_size
     ttrk.log_write("Target font size = {:}, height = {:.1f} pixels".format(font_size, font_size*hsr), print_to_console=True)
 
-    target.onset_event = TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
+    target.onset_event = ttrk.events.TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
     target.onset_time = [0]
     target.duration = [1000]  # never disappear
 
@@ -294,7 +294,7 @@ def create_generic_target(exp_info, config):
 
     target = ttrk.stimuli.MultiStimulus(position=(0, y))
 
-    target.onset_event = TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
+    target.onset_event = ttrk.events.TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
     target.onset_time = [0]
     target.duration = [1000]  # never disappear
 
@@ -335,11 +335,11 @@ def create_sounds(exp_info, config):
     :type config: trajtracker.paradigms.num2pos.Config
     """
 
-    exp_info.sound_err = load_sound('error.wav')
+    exp_info.sound_err = load_sound(config, 'error.wav')
 
     if config.sound_by_accuracy is None:
         # One sound, independently of accuracy
-        exp_info.sounds_ok = [load_sound('click.wav')]
+        exp_info.sounds_ok = [load_sound(config, 'click.wav')]
         exp_info.sounds_ok_max_ep_err = [1]
         return
 
@@ -359,13 +359,13 @@ def create_sounds(exp_info, config):
     cfg.sort(key=itemgetter(0))
     cfg[-1][0] = 1
 
-    exp_info.sounds_ok = [load_sound(x[1]) for x in cfg]
+    exp_info.sounds_ok = [load_sound(config, x[1]) for x in cfg]
     exp_info.sounds_ok_max_ep_err = np.array([x[0] for x in cfg])
 
 
 #------------------------------------------------
-def load_sound(filename):
-    sound = xpy.stimuli.Audio("sounds/" + filename)
+def load_sound(config, filename):
+    sound = xpy.stimuli.Audio(config.sounds_dir + "/" + filename)
     sound.preload()
     return sound
 

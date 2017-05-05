@@ -117,14 +117,14 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
                 return None
 
             if self._min_speed is not None and speed < self._min_speed:
-                return trajtracker.validators.create_experiment_error(self, self.err_too_slow, "You moved too slowly", {self.arg_speed: speed})
+                return trajtracker.validators.create_experiment_error(self, self.err_too_slow, "You moved too slowly, or completely stopped moving", {self.arg_speed: speed})
 
             if self._max_speed is not None and speed > self._max_speed:
                 return trajtracker.validators.create_experiment_error(self, self.err_too_fast, "You moved too fast", {self.arg_speed: speed})
 
             t_stopped = self._speed_monitor.stopped_duration
             if self._max_stop_duration is not None and t_stopped is not None and t_stopped > self._max_stop_duration:
-                return trajtracker.validators.create_experiment_error(self, self.err_stopped, "Do not stop moving",
+                return trajtracker.validators.create_experiment_error(self, self.err_stopped, "You stopped moving",
                                                                       {self.arg_stopped_duration: t_stopped})
 
         return None

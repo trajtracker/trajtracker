@@ -96,12 +96,12 @@ while n_completed < N_TRIALS:
     present_stimuli()
 
     # Wait for mouse/finger to start moving
-    state = start_point.wait_until_exit(exp)
-    if state == StartPoint.State.aborted:
+    start_point.wait_until_exit(exp)
+    if start_point.state == StartPoint.State.aborted:
         # Finger lifted (trial aborted)
         continue
 
-    elif state == StartPoint.State.error:
+    elif start_point.state == StartPoint.State.error:
         # Finger moved sideways rather than upwards: show an error message
         present_stimuli(show_error=True)
         continue
@@ -131,3 +131,5 @@ while n_completed < N_TRIALS:
             progress_msg.text = "Completed: %d/%d" % (n_completed, N_TRIALS)
             present_stimuli()
             break
+
+xpy.control.end()

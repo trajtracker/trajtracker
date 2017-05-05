@@ -34,8 +34,7 @@ ring = xpy.stimuli.Picture("ring.bmp", position=(0,0))
 in_ring_validator = LocationsValidator("gradient.bmp", position=(0, 0), default_valid=True)
 in_ring_validator.invalid_colors = ((255, 255, 255))
 
-direction_validator = \
-    MoveByGradientValidator("gradient.bmp", position=(0, 0), cyclic=True, max_valid_back_movement=5)
+direction_validator = MoveByGradientValidator("gradient.bmp", position=(0, 0), cyclic=True, max_valid_back_movement=5)
 direction_validator.single_color = "B"   # use only the blue scale
 direction_validator.log_level = ttrk.log_debug
 
@@ -62,12 +61,12 @@ direction_err = xpy.stimuli.TextBox("Wrong direction", size=(200, 50),
 ring.present(update=False)
 instruction.present(clear=False)
 
-button_was_pressed = False
+button_was_already_pressed = False
 
 start_time = get_time()
-time = 0
+time = start_time
 
-while time < 30000:  # continue for 30 seconds
+while time - start_time < 30000:  # continue for 30 seconds
 
     ring.present(update=False) # to clear previous stuff
 
@@ -75,7 +74,7 @@ while time < 30000:  # continue for 30 seconds
 
         finger_pos = exp.mouse.position
 
-        if button_was_pressed:
+        if button_was_already_pressed:
             # Check movement
             if in_ring_validator.update_xyt(finger_pos, time):
                 location_err.present(update=False, clear=False)
@@ -85,16 +84,17 @@ while time < 30000:  # continue for 30 seconds
                 print("Direction error")
 
         else:
-            # first touch: update it
-            button_was_pressed = True
+            # The finger touched the screen just now: reset validators, but don't validate yet
+            button_was_already_pressed = True
             in_ring_validator.reset(time)
             direction_validator.reset(time)
 
     else:
         # Finger lifted
-        button_was_pressed = False
+        button_was_already_pressed = False
 
     instruction.present(clear=False) # Go to next frame
+    time = get_time()
 
 
 xpy.control.end()

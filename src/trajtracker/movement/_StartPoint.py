@@ -227,7 +227,9 @@ class StartPoint(ttrk.TTrkObject):
                               If you provide an event manager, you also have to provide trial_start_time and
                               session_start_time (whose values were obtained by :func:`trajtracker.utils.get_time`
         :param max_wait_time: Maximal time (in seconds) to wait
-        :return: True if touched the start area, False if max_wait_time expired
+        :return: The value returned by the on_loop_callback function (in case it returned anything other than None).
+                 Otherwise the function returns None. Use :attr:`~trajtracker.movement.StartPoint.state` to
+                 learn about the StartPoint's exit status.
         """
 
         self._log_func_enters("wait_until_startpoint_touched",
@@ -236,7 +238,7 @@ class StartPoint(ttrk.TTrkObject):
         _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time, numbers.Number, none_allowed=True)
         _u.validate_func_arg_not_negative(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time)
         if event_manager is not None:
-            _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "trial_start_time", trial_start_time, numbers.Number)
+            _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "trial_start_time", trial_start_time, numbers.Number, none_allowed=True)
             _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "session_start_time", session_start_time, numbers.Number)
 
         if self._state != StartPoint.State.reset:
@@ -265,7 +267,8 @@ class StartPoint(ttrk.TTrkObject):
 
             if max_wait_time is not None and u.get_time() - time_started_waiting >= max_wait_time:
                 self._log_func_returns("wait_until_startpoint_touched", False)
-                return False
+                self._state = StartPoint.State.timeout
+                return None
 
             if self._state == StartPoint.State.init:
                 break  # Screen touched - we're done here
@@ -279,7 +282,8 @@ class StartPoint(ttrk.TTrkObject):
 
             if event_manager is not None:
                 curr_time = u.get_time()
-                event_manager.on_frame(curr_time - trial_start_time, curr_time - session_start_time)
+                event_manager.on_frame(None if trial_start_time is None else curr_time - trial_start_time,
+                                       curr_time - session_start_time)
 
             if on_loop_present is not None:
                 on_loop_present.present()
@@ -288,7 +292,7 @@ class StartPoint(ttrk.TTrkObject):
                 exp.clock.wait(15)
 
         self._log_func_returns("wait_until_startpoint_touched", True)
-        return True
+        return None
 
     #------------------------------------------------
     def wait_until_exit(self, exp, on_loop_callback=None, on_loop_present=None, event_manager=None,
@@ -313,8 +317,9 @@ class StartPoint(ttrk.TTrkObject):
                               If you provide an event manager, you also have to provide trial_start_time and
                               session_start_time (whose values were obtained by :func:`trajtracker.utils.get_time` 
         :param max_wait_time: Maximal time (in seconds) to wait
-        :returns: State.start if left the start area in the correct direction; State.error if not; State.aborted if
-                  the finger was lifted; State.timeout if max_wait_time has expired
+        :return: The value returned by the on_loop_callback function (in case it returned anything other than None).
+                 Otherwise the function returns None. Use :attr:`~trajtracker.movement.StartPoint.state` to
+                 learn about the StartPoint's exit status.
         """
 
         self._log_func_enters("wait_until_exit", ["exp", on_loop_callback, on_loop_present, event_manager])
@@ -322,18 +327,12 @@ class StartPoint(ttrk.TTrkObject):
         _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time, numbers.Number, none_allowed=True)
         _u.validate_func_arg_not_negative(self, "wait_until_startpoint_touched", "max_wait_time", max_wait_time)
         if event_manager is not None:
-            _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "trial_start_time", trial_start_time, numbers.Number)
+            _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "trial_start_time", trial_start_time, numbers.Number, none_allowed=True)
             _u.validate_func_arg_type(self, "wait_until_startpoint_touched", "session_start_time", session_start_time, numbers.Number)
 
-        if not exp.mouse.check_button_pressed(0):
-            # -- Finger lifted
-            self._log_func_returns("wait_until_exit", self.State.aborted)
-            self._state = StartPoint.State.aborted
-            return self.State.aborted
-
-        #-- Wait
         time_started_waiting = u.get_time()
 
+        #-- Wait
         while self._state not in [StartPoint.State.start, StartPoint.State.error]:
 
             if exp.mouse.check_button_pressed(0):
@@ -344,12 +343,12 @@ class StartPoint(ttrk.TTrkObject):
                 #-- Finger lifted
                 self._log_func_returns("wait_until_exit", self.State.aborted)
                 self._state = StartPoint.State.aborted
-                return self.State.aborted
+                return None
 
             if max_wait_time is not None and u.get_time() - time_started_waiting >= max_wait_time:
                 self._state = StartPoint.State.timeout
                 self._log_func_returns("wait_until_exit", self.State.timeout)
-                return self.State.timeout
+                return None
 
             # Invoke custom operations on each loop iteration
             if on_loop_callback is not None:
@@ -359,7 +358,8 @@ class StartPoint(ttrk.TTrkObject):
 
             if event_manager is not None:
                 curr_time = u.get_time()
-                event_manager.on_frame(curr_time - trial_start_time, curr_time - session_start_time)
+                event_manager.on_frame(None if trial_start_time is None else curr_time - trial_start_time,
+                                       curr_time - session_start_time)
 
             if on_loop_present is not None:
                 on_loop_present.present()
@@ -368,5 +368,4 @@ class StartPoint(ttrk.TTrkObject):
                 exp.clock.wait(15)
 
         self._log_func_returns("wait_until_exit", self._state)
-        return self._state
-
+        return None

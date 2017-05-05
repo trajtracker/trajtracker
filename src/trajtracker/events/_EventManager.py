@@ -138,7 +138,7 @@ class EventManager(ttrk.TTrkObject):
         :return: The number of operations invoked.
         """
 
-        _u.validate_func_arg_type(self, "on_frame", "time_in_trial", time_in_trial, numbers.Number)
+        _u.validate_func_arg_type(self, "on_frame", "time_in_trial", time_in_trial, numbers.Number, none_allowed=True)
         _u.validate_func_arg_type(self, "on_frame", "time_in_session", time_in_session, numbers.Number)
 
         n = 0

@@ -39,7 +39,7 @@ class - please see there for details.
 Methods and properties:
 -----------------------
 
-.. autoclass:: trajtracker.stimuli.MultiStimulis
+.. autoclass:: trajtracker.stimuli.MultiStimulus
    :members:
    :inherited-members:
    :member-order: bysource

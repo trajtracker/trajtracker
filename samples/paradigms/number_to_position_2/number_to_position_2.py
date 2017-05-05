@@ -26,6 +26,9 @@ import expyriment as xpy
 import trajtracker as ttrk
 from trajtracker.paradigms import num2pos
 
+#-- Change this to True to switch into stimulus-then-move mode
+STIMULUS_THEN_MOVE = True
+
 if not xpy.misc.is_android_running():
     xpy.control.defaults.window_mode = True
     ttrk.log_to_console = True
@@ -36,6 +39,7 @@ ttrk.default_log_level = ttrk.log_info
 accuracy_levels = [.05, .1]
 
 config = num2pos.Config("Num2Pos(D+U)",
+                        stimulus_then_move=STIMULUS_THEN_MOVE,
                         max_trial_duration=2,
                         speed_guide_enabled=True,
                         max_numberline_value=100,
@@ -49,8 +53,13 @@ config = num2pos.Config("Num2Pos(D+U)",
                         feedback_accuracy_levels=accuracy_levels,
                         sound_by_accuracy=((accuracy_levels[0], 'feedback-accuracy-0.wav'),
                                            (accuracy_levels[1], 'feedback-accuracy-1.wav'),
-                                           (1, 'feedback-accuracy-2.wav'))
+                                           (1, 'feedback-accuracy-2.wav')),
+                        sounds_dir="../sounds"
                         )
+
+if STIMULUS_THEN_MOVE:
+    config.finger_moves_min_time = 0.6
+    config.finger_moves_max_time = 1.5
 
 #----------------------------------------------------------------
 
@@ -74,9 +83,12 @@ if not xpy.misc.is_android_running():
 exp_info = ttrk.paradigms.num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
 num2pos.create_experiment_objects(exp_info)
 
-#-- These 2 lines were not in the original version of run_full_experiment(), I added them only here.
+#-- These 5 lines were not in the original version of run_full_experiment(), I added them only here.
 #-- Making this small modification is the reason that I copied run_full_experiment()
-exp_info.text_target.onset_time = [0, 0.1]
+if STIMULUS_THEN_MOVE:
+    exp_info.text_target.onset_time = [0.5, 0.6]
+else:
+    exp_info.text_target.onset_time = [0, 0.1]
 exp_info.text_target.duration = [0.1, 2]
 
 num2pos.register_to_event_manager(exp_info)

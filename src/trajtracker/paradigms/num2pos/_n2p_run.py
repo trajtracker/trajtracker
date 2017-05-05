@@ -30,7 +30,7 @@ RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
 
 # features:
-# todo: handle stimulus-then-move, including FingerMovedTooEarly,FingerMovedTooLate errors
+# todo: handle stimulus-then-move
 # todo: escape button
 
 # future:
@@ -112,10 +112,14 @@ def run_trial(exp_info, trial):
 
     initialize_trial(exp_info, trial)
 
-    exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp, on_loop_present=exp_info.stimuli)
+    exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp,
+                                                       on_loop_present=exp_info.stimuli,
+                                                       event_manager=exp_info.event_manager,
+                                                       trial_start_time=trial.start_time,
+                                                       session_start_time=exp_info.session_start_time)
     on_finger_touched_screen(exp_info, trial)
 
-    rc = initiate_trial(exp_info, trial)
+    rc = wait_until_finger_moves(exp_info, trial)
     if rc is not None:
         return rc
 
@@ -149,9 +153,31 @@ def run_trial(exp_info, trial):
 
 
 #----------------------------------------------------------------
-def initiate_trial(exp_info, trial):
+def on_finger_touched_screen(exp_info, trial):
     """
-    Make the trial start - either by the subject, or by the software.
+    This function should be called when the finger touches the screen
+
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo
+    """
+
+    exp_info.errmsg_textbox.visible = False
+    exp_info.target_pointer.visible = False
+
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_STARTED, 0,
+                                          get_time() - exp_info.session_start_time)
+
+    exp_info.stimuli.present()
+
+    trial.start_time = get_time()
+
+    #-- Reset all trajectory-sensitive objects
+    for obj in exp_info.trajectory_sensitive_objects:
+        obj.reset(0)
+
+#----------------------------------------------------------------
+def wait_until_finger_moves(exp_info, trial):
+    """
     The function returns after the finger started moving (or on error)
 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
@@ -160,21 +186,35 @@ def initiate_trial(exp_info, trial):
     :return: None if all OK, RunTrialResult.xxx if trial should terminate
     """
 
-    if exp_info.config.stimulus_then_move:
+    #-- Wait for the participant to start moving the finger
+    exp_info.start_point.wait_until_exit(exp_info.xpy_exp,
+                                         on_loop_present=exp_info.stimuli,
+                                         event_manager=exp_info.event_manager,
+                                         trial_start_time=trial.start_time,
+                                         session_start_time=exp_info.session_start_time,
+                                         max_wait_time=trial.finger_moves_max_time)
 
-        raise Exception("TBD")  #todo
+    if exp_info.start_point.state == StartPoint.State.aborted:
+        #-- Finger lifted
+        return RunTrialResult.Aborted
 
-    else:
-        #-- Wait for the participant to start moving the finger
-        rc = exp_info.start_point.wait_until_exit(exp_info.xpy_exp, on_loop_present=exp_info.stimuli)
-        if rc == StartPoint.State.aborted:
-            return RunTrialResult.Aborted
+    elif exp_info.start_point.state == StartPoint.State.error:
+        #-- Invalid start direction
+        trial_failed(ExperimentError("StartedSideways", "Start the trial by moving straight, not sideways!"), exp_info, trial)
+        return RunTrialResult.Failed
 
-        elif rc == StartPoint.State.error:
-            trial_failed(ExperimentError("StartedSideways", "Start the trial by moving straight, not sideways!"), exp_info, trial)
-            return RunTrialResult.Failed
+    elif exp_info.start_point.state == StartPoint.State.timeout:
+        #-- Finger moved too late
+        trial_failed(ExperimentError("FingerMovedTooLate", "You moved too late"), exp_info, trial)
+        return RunTrialResult.Failed
+
+    if trial.finger_moves_min_time is not None and get_time() - trial.start_time < trial.finger_moves_min_time:
+        #-- Finger moved too early
+        trial_failed(ExperimentError("FingerMovedTooEarly", "You moved too early"), exp_info, trial)
+        return RunTrialResult.Failed
 
     on_finger_started_moving(exp_info, trial)
+
     return None
 
 
@@ -190,6 +230,9 @@ def initialize_trial(exp_info, trial):
     exp_info.start_point.reset()
     exp_info.numberline.reset()    # mark the line as yet-untouched
 
+    exp_info.text_target.terminate_display()
+    exp_info.generic_target.terminate_display()
+
     exp_info.stimuli.present()  # reset the display
 
     update_text_target_for_trial(exp_info, trial)
@@ -198,29 +241,6 @@ def initialize_trial(exp_info, trial):
     exp_info.numberline.target = trial.target
 
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, get_time() - exp_info.session_start_time)
-
-
-#----------------------------------------------------------------
-def on_finger_touched_screen(exp_info, trial):
-    """
-    This function should be called when the finger touches the screen
-
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
-    """
-
-    exp_info.errmsg_textbox.visible = False
-    exp_info.target_pointer.visible = False
-
-    trial.start_time = get_time()
-
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_STARTED, 0, trial.start_time - exp_info.session_start_time)
-
-    exp_info.stimuli.present()
-
-    #-- Reset all trajectory-sensitive objects
-    for obj in exp_info.trajectory_sensitive_objects:
-        obj.reset(0)
 
 
 #----------------------------------------------------------------
@@ -241,8 +261,7 @@ def on_finger_started_moving(exp_info, trial):
 
     exp_info.stimuli.present()
 
-    if not exp_info.config.stimulus_then_move:
-        trial.results['time_target_shown'] = get_time() - trial.start_time
+    trial.results['targets_t0'] = 0 if exp_info.config.stimulus_then_move else time_in_trial
 
 
 #----------------------------------------------------------------
@@ -340,7 +359,8 @@ def _update_target_stimulus_attr(exp_info, trial, csv_name, attr_name, text_or_g
         value = type_cast_function(value)
 
     target_holder = exp_info.text_target if text_or_generic == "text" else exp_info.generic_target
-    setattr(exp_info.text_target, attr_name, value)
+    setattr(target_holder, attr_name, value)
+
 
 #------------------------------------------------
 def _update_target_stimulus_position(exp_info, trial, text_or_generic, x_or_y):
@@ -387,6 +407,7 @@ def _update_target_stimulus_position(exp_info, trial, text_or_generic, x_or_y):
             pos[i] = pos[i][0], coord[i]
 
     target_holder.position = pos
+
 
 #------------------------------------------------
 def update_movement(exp_info, trial):
@@ -508,7 +529,7 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code):
 
         endpoint = exp_info.numberline.response_value
         t_move = trial.results['time_started_moving'] if 'time_started_moving' in trial.results else -1
-        t_target = trial.results['time_target_shown'] if 'time_target_shown' in trial.results else -1
+        t_target = trial.results['targets_t0'] if 'targets_t0' in trial.results else -1
 
         if time_in_trial == 0 or 'time_started_moving' not in trial.results:
             movement_time = 0

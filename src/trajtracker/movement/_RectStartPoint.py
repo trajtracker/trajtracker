@@ -144,6 +144,11 @@ class RectStartPoint(ttrk.TTrkObject):
             event_manager=event_manager, trial_start_time=trial_start_time, session_start_time=session_start_time,
             max_wait_time=max_wait_time)
 
+    #-----------------------------------------------------------------
+    @property
+    def state(self):
+        return self._start_point.state
+
     #================================================================================
     #   Configuration
     #================================================================================

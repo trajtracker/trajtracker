@@ -69,3 +69,4 @@ while get_time() - start_time < 30:  # continue for 30 seconds
     #-- Update the display
     selector.present()
 
+xpy.control.end()

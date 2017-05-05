@@ -53,11 +53,11 @@ def run_trial():
     reset_trajectory_info(time0)
 
     #-- Wait for the participant to start moving the finger
-    rc = start_point.wait_until_exit(exp, on_loop_present=all_stimuli)
-    if rc == StartPoint.State.aborted:
+    start_point.wait_until_exit(exp, on_loop_present=all_stimuli)
+    if start_point.state == StartPoint.State.aborted:
         print("   Trial aborted.")
         return False
-    elif rc == StartPoint.State.error:
+    elif start_point.state == StartPoint.State.error:
         trial_error("Start the trial by moving upwards, not sideways!")
         return False
 
