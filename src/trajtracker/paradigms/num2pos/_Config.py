@@ -32,17 +32,17 @@ class Config(object):
                  start_point_size=(40, 30), start_point_tilt=0,
                  start_point_colour=xpy.misc.constants.C_GREY):
 
-        # A unique identifier of this experiment.
-        # This string is saved as-is to the results file, to identify the experiment.
+        #: A unique identifier of this experiment.
+        #: This string is saved as-is to the results file, to identify the experiment.
         self.experiment_id = experiment_id
 
 
         #----- Configuration of source data -----
 
-        # The trials information. This can be:
-        # - The name of a CSV file(string)
-        # - An explicit list of trials
-        # - A list of target numbers
+        #: The trials information. This can be:
+        #: - The name of a CSV file(string)
+        #: - An explicit list of trials
+        #: - A list of target numbers
         self.data_source = data_source
 
         # If True, trials will be presented in random order

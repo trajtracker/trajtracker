@@ -297,10 +297,12 @@ texinfo_domain_indices = False
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
 
+# autodoc_default_flags = ['show-inheritance']
 
 import trajtracker
 
-# autoclass_content = 'both'
+# autoclass_content = 'init'
+
 def skip(app, what, name, obj, skip, options):
     if name == "__init__":
         return False

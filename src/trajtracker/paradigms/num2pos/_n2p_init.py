@@ -28,21 +28,22 @@ def create_experiment_objects(exp_info):
     """
     Create the full default configuration for the experiment.
 
+    :param exp_info: 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
     config = exp_info.config
 
-    create_numberline(exp_info, config)
+    create_numberline(exp_info)
 
-    create_start_point(exp_info, config)
-    create_textbox_target(exp_info, config)
-    create_generic_target(exp_info, config)
+    create_start_point(exp_info)
+    create_textbox_target(exp_info)
+    create_generic_target(exp_info)
     create_errmsg_textbox(exp_info)
     create_traj_tracker(exp_info)
-    create_validators(exp_info, direction_validator=True, global_speed_validator=True,
-                      inst_speed_validator=True, zigzag_validator=True, config=config)
-    create_sounds(exp_info, config)
+    create_validators(exp_info, direction_validator=True, global_speed_validator=True, inst_speed_validator=True,
+                      zigzag_validator=True)
+    create_sounds(exp_info)
 
     exp_info.trials = load_data_source(config)
 
@@ -58,13 +59,15 @@ def create_experiment_objects(exp_info):
 
 
 #----------------------------------------------------------------
-def create_numberline(exp_info, config):
+def create_numberline(exp_info):
     """
     Create a :class:`~trajtracker.stimuli.NumberLine` object with default configuration
 
+    :param exp_info: 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type config: trajtracker.paradigms.num2pos.Config
     """
+
+    config = exp_info.config
 
     _u.validate_func_arg_type(None, "create_numberline", "max_value", config.max_numberline_value, Number)
 
@@ -127,13 +130,15 @@ def create_numberline(exp_info, config):
     exp_info.target_pointer_height = exp_info.target_pointer.size[1]
 
 #----------------------------------------------------------------
-def create_start_point(exp_info, config):
+def create_start_point(exp_info):
     """
     Create the "start" area, with default configuration
 
+    :param exp_info: The experiment-level objects
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type config: trajtracker.paradigms.num2pos.Config
     """
+
+    config = exp_info.config
 
     start_area_size = config.start_point_size
     start_area_position = (0, - (exp_info.screen_size[1] / 2 - start_area_size[1] / 2))
@@ -154,6 +159,7 @@ def create_traj_tracker(exp_info):
     """
     Create the object that tracks the trajectory
     
+    :param exp_info: The experiment-level objects
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
@@ -172,11 +178,11 @@ def create_traj_tracker(exp_info):
 
 
 #----------------------------------------------------------------
-def create_validators(exp_info, direction_validator, global_speed_validator, inst_speed_validator, zigzag_validator,
-                      config):
+def create_validators(exp_info, direction_validator, global_speed_validator, inst_speed_validator, zigzag_validator):
     """
     Create movement validators, with default configuration.
 
+    :param exp_info: The experiment-level objects
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
 
     :param direction_validator: Whether to include the validator that enforces upward-only movement
@@ -191,8 +197,6 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
     :param zigzag_validator: Whether to prohibit zigzag movement
     :type zigzag_validator: bool
 
-    :type config: trajtracker.paradigms.num2pos.Config
-
     :return: tuple: (list_of_validators, dict_of_validators)
     """
 
@@ -200,8 +204,8 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
     _u.validate_func_arg_type(None, "create_validators", "global_speed_validator", global_speed_validator, bool)
     _u.validate_func_arg_type(None, "create_validators", "inst_speed_validator", inst_speed_validator, bool)
     _u.validate_func_arg_type(None, "create_validators", "zigzag_validator", zigzag_validator, bool)
-    _u.validate_func_arg_type(None, "create_validators", "config", config, ttrk.paradigms.num2pos.Config)
 
+    config = exp_info.config
 
     if direction_validator:
         v = ttrk.validators.MovementAngleValidator(
@@ -248,14 +252,16 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
 
 
 #----------------------------------------------------------------
-def create_textbox_target(exp_info, config):
+def create_textbox_target(exp_info):
     """
     Create a textbox to serve as the target. This text box supports multiple texts (so it can be used
     for RSVP, priming, etc.)
 
+    :param exp_info: The experiment-level objects
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type config: trajtracker.paradigms.num2pos.Config
     """
+
+    config = exp_info.config
 
     screen_top = exp_info.screen_size[1] / 2
     height = screen_top - exp_info.numberline.position[1] - stimulus_distance_from_top - 1
@@ -281,12 +287,19 @@ def create_textbox_target(exp_info, config):
     target.onset_time = [0]
     target.duration = [1000]  # never disappear
 
-    exp_info.set_text_target(target)
+    exp_info.text_target = target
     exp_info.add_event_sensitive_object(target)
 
 
 #----------------------------------------------------------------
-def create_generic_target(exp_info, config):
+def create_generic_target(exp_info):
+    """
+    Create a handler for non-text targets (pictures, shapes, etc.). This object supports multiple targets
+    (so it can be used for RSVP, priming, etc.)
+
+    :param exp_info: The experiment-level objects
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    """
 
     screen_top = exp_info.screen_size[1] / 2
     height = screen_top - exp_info.numberline.position[1] - stimulus_distance_from_top - 1
@@ -294,11 +307,11 @@ def create_generic_target(exp_info, config):
 
     target = ttrk.stimuli.MultiStimulus(position=(0, y))
 
-    target.onset_event = ttrk.events.TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
+    target.onset_event = ttrk.events.TRIAL_STARTED if exp_info.config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
     target.onset_time = [0]
     target.duration = [1000]  # never disappear
 
-    exp_info.set_generic_target(target)
+    exp_info.generic_target = target
     exp_info.add_event_sensitive_object(target)
 
 #----------------------------------------------------------------
@@ -306,6 +319,7 @@ def create_errmsg_textbox(exp_info):
     """
     Create a stimulus that can show the error messages
 
+    :param exp_info: The experiment-level objects
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
@@ -317,8 +331,9 @@ def create_errmsg_textbox(exp_info):
 #----------------------------------------------------------------
 def register_to_event_manager(exp_info):
     """
-    Register all relevant objects to the event manager
+    Register all event-sensitive objects to the event manager
 
+    :param exp_info: The experiment-level objects
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
@@ -327,13 +342,15 @@ def register_to_event_manager(exp_info):
 
 
 #------------------------------------------------
-def create_sounds(exp_info, config):
+def create_sounds(exp_info):
     """
     Load the sounds for the experiment
     
+    :param exp_info: The experiment-level objects
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type config: trajtracker.paradigms.num2pos.Config
     """
+
+    config = exp_info.config
 
     exp_info.sound_err = load_sound(config, 'error.wav')
 
@@ -372,6 +389,12 @@ def load_sound(config, filename):
 
 #----------------------------------------------------------------
 def load_data_source(config):
+    """
+    Loads the CSV file with the per-trial configuration
+    
+    :param config: the program's configuration
+    :type config: :doc:`Config <Config>`
+    """
 
     ds = config.data_source
 

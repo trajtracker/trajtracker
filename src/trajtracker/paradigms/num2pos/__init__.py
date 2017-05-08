@@ -20,6 +20,7 @@ import CsvConfigFields
 from _n2p_init import \
     create_errmsg_textbox, \
     create_experiment_objects, \
+    create_generic_target, \
     create_numberline, \
     create_sounds, \
     create_start_point, \
@@ -44,4 +45,6 @@ from _n2p_run import \
     trial_failed, \
     trial_succeeded, \
     update_movement, \
-    update_text_target_for_trial
+    update_generic_target_for_trial, \
+    update_text_target_for_trial, \
+    wait_until_finger_moves

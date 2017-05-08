@@ -652,7 +652,6 @@ class GlobalSpeedGuide(trajtracker.TTrkObject):
         self._guide_line.activate(line_mode)
 
         pos = (coord, 0) if self._validator.axis == ValidationAxis.x else (0, coord)
-        print("pos={:}".format(pos))
         self._guide_line.position = pos
 
 

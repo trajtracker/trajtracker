@@ -21,9 +21,15 @@ class ExperimentInfo(object):
 
         #-- Static elements - remain throughout the experiment
 
-        self.xpy_exp = xpy_exp  # Expyriment's "Experiment" object
         self._config = config
+
+        #: Expyriment's "Experiment" object
+        self.xpy_exp = xpy_exp
+
+        #: Subject ID (As entered in Expyriment's welcome screen)
         self.subject_id = subject_id
+
+        #: Subject name (as entered in the number-to-position app's welcome screen)
         self.subject_name = subject_name
 
         self._numberline = None
@@ -36,27 +42,51 @@ class ExperimentInfo(object):
         self._trajectory_sensitive_objects = []
         self._event_sensitive_objects = []
 
+        #: A :class:`~trajtracker.stimuli.StimulusContainer` object, containing all stimuli.
         self.stimuli = ttrk.stimuli.StimulusContainer("main")
+
+        #: An :class:`~trajtracker.events.EventManager` object (responsible for handling the app's events)
         self.event_manager = ttrk.events.EventManager()
 
+        #: Sound to play on trial failure
+        #: (`expyriment.stimuli.Audio <http://docs.expyriment.org/expyriment.stimuli.Audio.html>`_)
         self.sound_err = None
+
+        #: Sound/s to play when the trial succeeded
+        #: (`expyriment.stimuli.Audio <http://docs.expyriment.org/expyriment.stimuli.Audio.html>`_)
+        #:
+        #: This has more than one entry in case you used several sounds (configured by Config.sound_by_accuracy)
         self.sounds_ok = None
+
+        #: Specify, for each entry in sounds_ok, the maximal endpoint error acceptable for this sound.
         self.sounds_ok_max_ep_err = None
 
         #-- Runtime elements: change during the experiment
 
+        #: The list of trials (loaded from the CSV file)
         self.trials = None
+
+        #: Time when the session started.
         self.session_start_time = None
+
+        #: Time when the session started, as string
         self.session_start_localtime = None
 
         #-- Results: per experiment, per trial
 
+        #: A dict with the experiment-level results
         self.exp_data = {}
 
+        #: Name of session.xml results file
         self.session_out_filename = None
+
+        #: Name of trials.csv results file
         self.trials_out_filename = None
+
+        #: Name of trajectory.csv results file
         self.traj_out_filename = None
 
+        #: a DictWriter for the trials.csv file
         self.trials_file_writer = None
 
 
@@ -64,6 +94,8 @@ class ExperimentInfo(object):
     @property
     def config(self):
         """
+        The program's configuration parameters 
+        
         :type: trajtracker.paradigms.num2pos.Config  
         """
         return self._config
@@ -71,12 +103,47 @@ class ExperimentInfo(object):
 
     #---------------------------------------------------------------
     @property
+    def trajectory_sensitive_objects(self):
+        """
+        A list of all objects that need to know about the finger movement 
+        (e.g. :class:`~trajtracker.movement.TrajectoryTracker` and the validators).
+        For each of these objects, obj.update_xyt() will be called on each frame.
+        """
+        return self._trajectory_sensitive_objects
+
+    #---------------------------------------------------------------
+    @property
+    def event_sensitive_objects(self):
+        """
+        A list of objects that need to be registered to the :class:`~trajtracker.events.EventManager`
+        """
+        return self._event_sensitive_objects
+
+
+    def add_event_sensitive_object(self, obj):
+        """
+        Add an object to :attr:`~trajtracker.paradigms.num2pos.event_sensitive_objects`
+        """
+        self._event_sensitive_objects.append(obj)
+
+    #---------------------------------------------------------------
+    @property
     def screen_size(self):
+        """
+        The screen size (width, height)
+        :type: tuple 
+        """
         return self.xpy_exp.screen.size
 
 
     #---------------------------------------------------------------
     def add_validator(self, validator, name):
+        """
+        Add a validator to the experiment's set of validators.
+        The validator will also be registered in :attr:`~trajtracker.paradigms.num2pos.trajectory_sensitive_objects` 
+
+        :param name: The validator will also be saved as "exp_info.validator_<name>"
+        """
 
         self._trajectory_sensitive_objects.append(validator)
         self.add_event_sensitive_object(validator)
@@ -88,6 +155,11 @@ class ExperimentInfo(object):
     #---------------------------------------------------------------
     @property
     def numberline(self):
+        """
+        The number line
+        
+        :type: trajtracker.stimuli.NumberLine 
+        """
         return self._numberline
 
     @numberline.setter
@@ -103,17 +175,14 @@ class ExperimentInfo(object):
     @property
     def text_target(self):
         """
-        Target stimulus (MultiTextBox)
+        The target text stimuli
+        
+        :type: trajtracker.stimuli.MultiTextBox 
         """
         return self._text_target
 
-    def set_text_target(self, target):
-        """
-        Set the text target.
-        
-        :param target: The object representing the target placeholder on screen (this is not necessarity a visual object)
-        :type target: trajtracker.stimuli.MultiTextBox
-        """
+    @text_target.setter
+    def text_target(self, target):
         if self._text_target is not None:
             raise ttrk.InvalidStateError("ExperimentInfo.text_target cannot be set twice")
 
@@ -125,17 +194,14 @@ class ExperimentInfo(object):
     @property
     def generic_target(self):
         """
-        Target stimulus (MultiStimulis)
+        The target non-text stimuli
+        
+        :type: trajtracker.stimuli.MultiStimulis 
         """
         return self._generic_target
 
-    def set_generic_target(self, target):
-        """
-        Set the generic target (e.g., for pictures).
-        
-        :param target: The object representing the target placeholder on screen (this is not necessarity a visual object)
-        :type target: trajtracker.stimuli.MultiPicture
-        """
+    @generic_target.setter
+    def generic_target(self, target):
         if self._generic_target is not None:
             raise ttrk.InvalidStateError("ExperimentInfo.generic_target cannot be set twice")
 
@@ -147,7 +213,8 @@ class ExperimentInfo(object):
     @property
     def target_pointer(self):
         """
-        A stimulus to directly indicate the target location on the number line
+        A stimulus that directly indicates the target location on the number line
+        (in the default implementation, this is a down-pointing arrow)
         """
         return self._target_pointer
 
@@ -162,6 +229,10 @@ class ExperimentInfo(object):
     #---------------------------------------------------------------
     @property
     def start_point(self):
+        """
+        The start point
+        (a :class:`~trajtracker.movement.StartPoint` or :class:`~trajtracker.movement.RectStartPoint` )   
+        """
         return self._start_point
 
     @start_point.setter
@@ -172,6 +243,11 @@ class ExperimentInfo(object):
     #---------------------------------------------------------------
     @property
     def errmsg_textbox(self):
+        """
+        A text box for showing error messages
+        (`expyriment.stimuli.TextBox <http://docs.expyriment.org/expyriment.stimuli.TextBox.html>`_
+        or an equivalent stimulus)  
+        """
         return self._errmsg_textbox
 
     @errmsg_textbox.setter
@@ -183,6 +259,9 @@ class ExperimentInfo(object):
     #---------------------------------------------------------------
     @property
     def trajtracker(self):
+        """
+        A :class:`~trajtracker.movement.TrajectoryTracker` object for tracking the finger trajectory
+        """
         return self._trajtracker
 
     @trajtracker.setter
@@ -194,16 +273,3 @@ class ExperimentInfo(object):
         self._event_sensitive_objects.append(tracker)
         self._trajtracker = tracker
 
-
-    #---------------------------------------------------------------
-    @property
-    def trajectory_sensitive_objects(self):
-        return self._trajectory_sensitive_objects
-
-    #---------------------------------------------------------------
-    @property
-    def event_sensitive_objects(self):
-        return self._event_sensitive_objects
-
-    def add_event_sensitive_object(self, obj):
-        self._event_sensitive_objects.append(obj)

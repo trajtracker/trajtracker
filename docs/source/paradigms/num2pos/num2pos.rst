@@ -25,7 +25,7 @@ with almost no programming. To use them, you should:
 - Create your main program by copy one of the existing sample scripts (the simplest one is in
   *samples/paradigms/number_to_position_1* in the TrajTracker distribution).
 - In your script, set the experiment's general configuration parameters.
-  This is done by updating the :class:`~trajtracker.paradigms.num2pos.Config` object.
+  This is done by updating the :doc:`Config <Config>` object.
 - Create a CSV file with the per-trial data. See :doc:`here <input_data_format>`
   a detailed description of this file format.
 
@@ -40,4 +40,4 @@ software is designed.
 The simplest way to do such modifications is to copy the relevant functions into your own script
 (e.g., see the script in *samples/paradigms/number_to_position_2* in the TrajTracker distribution).
 
-*TBD overview, how-to, list of functions, events, internal data structures*
+See details :doc:`here <num2pos_design>`
