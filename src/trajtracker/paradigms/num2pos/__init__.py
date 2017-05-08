@@ -15,8 +15,6 @@ from _TrialInfo import TrialInfo
 from _ExperimentInfo import ExperimentInfo
 from _Arrow import Arrow
 
-import CsvConfigFields
-
 from _n2p_init import \
     create_errmsg_textbox, \
     create_experiment_objects, \

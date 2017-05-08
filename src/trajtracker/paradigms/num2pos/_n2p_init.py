@@ -17,7 +17,7 @@ import trajtracker as ttrk
 import trajtracker._utils as _u
 import trajtracker.utils as u
 
-from trajtracker.paradigms.num2pos import Arrow, FINGER_STARTED_MOVING, CsvConfigFields
+from trajtracker.paradigms.num2pos import Arrow, FINGER_STARTED_MOVING
 
 
 stimulus_distance_from_top = 5
@@ -408,13 +408,13 @@ def load_data_source(config):
 
     if sum([not isinstance(x, Number) for x in ds]) == 0:
         #-- A list of numbers was provided: simulate it as a CSV
-        return [{CsvConfigFields.Target: str(x), ttrk.data.CSVLoader.FLD_LINE_NUM: 0} for x in ds]
+        return [{"target": str(x), ttrk.data.CSVLoader.FLD_LINE_NUM: 0} for x in ds]
 
     if sum([not isinstance(x, dict) for x in ds]) == 0:
         #-- An explicit list of trials was provided
         for row in ds:
-            if CsvConfigFields.Target not in row or not isinstance(row[CsvConfigFields.Target], str):
-                raise trajtracker.ValueError("The data source must contain a '{:}' string value per trial".format(CsvConfigFields.Target))
+            if "target" not in row or not isinstance(row["target"], str):
+                raise trajtracker.ValueError("The data source must contain a 'target' field")
             if ttrk.data.CSVLoader.FLD_LINE_NUM not in row:
                 row[ttrk.data.CSVLoader.FLD_LINE_NUM] = 0
         return ds
