@@ -115,7 +115,10 @@ Off-the-shelf paradigms
 TrajTracker also offers ready-to-use experimental paradigms: sets of functions that allow
 creating your own experiment with almost no programming:
 
-**Number-to-position mapping experiments**:
+**Number-to-position mapping experiments**
+
+For an overview of this paradigm under TrajTracker, see
+`here <https://drordotan.wixsite.com/trajtracker/ttrk-exp-num2pos>`_.
 
 .. toctree::
    :maxdepth: 1
@@ -130,7 +133,8 @@ creating your own experiment with almost no programming:
    Technical: the TrialInfo class <paradigms/num2pos/TrialInfo>
 
 
-**Dual-choice experiments**:
+**Dual-choice experiments**
+
 
 Coming up soon
 
