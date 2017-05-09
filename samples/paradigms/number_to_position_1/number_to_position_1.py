@@ -19,7 +19,7 @@ if not xpy.misc.is_android_running():
 
 
 config = num2pos.Config("Num2Pos(0-100*2)", max_trial_duration=2, max_numberline_value=100,
-                        speed_guide_enabled=True, data_source=range(101) * 2,
+                        speed_guide_enabled=True, data_source=[10,20,30,40],# range(101) * 2,
                         sounds_dir="../sounds")
 
 
@@ -29,7 +29,7 @@ exp = xpy.control.initialize()
 xpy.control.start(exp)
 
 if not xpy.misc.is_android_running():
-    xpy_exp.mouse.show_cursor()
+    exp.mouse.show_cursor()
 
 #-- Get subject info
 (subj_id, subj_name) = ttrk.paradigms.general.get_subject_name_id()

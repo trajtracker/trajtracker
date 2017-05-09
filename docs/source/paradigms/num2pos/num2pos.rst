@@ -3,7 +3,7 @@ Number-to-position mapping experiments
 ======================================
 
 For general details about this paradigm (general information, supported features, format of results, etc.),
-see `this page <https://drordotan.wixsite.com/trajtracker/supported-paradigms>`_.
+see `this page <https://drordotan.wixsite.com/trajtracker/ttrk-exp-num2pos>`_.
 
 Example scripts are provided as part of the TrajTracker distribution, under *samples/paradigms/number_to_position_...*
 
@@ -14,6 +14,9 @@ You can create your own number-to-position experiment in two ways:
 * If your experiment requires features that are not directly supported by the configuration offered,
   you can change the python code. To help you in that, see below the documentation of the functions
   that implement the number-to-position experiment.
+
+The results of each experiment session are saved in 3 files: a file with general data, a file with
+trials information, and a trajectory file. See details :doc:`here <results>`.
 
 
 Use common features by setting configuration

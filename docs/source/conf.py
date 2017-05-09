@@ -54,7 +54,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'TrajTracker'
-copyright = u'2017, Dror Dotan'
+copyright = u'2017, <a href="https://drordotan.wixsite.com/dror">Dror Dotan</a>. | <a href="https://drordotan.wixsite.com/trajtracker">Home</a>'
 author = u'Dror Dotan'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -178,10 +178,10 @@ html_static_path = ['_static']
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = False
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 #html_show_copyright = True

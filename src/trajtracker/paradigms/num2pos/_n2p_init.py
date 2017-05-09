@@ -52,7 +52,6 @@ def create_experiment_objects(exp_info):
     exp_info.exp_data['WindowWidth'] = exp_info.screen_size[0]
     exp_info.exp_data['WindowHeight'] = exp_info.screen_size[1]
     exp_info.exp_data['nExpectedTrials'] = len(exp_info.trials)
-    exp_info.exp_data['nExpectedGoodTrials'] = len(exp_info.trials)
     exp_info.exp_data['nTrialsCompleted'] = 0
     exp_info.exp_data['nTrialsFailed'] = 0
     exp_info.exp_data['nTrialsSucceeded'] = 0
@@ -167,9 +166,9 @@ def create_traj_tracker(exp_info):
         return
 
     curr_time = time.strftime("%Y%m%d_%H%M", time.localtime())
-    exp_info.trials_out_filename = "trials_{:}_{:}.csv".format(exp_info.xpy_exp.subject, curr_time)
-    exp_info.traj_out_filename = "trajectory_{:}_{:}.csv".format(exp_info.xpy_exp.subject, curr_time)
-    exp_info.session_out_filename = "session_{:}_{:}.xml".format(exp_info.xpy_exp.subject, curr_time)
+    exp_info.trials_out_filename = "trials_{:}_{:}.csv".format(exp_info.subject_id, curr_time)
+    exp_info.traj_out_filename = "trajectory_{:}_{:}.csv".format(exp_info.subject_id, curr_time)
+    exp_info.session_out_filename = "session_{:}_{:}.xml".format(exp_info.subject_id, curr_time)
 
     traj_file_path = xpy.io.defaults.datafile_directory + "/" + exp_info.traj_out_filename
     exp_info.trajtracker = ttrk.movement.TrajectoryTracker(traj_file_path)

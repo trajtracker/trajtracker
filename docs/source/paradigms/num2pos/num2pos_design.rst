@@ -17,7 +17,7 @@ The number-to-position experiment program is organized in two main files and has
 **Data structures**:
 
 - :doc:`Config <Config>` : an object containing the configuration of supported features.
-- :doc:`ExperimentInfo <ExperimentInfo>` : an object that keeps all the experiment-level information:
+- :class:`~trajtracker.paradigms.num2pos.ExperimentInfo` : an object that keeps all the experiment-level information:
   visual objects (number-line, stimulus), movement validators, the info from the CSV data file,
   experiment-level results (e.g., number of failed trial), etc.
 - TrialInfo : an object that keeps the information about the present trial.
@@ -29,7 +29,7 @@ The persistent objects
 ++++++++++++++++++++++
 
 The following objects exist throughout the experiment session (all are stored as part of the
-:doc:`ExperimentInfo <ExperimentInfo>` object):
+:class:`~trajtracker.paradigms.num2pos.ExperimentInfo` object):
 
 - A :class:`~trajtracker.stimuli.NumberLine`
 
@@ -59,13 +59,14 @@ The following objects exist throughout the experiment session (all are stored as
 - An `expyriment.stimuli.TextBox <http://docs.expyriment.org/expyriment.stimuli.TextBox.html>`_ for presenting
   error messages.
 
-- A list of :doc:`TrialInfo <TrialInfo>` objects, typically created by loading from the CSV file.
+- A list of :class:`~trajtracker.paradigms.num2pos.TrialInfo` objects, typically created by loading from the CSV file.
 
 - The :doc:`Config <Config>` object and some other configuration parameters (e.g., result file names,
   subject ID and name, etc.).
 
 - A *dict* with experiment-level results (which is saved to the results file at the end of the exepriment).
-  Trial-level results (which are saved in trials.csv) are stored on the :doc:`TrialInfo <TrialInfo>` object.
+  Trial-level results (which are saved in trials.csv) are stored on the :class:`~trajtracker.paradigms.num2pos.TrialInfo`
+  object.
 
 
 Events

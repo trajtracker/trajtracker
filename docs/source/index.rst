@@ -18,8 +18,11 @@ Visual objects.
    :maxdepth: 1
    :glob:
 
-   stimuli/*
-
+   MultiStimulus: controls the presentation of a sequence of stimuli <stimuli/MultiStimulus>
+   MultiTextBox: controls the presentation of a sequence of texts <stimuli/MultiTextBox>
+   NumberLine: show a number line, detect when it's touched <stimuli/NumberLine>
+   StimulusContainer: present several stimuli, easily toggle them on/off <stimuli/StimulusContainer>
+   StimulusSelector: create a "virtual stimulus" that can present one of several underlying stimuli <stimuli/StimulusSelector>
 
 trajtracker.validators
 ----------------------
@@ -30,8 +33,12 @@ Perform various validations on mouse/finger movement during the trial.
    :maxdepth: 1
    :glob:
 
-   validators/*
-
+   GlobalSpeedValidator: enforce minimal speed by defining milestones <validators/GlobalSpeedValidator>
+   InstantaneousSpeedValidator: enforce minimal/maximal momentary speed <validators/InstantaneousSpeedValidator>
+   LocationsValidator: allow touching only predefined screen locations <validators/LocationsValidator>
+   MoveByGradientValidator: restrict movement to predefined paths <validators/MoveByGradientValidator>
+   MovementAngleValidator: restrict movement direction <validators/MovementAngleValidator>
+   NCurvesValidator: prevent "zigzag" movement <validators/NCurvesValidator>
 
 trajtracker.movement
 --------------------
@@ -45,11 +52,11 @@ Classes that handle various aspects of finger/mouse movement.
    :maxdepth: 1
    :glob:
 
-   movement/StimulusAnimator
-   movement/CircularTrajectoryGenerator
-   movement/CustomTrajectoryGenerator
-   movement/LineTrajectoryGenerator
-   movement/SegmentedTrajectoryGenerator
+   StimulusAnimator: move a stimulus along a path defined by a trajectory-generator <movement/StimulusAnimator>
+   CircularTrajectoryGenerator: define a circular movement path <movement/CircularTrajectoryGenerator>
+   CustomTrajectoryGenerator: load movement path from CSV <movement/CustomTrajectoryGenerator>
+   LineTrajectoryGenerator: define a straight movement path <movement/LineTrajectoryGenerator>
+   SegmentedTrajectoryGenerator: define a multi-segment movement path <movement/SegmentedTrajectoryGenerator>
 
 
 **Monitor the finger/mouse movement:**
@@ -58,12 +65,12 @@ Classes that handle various aspects of finger/mouse movement.
    :maxdepth: 1
    :glob:
 
-   movement/DirectionMonitor
-   movement/Hotspot
-   movement/SpeedMonitor
-   movement/StartPoint
-   movement/RectStartPoint
-   movement/TrajectoryTracker
+   DirectionMonitor: track the movement direction <movement/DirectionMonitor>
+   Hotspot: detect touching certain screen locations <movement/Hotspot>
+   SpeedMonitor: track the movement speed <movement/SpeedMonitor>
+   StartPoint: initiate a trial <movement/StartPoint>
+   RectStartPoint: a rectangle for initiating a trial <movement/RectStartPoint>
+   TrajectoryTracker: track & save the movement trajectory <movement/TrajectoryTracker>
 
 
 trajtracker.events
@@ -71,12 +78,11 @@ trajtracker.events
 
 This set of classes allows defining the flow of a trial by using events.
 
-Before looking at specific classes, check out :doc:`this overview <events/events_overview>`.
-
 .. toctree::
    :maxdepth: 1
    :glob:
 
+   Overview of the events mechanism <events/events_overview>
    events/Event
    events/EventManager
 
@@ -98,7 +104,7 @@ other modules
    :maxdepth: 1
    :glob:
 
-   utils
+   General utilities <utils>
 
 
 
@@ -107,10 +113,26 @@ Off-the-shelf paradigms
 =======================
 
 TrajTracker also offers ready-to-use experimental paradigms: sets of functions that allow
-creating your own experiment with almost no programming.:
+creating your own experiment with almost no programming:
 
-* :doc:`Number-to-position mapping <paradigms/num2pos/num2pos>` experiments
-* Dual-choice experiments: coming up soon
+**Number-to-position mapping experiments**:
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   Overview <paradigms/num2pos/num2pos>
+   Configuration: the Config class <paradigms/num2pos/Config>
+   Configuration: input CSV file format <paradigms/num2pos/input_data_format>
+   The result files <paradigms/num2pos/results>
+   Technical: the software design <paradigms/num2pos/num2pos_design>
+   Technical: the ExperimentInfo class <paradigms/num2pos/ExperimentInfo>
+   Technical: the TrialInfo class <paradigms/num2pos/TrialInfo>
+
+
+**Dual-choice experiments**:
+
+Coming up soon
 
 
 Indices and tables
