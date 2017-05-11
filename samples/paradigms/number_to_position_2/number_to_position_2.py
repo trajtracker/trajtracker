@@ -30,7 +30,7 @@ from trajtracker.paradigms import num2pos
 STIMULUS_THEN_MOVE = False
 
 if not xpy.misc.is_android_running():
-    xpy.control.defaults.window_mode = True
+    xpy.control.defaults.window_mode = False
     ttrk.log_to_console = True
 
 ttrk.default_log_level = ttrk.log_info

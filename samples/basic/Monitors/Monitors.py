@@ -18,7 +18,6 @@ xpy.control.defaults.window_mode = True
 ttrk.log_to_console = True
 
 
-
 #-- Initialize Expyriment
 exp = xpy.control.initialize()
 xpy.control.start(exp)
@@ -109,3 +108,6 @@ while get_time() - start_time < 60:   # continue for 60 sec
         direction_monitor.reset()
 
     update_display()
+    xpy.io.Keyboard.process_control_keys()
+
+xpy.control.end()

@@ -86,6 +86,9 @@ def run_trial():
 
         all_stimuli.present()  # update display
 
+        #-- Check if quit/pause was pressed
+        xpy.io.Keyboard.process_control_keys()
+
 
 #------------------------------------------------
 def reset_trajectory_info(trial_start_time):

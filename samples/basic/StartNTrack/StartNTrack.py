@@ -20,7 +20,7 @@ import trajtracker as ttrk
 from trajtracker.movement import StartPoint
 from trajtracker.utils import get_time
 
-xpy.control.defaults.window_mode = True
+xpy.control.defaults.window_mode = False
 ttrk.log_to_console = True
 
 
@@ -131,5 +131,7 @@ while n_completed < N_TRIALS:
             progress_msg.text = "Completed: %d/%d" % (n_completed, N_TRIALS)
             present_stimuli()
             break
+
+        xpy.io.Keyboard.process_control_keys()
 
 xpy.control.end()

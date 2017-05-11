@@ -209,11 +209,11 @@ class BaseMultiStim(ttrk.TTrkObject):
 
         n_stim = self.n_stim
 
-        show_ops = zip(self._onset_time[:n_stim], [True] * n_stim, range(n_stim))
+        show_ops = list(zip(self._onset_time[:n_stim], [True] * n_stim, range(n_stim)))
 
         duration = self._duration if self._duration_multiple else ([self._duration] * n_stim)
         offset_times = [self._onset_time[i] + duration[i] for i in range(n_stim)]
-        hide_ops = zip(offset_times, [False] * n_stim, range(n_stim))
+        hide_ops = list(zip(offset_times, [False] * n_stim, range(n_stim)))
         if self._last_stimulus_remains:
             hide_ops = hide_ops[:-1]  # don't hide the last one
 

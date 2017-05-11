@@ -7,7 +7,7 @@ TrajTracker - misc package
 
 """
 
-from _EnabledDisabledObj import EnabledDisabledObj
-from _LocationColorMap import LocationColorMap
+from ._EnabledDisabledObj import EnabledDisabledObj
+from ._LocationColorMap import LocationColorMap
 
-import nvshapes
+import trajtracker.misc.nvshapes

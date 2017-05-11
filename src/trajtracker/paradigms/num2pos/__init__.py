@@ -10,12 +10,12 @@ def version():
     return "1.0"
 
 
-from _Config import Config, FINGER_STARTED_MOVING
-from _TrialInfo import TrialInfo
-from _ExperimentInfo import ExperimentInfo
-from _Arrow import Arrow
+from ._Config import Config, FINGER_STARTED_MOVING
+from ._TrialInfo import TrialInfo
+from ._ExperimentInfo import ExperimentInfo
+from ._Arrow import Arrow
 
-from _n2p_init import \
+from ._n2p_init import \
     create_errmsg_textbox, \
     create_experiment_objects, \
     create_generic_target, \
@@ -30,7 +30,7 @@ from _n2p_init import \
     register_to_event_manager
 
 
-from _n2p_run import \
+from ._n2p_run import \
     initialize_trial, \
     on_finger_started_moving, \
     on_finger_touched_screen, \

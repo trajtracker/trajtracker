@@ -83,5 +83,6 @@ while get_time() - start_time < 30:  # continue the game for 30 seconds
 
     square.present(clear=not screen_cleared) # update the square's position; and update the display (wait 1 frame)
 
+    xpy.io.Keyboard.process_control_keys()
 
 xpy.control.end()

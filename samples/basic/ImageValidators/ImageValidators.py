@@ -95,6 +95,7 @@ while time - start_time < 30000:  # continue for 30 seconds
 
     instruction.present(clear=False) # Go to next frame
     time = get_time()
+    xpy.io.Keyboard.process_control_keys()
 
 
 xpy.control.end()

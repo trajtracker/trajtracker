@@ -11,6 +11,8 @@ from __future__ import division
 import numbers
 from enum import Enum
 
+import expyriment as xpy
+
 import trajtracker as ttrk
 import trajtracker.utils as u
 import trajtracker._utils as _u
@@ -291,6 +293,8 @@ class StartPoint(ttrk.TTrkObject):
             if on_loop_present is None and on_loop_callback is None:
                 exp.clock.wait(15)
 
+            xpy.io.Keyboard.process_control_keys()
+
         self._log_func_returns("wait_until_startpoint_touched", True)
         return None
 
@@ -366,6 +370,8 @@ class StartPoint(ttrk.TTrkObject):
 
             if on_loop_present is None and on_loop_callback is None:
                 exp.clock.wait(15)
+
+            xpy.io.Keyboard.process_control_keys()
 
         self._log_func_returns("wait_until_exit", self._state)
         return None

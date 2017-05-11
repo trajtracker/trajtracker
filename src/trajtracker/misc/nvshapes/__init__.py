@@ -7,6 +7,6 @@ TrajTracker - shapes package
 
 """
 
-from _Circle import Circle
-from _Rectangle import Rectangle
-from _Sector import Sector
+from ._Circle import Circle
+from ._Rectangle import Rectangle
+from ._Sector import Sector

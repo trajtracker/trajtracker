@@ -102,7 +102,8 @@ class EventManager(ttrk.TTrkObject):
 
         added_pending_op = False
 
-        for op_info in self._operations_by_event[event.event_id].values():
+        op_infos = list(self._operations_by_event[event.event_id].values())
+        for op_info in op_infos:
 
             if not op_info['active']:
                 #-- It was already invoked

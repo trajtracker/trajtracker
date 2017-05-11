@@ -69,4 +69,6 @@ while get_time() - start_time < 30:  # continue for 30 seconds
     #-- Update the display
     selector.present()
 
+    xpy.io.Keyboard.process_control_keys()
+
 xpy.control.end()

@@ -158,6 +158,8 @@ def run_trial(exp_info, trial):
             trial_succeeded(exp_info, trial)
             return RunTrialResult.Succeeded
 
+        xpy.io.Keyboard.process_control_keys()
+
 
 #----------------------------------------------------------------
 def on_finger_touched_screen(exp_info, trial):

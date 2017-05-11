@@ -14,7 +14,7 @@ from trajtracker import BadFormatError, TypeError
 
 ValidationAxis = enum.Enum('ValidationAxis', 'x y xy')
 
-from _ExperimentError import ExperimentError
+from ._ExperimentError import ExperimentError
 
 
 #--------------------------------------------------------------------
@@ -53,11 +53,11 @@ def create_experiment_error(self, err_code, message, err_args=None):
 
 #========================================================================================
 
-from _GlobalSpeedValidator import GlobalSpeedValidator, GlobalSpeedGuide
-from _InstantaneousSpeedValidator import InstantaneousSpeedValidator
-from _LocationsValidator import LocationsValidator
-from _MovementAngleValidator import MovementAngleValidator
-from _MoveByGradientValidator import MoveByGradientValidator
-from _NCurvesValidator import NCurvesValidator
+from ._GlobalSpeedValidator import GlobalSpeedValidator, GlobalSpeedGuide
+from ._InstantaneousSpeedValidator import InstantaneousSpeedValidator
+from ._LocationsValidator import LocationsValidator
+from ._MovementAngleValidator import MovementAngleValidator
+from ._MoveByGradientValidator import MoveByGradientValidator
+from ._NCurvesValidator import NCurvesValidator
 
 

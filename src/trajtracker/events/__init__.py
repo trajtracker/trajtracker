@@ -8,9 +8,9 @@ TrajTracker - events package
 """
 
 
-from _Event import Event
-from _EventManager import EventManager
-from _OnsetOffsetObj import OnsetOffsetObj
+from ._Event import Event
+from ._EventManager import EventManager
+from ._OnsetOffsetObj import OnsetOffsetObj
 
 #-- Predefined events
 TRIAL_INITIALIZED = Event("TRIAL_INITIALIZED")

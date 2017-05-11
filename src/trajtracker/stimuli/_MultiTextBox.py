@@ -13,7 +13,6 @@ import expyriment as xpy
 import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
-from trajtracker.data import fromXML
 from trajtracker.stimuli import BaseMultiStim
 
 
@@ -166,7 +165,6 @@ class MultiTextBox(BaseMultiStim):
         return self._texts
 
     @texts.setter
-    @fromXML(_u.parse_scalar_or_list(str))
     def texts(self, value):
         self._set_property("texts", value, str, allow_single_value=False)
         self._log_property_changed("texts")
@@ -181,7 +179,6 @@ class MultiTextBox(BaseMultiStim):
         return self._text_font
 
     @text_font.setter
-    @fromXML(_u.parse_scalar_or_list(str))
     def text_font(self, value):
         self._set_property("text_font", value, str)
         self._log_property_changed("text_font")
@@ -196,7 +193,6 @@ class MultiTextBox(BaseMultiStim):
         return self._text_size
 
     @text_size.setter
-    @fromXML(_u.parse_scalar_or_list(int))
     def text_size(self, value):
         self._set_property("text_size", value, int)
         self._log_property_changed("text_size")
@@ -211,7 +207,6 @@ class MultiTextBox(BaseMultiStim):
         return self._text_bold
 
     @text_bold.setter
-    @fromXML(_u.parse_scalar_or_list(bool))
     def text_bold(self, value):
         self._set_property("text_bold", value, bool, allow_none=False)
         self._log_property_changed("text_bold")
@@ -226,7 +221,6 @@ class MultiTextBox(BaseMultiStim):
         return self._text_italic
 
     @text_italic.setter
-    @fromXML(_u.parse_scalar_or_list(bool))
     def text_italic(self, value):
         self._set_property("text_italic", value, bool, allow_none=False)
         self._log_property_changed("text_italic")
@@ -241,7 +235,6 @@ class MultiTextBox(BaseMultiStim):
         return self._text_underline
 
     @text_underline.setter
-    @fromXML(_u.parse_scalar_or_list(bool))
     def text_underline(self, value):
         self._set_property("text_underline", value, bool, allow_none=False)
         self._log_property_changed("text_underline")
@@ -270,7 +263,6 @@ class MultiTextBox(BaseMultiStim):
         return self._text_colour
 
     @text_colour.setter
-    @fromXML(_u.parse_scalar_or_list(_u.parse_rgb))
     def text_colour(self, value):
         self._set_property("text_colour", value, "RGB")
         self._log_property_changed("text_colour")
@@ -285,7 +277,6 @@ class MultiTextBox(BaseMultiStim):
         return self._background_colour
 
     @background_colour.setter
-    @fromXML(_u.parse_scalar_or_list(_u.parse_rgb))
     def background_colour(self, value):
         self._set_property("background_colour", value, "RGB")
         self._log_property_changed("background_colour")
@@ -300,7 +291,6 @@ class MultiTextBox(BaseMultiStim):
         return self._size
 
     @size.setter
-    @fromXML(_u.parse_scalar_or_list(int))
     def size(self, value):
         self._set_property("size", value, "coord")
         self._log_property_changed("size")

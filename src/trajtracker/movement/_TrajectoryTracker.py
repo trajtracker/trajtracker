@@ -114,7 +114,7 @@ class TrajectoryTracker(ttrk.TTrkObject, EnabledDisabledObj):
         Get a list of (x,y,time) tuples - one per tracked point
         """
         trj = self._trajectory
-        return zip(trj['x'], trj['y'], trj['time'])
+        return list(zip(trj['x'], trj['y'], trj['time']))
 
 
     #----------------------------------------------------

@@ -7,7 +7,7 @@ TrajTracker - data package
 
 """
 
-from _CSVLoader import CSVLoader
-from _XmlConfigUpdater import XmlConfigUpdater, fromXML
+from ._CSVLoader import CSVLoader
+from ._XmlConfigUpdater import XmlConfigUpdater, fromXML
 
-import csv_formats
+import trajtracker.data.csv_formats

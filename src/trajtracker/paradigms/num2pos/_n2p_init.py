@@ -5,6 +5,8 @@ Functions to support the number-to-position paradigm
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
+from __future__ import division
+
 import time
 from numbers import Number
 from operator import itemgetter
@@ -71,13 +73,13 @@ def create_numberline(exp_info):
     _u.validate_func_arg_type(None, "create_numberline", "max_value", config.max_numberline_value, Number)
 
     numberline = ttrk.stimuli.NumberLine(
-        position=(0, exp_info.screen_size[1] / 2 - numberline_distance_from_top),
+        position=(0, int(exp_info.screen_size[1] / 2 - numberline_distance_from_top)),
         line_length=int(exp_info.screen_size[0] * 0.85),
         min_value=0,
         max_value=config.max_numberline_value)
 
     # -- Graphical properties of the number line
-    numberline.position = (0, exp_info.screen_size[1] / 2 - numberline_distance_from_top)
+    numberline.position = (0, int(exp_info.screen_size[1] / 2 - numberline_distance_from_top))
     numberline.line_length = exp_info.screen_size[0] * 0.85
     numberline.line_width = 2
     numberline.end_tick_height = 5
@@ -110,7 +112,7 @@ def create_numberline(exp_info):
         numberline.feedback_stimuli = [Arrow(c) for c in colors]
         [s.preload() for s in numberline.feedback_stimuli]
 
-        numberline.feedback_stim_offset = (0, numberline.feedback_stimuli[0].size[1] / 2)
+        numberline.feedback_stim_offset = (0, int(numberline.feedback_stimuli[0].size[1] / 2))
         numberline.feedback_stim_hide_event = ttrk.events.TRIAL_STARTED
 
         i = 0
@@ -270,7 +272,7 @@ def create_textbox_target(exp_info):
 
     target.position = (0, y)
     target.text_font = "Arial"
-    target.size = (600, height)
+    target.size = (600, int(height))
     target.text_colour = xpy.misc.constants.C_WHITE
     target.text_justification = 1  # center
 

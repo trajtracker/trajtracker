@@ -7,5 +7,5 @@ TrajTracker - paradigms package
 """
 
 
-import general
-import num2pos
+import trajtracker.paradigms.general
+import trajtracker.paradigms.num2pos

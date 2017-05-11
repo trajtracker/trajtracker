@@ -35,7 +35,7 @@ def version():
 #   Exception classes
 #============================================================================
 
-class TrajTrackerError(StandardError):
+class TrajTrackerError(Exception):
     def __init__(self, message):
         self.message = message
 
@@ -59,13 +59,13 @@ class TypeError(TrajTrackerError):
     pass
 
 
-from _ttrk_funcs import log_write
+from trajtracker._ttrk_funcs import log_write
 
 #============================================================================
 #   Import the TrajTracker modules
 #============================================================================
 
-from _TTrkObject import TTrkObject
+from trajtracker._TTrkObject import TTrkObject
 
 import trajtracker._utils as _utils
 
