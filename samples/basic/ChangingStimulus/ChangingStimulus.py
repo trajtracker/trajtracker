@@ -23,6 +23,7 @@ ttrk.log_to_console = True
 
 
 #-- Initialize Expyriment
+xpy.control.set_develop_mode(1)
 exp = xpy.control.initialize()
 xpy.control.start(exp)
 if not xpy.misc.is_android_running():

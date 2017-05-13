@@ -13,7 +13,6 @@ import expyriment
 import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
-from trajtracker.data import fromXML
 from trajtracker.misc import EnabledDisabledObj
 
 
@@ -53,7 +52,6 @@ class TrajectoryTracker(ttrk.TTrkObject, EnabledDisabledObj):
         return self._track_if_no_movement
 
     @track_if_no_movement.setter
-    @fromXML(bool)
     def track_if_no_movement(self, value):
         _u.validate_attr_type(self, "track_if_no_movement", value, bool)
         self._track_if_no_movement = value

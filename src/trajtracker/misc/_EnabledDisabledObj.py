@@ -11,7 +11,6 @@ import trajtracker
 import trajtracker._utils as _u
 
 from trajtracker.events import Event
-from trajtracker.data import fromXML
 
 
 class EnabledDisabledObj(object):
@@ -37,7 +36,6 @@ class EnabledDisabledObj(object):
         return self._enabled
 
     @enabled.setter
-    @fromXML(bool)
     def enabled(self, value):
         _u.validate_attr_type(self, "enabled", value, bool)
         self._enabled = value
@@ -54,7 +52,6 @@ class EnabledDisabledObj(object):
         return self._enable_event
 
     @enable_event.setter
-    @fromXML(Event.parse)
     def enable_event(self, value):
         _u.validate_attr_type(self, "enable_event", value, Event, none_allowed=True)
         if self._registered:
@@ -74,7 +71,6 @@ class EnabledDisabledObj(object):
         return self._disable_event
 
     @disable_event.setter
-    @fromXML(Event.parse)
     def disable_event(self, value):
         _u.validate_attr_type(self, "disable_event", value, Event, none_allowed=True)
         if self._registered:

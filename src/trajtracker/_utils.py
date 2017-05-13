@@ -279,7 +279,7 @@ def update_xyt_validate_and_log(self, position, time_in_trial=DONT_VALIDATE, tim
 def is_collection(value, allow_set=True):
     val_methods = dir(value)
     return "__len__" in val_methods and "__iter__" in val_methods and \
-           (allow_set or "__getitem__" in val_methods)
+           (allow_set or "__getitem__" in val_methods) and not isinstance(value, str)
 
 
 #--------------------------------------

@@ -12,7 +12,6 @@ import numpy as np
 
 import trajtracker
 import trajtracker._utils as _u
-from trajtracker.data import fromXML
 
 
 class SegmentedTrajectoryGenerator(trajtracker.TTrkObject):
@@ -108,7 +107,6 @@ class SegmentedTrajectoryGenerator(trajtracker.TTrkObject):
         return self._cyclic
 
     @cyclic.setter
-    @fromXML(bool)
     def cyclic(self, value):
         _u.validate_attr_type(self, "cyclic", value, bool)
         self._cyclic = value

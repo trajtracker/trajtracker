@@ -23,7 +23,7 @@ class NCurvesValidatorTests(unittest.TestCase):
         self.assertRaises(trajtracker.ValueError, lambda: NCurvesValidator(max_curves_per_trial=-1))
 
     #--------------------------------------------------
-    def test_config_from_xml(self):
+    def ____test_config_from_xml(self):
 
         v = NCurvesValidator()
         configer = trajtracker.data.XmlConfigUpdater()
@@ -62,7 +62,7 @@ class DirectionMonitorDbg(object):
     def reset(self):
         pass
 
-    def update_xyt(self, (x_coord, y_coord), time):
+    def update_xyt(self, coord, time):
         pass
 
     @property

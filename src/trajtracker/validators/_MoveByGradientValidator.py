@@ -14,7 +14,6 @@ import trajtracker.utils as u
 import trajtracker.validators
 
 from trajtracker.misc import LocationColorMap, EnabledDisabledObj
-from trajtracker.data import fromXML
 
 
 
@@ -65,7 +64,6 @@ class MoveByGradientValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._lcm.position
 
     @position.setter
-    @fromXML(_u.parse_coord)
     def position(self, value):
         self._lcm.position = value
 
@@ -80,7 +78,6 @@ class MoveByGradientValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
 
     @rgb_should_ascend.setter
-    @fromXML(bool)
     def rgb_should_ascend(self, value):
         _u.validate_attr_type(self, "rgb_should_ascend", value, bool)
         self._rgb_should_ascend = value
@@ -97,7 +94,6 @@ class MoveByGradientValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
 
     @max_valid_back_movement.setter
-    @fromXML(float)
     def max_valid_back_movement(self, value):
         _u.validate_attr_numeric(self, "max_valid_back_movement", value)
         _u.validate_attr_not_negative(self, "max_valid_back_movement", value)
@@ -169,7 +165,6 @@ class MoveByGradientValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._cyclic
 
     @cyclic.setter
-    @fromXML(bool)
     def cyclic(self, value):
         _u.validate_attr_type(self, "cyclic", value, bool)
         self._cyclic = value

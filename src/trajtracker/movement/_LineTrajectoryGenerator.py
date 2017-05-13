@@ -12,7 +12,6 @@ import numpy as np
 
 import trajtracker
 import trajtracker._utils as _u
-from trajtracker.data import fromXML
 
 
 class LineTrajectoryGenerator(trajtracker.TTrkObject):
@@ -104,7 +103,6 @@ class LineTrajectoryGenerator(trajtracker.TTrkObject):
         return self._start_point
 
     @start_point.setter
-    @fromXML(_u.parse_coord)
     def start_point(self, value):
         value = _u.validate_attr_is_coord(self, "start_point", value)
         self._start_point = value
@@ -120,7 +118,6 @@ class LineTrajectoryGenerator(trajtracker.TTrkObject):
         return self._end_point
 
     @end_point.setter
-    @fromXML(_u.parse_coord)
     def end_point(self, value):
         value = _u.validate_attr_is_coord(self, "end_point", value)
         self._end_point = value
@@ -136,7 +133,6 @@ class LineTrajectoryGenerator(trajtracker.TTrkObject):
         return self._duration
 
     @duration.setter
-    @fromXML(float)
     def duration(self, value):
         _u.validate_attr_type(self, "duration", value, numbers.Number)
         _u.validate_attr_positive(self, "duration", value)
@@ -151,7 +147,6 @@ class LineTrajectoryGenerator(trajtracker.TTrkObject):
         return self._return_to_start
 
     @return_to_start.setter
-    @fromXML(bool)
     def return_to_start(self, value):
         _u.validate_attr_type(self, "return_to_start", value, bool)
         self._return_to_start = value
@@ -165,7 +160,6 @@ class LineTrajectoryGenerator(trajtracker.TTrkObject):
         return self._cyclic
 
     @cyclic.setter
-    @fromXML(bool)
     def cyclic(self, value):
         _u.validate_attr_type(self, "cyclic", value, bool)
         self._cyclic = value

@@ -20,7 +20,6 @@ import trajtracker.validators
 from trajtracker.misc import EnabledDisabledObj
 from trajtracker.validators import ValidationAxis, ExperimentError
 from trajtracker.movement import StimulusAnimator
-from trajtracker.data import fromXML
 
 
 # -------------------------------------------------------------
@@ -297,7 +296,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._axis
 
     @axis.setter
-    @fromXML(ValidationAxis.parse)
     def axis(self, value):
         _u.validate_attr_type(self, "axis", value, ValidationAxis)
         if value == ValidationAxis.xy:
@@ -316,7 +314,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._origin_coord
 
     @origin_coord.setter
-    @fromXML(int)
     def origin_coord(self, value):
         _u.validate_attr_numeric(self, "origin_coord", value, _u.NoneValues.Invalid)
         self._origin_coord = value
@@ -332,7 +329,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._end_coord
 
     @end_coord.setter
-    @fromXML(int)
     def end_coord(self, value):
         _u.validate_attr_numeric(self, "end_coord", value, _u.NoneValues.Invalid)
         self._end_coord = value
@@ -346,7 +342,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._grace_period
 
     @grace_period.setter
-    @fromXML(float)
     def grace_period(self, value):
         value = _u.validate_attr_numeric(self, "grace_period", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "grace_period", value)
@@ -360,7 +355,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._max_trial_duration
 
     @max_trial_duration.setter
-    @fromXML(int)
     def max_trial_duration(self, value):
         value = _u.validate_attr_numeric(self, "max_trial_duration", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_positive(self, "max_trial_duration", value)
@@ -391,7 +385,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return list(self._milestones)
 
     @milestones.setter
-    @fromXML(_parse_xml_milestones, raw_xml=True)
     def milestones(self, value):
         if value is None:
             value = []
@@ -496,7 +489,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._show_guide
 
     @show_guide.setter
-    @fromXML(bool)
     def show_guide(self, show):
         _u.validate_attr_type(self, "show_guide", show, bool)
         self._show_guide = show
@@ -511,7 +503,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._guide_warning_time_delta
 
     @guide_warning_time_delta.setter
-    @fromXML(float)
     def guide_warning_time_delta(self, value):
         _u.validate_attr_type(self, "guide_warning_time_delta", value, numbers.Number)
         _u.validate_attr_not_negative(self, "guide_warning_time_delta", value)
@@ -526,7 +517,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._guide_line_length
 
     @guide_line_length.setter
-    @fromXML(int)
     def guide_line_length(self, value):
         _u.validate_attr_type(self, "guide_line_length", value, numbers.Number, none_allowed=True)
         if value is not None:

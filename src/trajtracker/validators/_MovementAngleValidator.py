@@ -18,7 +18,6 @@ import trajtracker._utils as _u
 import trajtracker.utils as u
 import trajtracker.validators
 from trajtracker.misc import EnabledDisabledObj
-from trajtracker.data import fromXML
 
 
 # noinspection PyAttributeOutsideInit
@@ -181,7 +180,6 @@ class MovementAngleValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
 
     @min_angle.setter
-    @fromXML(float)
     def min_angle(self, value):
 
         if value is None:
@@ -207,7 +205,6 @@ class MovementAngleValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
 
     @max_angle.setter
-    @fromXML(float)
     def max_angle(self, value):
 
         if value is None:
@@ -231,7 +228,6 @@ class MovementAngleValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._calc_angle_interval
 
     @calc_angle_interval.setter
-    @fromXML(float)
     def calc_angle_interval(self, value):
         value = _u.validate_attr_numeric(self, "calc_angle_interval", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "calc_angle_interval", value)
@@ -245,7 +241,6 @@ class MovementAngleValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._grace_period
 
     @grace_period.setter
-    @fromXML(float)
     def grace_period(self, value):
         value = _u.validate_attr_numeric(self, "grace_period", value, _u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "grace_period", value)

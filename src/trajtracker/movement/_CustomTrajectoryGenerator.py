@@ -60,7 +60,7 @@ class CustomTrajectoryGenerator(trajtracker.TTrkObject):
 
         if self._active_traj_id is None:
             if len(self._trajectories):
-                self.active_traj_id = self._trajectories.keys()[0]
+                self.active_traj_id = list(self._trajectories.keys())[0]
             else:
                 raise trajtracker.InvalidStateError("{:}.get_traj_point() cannot be called before active_traj_id was set".format(type(self).__name__))
 

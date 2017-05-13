@@ -13,7 +13,6 @@ import numbers
 import trajtracker._utils as _u
 import trajtracker.validators
 from trajtracker.movement import SpeedMonitor
-from trajtracker.data import fromXML
 from trajtracker.misc import EnabledDisabledObj
 from trajtracker.validators import ValidationAxis, ExperimentError
 
@@ -145,7 +144,6 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._axis
 
     @axis.setter
-    @fromXML(ValidationAxis.parse)
     def axis(self, value):
         _u.validate_attr_type(self, "axis", value, ValidationAxis)
         self._axis = value
@@ -165,7 +163,6 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._min_speed
 
     @min_speed.setter
-    @fromXML(float)
     def min_speed(self, value):
         _u.validate_attr_numeric(self, "min_speed", value, none_value=_u.NoneValues.Valid)
         _u.validate_attr_positive(self, "min_speed", value)
@@ -182,7 +179,6 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._max_speed
 
     @max_speed.setter
-    @fromXML(float)
     def max_speed(self, value):
         _u.validate_attr_numeric(self, "max_speed", value, none_value=_u.NoneValues.Valid)
         _u.validate_attr_positive(self, "max_speed", value)
@@ -196,7 +192,6 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._grace_period
 
     @grace_period.setter
-    @fromXML(float)
     def grace_period(self, value):
         value = _u.validate_attr_numeric(self, "grace_period", value, none_value=_u.NoneValues.ChangeTo0)
         _u.validate_attr_not_negative(self, "grace_period", value)
@@ -213,7 +208,6 @@ class InstantaneousSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         return self._speed_monitor.calculation_interval
 
     @calculation_interval.setter
-    @fromXML(float)
     def calculation_interval(self, value):
         self._speed_monitor.calculation_interval = value
         self._log_property_changed("calculation_interval")
