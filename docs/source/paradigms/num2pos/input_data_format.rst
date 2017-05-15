@@ -36,17 +36,18 @@ and disappear.
 
 Columns that refer to the text stimuli (the :class:`~trajtracker.stimuli.MultiTextBox`) are called *text.<something>*.
 Columns that refer to non-text stimuli (the :class:`~trajtracker.stimuli.MultiStimulus`) are called *genstim.<something>*.
+Columns that refer to fixation stimulus are called *fixation.<something>*.
 
 All columns can contain either a single value or a semicolon-separated list of values (at least one per target;
 excessive values are ignored).
 
-- **text.position**, **genstim.position**: The stimulus position - x and y coordinates, separated by
+- **text.position**, **genstim.position**, **fixation.position**: The stimulus position - x and y coordinates, separated by
   a colon, e.g.: "10:20" for x=10, y=20. If you specified several target stimuli, you can define here a
   semicolon-separated list of positions.
 
-- **text.position.x**, **text.position.y**, **genstim.position.x**, **genstim.position.y**: The stimulus position -
-  either x or y coordinates (the other coordinate can be defined either in another column or just in the
-  initialization script).
+- **text.position.x**, **text.position.y**, **genstim.position.x**, **genstim.position.y**,
+  **fixation.position.x**, **fixation.position.y**: The stimulus position - either x or y coordinates
+  (the other coordinate can be defined either in another column or just in the initialization script).
 
 - **text.onset_time**, **genstim.onset_time**: The time to present the stimulus, specified in seconds relatively
   to the baseline event (which is TRIAL_STARTED in case config.stimulusThenMove is True, and FINGER_STARTED_MOVING
@@ -77,3 +78,6 @@ excessive values are ignored).
 - **text.background_colour**: Background color (R:G:B); or a semicolon-separated list of RGB's.
 
 - **text.size**: The textbox size, in pixels (width:height); or a semicolon-separated list of sizes
+
+- **fixation.text**: The text to show as fixation stimulus. This is applied only if
+  config.fixation_type = 'text'

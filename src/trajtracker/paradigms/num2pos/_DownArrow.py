@@ -8,10 +8,10 @@ Arrow that points at the number line
 import expyriment as xpy
 
 
-class Arrow(xpy.stimuli.Shape):
+class DownArrow(xpy.stimuli.Shape):
 
     def __init__(self, colour=xpy.misc.constants.C_GREEN):
-        super(Arrow, self).__init__()
+        super(DownArrow, self).__init__()
         # noinspection PyTypeChecker
         self.add_vertices([(10, 20), (-6, 0), (0, 20), (-9, 0), (0, -20), (-6, 0)])
         self.colour = colour

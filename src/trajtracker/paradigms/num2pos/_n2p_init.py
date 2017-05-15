@@ -19,11 +19,8 @@ import trajtracker as ttrk
 import trajtracker._utils as _u
 import trajtracker.utils as u
 
-from trajtracker.paradigms.num2pos import Arrow, FINGER_STARTED_MOVING
+from trajtracker.paradigms.num2pos import DownArrow, FINGER_STARTED_MOVING
 
-
-stimulus_distance_from_top = 5
-numberline_distance_from_top = 80
 
 #----------------------------------------------------------------
 def create_experiment_objects(exp_info):
@@ -41,6 +38,7 @@ def create_experiment_objects(exp_info):
     create_start_point(exp_info)
     create_textbox_target(exp_info)
     create_generic_target(exp_info)
+    create_fixation(exp_info)
     create_errmsg_textbox(exp_info)
     create_traj_tracker(exp_info)
     create_validators(exp_info, direction_validator=True, global_speed_validator=True, inst_speed_validator=True,
@@ -73,26 +71,24 @@ def create_numberline(exp_info):
     _u.validate_func_arg_type(None, "create_numberline", "max_value", config.max_numberline_value, Number)
 
     numberline = ttrk.stimuli.NumberLine(
-        position=(0, int(exp_info.screen_size[1] / 2 - numberline_distance_from_top)),
-        line_length=int(exp_info.screen_size[0] * 0.85),
-        min_value=0,
+        position=(0, int(exp_info.screen_size[1] / 2 - config.nl_distance_from_top)),
+        line_length=int(exp_info.screen_size[0] * config.nl_length_percent),
+        line_width=config.nl_line_width,
+        min_value=config.min_numberline_value,
         max_value=config.max_numberline_value)
 
     # -- Graphical properties of the number line
-    numberline.position = (0, int(exp_info.screen_size[1] / 2 - numberline_distance_from_top))
-    numberline.line_length = exp_info.screen_size[0] * 0.85
-    numberline.line_width = 2
-    numberline.end_tick_height = 5
-    numberline.line_colour = xpy.misc.constants.C_WHITE
+    numberline.end_tick_height = config.nl_end_tick_height
+    numberline.line_colour = config.nl_line_colour
 
     # -- The labels at the end of the line
     numberline.labels_visible = True
-    numberline.labels_font_name = "Arial"
-    numberline.labels_box_size = (100, 30)
+    numberline.labels_font_name = config.nl_labels_font_name
+    numberline.labels_box_size = config.nl_labels_box_size
     hsr = u.get_font_height_to_size_ratio(numberline.labels_font_name)
     numberline.labels_font_size = int(numberline.labels_box_size[1] / hsr)
-    numberline.labels_font_colour = xpy.misc.constants.C_GREY
-    numberline.labels_offset = (0, 20)
+    numberline.labels_font_colour = config.nl_labels_colour
+    numberline.labels_offset = config.nl_labels_offset
 
     exp_info.numberline = numberline
 
@@ -109,7 +105,7 @@ def create_numberline(exp_info):
 
         colors = config.feedback_arrow_colors
         colors = colors if _u.is_collection(colors) else [colors]
-        numberline.feedback_stimuli = [Arrow(c) for c in colors]
+        numberline.feedback_stimuli = [DownArrow(c) for c in colors]
         [s.preload() for s in numberline.feedback_stimuli]
 
         numberline.feedback_stim_offset = (0, int(numberline.feedback_stimuli[0].size[1] / 2))
@@ -130,6 +126,7 @@ def create_numberline(exp_info):
     exp_info.target_pointer.preload()
     exp_info.target_pointer_height = exp_info.target_pointer.size[1]
 
+
 #----------------------------------------------------------------
 def create_start_point(exp_info):
     """
@@ -142,9 +139,11 @@ def create_start_point(exp_info):
     config = exp_info.config
 
     start_area_size = config.start_point_size
-    start_area_position = (0, - (exp_info.screen_size[1] / 2 - start_area_size[1] / 2))
+    start_area_position = (config.start_point_x_coord,
+                           - (exp_info.screen_size[1] / 2 - start_area_size[1] / 2))
 
-    exp_info.start_point = ttrk.movement.RectStartPoint(size=start_area_size, position=start_area_position,
+    exp_info.start_point = ttrk.movement.RectStartPoint(size=start_area_size,
+                                                        position=start_area_position,
                                                         rotation=config.start_point_tilt,
                                                         colour=config.start_point_colour)
 
@@ -210,9 +209,9 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
 
     if direction_validator:
         v = ttrk.validators.MovementAngleValidator(
-            min_angle=-90,
-            max_angle=90,
-            calc_angle_interval=20)
+            min_angle=config.dir_validator_min_angle,
+            max_angle=config.dir_validator_max_angle,
+            calc_angle_interval=config.dir_validator_calc_angle_interval)
         v.enable_event = FINGER_STARTED_MOVING
         v.disable_event = ttrk.events.TRIAL_ENDED
         exp_info.add_validator(v, 'direction')
@@ -224,7 +223,7 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
             end_coord=exp_info.numberline.position[1],
             grace_period=config.grace_period,
             max_trial_duration=config.max_trial_duration,
-            milestones=[(.5, .33), (.5, .67)],
+            milestones=config.global_speed_validator_milestones,
             show_guide=config.speed_guide_enabled)
         v.do_present_guide = False
         v.movement_started_event = FINGER_STARTED_MOVING
@@ -246,7 +245,7 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
 
     if zigzag_validator:
         v = ttrk.validators.NCurvesValidator(max_curves_per_trial=config.max_zigzags)
-        v.direction_monitor.min_angle_change_per_curve = 10  # Changes smaller than 10 degrees don't count as curves
+        v.direction_monitor.min_angle_change_per_curve = config.zigzag_validator_min_angle_change_per_curve
         v.enable_event = FINGER_STARTED_MOVING
         v.disable_event = ttrk.events.TRIAL_ENDED
         exp_info.add_validator(v, 'zigzag')
@@ -264,17 +263,62 @@ def create_textbox_target(exp_info):
 
     config = exp_info.config
 
-    screen_top = exp_info.screen_size[1] / 2
-    height = screen_top - exp_info.numberline.position[1] - stimulus_distance_from_top - 1
-    y = int(screen_top - stimulus_distance_from_top - height / 2)
+    target = _create_textbox_target_impl(exp_info, "target")
+
+    target.onset_event = ttrk.events.TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
+    target.onset_time = config.target_onset_time
+    target.duration = config.target_duration
+    target.last_stimulus_remains = config.text_target_last_stimulus_remains
+
+    exp_info.text_target = target
+    exp_info.add_event_sensitive_object(target)
+
+
+#----------------------------------------------------------------
+def create_textbox_fixation(exp_info):
+    """
+    Create a textbox to serve as the fixation. 
+
+    :param exp_info: The experiment-level objects
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    """
+
+    config = exp_info.config
+
+    y, height = get_target_y(exp_info)
+
+    text = exp_info.config.fixation_text
+
+    fixation = xpy.stimuli.TextBox(
+        text='' if text is None else text,
+        size=(config.text_target_width, int(height)),
+        position=(config.text_target_x_coord, y),
+        text_font=config.text_target_font,
+        text_colour=config.text_target_colour,
+        text_justification=config.text_target_justification
+    )
+
+    hsr = u.get_font_height_to_size_ratio(fixation.text_font)
+    font_size = int(height / hsr * config.text_target_height)
+    fixation.text_size = font_size
+    ttrk.log_write("Fixation font size = {:}, height = {:.1f} pixels".format(font_size, font_size*hsr), print_to_console=True)
+
+    exp_info.fixation = fixation
+
+
+#----------------------------------------------------------------
+def _create_textbox_target_impl(exp_info, role):
+
+    config = exp_info.config
 
     target = ttrk.stimuli.MultiTextBox()
 
-    target.position = (0, y)
-    target.text_font = "Arial"
-    target.size = (600, int(height))
-    target.text_colour = xpy.misc.constants.C_WHITE
-    target.text_justification = 1  # center
+    y, height = get_target_y(exp_info)
+    target.position = (config.text_target_x_coord, y)
+    target.text_font = config.text_target_font
+    target.size = (config.text_target_width, int(height))
+    target.text_colour = config.text_target_colour
+    target.text_justification = config.text_target_justification
 
     if not (0 < config.text_target_height <= 1):
         raise ttrk.ValueError("Invalid config.text_target_height ({:}): value must be between 0 and 1, check out the documentation".format(config.text_target_height))
@@ -282,14 +326,9 @@ def create_textbox_target(exp_info):
     hsr = u.get_font_height_to_size_ratio(target.text_font)
     font_size = int(height / hsr * config.text_target_height)
     target.text_size = font_size
-    ttrk.log_write("Target font size = {:}, height = {:.1f} pixels".format(font_size, font_size*hsr), print_to_console=True)
+    ttrk.log_write("{:} font size = {:}, height = {:.1f} pixels".format(role, font_size, font_size*hsr), print_to_console=True)
 
-    target.onset_event = ttrk.events.TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
-    target.onset_time = [0]
-    target.duration = [1000]  # never disappear
-
-    exp_info.text_target = target
-    exp_info.add_event_sensitive_object(target)
+    return target
 
 
 #----------------------------------------------------------------
@@ -302,18 +341,65 @@ def create_generic_target(exp_info):
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
-    screen_top = exp_info.screen_size[1] / 2
-    height = screen_top - exp_info.numberline.position[1] - stimulus_distance_from_top - 1
-    y = int(screen_top - stimulus_distance_from_top - height / 2)
+    config = exp_info.config
 
-    target = ttrk.stimuli.MultiStimulus(position=(0, y))
+    y, height = get_target_y(exp_info)
+    target = ttrk.stimuli.MultiStimulus(position=(config.generic_target_x_coord, y))
 
-    target.onset_event = ttrk.events.TRIAL_STARTED if exp_info.config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
-    target.onset_time = [0]
-    target.duration = [1000]  # never disappear
+    target.onset_event = ttrk.events.TRIAL_STARTED if config.stimulus_then_move else ttrk.paradigms.num2pos.FINGER_STARTED_MOVING
+    target.onset_time = config.target_onset_time
+    target.duration = config.target_duration
+    target.last_stimulus_remains = config.generic_target_last_stimulus_remains
 
     exp_info.generic_target = target
     exp_info.add_event_sensitive_object(target)
+
+
+#----------------------------------------------------------------
+def create_fixation(exp_info):
+    """
+    Create the fixation shape
+
+    :param exp_info: The experiment-level objects
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    """
+
+    fixtype = exp_info.config.fixation_type.lower()
+
+    if fixtype is None:
+        pass
+
+    if fixtype == 'cross':
+        create_fixation_cross(exp_info)
+
+    elif fixtype == 'text':
+        create_textbox_fixation(exp_info)
+
+    else:
+        raise ttrk.ValueError("Invalid config.fixation_type ({:})".format(fixtype))
+
+
+#----------------------------------------------------------------
+def create_fixation_cross(exp_info):
+    y, height = get_target_y(exp_info)
+    exp_info.fixation = ttrk.paradigms.general.FixationCross(radius=15)
+    exp_info.fixation.position = (0, y)
+
+
+#----------------------------------------------------------------
+def get_target_y(exp_info):
+    """
+    Create the y coordinate where the target should be presented 
+
+    :param exp_info: The experiment-level objects
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    """
+
+    screen_top = exp_info.screen_size[1] / 2
+    height = screen_top - exp_info.numberline.position[1] - exp_info.config.stimulus_distance_from_top - 1
+    y = int(screen_top - exp_info.config.stimulus_distance_from_top - height / 2)
+    return y, height
+
 
 #----------------------------------------------------------------
 def create_errmsg_textbox(exp_info):
@@ -324,9 +410,15 @@ def create_errmsg_textbox(exp_info):
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
+    config = exp_info.config
+
     exp_info.errmsg_textbox = xpy.stimuli.TextBox(
-        text="", size=(290, 180), position=(0, 0),
-        text_font="Arial", text_size=16, text_colour=xpy.misc.constants.C_RED)
+        text="",
+        size=config.errmsg_textbox_size,
+        position=config.errmsg_textbox_coords,
+        text_font=config.errmsg_textbox_font_name,
+        text_size=config.errmsg_textbox_font_size,
+        text_colour=config.errmsg_textbox_font_colour)
 
 
 #----------------------------------------------------------------
@@ -353,11 +445,11 @@ def create_sounds(exp_info):
 
     config = exp_info.config
 
-    exp_info.sound_err = load_sound(config, 'error.wav')
+    exp_info.sound_err = load_sound(config, config.sound_err)
 
     if config.sound_by_accuracy is None:
         # One sound, independently of accuracy
-        exp_info.sounds_ok = [load_sound(config, 'click.wav')]
+        exp_info.sounds_ok = [load_sound(config, config.sound_ok)]
         exp_info.sounds_ok_max_ep_err = [1]
         return
 

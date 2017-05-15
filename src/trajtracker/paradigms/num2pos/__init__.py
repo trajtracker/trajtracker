@@ -13,15 +13,18 @@ def version():
 from ._Config import Config, FINGER_STARTED_MOVING
 from ._TrialInfo import TrialInfo
 from ._ExperimentInfo import ExperimentInfo
-from ._Arrow import Arrow
+from ._DownArrow import DownArrow
 
 from ._n2p_init import \
     create_errmsg_textbox, \
     create_experiment_objects, \
+    create_fixation, \
+    create_fixation_cross, \
     create_generic_target, \
     create_numberline, \
     create_sounds, \
     create_start_point, \
+    create_textbox_fixation, \
     create_textbox_target, \
     create_traj_tracker, \
     create_validators, \

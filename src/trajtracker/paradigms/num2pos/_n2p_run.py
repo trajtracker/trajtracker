@@ -11,6 +11,7 @@ import csv
 import numpy as np
 import time
 from enum import Enum
+# noinspection PyPep8Naming
 import xml.etree.cElementTree as ET
 
 
@@ -28,15 +29,6 @@ from trajtracker.paradigms.num2pos import *
 
 RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
 
-
-# features:
-# todo: handle stimulus-then-move
-# todo: escape button
-
-# future:
-# todo: delete XML support?
-# todo: organize documentation. Have a "using this class" section for each complex class.
-# todo: add logging to all trajtracker functions? Decide on logging policy (trace=enter/exit, detailed flow trace; debug=potentially interesting data, stages within functions; info=configuration, major operations, important data, validation errors)
 
 #----------------------------------------------------------------
 def run_full_experiment(config, xpy_exp, subj_id, subj_name=""):
@@ -60,8 +52,6 @@ def run_full_experiment(config, xpy_exp, subj_id, subj_name=""):
     register_to_event_manager(exp_info)
 
     run_trials(exp_info)
-
-    save_session_file(exp_info)
 
 
 #----------------------------------------------------------------
@@ -173,6 +163,8 @@ def on_finger_touched_screen(exp_info, trial):
     exp_info.errmsg_textbox.visible = False
     exp_info.target_pointer.visible = False
 
+    show_fixation(exp_info)
+
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_STARTED, 0,
                                           get_time() - exp_info.session_start_time)
 
@@ -183,6 +175,7 @@ def on_finger_touched_screen(exp_info, trial):
     #-- Reset all trajectory-sensitive objects
     for obj in exp_info.trajectory_sensitive_objects:
         obj.reset(0)
+
 
 #----------------------------------------------------------------
 def wait_until_finger_moves(exp_info, trial):
@@ -205,6 +198,7 @@ def wait_until_finger_moves(exp_info, trial):
 
     if exp_info.start_point.state == StartPoint.State.aborted:
         #-- Finger lifted
+        show_fixation(exp_info, False)
         return RunTrialResult.Aborted
 
     elif exp_info.start_point.state == StartPoint.State.error:
@@ -246,6 +240,8 @@ def initialize_trial(exp_info, trial):
 
     update_text_target_for_trial(exp_info, trial)
     update_generic_target_for_trial(exp_info, trial)
+    if exp_info.fixation is not None:
+        update_fixation_for_trial(exp_info, trial)
 
     exp_info.numberline.target = trial.target
 
@@ -261,6 +257,7 @@ def on_finger_started_moving(exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
 
+    show_fixation(exp_info, False)
     t = get_time()
     time_in_trial = t - trial.start_time
     time_in_session = t - exp_info.session_start_time
@@ -271,6 +268,12 @@ def on_finger_started_moving(exp_info, trial):
     exp_info.stimuli.present()
 
     trial.results['targets_t0'] = 0 if exp_info.config.stimulus_then_move else time_in_trial
+
+
+#----------------------------------------------------------------
+def show_fixation(exp_info, visible=True):
+    if exp_info.fixation is not None:
+        exp_info.fixation.visible = visible
 
 
 #----------------------------------------------------------------
@@ -295,25 +298,25 @@ def update_text_target_for_trial(exp_info, trial):
 
     exp_info.text_target.texts = trial.text_target.split(";")
 
-    _update_target_stimulus_attr(exp_info, trial, 'text.font', 'text_font', "text")
-    _update_target_stimulus_attr(exp_info, trial, 'text.text_size', 'text_size', "text", int)
-    _update_target_stimulus_attr(exp_info, trial, 'text.bold', 'text_bold', "text", bool)
-    _update_target_stimulus_attr(exp_info, trial, 'text.italic', 'text_italic', "text", bool)
-    _update_target_stimulus_attr(exp_info, trial, 'text.underline', 'text_underline', "text", bool)
-    _update_target_stimulus_attr(exp_info, trial, 'text.justification', 'text_justification', "text",
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.font', 'text_font', "text")
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.text_size', 'text_size', "text", int)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.bold', 'text_bold', "text", bool)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.italic', 'text_italic', "text", bool)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.underline', 'text_underline', "text", bool)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.justification', 'text_justification', "text",
                                  ttrk.data.csv_formats.parse_text_justification)
-    _update_target_stimulus_attr(exp_info, trial, 'text.text_colour', 'text_colour', "text",
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.text_colour', 'text_colour', "text",
                                  ttrk.data.csv_formats.parse_rgb)
-    _update_target_stimulus_attr(exp_info, trial, 'text.background_colour', 'background_colour', "text",
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.background_colour', 'background_colour', "text",
                                  ttrk.data.csv_formats.parse_rgb)
-    _update_target_stimulus_attr(exp_info, trial, 'text.size', 'size', "text", ttrk.data.csv_formats.parse_size)
-    _update_target_stimulus_attr(exp_info, trial, 'text.position', 'position', "text",
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.size', 'size', "text", ttrk.data.csv_formats.parse_size)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.position', 'position', "text",
                                  ttrk.data.csv_formats.parse_coord)
-    _update_target_stimulus_position(exp_info, trial, 'text', 'x')
-    _update_target_stimulus_position(exp_info, trial, 'text', 'y')
+    _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'x')
+    _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'y')
 
-    _update_target_stimulus_attr(exp_info, trial, 'text.onset_time', 'onset_time', "text", float)
-    _update_target_stimulus_attr(exp_info, trial, 'text.duration', 'duration', "text", float)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.onset_time', 'onset_time', "text", float)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.duration', 'duration', "text", float)
 
 
 # ----------------------------------------------------------------
@@ -333,24 +336,46 @@ def update_generic_target_for_trial(exp_info, trial):
     trial.generic_target = trial.csv_data["genstim.target"]
 
     exp_info.generic_target.shown_stimuli = trial.csv_data['genstim.target'].split(";")
-    _update_target_stimulus_attr(exp_info, trial, 'genstim.position', 'position', "genstim",
-                                 ttrk.data.csv_formats.parse_coord)
-    _update_target_stimulus_position(exp_info, trial, 'genstim', 'x')
-    _update_target_stimulus_position(exp_info, trial, 'genstim', 'y')
+
+    _update_target_stimulus_attr(exp_info, trial, exp_info.generic_target, 'genstim.position',
+                                 'position', "genstim", ttrk.data.csv_formats.parse_coord)
+
+    _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'x')
+    _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'y')
+
+
+# ------------------------------------------------
+def update_fixation_for_trial(exp_info, trial):
+    """
+    Update the fixation when the trial is initialized
+
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo
+    """
+
+    if exp_info.config.fixation_type == 'cross' and 'fixation.text' in trial.csv_data:
+        exp_info.fixation.text = trial.csv_data['fixation.text']
+
+    if exp_info.fixation.text == '':
+        ttrk.log_write("WARNING: No fixation text was set for trial #{:}".format(trial.trial_num))
+
+    _update_target_stimulus_attr(exp_info, trial, exp_info.generic_target, 'fixation.position',
+                                 'position', 'fixation', ttrk.data.csv_formats.parse_coord)
+
+    _update_target_stimulus_position(exp_info, trial, exp_info.fixation, 'fixation', 'x')
+    _update_target_stimulus_position(exp_info, trial, exp_info.fixation, 'fixation', 'y')
 
 
 #------------------------------------------------
-def _update_target_stimulus_attr(exp_info, trial, csv_name, attr_name, text_or_generic, type_cast_function=None):
+def _update_target_stimulus_attr(exp_info, trial, target_holder, csv_name, attr_name,
+                                 col_name_prefix, type_cast_function=None):
     """
     Update one attribute of the target object from the CSV file
     
-    :param text_or_generic: 
+    :param col_name_prefix: 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
-
-    if text_or_generic != "text" and text_or_generic != "genstim":
-        raise Exception("Invalid text_or_generic argument ({:})".format(text_or_generic))
 
     if type_cast_function is None:
         type_cast_function = str
@@ -367,12 +392,11 @@ def _update_target_stimulus_attr(exp_info, trial, csv_name, attr_name, text_or_g
     else:
         value = type_cast_function(value)
 
-    target_holder = exp_info.text_target if text_or_generic == "text" else exp_info.generic_target
     setattr(target_holder, attr_name, value)
 
 
 #------------------------------------------------
-def _update_target_stimulus_position(exp_info, trial, text_or_generic, x_or_y):
+def _update_target_stimulus_position(exp_info, trial, target_holder, col_name_prefix, x_or_y):
     """
     Update the stimulus position according to "position.x" or "position.y" columns
     
@@ -383,14 +407,10 @@ def _update_target_stimulus_position(exp_info, trial, text_or_generic, x_or_y):
     if x_or_y != "x" and x_or_y != "y":
         raise Exception("Invalid x_or_y argument ({:})".format(x_or_y))
 
-    if text_or_generic != "text" and text_or_generic != "genstim":
-        raise Exception("Invalid text_or_generic argument ({:})".format(text_or_generic))
-
-    csv_col = "%s.position.%s" % (text_or_generic, x_or_y)
+    csv_col = "%s.position.%s" % (col_name_prefix, x_or_y)
     if csv_col not in trial.csv_data:
         return
 
-    target_holder = exp_info.text_target if text_or_generic == "text" else exp_info.generic_target
     n_stim = target_holder.n_stim
 
     #-- Get the x/y coordinates as an array
@@ -522,62 +542,89 @@ def play_success_sound(exp_info, trial):
 def trial_ended(exp_info, trial, time_in_trial, success_err_code):
     """
     This function is called whenever a trial ends, either successfully or with failure.
-    
-    Its main role is to write a row to the trials.csv file.
+    It updates the result files.
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     :param time_in_trial: 
     :param success_err_code: A string code to write as status for this trial 
-    :return: 
     """
 
     exp_info.stimuli.present()
 
     if exp_info.config.save_results:
 
-        endpoint = exp_info.numberline.response_value
-        t_move = trial.results['time_started_moving'] if 'time_started_moving' in trial.results else -1
-        t_target = trial.results['targets_t0'] if 'targets_t0' in trial.results else -1
+        update_trials_file(exp_info, trial, time_in_trial, success_err_code)
 
-        if time_in_trial == 0 or 'time_started_moving' not in trial.results:
-            movement_time = 0
-        else:
-            movement_time = time_in_trial - trial.results['time_started_moving']
+        #-- Save the session at the end of each trial, to make sure it's always saved - even if
+        #-- the experiment software unexpectedly terminates
+        save_session_file(exp_info)
 
-        if trial.use_text_targets and trial.use_generic_targets:
-            presented_target = 'text="{:}";generic="{:}"'.format(trial.text_target, trial.generic_target)
-        elif trial.use_text_targets:
-            presented_target = trial.text_target
-        elif trial.use_generic_targets:
-            presented_target = trial.generic_target
-        else:
-            presented_target = ""
 
-        #-- Save data to trials file
-        trial_out_row = {
-            'trialNum':             trial.trial_num,
-            'LineNum':              trial.file_line_num,
-            'target':               trial.target,
-            'presentedTarget':      presented_target,
-            'endPoint':             "" if endpoint is None else "{:.3g}".format(endpoint),
-            'status':               success_err_code,
-            'movementTime':         "{:.3g}".format(movement_time),
-            'timeInSession':        "{:.3g}".format(trial.start_time - exp_info.session_start_time),
-            'timeUntilFingerMoved': "{:.3g}".format(t_move),
-            'timeUntilTarget':      "{:.3g}".format(t_target),
-        }
+#------------------------------------------------
+def update_trials_file(exp_info, trial, time_in_trial, success_err_code):
+    """
+    Add an entry (line) to the trials.csv file
+    
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    :param time_in_trial: 
+    :param success_err_code: A string code to write as status for this trial 
+    """
 
-        if exp_info.trials_file_writer is None:
-            fields = ['trialNum', 'LineNum', 'target', 'presentedTarget', 'status', 'endPoint', 'movementTime',
-                      'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']
-            filename = xpy.io.defaults.datafile_directory + "/" + exp_info.trials_out_filename
-            exp_info.trials_out_fp = open(filename, 'w')
-            exp_info.trials_file_writer = csv.DictWriter(exp_info.trials_out_fp, fields)
-            exp_info.trials_file_writer.writeheader()
+    if time_in_trial == 0 or 'time_started_moving' not in trial.results:
+        movement_time = 0
+    else:
+        movement_time = time_in_trial - trial.results['time_started_moving']
 
-        exp_info.trials_file_writer.writerow(trial_out_row)
-        exp_info.trials_out_fp.flush()
+    if trial.use_text_targets and trial.use_generic_targets:
+        presented_target = 'text="{:}";generic="{:}"'.format(trial.text_target, trial.generic_target)
+    elif trial.use_text_targets:
+        presented_target = trial.text_target
+    elif trial.use_generic_targets:
+        presented_target = trial.generic_target
+    else:
+        presented_target = ""
+
+    endpoint = exp_info.numberline.response_value
+    t_move = trial.results['time_started_moving'] if 'time_started_moving' in trial.results else -1
+    t_target = trial.results['targets_t0'] if 'targets_t0' in trial.results else -1
+
+    # -- Save data to trials file
+    trial_out_row = {
+        'trialNum': trial.trial_num,
+        'LineNum': trial.file_line_num,
+        'target': trial.target,
+        'presentedTarget': presented_target,
+        'endPoint': "" if endpoint is None else "{:.3g}".format(endpoint),
+        'status': success_err_code,
+        'movementTime': "{:.3g}".format(movement_time),
+        'timeInSession': "{:.3g}".format(trial.start_time - exp_info.session_start_time),
+        'timeUntilFingerMoved': "{:.3g}".format(t_move),
+        'timeUntilTarget': "{:.3g}".format(t_target),
+    }
+
+    if exp_info.trials_file_writer is None:
+        open_trials_file(exp_info)
+
+    exp_info.trials_file_writer.writerow(trial_out_row)
+    exp_info.trials_out_fp.flush()
+
+
+#------------------------------------------------
+def open_trials_file(exp_info):
+    """
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
+    """
+
+    fields = ['trialNum', 'LineNum', 'target', 'presentedTarget', 'status', 'endPoint', 'movementTime',
+              'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']
+
+    filename = xpy.io.defaults.datafile_directory + "/" + exp_info.trials_out_filename
+
+    exp_info.trials_out_fp = open(filename, 'w')
+    exp_info.trials_file_writer = csv.DictWriter(exp_info.trials_out_fp, fields)
+    exp_info.trials_file_writer.writeheader()
 
 
 #------------------------------------------------

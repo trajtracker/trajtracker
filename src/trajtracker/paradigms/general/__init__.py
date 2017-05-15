@@ -6,5 +6,5 @@ TrajTracker - general stuff for all paradigms
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
+from ._FixationCross import FixationCross
 from ._funcs import get_subject_name_id
-

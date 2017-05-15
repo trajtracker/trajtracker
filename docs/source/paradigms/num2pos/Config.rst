@@ -38,6 +38,14 @@ Targets to show
        Whether to present generic targets. A generic target is any Expyriment (or equivalent) stimulus - e.g.,
        image, shape, etc.
 
+    **fixation_type**
+       The type of fixation stimulus: 'cross', 'text', or None.
+       When using 'text' fixation, you can set the text via *fixation_text* or via the CSV config file.
+
+    **fixation_text**
+       The default fixation text to use when *fixation_type='text'*.
+       This value can be overriden by column *fixation.text* in the CSV config file.
+
 
 Number line
 -----------

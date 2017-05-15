@@ -61,6 +61,8 @@ class ExperimentInfo(object):
         #: Specify, for each entry in sounds_ok, the maximal endpoint error acceptable for this sound.
         self.sounds_ok_max_ep_err = None
 
+        self.fixation = None
+
         #-- Runtime elements: change during the experiment
 
         #: The list of trials (loaded from the CSV file)
@@ -273,3 +275,16 @@ class ExperimentInfo(object):
         self._event_sensitive_objects.append(tracker)
         self._trajtracker = tracker
 
+    #---------------------------------------------------------------
+    @property
+    def fixation(self):
+        """
+        The fixation (a cross / symbol / etc) 
+        """
+        return self._fixation
+
+    @fixation.setter
+    def fixation(self, value):
+        self._fixation = value
+        if value is not None:
+            self.stimuli.add(value, "fixation", visible=False)

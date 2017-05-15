@@ -107,6 +107,32 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
 
     #----------------------------------------------------------
+    def remove(self, stimulus_id):
+        """
+        Remove a stimulus from the container
+        
+        :param stimulus_id: The ID to remove 
+        :return: True if removed, False if not found
+        """
+
+        if stimulus_id not in self._stimuli:
+            return False
+
+        del self._stimuli[stimulus_id]
+        return True
+
+
+    #----------------------------------------------------------
+    @property
+    def position(self):
+        raise ttrk.TrajTrackerError("This object has no 'position' method")
+
+    @position.setter
+    def position(self, value):
+        raise ttrk.TrajTrackerError("This object has no 'position' method")
+
+
+    #----------------------------------------------------------
     def __getitem__(self, item):
         return self._stimuli[item]['stimulus']
 
