@@ -353,11 +353,13 @@ def update_fixation_for_trial(exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo
     """
 
-    if exp_info.config.fixation_type == 'cross' and 'fixation.text' in trial.csv_data:
-        exp_info.fixation.text = trial.csv_data['fixation.text']
+    if exp_info.config.fixation_type == 'text':
 
-    if exp_info.fixation.text == '':
-        ttrk.log_write("WARNING: No fixation text was set for trial #{:}".format(trial.trial_num))
+        if 'fixation.text' in trial.csv_data:
+            exp_info.fixation.text = trial.csv_data['fixation.text']
+
+        if exp_info.fixation.text == '':
+            ttrk.log_write("WARNING: No fixation text was set for trial #{:}".format(trial.trial_num))
 
     _update_target_stimulus_attr(exp_info, trial, exp_info.generic_target, 'fixation.position',
                                  'position', 'fixation', ttrk.data.csv_formats.parse_coord)
