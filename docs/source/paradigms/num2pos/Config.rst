@@ -7,6 +7,8 @@ Configuration parameters for a number-to-position experiment.
 
 All parameters can be set directly and via the constructor.
 
+Some advanced config parameters are not documented here - see the source file for details.
+
 
 General:
 --------
