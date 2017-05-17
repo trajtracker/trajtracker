@@ -309,9 +309,17 @@ def _get_func_name(obj, func_name):
 
 #--------------------------------------
 def display_clear():
+    """
+    Clear previous objects that were drawn on the display buffer
+    """
     xpy._internals.active_exp.screen.clear()
 
+
 def display_update():
+    """
+    Update the display buffer - i.e., flip
+    This shows all recent items that were displayed with present(update=False) 
+    """
     xpy._internals.active_exp.screen.update()
 
 

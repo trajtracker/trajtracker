@@ -18,7 +18,7 @@ class TTrkObject(object):
 
     #--------------------------------------------
     def __init__(self):
-        self.log_level = ttrk.default_log_level
+        self.log_level = ttrk.env.default_log_level
 
 
     #--------------------------------------------

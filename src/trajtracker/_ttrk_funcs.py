@@ -20,3 +20,17 @@ def log_write(msg, print_to_console=False):
         t = time.time()
         stime = time.strftime('%H:%m:%S', time.localtime(t)) + "{:.3f}".format(t % 1)[1:]
         print(stime + ": " + msg)
+
+
+#-------------------------------------------------
+def initialize():
+    """
+    Initialize TrajTracker and Expyriment
+    
+    :return: Expyriment's Experiment object 
+    """
+
+    exp = xpy.control.initialize()
+    ttrk.env.mouse = ttrk.io.Mouse(exp.mouse)
+
+    return exp

@@ -19,7 +19,7 @@ ttrk.log_to_console = True
 
 
 #-- Initialize Expyriment
-exp = xpy.control.initialize()
+exp = ttrk.initialize()
 xpy.control.start(exp)
 if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
@@ -30,7 +30,7 @@ if not xpy.misc.is_android_running():
 #===========================================================================================
 
 #-- monitor speed & direction
-speed_monitor = ttrk.movement.SpeedMonitor(1)
+speed_monitor = ttrk.movement.SpeedMonitor(0.05)
 direction_monitor = ttrk.movement.DirectionMonitor(min_distance=10, min_angle_change_per_curve=5)
 
 
@@ -90,13 +90,13 @@ while get_time() - start_time < 60:   # continue for 60 sec
 
     curr_time = get_time()
 
-    if exp.mouse.check_button_pressed(0):
+    if ttrk.env.mouse.check_button_pressed(0):
         #-- Finger is touching the screen
 
         #-- Update the monitors on each frame, so they can continuously track the speed
         #-- and direction of movement
-        speed_monitor.update_xyt(exp.mouse.position, curr_time - start_time)
-        direction_monitor.update_xyt(exp.mouse.position, curr_time - start_time)
+        speed_monitor.update_xyt(ttrk.env.mouse.position, curr_time - start_time)
+        direction_monitor.update_xyt(ttrk.env.mouse.position, curr_time - start_time)
 
         # Update the text information only every 100 ms (because this is time consuming)
         if get_time() - last_updated_texts_time >= 0.1:

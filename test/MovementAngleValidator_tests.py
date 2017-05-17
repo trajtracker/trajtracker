@@ -162,7 +162,7 @@ class DirectionValidatorTestCase(unittest.TestCase):
     def ____test_config_from_xml(self):
 
         v = MovementAngleValidator()
-        configer = trajtracker.data.XmlConfigUpdater()
+        configer = trajtracker.io.XmlConfigUpdater()
         xml = ET.fromstring('<config min_angle="1" max_angle="2" calc_angle_interval="3" grace_period="4"/>')
         configer.configure_object(xml, v)
         self.assertEqual(1, v.min_angle)

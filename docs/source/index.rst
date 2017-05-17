@@ -9,6 +9,20 @@ TrajTracker documentation
 Expyriment-based tools for psychology experiments, focusing on finger/mouse tracking
 
 
+General
+-------
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   TrajTracker general functions <trajtracker>
+   Environment
+   General utilities <utils>
+
+
+
+
 trajtracker.stimuli
 -------------------
 
@@ -87,6 +101,16 @@ This set of classes allows defining the flow of a trial by using events.
    events/EventManager
 
 
+trajtracker.io
+--------------
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   io/*
+
+
 trajtracker.misc
 ----------------
 
@@ -95,17 +119,6 @@ trajtracker.misc
    :glob:
 
    misc/*
-
-
-other modules
--------------
-
-.. toctree::
-   :maxdepth: 1
-   :glob:
-
-   General utilities <utils>
-
 
 
 

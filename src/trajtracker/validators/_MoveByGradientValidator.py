@@ -202,7 +202,9 @@ class MoveByGradientValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
         _u.update_xyt_validate_and_log(self, position)
 
-        color = self._lcm.get_color_at(position[0], position[1])
+        # casting "color" to int because get_color_at() may return uint8, and subtracting uint variables
+        # would always yield a positive value
+        color = int(self._lcm.get_color_at(position[0], position[1]))
         if color is None:  # color N/A -- can't validate
             self._last_color = None
             return None

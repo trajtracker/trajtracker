@@ -26,6 +26,7 @@ import expyriment as xpy
 import trajtracker as ttrk
 from trajtracker.paradigms import num2pos
 
+
 #-- Change this to True to switch into stimulus-then-move mode
 STIMULUS_THEN_MOVE = False
 
@@ -33,7 +34,7 @@ if not xpy.misc.is_android_running():
     xpy.control.defaults.window_mode = True
     ttrk.log_to_console = True
 
-ttrk.default_log_level = ttrk.log_info
+ttrk.env.default_log_level = ttrk.log_info
 
 
 accuracy_levels = [.05, .1]
@@ -63,9 +64,8 @@ if STIMULUS_THEN_MOVE:
 
 #----------------------------------------------------------------
 
-#-- Initialize Expyriment
-
-exp = xpy.control.initialize()
+#-- Initialize & start the Expyriment
+exp = ttrk.initialize()
 xpy.control.start(exp)
 
 if not xpy.misc.is_android_running():

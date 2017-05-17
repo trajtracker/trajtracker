@@ -82,7 +82,7 @@ class LocationsValidatorTests(unittest.TestCase):
     def ____test_config_from_xml(self):
 
         v = LocationsValidator([[]])
-        configer = trajtracker.data.XmlConfigUpdater()
+        configer = trajtracker.io.XmlConfigUpdater()
         xml = ET.fromstring('''
         <config default_valid="True">
             <position>(1,2)</position>

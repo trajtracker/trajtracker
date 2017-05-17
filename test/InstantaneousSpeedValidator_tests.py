@@ -122,7 +122,7 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
     def ____test_config_from_xml(self):
 
         v = InstantaneousSpeedValidator()
-        configer = trajtracker.data.XmlConfigUpdater()
+        configer = trajtracker.io.XmlConfigUpdater()
         xml = ET.fromstring('''
         <config axis="y" min_speed="1" max_speed="10" grace_period="0.5" calculation_interval="2.5"/>
         ''')

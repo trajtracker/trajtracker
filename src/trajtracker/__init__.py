@@ -4,7 +4,6 @@
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
-
 """
 
 import expyriment as xpy
@@ -17,17 +16,23 @@ log_warn = 4
 log_error = 5
 log_none = 6
 
+from ._Environment import Environment
 
-#-- When set to True, this will print all log messages to the console (on top of printing them
-#-- to the log file)
+#: :class:`~trajtracker.Environment` parameters
+env = Environment()
+
+#: When set to True, this will print all log messages to the console (on top of printing them
+#: to the log file)
 log_to_console = False
 
-#-- The default logging level for all trajtracker objects.
-#-- If you change this, only objects created from now on will be affected.
-default_log_level = log_warn
 
-
+#----------------------------------------------------------
 def version():
+    """
+    Return trajtracker version number (major.minor.build)
+    
+    :return: str
+    """
     return "0.0.1"
 
 
@@ -43,23 +48,23 @@ class TrajTrackerError(Exception):
         return "{:}: {:}".format(type(self).__name__, self.message)
 
 class InvalidStateError(TrajTrackerError):
-    """ A method was called when the object is an inappropriate state """
+    """ Exception indicating that a method was called when the object is an inappropriate state """
     pass
 
 class BadFormatError(TrajTrackerError):
-    """ Data was provided in an invalid format (e.g., in a file) """
+    """ Exception indicating that data was provided in an invalid format (e.g., in a file) """
     pass
 
 class ValueError(TrajTrackerError):
-    """ An invalid value was encountered """
+    """ Exception indicating that an invalid value was encountered """
     pass
 
 class TypeError(TrajTrackerError):
-    """ a value of invalid type was encountered """
+    """ Exception indicating that a value of invalid type was encountered """
     pass
 
 
-from trajtracker._ttrk_funcs import log_write
+from trajtracker._ttrk_funcs import log_write, initialize
 
 #============================================================================
 #   Import the TrajTracker modules
@@ -67,11 +72,12 @@ from trajtracker._ttrk_funcs import log_write
 
 from trajtracker._TTrkObject import TTrkObject
 
-import trajtracker._utils as _utils
+import _utils
+import utils
 
-from . import misc
-from . import data
-from . import events
-from . import stimuli
-from . import movement
-from . import validators
+import misc
+import io
+import events
+import stimuli
+import movement
+import validators

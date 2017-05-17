@@ -98,7 +98,7 @@ class MoveByGradientValidatorTests(unittest.TestCase):
     def ____test_config_from_xml(self):
 
         v = MoveByGradientValidator([[]])
-        configer = trajtracker.data.XmlConfigUpdater()
+        configer = trajtracker.io.XmlConfigUpdater()
         xml = ET.fromstring('''
         <config max_valid_back_movement="0.5" position="(1,2)" rgb_should_ascend="True" cyclic="True"/>
         ''')

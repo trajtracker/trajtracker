@@ -3,10 +3,10 @@ import inspect, re
 import xml.etree.ElementTree as ET
 import expyriment as xpy
 
-from trajtracker import TTrkObject, BadFormatError
+import trajtracker as ttrk
 
 
-class XmlConfigUpdater(TTrkObject):
+class XmlConfigUpdater(ttrk.TTrkObject):
     """
 
     """
@@ -25,7 +25,7 @@ class XmlConfigUpdater(TTrkObject):
 
             #-- Make sure that this object in fact exists
             if obj_id not in objects:
-                raise BadFormatError("Invalid xml configuration in {:} (<'{:}' ...>): there is no object to configure named {:}".format(
+                raise ttrk.BadFormatError("Invalid xml configuration in {:} (<'{:}' ...>): there is no object to configure named {:}".format(
                     xml_source, obj_id, obj_id))
 
             self.configure_object(one_obj_config, objects[obj_id])
@@ -52,7 +52,7 @@ class XmlConfigUpdater(TTrkObject):
     def _validate_attr(self, obj, attr_name):
         try:
             setattr(obj, attr_name, _TestIfXmlSupported())
-            raise BadFormatError('Invalid XML configuration: {:}.{:} cannot be configured from XML'.format(type(obj).__name__, attr_name))
+            raise ttrk.BadFormatError('Invalid XML configuration: {:}.{:} cannot be configured from XML'.format(type(obj).__name__, attr_name))
         except _TestIfXmlSupported:
             pass
 
@@ -112,7 +112,7 @@ def _convert_xml_value_to_attr_value(obj, attr_name, xml_value, converter, conve
     if convert_raw_xml:
         #-- Make sure that we got the XML node
         if not isinstance(xml_value.value, ET.Element):
-            BadFormatError(
+            raise ttrk.BadFormatError(
                 'Invalid XML configuration <{:} ...>: to configure {:}.{:} via XML, you must define a sub-block'.format(
                 xml_value.tag, type(obj).__name__, attr_name))
 

@@ -1,7 +1,7 @@
 import unittest
 import xml.etree.ElementTree as ET
 
-from trajtracker.data import XmlConfigUpdater, fromXML
+from trajtracker.io import XmlConfigUpdater, fromXML
 import trajtracker as ttrk
 
 

@@ -125,7 +125,7 @@ def run_trial(exp_info, trial):
         #-- Update all displayable elements
         exp_info.stimuli.present()
 
-        if not exp_info.xpy_exp.mouse.check_button_pressed(0):
+        if not ttrk.env.mouse.check_button_pressed(0):
             trial_failed(ExperimentError("FingerLifted", "You lifted your finger in mid-trial"), exp_info, trial)
             return RunTrialResult.Failed
 
@@ -263,6 +263,8 @@ def on_finger_started_moving(exp_info, trial):
     time_in_session = t - exp_info.session_start_time
     trial.results['time_started_moving'] = time_in_trial
 
+    #-- This event is dispatched before calling present(), because it might trigger operations that
+    #-- show/hide stuff
     exp_info.event_manager.dispatch_event(FINGER_STARTED_MOVING, time_in_trial, time_in_session)
 
     exp_info.stimuli.present()
@@ -298,25 +300,21 @@ def update_text_target_for_trial(exp_info, trial):
 
     exp_info.text_target.texts = trial.text_target.split(";")
 
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.font', 'text_font', "text")
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.text_size', 'text_size', "text", int)
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.bold', 'text_bold', "text", bool)
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.italic', 'text_italic', "text", bool)
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.underline', 'text_underline', "text", bool)
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.justification', 'text_justification', "text",
-                                 ttrk.data.csv_formats.parse_text_justification)
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.text_colour', 'text_colour', "text",
-                                 ttrk.data.csv_formats.parse_rgb)
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.background_colour', 'background_colour', "text",
-                                 ttrk.data.csv_formats.parse_rgb)
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.size', 'size', "text", ttrk.data.csv_formats.parse_size)
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.position', 'position', "text",
-                                 ttrk.data.csv_formats.parse_coord)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.font', 'text_font')
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.text_size', 'text_size')
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.bold', 'text_bold')
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.italic', 'text_italic')
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.underline', 'text_underline')
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.justification', 'text_justification')
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.text_colour', 'text_colour')
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.background_colour', 'background_colour')
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.size', 'size')
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.position', 'position')
     _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'x')
     _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'y')
 
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.onset_time', 'onset_time', "text", float)
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.duration', 'duration', "text", float)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.onset_time', 'onset_time')
+    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.duration', 'duration')
 
 
 # ----------------------------------------------------------------
@@ -337,8 +335,7 @@ def update_generic_target_for_trial(exp_info, trial):
 
     exp_info.generic_target.shown_stimuli = trial.csv_data['genstim.target'].split(";")
 
-    _update_target_stimulus_attr(exp_info, trial, exp_info.generic_target, 'genstim.position',
-                                 'position', "genstim", ttrk.data.csv_formats.parse_coord)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.generic_target, 'genstim.position', 'position')
 
     _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'x')
     _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'y')
@@ -361,38 +358,28 @@ def update_fixation_for_trial(exp_info, trial):
         if exp_info.fixation.text == '':
             ttrk.log_write("WARNING: No fixation text was set for trial #{:}".format(trial.trial_num))
 
-    _update_target_stimulus_attr(exp_info, trial, exp_info.generic_target, 'fixation.position',
-                                 'position', 'fixation', ttrk.data.csv_formats.parse_coord)
+    _update_target_stimulus_attr(exp_info, trial, exp_info.generic_target, 'fixation.position', 'position')
 
     _update_target_stimulus_position(exp_info, trial, exp_info.fixation, 'fixation', 'x')
     _update_target_stimulus_position(exp_info, trial, exp_info.fixation, 'fixation', 'y')
 
 
 #------------------------------------------------
-def _update_target_stimulus_attr(exp_info, trial, target_holder, csv_name, attr_name,
-                                 col_name_prefix, type_cast_function=None):
+def _update_target_stimulus_attr(exp_info, trial, target_holder, csv_name, attr_name):
     """
     Update one attribute of the target object from the CSV file
     
-    :param col_name_prefix: 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
-
-    if type_cast_function is None:
-        type_cast_function = str
 
     if csv_name not in trial.csv_data:
         return
 
     value = trial.csv_data[csv_name]
-    if ";" in value:
-        value = [type_cast_function(s) for s in value.split(";")]
-        if len(value) < exp_info.text_target.n_stim:
+    if isinstance(value, list) and len(value) < exp_info.text_target.n_stim:
             raise Exception("Invalid value for column '{:}' in the data file {:}: the column has {:} values, expecting {:}".format(
                 attr_name, exp_info.config.data_source, len(value), exp_info.text_target.n_stim))
-    else:
-        value = type_cast_function(value)
 
     setattr(target_holder, attr_name, value)
 
@@ -416,11 +403,9 @@ def _update_target_stimulus_position(exp_info, trial, target_holder, col_name_pr
     n_stim = target_holder.n_stim
 
     #-- Get the x/y coordinates as an array
-    value = trial.csv_data[csv_col]
-    if ";" in value:
-        coord = [int(s) for s in value.split(";")]
-    else:
-        coord = [int(value)] * n_stim
+    coord = trial.csv_data[csv_col]
+    if not isinstance(coord, list):
+        coord = [coord] * n_stim
 
     if len(coord) < n_stim:
         raise Exception(
@@ -455,7 +440,7 @@ def update_movement(exp_info, trial):
     time_in_session = curr_time - exp_info.session_start_time
 
     for obj in exp_info.trajectory_sensitive_objects:
-        err = obj.update_xyt(exp_info.xpy_exp.mouse.position, time_in_trial, time_in_session)
+        err = obj.update_xyt(ttrk.env.mouse.position, time_in_trial, time_in_session)
         if err is not None:
             return err
 

@@ -21,7 +21,7 @@ xpy.control.defaults.window_mode = True
 ttrk.log_to_console = True
 
 
-exp = xpy.control.initialize()
+exp = ttrk.initialize()
 xpy.control.start(exp)
 if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
@@ -70,9 +70,9 @@ while time - start_time < 30000:  # continue for 30 seconds
 
     ring.present(update=False) # to clear previous stuff
 
-    if exp.mouse.check_button_pressed(0):
+    if ttrk.env.mouse.check_button_pressed(0):
 
-        finger_pos = exp.mouse.position
+        finger_pos = ttrk.env.mouse.position
 
         if button_was_already_pressed:
             # Check movement

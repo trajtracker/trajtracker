@@ -8,30 +8,26 @@ CSV reader: read a CSV file and translate columns to specific data types
 
 import csv
 
-import trajtracker
+import trajtracker as ttrk
 import trajtracker._utils as _u
 
 func_type = type(lambda: None)
 
 
-class CSVLoader(trajtracker.TTrkObject):
-    """
-    Load data from a CSV file. This class can:
+class CSVLoader(ttrk.TTrkObject):
 
-    - Define some fields (columns) as mandatory;
-    - Define, per field, how to transform its value from string to something else
-    - Handle changes in lower/uppercase of field names
-    """
-
+    #: Each loaded row will have an auto-generated field with this name. The field contains the corresponding
+    #: line number in the csv text file (int)
     FLD_LINE_NUM = 'line_num'
 
 
     #------------------------------------------------
     def __init__(self, case_sensitive_col_names=False):
         """
-        Constructor - invoked when you create a new object by writing CSVLoader()
+        Create a CSVLoader object
 
-        :param case_sensitive_col_names: If True, all field names will be converted to lowercase when loading
+        :param case_sensitive_col_names: If True, all field names are case insensitive
+                             (when converting each row to dict, the dict key will be lowercase)
         """
 
         super(CSVLoader, self).__init__()
@@ -45,10 +41,11 @@ class CSVLoader(trajtracker.TTrkObject):
         """
         Define a configurable field. You do not have to define all fields in the file - only
         those for which you need special configuration.
+        
+        Do this before calling :func:`~trajtracker.io.CSVLoader.load_file`
 
-        :param field_name:
-        :param field_type: either a type, or a function that converts string to another value
-        :param optional: If False, :func:`~trajtracker.data.CSVLoader.load_file` will fail if the field is missing.
+        :param field_type: either a type, or a function that converts the string (from the CSV file) to another value
+        :param optional: If False, :func:`~trajtracker.io.CSVLoader.load_file` will fail if the field is missing.
 s       """
 
         _u.validate_func_arg_type(self, "add_field", "field_name", field_name, str)
@@ -80,7 +77,7 @@ s       """
         for row in rows:
             if not self._case_sensitive_col_names:
                 row = self._transform_lowercase(row)
-            row = self._transform_types(row)
+            row = self._transform_types(row, filename)
             result.append(row)
 
         return result
@@ -112,12 +109,12 @@ s       """
             fieldnames = [field.lower() for field in fieldnames]
 
         if self.FLD_LINE_NUM in fieldnames:
-            raise trajtracker.BadFormatError("An invalid field name ({:}) was found im {:} - this is a reserved field name".format(
+            raise ttrk.BadFormatError("An invalid field name ({:}) was found im {:} - this is a reserved field name".format(
                 self.FLD_LINE_NUM, filename))
 
         for field in self._fields:
             if field not in fieldnames and not self._fields[field]['optional']:
-                raise trajtracker.BadFormatError("Mandatory field '{:} is missing in file {:}".format(field, filename))
+                raise ttrk.BadFormatError("Mandatory field '{:} is missing in file {:}".format(field, filename))
 
 
     #------------------------------------------------
@@ -127,7 +124,7 @@ s       """
 
 
     #------------------------------------------------
-    def _transform_types(self, row):
+    def _transform_types(self, row, filename):
 
         for field in row:
 
@@ -137,6 +134,10 @@ s       """
             field_type = self._fields[field]['type']
 
             if field_type != str:
-                row[field] = field_type(row[field])
+                try:
+                    row[field] = field_type(row[field])
+                except BaseException as e:
+                    raise ttrk.BadFormatError("Invalid CSV file format (line {:} in {:}): {:}".
+                                              format(row[self.FLD_LINE_NUM], filename, e))
 
         return row

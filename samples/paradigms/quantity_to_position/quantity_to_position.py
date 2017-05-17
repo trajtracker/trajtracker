@@ -23,7 +23,7 @@ if not xpy.misc.is_android_running():
     xpy.control.defaults.window_mode = True
     ttrk.log_to_console = True
 
-ttrk.default_log_level = ttrk.log_info
+ttrk.env.default_log_level = ttrk.log_info
 
 
 #-----------------------------------

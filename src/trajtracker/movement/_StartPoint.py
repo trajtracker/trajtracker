@@ -256,15 +256,15 @@ class StartPoint(ttrk.TTrkObject):
 
         while True:
 
-            if not exp.mouse.check_button_pressed(0) and self._state == StartPoint.State.reset:
+            if not ttrk.env.mouse.check_button_pressed(0) and self._state == StartPoint.State.reset:
                 # Mouse/finger is UP
                 self._state = StartPoint.State.mouse_up
                 if self._should_log(ttrk.log_info):
                     self._log_write("Mouse unclicked. Setting state=mouse_up", True)
 
-            elif exp.mouse.check_button_pressed(0) and self._state == StartPoint.State.mouse_up:
+            elif ttrk.env.mouse.check_button_pressed(0) and self._state == StartPoint.State.mouse_up:
                 # Mouse/finger touched the screen
-                finger_pos = exp.mouse.position
+                finger_pos = ttrk.env.mouse.position
                 self.check_xy(finger_pos[0], finger_pos[1])
 
             if max_wait_time is not None and u.get_time() - time_started_waiting >= max_wait_time:
@@ -339,9 +339,9 @@ class StartPoint(ttrk.TTrkObject):
         #-- Wait
         while self._state not in [StartPoint.State.start, StartPoint.State.error]:
 
-            if exp.mouse.check_button_pressed(0):
+            if ttrk.env.mouse.check_button_pressed(0):
                 #-- Finger still touching screen
-                finger_pos = exp.mouse.position
+                finger_pos = ttrk.env.mouse.position
                 self.check_xy(finger_pos[0], finger_pos[1])
             else:
                 #-- Finger lifted

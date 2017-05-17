@@ -8,6 +8,7 @@ TrajTracker - data package
 """
 
 from ._CSVLoader import CSVLoader
+from ._Mouse import Mouse
 from ._XmlConfigUpdater import XmlConfigUpdater, fromXML
 
-import trajtracker.data.csv_formats
+import trajtracker.io.csv_formats

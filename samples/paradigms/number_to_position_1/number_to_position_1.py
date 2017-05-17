@@ -25,7 +25,7 @@ config = num2pos.Config("Num2Pos(0-100*2)", max_trial_duration=2, max_numberline
 
 #-- Initialize Expyriment
 
-exp = xpy.control.initialize()
+exp = ttrk.initialize()
 xpy.control.start(exp)
 
 if not xpy.misc.is_android_running():

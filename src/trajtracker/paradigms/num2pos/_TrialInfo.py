@@ -6,7 +6,7 @@ The information of one trial
 """
 
 
-from trajtracker.data import CSVLoader
+from trajtracker.io import CSVLoader
 
 
 class TrialInfo(object):
@@ -34,10 +34,8 @@ class TrialInfo(object):
         #: The data loaded from the CSV file (dict)
         self.csv_data = csv_row
 
-        s_target = csv_row['target']
-
         #: The target location
-        self.target = int(s_target) if s_target.isdigit() else float(s_target)
+        self.target = csv_row['target']
 
         #: Whether text targets should be presented in this trial
         self.use_text_targets = csv_row['use_text_targets'] if exp_config.use_text_targets is None else exp_config.use_text_targets
@@ -46,7 +44,7 @@ class TrialInfo(object):
         self.use_generic_targets = csv_row['use_generic_targets'] if exp_config.use_generic_targets is None else exp_config.use_generic_targets
 
         #: The earliest time (relatively to the touch-screen time) when the finger can move
-        self.finger_moves_min_time = float(csv_row['finger_moves_min_time']) if 'finger_moves_min_time' in csv_row else exp_config.finger_moves_min_time
+        self.finger_moves_min_time = csv_row['finger_moves_min_time'] if 'finger_moves_min_time' in csv_row else exp_config.finger_moves_min_time
 
         #: The latest time (relatively to the touch-screen time) when the finger must move
-        self.finger_moves_max_time = float(csv_row['finger_moves_max_time']) if 'finger_moves_max_time' in csv_row else exp_config.finger_moves_max_time
+        self.finger_moves_max_time = csv_row['finger_moves_max_time'] if 'finger_moves_max_time' in csv_row else exp_config.finger_moves_max_time

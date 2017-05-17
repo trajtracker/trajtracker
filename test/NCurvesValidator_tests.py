@@ -26,7 +26,7 @@ class NCurvesValidatorTests(unittest.TestCase):
     def ____test_config_from_xml(self):
 
         v = NCurvesValidator()
-        configer = trajtracker.data.XmlConfigUpdater()
+        configer = trajtracker.io.XmlConfigUpdater()
         xml = ET.fromstring('<config max_curves_per_trial="3" min_distance="2.5" min_angle_change_per_curve="10.5"/>')
         configer.configure_object(xml, v)
         self.assertEqual(3, v.max_curves_per_trial)

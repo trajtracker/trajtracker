@@ -53,7 +53,7 @@ MAX_DISTANCE_FOR_POSITIVE_FEEDBACK = 50
 #===========================================================================================
 
 #-- Initialize Expyriment
-exp = xpy.control.initialize()
+exp = ttrk.initialize()
 xpy.control.start(exp)
 if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
@@ -72,8 +72,8 @@ while get_time() - start_time < 30:  # continue the game for 30 seconds
     screen_cleared = False
 
     #-- If the finger is touching the screen, display the circle in the finger's position
-    if exp.mouse.check_button_pressed(0):
-        circle.position = exp.mouse.position
+    if ttrk.env.mouse.check_button_pressed(0):
+        circle.position = ttrk.env.mouse.position
         circle.present(update=False)   # this updates the circle position, but doesn't update the display yet
         screen_cleared = True
 

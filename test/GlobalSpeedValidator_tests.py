@@ -143,7 +143,7 @@ class GlobalSpeedValidatorTests(unittest.TestCase):
     def ____test_config_from_xml(self):
 
         v = GlobalSpeedValidator()
-        configer = trajtracker.data.XmlConfigUpdater()
+        configer = trajtracker.io.XmlConfigUpdater()
         xml = ET.fromstring('''
         <config axis="y" origin_coord="5" end_coord="10" grace_period="0.5" max_trial_duration="3"
                 guide_warning_time_delta="0.2">

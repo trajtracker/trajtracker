@@ -164,7 +164,7 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
     def ____test_config_from_xml(self):
 
         trk = TrajectoryTracker()
-        configer = trajtracker.data.XmlConfigUpdater()
+        configer = trajtracker.io.XmlConfigUpdater()
         xml = ET.fromstring('<config track_if_no_movement="True" enabled="True" enable_event="A" disable_event="B+1"/>')
         configer.configure_object(xml, trk)
         self.assertEqual(True, trk.enabled)

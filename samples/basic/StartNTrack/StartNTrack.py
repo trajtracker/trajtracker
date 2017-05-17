@@ -25,7 +25,7 @@ ttrk.log_to_console = True
 
 
 #-- Initialize Expyriment
-exp = xpy.control.initialize()
+exp = ttrk.initialize()
 xpy.control.start(exp)
 if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
@@ -112,13 +112,13 @@ while n_completed < N_TRIALS:
     # This loop runs once per frame, and stops only when the finger is lifted or reaches the target circle
     while True:
 
-        if not exp.mouse.check_button_pressed(0):
+        if not ttrk.env.mouse.check_button_pressed(0):
             # Finger lifted / mouse unclicked: abort the trial
             break
 
         # The mouse/finger moves
 
-        mouse_pos = exp.mouse.position
+        mouse_pos = ttrk.env.mouse.position
 
         # save trajectory data
         traj_tracker.update_xyt(mouse_pos, get_time() - trial_start_time)

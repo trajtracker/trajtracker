@@ -70,11 +70,11 @@ def run_trial():
 
     while True:  # This loop runs once per frame
 
-        if not exp.mouse.check_button_pressed(0):
+        if not ttrk.env.mouse.check_button_pressed(0):
             trial_error("Finger lifted in mid-trial")
             return False
 
-        err = update_trajectory(exp.mouse.position, get_time() - time0)
+        err = update_trajectory(ttrk.env.mouse.position, get_time() - time0)
         if err is not None:
             trial_error(err.message)
             return False
@@ -144,7 +144,7 @@ def trial_succeeded():
 
 #-- Initialize expyriment
 
-exp = xpy.control.initialize()
+exp = ttrk.initialize()
 xpy.control.start(exp)
 if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
@@ -186,14 +186,14 @@ all_stimuli.add(target_box, visible=False)
 
 #-- Validators
 direction_validator = \
-    trajtracker.validators.MovementAngleValidator(min_angle=-90, max_angle=90, calc_angle_interval=20, enabled=True)
+    ttrk.validators.MovementAngleValidator(min_angle=-90, max_angle=90, calc_angle_interval=20, enabled=True)
 trajectory_sensitive_objects.append(direction_validator)
 
 global_speed_validator = \
-    trajtracker.validators.GlobalSpeedValidator(origin_coord=start_area.position[1] + start_area.size[1] / 2,
-                                                end_coord=number_line.position[1],
-                                                grace_period=0.3, max_trial_duration=MAX_TRIAL_DURATION,
-                                                milestones=[(.5, .33), (.5, .67)], show_guide=GUIDE_ENABLED)
+    ttrk.validators.GlobalSpeedValidator(origin_coord=start_area.position[1] + start_area.size[1] / 2,
+                                         end_coord=number_line.position[1],
+                                         grace_period=0.3, max_trial_duration=MAX_TRIAL_DURATION,
+                                         milestones=[(.5, .33), (.5, .67)], show_guide=GUIDE_ENABLED)
 global_speed_validator.do_present_guide = False
 trajectory_sensitive_objects.append(global_speed_validator)
 speed_guide = global_speed_validator.guide.stimulus
