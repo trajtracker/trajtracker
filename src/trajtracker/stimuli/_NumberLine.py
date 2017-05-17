@@ -394,6 +394,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         :type position: tuple (x,y)
 
         :param time_in_trial: ignored.
+        :param time_in_session: ignored.
         """
 
         _u.update_xyt_validate_and_log(self, position)
@@ -693,8 +694,6 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
     @position.setter
     def position(self, value):
-        self._validate_unlocked()
-
         value = _u.validate_attr_is_coord(self, "position", value)
         self._mid_x = value[0]
         self._mid_y = value[1]

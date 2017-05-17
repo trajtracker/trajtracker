@@ -8,6 +8,7 @@ TrajTracker - movement package - private utilities
 
 import numbers
 import re
+# noinspection PyPep8Naming
 import xml.etree.ElementTree as ET
 
 import numpy as np
@@ -95,9 +96,7 @@ def validate_attr_type(obj, attr_name, value, attr_type, none_allowed=False, typ
         raise Exception("trajtracker internal error: unsupported type '{:}'".format(attr_type))
 
 
-#--------------------------------------
-LIST_TYPES = (list, tuple, np.ndarray)
-
+#--------------------------------------------------------------------------------------
 def validate_attr_is_collection(obj, attr_name, value, min_length=None, max_length=None,
                                 none_allowed=False, allow_set=False):
 
@@ -128,7 +127,7 @@ def validate_attr_rgb(obj, attr_name, value, accept_single_num=False, none_allow
         return None
 
     if accept_single_num and isinstance(value, int) and 0 <= value < 2**24:
-        return (int(np.floor(value / 2 ** 16)), int(np.floor(value / 256)) % 256, value % 256)
+        return int(np.floor(value / 2 ** 16)), int(np.floor(value / 256)) % 256, value % 256
 
     validate_attr_type(obj, attr_name, value, tuple, type_name="(red,green,blue)")
     if len(value) != 3 or \
@@ -139,11 +138,12 @@ def validate_attr_rgb(obj, attr_name, value, accept_single_num=False, none_allow
 
     return value
 
+
 #--------------------------------------
 def validate_attr_is_coord(obj, attr_name, value, change_none_to_0=False, allow_float=False):
 
     if value is None and change_none_to_0:
-        return (0, 0)
+        return 0, 0
 
     if isinstance(value, geometry.XYPoint):
         value = (value.x, value.y)
@@ -171,11 +171,13 @@ def validate_attr_numeric(obj, attr_name, value, none_value=NoneValues.Invalid):
 
     return value
 
+
 #--------------------------------------
 def validate_attr_not_negative(obj, attr_name, value):
     if value is not None and value < 0:
         msg = "{:}.{:} was set to a negative value ({:})".format(get_type_name(obj), attr_name, value)
         raise trajtracker.ValueError(msg)
+
 
 #--------------------------------------
 def validate_attr_positive(obj, attr_name, value):
@@ -202,15 +204,14 @@ def validate_func_arg_type(obj, func_name, arg_name, value, arg_type, none_allow
             _get_func_name(obj, func_name), type_name, arg_name, value))
 
 
-#--------------------------------------
+#--------------------------------------------------------------------------------------
 def validate_func_arg_not_negative(obj, func_name, arg_name, value):
 
     if value is not None and value < 0:
         raise ttrk.ValueError("Argument '{:}' of {:}() has a negative value ({:})".format(arg_name, _get_func_name(obj, func_name), value))
 
-#--------------------------------------
-_LIST_TYPES = (list, tuple, np.ndarray)
 
+#--------------------------------------------------------------------------------------
 def validate_func_arg_is_collection(obj, func_name, arg_name, value, min_length=None, max_length=None,
                                     none_allowed=False, allow_set=False):
 
@@ -223,24 +224,25 @@ def validate_func_arg_is_collection(obj, func_name, arg_name, value, min_length=
 
     if min_length is not None and len(value) < min_length:
         raise trajtracker.TypeError("Argument {:} of {:}() cannot be set to a collection with {:} elements - a minimal of {:} elements are expected".
-                         format(arg_name, _get_func_name(obj, func_name), len(value), min_length))
+                                    format(arg_name, _get_func_name(obj, func_name), len(value), min_length))
     if max_length is not None and len(value) > max_length:
         raise trajtracker.TypeError("Argument {:} of {:}() cannot be set to a collection with {:} elements - a maximum of {:} elements is allowed".
-                         format(arg_name, _get_func_name(obj, func_name), len(value), max_length))
+                                    format(arg_name, _get_func_name(obj, func_name), len(value), max_length))
 
     return value
 
-#--------------------------------------
+
+#--------------------------------------------------------------------------------------
 def validate_func_arg_positive(obj, func_name, arg_name, value):
     if value is not None and value <= 0:
         raise trajtracker.ValueError("Argument {:} of {:}() has a negative/0 value ({:})".format(arg_name, _get_func_name(obj, func_name), value))
 
 
-#--------------------------------------
+#--------------------------------------------------------------------------------------
 def validate_func_arg_is_coord(obj, func_name, arg_name, value, change_none_to_0=False, allow_float=False):
 
     if value is None and change_none_to_0:
-        return (0, 0)
+        return 0, 0
 
     if isinstance(value, geometry.XYPoint):
         value = (value.x, value.y)
@@ -253,7 +255,7 @@ def validate_func_arg_is_coord(obj, func_name, arg_name, value, change_none_to_0
     return value
 
 
-#--------------------------------------------------------------------
+#--------------------------------------------------------------------------------------
 DONT_VALIDATE = "DONT_VALIDATE"
 def update_xyt_validate_and_log(self, position, time_in_trial=DONT_VALIDATE, time_in_session=DONT_VALIDATE):
 
@@ -312,6 +314,7 @@ def display_clear():
     """
     Clear previous objects that were drawn on the display buffer
     """
+    # noinspection PyProtectedMember
     xpy._internals.active_exp.screen.clear()
 
 
@@ -320,6 +323,7 @@ def display_update():
     Update the display buffer - i.e., flip
     This shows all recent items that were displayed with present(update=False) 
     """
+    # noinspection PyProtectedMember
     xpy._internals.active_exp.screen.update()
 
 
@@ -342,7 +346,8 @@ def parse_coord(value):
     if m is None:
         raise trajtracker.ValueError('Invalid coordinates "{:}"'.format(value))
 
-    return (int(m.group(1)), int(m.group(2)))
+    return int(m.group(1)), int(m.group(2))
+
 
 #--------------------------------------------------------------------
 def parse_rgb(value):
@@ -358,7 +363,7 @@ def parse_rgb(value):
     if m is None:
         raise trajtracker.ValueError('Invalid RGB "{:}"'.format(value))
 
-    return (int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    return int(m.group(1)), int(m.group(2)), int(m.group(3))
 
 
 #--------------------------------------------------------------------
@@ -370,6 +375,7 @@ def parse_rgb_or_num(value):
             return int(m.group(1))
 
     return parse_rgb(value)
+
 
 #--------------------------------------------------------------------
 def parse_rgb_list(xml):
@@ -386,6 +392,7 @@ def parse_rgb_list(xml):
 
     return colors
 
+
 #--------------------------------------------------------------------
 def _parse_list_of(value, converter):
 
@@ -396,5 +403,6 @@ def _parse_list_of(value, converter):
         return converter(value)
 
 
+#--------------------------------------------------------------------
 def parse_scalar_or_list(converter):
     return lambda value: _parse_list_of(value, converter)

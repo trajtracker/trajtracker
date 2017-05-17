@@ -55,6 +55,13 @@ Number line
     **max_numberline_value** (number, mandatory parameter)
         The value at the right end of the number line.
 
+    **min_numberline_value** (number)
+        The value at the left end of the number line.
+
+    **nl_length** (number, default: 0.9)
+        The length of the number line. The length is specified either in pixels (an int value larger than 1)
+        or as percentage of the screen width (a number between 0 and 1).
+
     **show_feedback** (bool, default: True)
         Whether to show a feedback arrow (where the finger landed on the number line)
 

@@ -70,9 +70,16 @@ def create_numberline(exp_info):
 
     _u.validate_func_arg_type(None, "create_numberline", "max_value", config.max_numberline_value, Number)
 
+    if isinstance(config.nl_length, int) and config.nl_length > 1:
+        nl_length = config.nl_length
+    elif isinstance(config.nl_length, Number) and 0 < config.nl_length <= 1:
+        nl_length = int(exp_info.screen_size[0] * config.nl_length)
+    else:
+        raise ttrk.ValueError("Invalid value for config.nl_length: {:}".format(config.nl_length))
+
     numberline = ttrk.stimuli.NumberLine(
         position=(0, int(exp_info.screen_size[1] / 2 - config.nl_distance_from_top)),
-        line_length=int(exp_info.screen_size[0] * config.nl_length_percent),
+        line_length=nl_length,
         line_width=config.nl_line_width,
         min_value=config.min_numberline_value,
         max_value=config.max_numberline_value)
@@ -523,6 +530,10 @@ def load_data_source(config):
         loader.add_field('fixation.position', getparser(ttrk.io.csv_formats.parse_coord), optional=True)
         loader.add_field('fixation.position.x', getparser(int), optional=True)
         loader.add_field('fixation.position.y', getparser(int), optional=True)
+
+        loader.add_field('nl.position', getparser(ttrk.io.csv_formats.parse_coord), optional=True)
+        loader.add_field('nl.position.x', getparser(int), optional=True)
+        loader.add_field('nl.position.y', getparser(int), optional=True)
 
         return loader.load_file(ds)
 

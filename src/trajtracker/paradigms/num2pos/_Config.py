@@ -25,7 +25,7 @@ class Config(object):
                  use_text_targets=True, use_generic_targets=False,
                  fixation_type='cross', fixation_text=None,
                  text_target_height=0.6, shuffle_trials=True,
-                 min_numberline_value=0, max_numberline_value=100,
+                 nl_length=0.9, min_numberline_value=0, max_numberline_value=100,
                  show_feedback=True, feedback_arrow_colors=xpy.misc.constants.C_GREEN,
                  feedback_accuracy_levels=None, post_response_target=False,
                  min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=10,
@@ -68,6 +68,10 @@ class Config(object):
         self.fixation_text = fixation_text
 
         #----- Configuration of number line -----
+
+        #: The length of the number line. The length is specified either in pixels (an int value larger than 1)
+        #: or as percentage of the screen width (a number between 0 and 1)
+        self.nl_length = nl_length
 
         # The values at the left/right ends of the number line
         self.min_numberline_value = min_numberline_value
@@ -188,7 +192,6 @@ class Config(object):
         self.zigzag_validator_min_angle_change_per_curve = 10  # see NCurvesValidator.min_angle_change_per_curve
 
         # Number line (see documentation of NumberLine)
-        self.nl_length_percent = 0.85   # Percentage of screen width
         self.nl_line_width = 2
         self.nl_end_tick_height = 5
         self.nl_line_colour = xpy.misc.constants.C_WHITE

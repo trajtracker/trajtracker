@@ -164,6 +164,7 @@ def on_finger_touched_screen(exp_info, trial):
     exp_info.target_pointer.visible = False
 
     show_fixation(exp_info)
+    update_numberline_for_trial(exp_info, trial)
 
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_STARTED, 0,
                                           get_time() - exp_info.session_start_time)
@@ -300,21 +301,21 @@ def update_text_target_for_trial(exp_info, trial):
 
     exp_info.text_target.texts = trial.text_target.split(";")
 
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.font', 'text_font')
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.text_size', 'text_size')
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.bold', 'text_bold')
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.italic', 'text_italic')
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.underline', 'text_underline')
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.justification', 'text_justification')
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.text_colour', 'text_colour')
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.background_colour', 'background_colour')
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.size', 'size')
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.position', 'position')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.font', 'text_font')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.text_size', 'text_size')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.bold', 'text_bold')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.italic', 'text_italic')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.underline', 'text_underline')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.justification', 'text_justification')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.text_colour', 'text_colour')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.background_colour', 'background_colour')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.size', 'size')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.position', 'position')
     _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'x')
     _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'y')
 
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.onset_time', 'onset_time')
-    _update_target_stimulus_attr(exp_info, trial, exp_info.text_target, 'text.duration', 'duration')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.onset_time', 'onset_time')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.duration', 'duration')
 
 
 # ----------------------------------------------------------------
@@ -335,13 +336,13 @@ def update_generic_target_for_trial(exp_info, trial):
 
     exp_info.generic_target.shown_stimuli = trial.csv_data['genstim.target'].split(";")
 
-    _update_target_stimulus_attr(exp_info, trial, exp_info.generic_target, 'genstim.position', 'position')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.generic_target, 'genstim.position', 'position')
 
     _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'x')
     _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'y')
 
 
-# ------------------------------------------------
+#------------------------------------------------
 def update_fixation_for_trial(exp_info, trial):
     """
     Update the fixation when the trial is initialized
@@ -358,14 +359,29 @@ def update_fixation_for_trial(exp_info, trial):
         if exp_info.fixation.text == '':
             ttrk.log_write("WARNING: No fixation text was set for trial #{:}".format(trial.trial_num))
 
-    _update_target_stimulus_attr(exp_info, trial, exp_info.generic_target, 'fixation.position', 'position')
+    _update_attr_by_csv_config(exp_info, trial, exp_info.fixation, 'fixation.position', 'position')
 
-    _update_target_stimulus_position(exp_info, trial, exp_info.fixation, 'fixation', 'x')
-    _update_target_stimulus_position(exp_info, trial, exp_info.fixation, 'fixation', 'y')
+    _update_obj_position(trial, exp_info.fixation, 'fixation', 'x')
+    _update_obj_position(trial, exp_info.fixation, 'fixation', 'y')
 
 
 #------------------------------------------------
-def _update_target_stimulus_attr(exp_info, trial, target_holder, csv_name, attr_name):
+def update_numberline_for_trial(exp_info, trial):
+    """
+    Update the number line when the trial is initialized
+
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo
+    """
+
+    _update_attr_by_csv_config(exp_info, trial, exp_info.numberline, 'nl.position', 'position')
+
+    _update_obj_position(trial, exp_info.numberline, 'nl', 'x')
+    _update_obj_position(trial, exp_info.numberline, 'nl', 'y')
+
+
+#------------------------------------------------
+def _update_attr_by_csv_config(exp_info, trial, target_holder, csv_name, attr_name):
     """
     Update one attribute of the target object from the CSV file
     
@@ -377,9 +393,9 @@ def _update_target_stimulus_attr(exp_info, trial, target_holder, csv_name, attr_
         return
 
     value = trial.csv_data[csv_name]
-    if isinstance(value, list) and len(value) < exp_info.text_target.n_stim:
+    if isinstance(value, list) and len(value) < target_holder.n_stim:
             raise Exception("Invalid value for column '{:}' in the data file {:}: the column has {:} values, expecting {:}".format(
-                attr_name, exp_info.config.data_source, len(value), exp_info.text_target.n_stim))
+                attr_name, exp_info.config.data_source, len(value), target_holder.n_stim))
 
     setattr(target_holder, attr_name, value)
 
@@ -423,6 +439,31 @@ def _update_target_stimulus_position(exp_info, trial, target_holder, col_name_pr
             pos[i] = pos[i][0], coord[i]
 
     target_holder.position = pos
+
+
+#------------------------------------------------
+def _update_obj_position(trial, visual_obj, col_name_prefix, x_or_y):
+    """
+    Update the position of a visual object according to "position.x" or "position.y" columns
+    
+    :type trial: trajtracker.paradigms.num2pos.TrialInfo
+    """
+
+    if x_or_y not in ('x', 'y'):
+        raise Exception("Invalid x_or_y argument ({:})".format(x_or_y))
+
+    csv_col = "%s.position.%s" % (col_name_prefix, x_or_y)
+    if csv_col not in trial.csv_data:
+        return
+
+    coord = trial.csv_data[csv_col]
+
+    if x_or_y == "x":
+        new_position = coord, visual_obj.position[1]
+    else:
+        new_position = visual_obj.position[0], coord
+
+    visual_obj.position = new_position
 
 
 #------------------------------------------------

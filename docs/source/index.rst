@@ -18,7 +18,7 @@ General
 
    TrajTracker general functions <trajtracker>
    Environment
-   General utilities <utils>
+   The "utils" module: general utility functions <utils>
 
 
 

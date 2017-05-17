@@ -46,7 +46,7 @@ class CSVLoader(ttrk.TTrkObject):
 
         :param field_type: either a type, or a function that converts the string (from the CSV file) to another value
         :param optional: If False, :func:`~trajtracker.io.CSVLoader.load_file` will fail if the field is missing.
-s       """
+        """
 
         _u.validate_func_arg_type(self, "add_field", "field_name", field_name, str)
         _u.validate_func_arg_type(self, "add_field", "field_type", field_type, (type, func_type))
