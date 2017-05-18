@@ -157,8 +157,7 @@ class Hotspot(ttrk.TTrkObject):
 
     @on_touched_callback.setter
     def on_touched_callback(self, value):
-        if value is not None and not "__call__" in dir(value):
-            raise ttrk.TypeError("{:}.on_touched_callback was set to a non-callable value!".format(_u.get_type_name(self)))
+        _u.validate_attr_type(self, "on_touched_callback", value, ttrk.TYPE_CALLABLE, none_allowed=True)
 
         self._on_touched_callback = value
         self._log_property_changed("on_touched_callback")

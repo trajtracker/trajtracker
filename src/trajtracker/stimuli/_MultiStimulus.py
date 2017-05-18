@@ -24,6 +24,18 @@ class MultiStimulus(BaseMultiStim):
     def __init__(self, available_stimuli=None, shown_stimuli=None, position=None,
                  onset_time=None, duration=None, last_stimulus_remains=False,
                  onset_event=None, terminate_event=ttrk.events.TRIAL_ENDED):
+        """
+        Called when creating a MultiStimulus object 
+        
+        :param available_stimuli: See :attr:`~trajtracker.stimuli.MultiStimulus.available_stimuli` 
+        :param shown_stimuli:  See :attr:`~trajtracker.stimuli.MultiStimulus.shown_stimuli`
+        :param position:  See :attr:`~trajtracker.stimuli.MultiStimulus.position`
+        :param onset_time:  See :attr:`~trajtracker.stimuli.MultiStimulus.onset_time`
+        :param duration:  See :attr:`~trajtracker.stimuli.MultiStimulus.duration`
+        :param last_stimulus_remains:  See :attr:`~trajtracker.stimuli.MultiStimulus.last_stimulus_remains`
+        :param onset_event:  See :attr:`~trajtracker.stimuli.MultiStimulus.onset_event`
+        :param terminate_event:  See :attr:`~trajtracker.stimuli.MultiStimulus.terminate_event`
+        """
 
         super(MultiStimulus, self).__init__(onset_time=onset_time, duration=duration,
                                             last_stimulus_remains=last_stimulus_remains)
@@ -49,7 +61,7 @@ class MultiStimulus(BaseMultiStim):
 
         n_stim = len(self._shown_stimuli)
 
-        self._stimuli = [self._available_stimuli[id] for id in self._shown_stimuli]
+        self._stimuli = [self._available_stimuli[s_id] for s_id in self._shown_stimuli]
 
         self._set_stimuli_property("position", "coord", n_stim)
 
@@ -61,7 +73,7 @@ class MultiStimulus(BaseMultiStim):
 
         self._validate_property("shown_stimuli")
 
-        missing_pics = [id for id in self._shown_stimuli if id not in self._available_stimuli]
+        missing_pics = [s_id for s_id in self._shown_stimuli if s_id not in self._available_stimuli]
         if len(missing_pics) > 0:
             raise ttrk.ValueError("shown_stimuli includes unknown stimulus IDs: {:}".format(
                 ", ".join(missing_pics)))
@@ -78,7 +90,13 @@ class MultiStimulus(BaseMultiStim):
 
 
     #----------------------------------------------------
-    def _stimulus_to_string(self, stimulus_num):
+    def get_stimulus_desc(self, stimulus_num):
+        """
+        Get a description of one of the stimuli (e.g., the filename in case of a picture) 
+        
+        :param stimulus_num: The stimulus index
+        :return: str 
+        """
         if isinstance(self._stimuli[stimulus_num], xpy.stimuli.Picture):
             return self._stimuli[stimulus_num].filename
         else:

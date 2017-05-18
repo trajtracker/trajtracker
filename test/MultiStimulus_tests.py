@@ -11,10 +11,11 @@ from trajtracker.events import *
 #--------------------------------------------------
 class StimDbg(object):
     # noinspection PyMissingConstructor
-    def __init__(self):
+    def __init__(self, text_id="dummy"):
         self._is_preloaded = False
         self._position = (0, 0)
         self._filename = "DebugPicture"
+        self._text_id = text_id
 
     def present(self, clear=True, update=True, log_event_tag=None):
         pass
@@ -28,6 +29,9 @@ class StimDbg(object):
     @property
     def is_preloaded(self):
         return self._is_preloaded
+
+    def __str__(self):
+        return self._text_id
 
 
 
@@ -123,40 +127,40 @@ class MultiStimulusTests(unittest.TestCase):
     #   Validation function for RSVP properties
     #==============================================================================
 
-    def _create_good_multipict(self, available_pictures="default",
-                               shown_pictures=('a', 'b'), position=(0, 0),
-                               onset_time=(0, 1, 2), duration=1, start_event=TRIAL_STARTED):
-
-        if available_pictures == "default":
-            available_pictures = dict(a=StimDbg(), b=StimDbg())
-
-        return MultiStimulus(available_stimuli=available_pictures, shown_stimuli=shown_pictures,
-                             position=position, onset_time=onset_time, duration=duration,
-                             onset_event=start_event)
+    def test_validate_ok(self):
+        self._create_good_multistim()._validate()
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
-    def test_validate_ok(self):
-        self._create_good_multipict()._validate()
+    def _create_good_multistim(self, available_stimuli=None,
+                               shown_stimuli=('a', 'b'), position=(0, 0),
+                               onset_time=(0, 1, 2), duration=1.0, start_event=TRIAL_STARTED):
+
+        if available_stimuli is None:
+            available_stimuli = dict(a=StimDbg(), b=StimDbg())
+
+        return MultiStimulus(available_stimuli=available_stimuli, shown_stimuli=shown_stimuli,
+                             position=position, onset_time=onset_time, duration=duration,
+                             onset_event=start_event)
 
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_shown_pics(self):
-        mp = self._create_good_multipict(shown_pictures=('c',))
+        mp = self._create_good_multistim(shown_stimuli=('c',))
         self.assertRaises(ttrk.ValueError, lambda: mp._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_position(self):
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_multipict(position=None)._validate())
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_multipict(position=((10, 10), ))._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_multistim(position=None)._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_multistim(position=((10, 10),))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_duration(self):
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_multipict(duration=None)._validate())
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_multipict(duration=(10, ))._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_multistim(duration=None)._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_multistim(duration=(10,))._validate())
 
     #==============================================================================
     #   Working without event manager
@@ -164,7 +168,7 @@ class MultiStimulusTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_noevents_one_stim_onset_time0(self):
-        rsvp = self._create_good_multipict(shown_pictures=['a'], onset_time=[0], duration=1)
+        rsvp = self._create_good_multistim(shown_stimuli=['a'], onset_time=[0], duration=1)
         rsvp.init_for_trial()
         self.assertEqual([False], rsvp.stim_visibility)
         self.assertEqual(False, rsvp._stimuli[0].visible)
@@ -183,7 +187,7 @@ class MultiStimulusTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_noevents_one_stim_onset_time_gt_0(self):
-        rsvp = self._create_good_multipict(shown_pictures=['a'], onset_time=[1], duration=1)
+        rsvp = self._create_good_multistim(shown_stimuli=['a'], onset_time=[1], duration=1)
         rsvp.init_for_trial()
         rsvp.start_showing(10)
         self.assertEqual([False], rsvp.stim_visibility)
@@ -198,7 +202,7 @@ class MultiStimulusTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_noevents_two_stim_onset_time(self):
-        rsvp = self._create_good_multipict(shown_pictures=['a', 'b'], onset_time=[0, 3], duration=1)
+        rsvp = self._create_good_multistim(shown_stimuli=['a', 'b'], onset_time=[0, 3], duration=1)
 
         rsvp.init_for_trial()
         self.assertEqual([False, False], rsvp.stim_visibility)
@@ -238,7 +242,7 @@ class MultiStimulusTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_noevents_last_stim_remains(self):
-        rsvp = self._create_good_multipict(shown_pictures=['a', 'b'], onset_time=[0, 3], duration=1)
+        rsvp = self._create_good_multistim(shown_stimuli=['a', 'b'], onset_time=[0, 3], duration=1)
         rsvp.last_stimulus_remains = True
 
         rsvp.init_for_trial()
@@ -250,7 +254,7 @@ class MultiStimulusTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_noevents_cleanup(self):
-        rsvp = self._create_good_multipict(shown_pictures=['a'], onset_time=[0, 3], duration=1)
+        rsvp = self._create_good_multistim(shown_stimuli=['a'], onset_time=[0, 3], duration=1)
 
         rsvp.init_for_trial()
         rsvp.start_showing(10)
@@ -272,7 +276,7 @@ class MultiStimulusTests(unittest.TestCase):
     def test_events_one_stim_onset_time0(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_multipict(shown_pictures=['a'], onset_time=[0], duration=1)
+        rsvp = self._create_good_multistim(shown_stimuli=['a'], onset_time=[0], duration=1)
         em.register(rsvp)
 
         em.dispatch_event(TRIAL_INITIALIZED, time_in_trial=1, time_in_session=1)
@@ -299,7 +303,7 @@ class MultiStimulusTests(unittest.TestCase):
     def test_events_one_stim_onset_time_gt_0(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_multipict(shown_pictures=['a'], onset_time=[1], duration=1)
+        rsvp = self._create_good_multistim(shown_stimuli=['a'], onset_time=[1], duration=1)
         em.register(rsvp)
 
         em.dispatch_event(TRIAL_INITIALIZED, time_in_trial=1, time_in_session=1)
@@ -327,7 +331,7 @@ class MultiStimulusTests(unittest.TestCase):
     def test_events_two_stim_onset_time(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_multipict(shown_pictures=['a', 'b'], onset_time=[0, 3], duration=1)
+        rsvp = self._create_good_multistim(shown_stimuli=['a', 'b'], onset_time=[0, 3], duration=1)
         em.register(rsvp)
 
         em.dispatch_event(TRIAL_INITIALIZED, time_in_trial=1, time_in_session=1)
@@ -355,7 +359,7 @@ class MultiStimulusTests(unittest.TestCase):
     def test_events_last_stim_remains(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_multipict(shown_pictures=['a', 'b'], onset_time=[0, 3], duration=1)
+        rsvp = self._create_good_multistim(shown_stimuli=['a', 'b'], onset_time=[0, 3], duration=1)
         rsvp.last_stimulus_remains = True
         em.register(rsvp)
 
@@ -370,7 +374,7 @@ class MultiStimulusTests(unittest.TestCase):
     def test_events_simultaneous_events(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_multipict(shown_pictures=['a', 'b'], onset_time=[1, 0], duration=2)
+        rsvp = self._create_good_multistim(shown_stimuli=['a', 'b'], onset_time=[1, 0], duration=2)
         em.register(rsvp)
 
         em.dispatch_event(TRIAL_INITIALIZED, time_in_trial=1, time_in_session=1)
@@ -393,7 +397,7 @@ class MultiStimulusTests(unittest.TestCase):
     def test_events_cancel(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_multipict(shown_pictures=['a', 'b'], onset_time=[1, 0], duration=2)
+        rsvp = self._create_good_multistim(shown_stimuli=['a', 'b'], onset_time=[1, 0], duration=2)
         em.register(rsvp)
 
         em.dispatch_event(TRIAL_INITIALIZED, time_in_trial=1, time_in_session=1)
@@ -413,6 +417,92 @@ class MultiStimulusTests(unittest.TestCase):
         em.on_frame(time_in_trial=0, time_in_session=13)
         self.assertEqual([False, False], rsvp.stim_visibility)
 
+
+    #==============================================================================
+    #   Callbacks
+    #==============================================================================
+
+    #----------------------------------------------------
+    def test_callback_1(self):
+        a = StimDbg(text_id="a")
+        b = StimDbg(text_id="b")
+        ms = self._create_good_multistim(available_stimuli=dict(a=a, b=b),
+                                         shown_stimuli=['a', 'b'], onset_time=[0, 0.2], duration=0.1)
+        container = StimulusContainerDbg()
+        ms._container = container
+
+        cbk = MultiStimDbgCallback()
+        ms.register_onset_offset_callback_func(cbk)
+
+        ms.init_for_trial()
+        ms.start_showing(0)
+        container.present()
+        self.assertEqual(True, a.visible)  # Just a sanity check - to make sure it worked
+        self.assertEqual(1, cbk.n_times_called)
+        self.assertEqual(0, cbk.stim_number)
+        self.assertEqual(True, cbk.visible)
+
+        ms.update_display(0.08)
+        self.assertEqual(1, cbk.n_times_called)
+
+        ms.update_display(0.1)
+        container.present()
+        self.assertEqual(False, a.visible)  # sanity check
+        self.assertEqual(2, cbk.n_times_called)
+        self.assertEqual(0, cbk.stim_number)
+        self.assertEqual(False, cbk.visible)
+
+        ms.update_display(0.2)
+        container.present()
+        self.assertEqual(True, b.visible)  # sanity check
+        self.assertEqual(3, cbk.n_times_called)
+        self.assertEqual(1, cbk.stim_number)
+        self.assertEqual(True, cbk.visible)
+
+
+    #----------------------------------------------------
+    def test_callback_offset_and_onset_at_same_time(self):
+        a = StimDbg(text_id="a")
+        b = StimDbg(text_id="b")
+        ms = self._create_good_multistim(available_stimuli=dict(a=a, b=b),
+                                         shown_stimuli=['a', 'b'], onset_time=[0, 0.1], duration=0.1)
+        container = StimulusContainerDbg()
+        ms._container = container
+
+        cbk = MultiStimDbgCallback()
+        ms.register_onset_offset_callback_func(cbk)
+
+        ms.init_for_trial()
+        ms.start_showing(0)
+        container.present()
+        self.assertEqual(True, a.visible)  # Just a sanity check - to make sure it worked
+        self.assertEqual(1, cbk.n_times_called)
+
+        ms.update_display(0.1)
+        container.present()
+        self.assertEqual(False, a.visible)  # sanity check
+        self.assertEqual(True, b.visible)  # sanity check
+        self.assertEqual(3, cbk.n_times_called)
+
+
+
+class MultiStimDbgCallback(object):
+
+    def __init__(self):
+        self.n_times_called = 0
+
+    def __call__(self, ms, stim_number, visible, time):
+        self.ms = ms
+        self.stim_number = stim_number
+        self.visible = visible
+        self.time = time
+        self.n_times_called += 1
+
+
+class StimulusContainerDbg(ttrk.stimuli.StimulusContainer):
+
+    def present(self, clear=True, update=True):
+        self._invoke_callbacks([])
 
 
 if __name__ == '__main__':

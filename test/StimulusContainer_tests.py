@@ -4,6 +4,7 @@ import unittest
 from trajtracker.stimuli import StimulusContainer
 from ttrk_testing import DummyStimulus
 
+
 class StimulusContainerTests(unittest.TestCase):
 
     #-------------------------------------------
@@ -57,6 +58,73 @@ class StimulusContainerTests(unittest.TestCase):
         self.assertEqual(True, a.presented_args['update'])
 
 
+    #-------------------------------------------
+    def test_callback_non_recurring(self):
+
+        c = StimulusContainer()
+        c.add(DummyStimulus(), "a")
+        c.add(DummyStimulus(), "b", visible=False)
+        cbk = StimContainerCallback()
+
+        c.register_callback(cbk)
+
+        #-- Make sure callback was called
+        c.present()
+        self.assertEqual(1, cbk.n_times_called)
+        self.assertEqual(('a',), cbk.visible_stim_ids)
+        self.assertEqual(c, cbk.stim_container)
+
+        c.present()
+        self.assertEqual(1, cbk.n_times_called)
+
+
+    #-------------------------------------------
+    def test_callback_recurring(self):
+
+        c = StimulusContainer()
+        c.add(DummyStimulus(), "a")
+        c.add(DummyStimulus(), "b", visible=False)
+        cbk = StimContainerCallback()
+
+        c.register_callback(cbk, recurring=True, func_id="cb")
+
+        #-- Make sure callback was called
+        c.present()
+        self.assertEqual(1, cbk.n_times_called)
+        self.assertEqual(('a',), cbk.visible_stim_ids)
+
+        c.present()
+        self.assertEqual(2, cbk.n_times_called)
+
+
+    #-------------------------------------------
+    def test_unregister_recurring_callback(self):
+
+        c = StimulusContainer()
+        c.add(DummyStimulus(), "a")
+        c.add(DummyStimulus(), "b", visible=False)
+        cbk = StimContainerCallback()
+
+        c.register_callback(cbk, recurring=True, func_id="cb")
+        self.assertTrue(c.unregister_recurring_callback("cb"))
+
+        c.present()
+        self.assertEqual(0, cbk.n_times_called)
+
+
+#-------------------------------------------------------
+class StimContainerCallback(object):
+
+    def __init__(self):
+        self.visible_stim_ids = ()
+        self.n_times_called = 0
+        self.stim_container = None
+
+
+    def __call__(self, stim_container, visible_stim_ids, time):
+        self.visible_stim_ids = visible_stim_ids
+        self.n_times_called += 1
+        self.stim_container = stim_container
 
 
 if __name__ == '__main__':

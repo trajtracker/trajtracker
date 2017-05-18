@@ -10,11 +10,17 @@ from __future__ import division
 
 import expyriment as xpy
 
+import trajtracker
 import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 from trajtracker.stimuli import BaseMultiStim
 
+
+#
+# NOTE: Some of the functionality of the base class (BaseMultiStim) is tested only for the
+#       MultiStimulus class, and not here
+#
 
 # noinspection PyProtectedMember
 class MultiTextBox(BaseMultiStim):
@@ -83,8 +89,8 @@ class MultiTextBox(BaseMultiStim):
         self._set_stimuli_property("text_italic", bool, n_stim)
         self._set_stimuli_property("text_underline", bool, n_stim)
         self._set_stimuli_property("text_justification", str, n_stim)
-        self._set_stimuli_property("text_colour", "RGB", n_stim)
-        self._set_stimuli_property("background_colour", "RGB", n_stim)
+        self._set_stimuli_property("text_colour", trajtracker.TYPE_RGB, n_stim)
+        self._set_stimuli_property("background_colour", trajtracker.TYPE_RGB, n_stim)
         self._set_stimuli_property("size", "coord", n_stim)
         self._set_stimuli_property("position", "coord", n_stim)
 
@@ -131,7 +137,13 @@ class MultiTextBox(BaseMultiStim):
 
 
     #----------------------------------------------------
-    def _stimulus_to_string(self, stimulus_num):
+    def get_stimulus_desc(self, stimulus_num):
+        """
+        Get one of the stimuli (= the text presented)
+
+        :param stimulus_num: The index of the text to return
+        :return: str 
+        """
         return self._texts[stimulus_num]
 
 
@@ -264,7 +276,7 @@ class MultiTextBox(BaseMultiStim):
 
     @text_colour.setter
     def text_colour(self, value):
-        self._set_property("text_colour", value, "RGB")
+        self._set_property("text_colour", value, trajtracker.TYPE_RGB)
         self._log_property_changed("text_colour")
 
     #-----------------------------------------------------------------
@@ -278,7 +290,7 @@ class MultiTextBox(BaseMultiStim):
 
     @background_colour.setter
     def background_colour(self, value):
-        self._set_property("background_colour", value, "RGB")
+        self._set_property("background_colour", value, trajtracker.TYPE_RGB)
         self._log_property_changed("background_colour")
 
     #-----------------------------------------------------------------

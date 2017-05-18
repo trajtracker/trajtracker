@@ -18,6 +18,7 @@ import trajtracker._utils as _u
 class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
 
+    #----------------------------------------------------------
     def __init__(self, name=None):
         """
         Constructor
@@ -25,8 +26,10 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         :param name: A name that identifies this container (this is used only to print in log messages)   
         """
         super(StimulusContainer, self).__init__()
-        self._stimuli = {}
         self._name = name
+        self._stimuli = {}
+        self._non_recurring_callbacks = []
+        self._recurring_callbacks = {}
 
 
     #==============================================================================
@@ -68,6 +71,21 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
                 if self._should_log(ttrk.log_debug):
                     self._log_write("{:}.present(clear={:}, update={:}) stimulus #{:}".format(self._myname(), visible_stims[i]['order'], c, u), True)
+
+        self._invoke_callbacks(visible_stims)
+
+
+    #-------------------------------------------------------
+    def _invoke_callbacks(self, visible_stims):
+        if len(self._recurring_callbacks) == 0 and len(self._non_recurring_callbacks) == 0:
+            return
+
+        present_time = ttrk.utils.get_time()
+        visible_stim_ids = tuple(s['id'] for s in visible_stims)
+        all_listeners = list(self._recurring_callbacks.values()) + self._non_recurring_callbacks
+        for listener in all_listeners:
+            listener(self, visible_stim_ids, present_time)
+        self._non_recurring_callbacks = []
 
 
     #----------------------------------------------------------
@@ -120,6 +138,64 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         del self._stimuli[stimulus_id]
         return True
+
+
+    #----------------------------------------------------------
+    def register_callback(self, callback_func, recurring=False, func_id=None):
+        """
+        Register a "present callback" - a function that should be called when the StimulusContainer is present()ed
+        
+        :param callback_func: A function or another callable object, which will be called. 
+                         This function takes these arguments -
+                         
+                         1. The StimulusContainer object
+                         2. a tuple with the IDs of the stimuli that were actually presented (i.e., stimuli 
+                            that had stim.visible == True)
+                         3. The time when present() returned
+                            
+        :param recurring: True = invoke the function on each present() call. False = Invoke the function only 
+                          on the next present(), and then forget this function.
+                          
+        :param func_id: A logical ID for a recurring function (it can be used to unregister the function later) 
+        """
+
+        _u.validate_func_arg_type(self, "register_callback", "callback_func", callback_func, ttrk.TYPE_CALLABLE)
+        _u.validate_func_arg_type(self, "register_callback", "recurring", recurring, bool)
+
+        if recurring:
+            if func_id == "":
+                func_id = None
+            _u.validate_func_arg_type(self, "register_callback", "func_id", func_id, str)
+            self._recurring_callbacks[func_id] = callback_func
+
+        else:
+            self._non_recurring_callbacks.append(callback_func)
+
+
+    #----------------------------------------------------------
+    def unregister_recurring_callback(self, func_id):
+        """
+        Unregister a recurring listener function that was previously registered via 
+        :func:`~trajtracker.stimuli.StimulusContainer.register_callback`
+        
+        :param func_id: The function ID that was provided to :func:`~trajtracker.stimuli.StimulusContainer.register_callback` 
+        :return: *True* if unregistered, *False* if there is no registered recurring function with the given func_id 
+        """
+        _u.validate_func_arg_type(self, "unregister_recurring_callback", "func_id", func_id, str)
+
+        if func_id in self._recurring_callbacks:
+            del self._recurring_callbacks[func_id]
+            return True
+        else:
+            return False
+
+
+    #----------------------------------------------------------
+    def unregister_non_recurring_callbacks(self):
+        """
+        Clear all non-recurring listeners that were previously registered
+        """
+        self._non_recurring_callbacks = []
 
 
     #----------------------------------------------------------

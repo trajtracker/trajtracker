@@ -18,6 +18,9 @@ Using this class
 - Objects added to the container later will appear on top of earlier-added objects.
 - You can access objects from the container by writing *container[obj_id]*, where *obj_id* is the ID
   you provided to :func:`~trajtracker.stimuli.StimulusContainer.add`.
+- You can also tell the StimulusContainer to call a function when
+  :func:`~trajtracker.stimuli.StimulusContainer.present` is called - to do this, use
+  :func:`~trajtracker.stimuli.StimulusContainer.register_callback`
 
 
 Methods and properties:

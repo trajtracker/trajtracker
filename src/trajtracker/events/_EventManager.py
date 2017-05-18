@@ -11,6 +11,7 @@ import numbers
 import numpy as np
 from operator import itemgetter
 
+import trajtracker
 import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
@@ -198,9 +199,7 @@ class EventManager(ttrk.TTrkObject):
         _u.validate_func_arg_type(self, "register_operation", "recurring", recurring, bool)
         _u.validate_func_arg_type(self, "register_operation", "cancel_pending_operation_on", cancel_pending_operation_on,
                                   (ttrk.events.Event, list, tuple, set, np.ndarray))
-        if "__call__" not in dir(operation):
-            raise TypeError("trajtracker error: EventManager.register_operation() was called with an invalid operation " +
-                            "({:}) - expecting a function or another callable object".format(operation))
+        _u.validate_func_arg_type(self, "register_operation", "operation", operation, trajtracker.TYPE_CALLABLE)
 
         if isinstance(cancel_pending_operation_on, Event):
             cancel_pending_operation_on = cancel_pending_operation_on,

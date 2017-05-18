@@ -11,13 +11,12 @@ import re
 # noinspection PyPep8Naming
 import xml.etree.ElementTree as ET
 
+import expyriment as xpy
 import numpy as np
 from enum import Enum
-
-import expyriment as xpy
 from expyriment.misc import geometry
 
-import trajtracker
+import trajtracker as ttrk
 
 
 #--------------------------------------------------------------------------
@@ -84,13 +83,18 @@ def validate_attr_type(obj, attr_name, value, attr_type, none_allowed=False, typ
             if type_name is None:
                 type_name = get_type_name(attr_type)
 
-            raise trajtracker.TypeError(ErrMsg.attr_invalid_type(get_type_name(obj), attr_name, type_name, value))
+            raise ttrk.TypeError(ErrMsg.attr_invalid_type(get_type_name(obj), attr_name, type_name, value))
 
-    elif attr_type == "RGB":
+    elif attr_type == ttrk.TYPE_RGB:
         validate_attr_rgb(obj, attr_name, value)
 
-    elif attr_type == "coord":
+    elif attr_type == ttrk.TYPE_COORD:
         validate_attr_is_coord(obj, attr_name, value)
+
+    elif attr_type == ttrk.TYPE_CALLABLE:
+        if "__call__" not in dir(value):
+            raise ttrk.TypeError(
+                "{:}.{:} was set to a non-callable value ({:})".format(get_type_name(obj), attr_name, value))
 
     else:
         raise Exception("trajtracker internal error: unsupported type '{:}'".format(attr_type))
@@ -104,16 +108,16 @@ def validate_attr_is_collection(obj, attr_name, value, min_length=None, max_leng
         value = ()
 
     if not is_collection(value, allow_set):
-        raise trajtracker.TypeError("{:}.{:} was set to a non-{:} value ({:})".format(
+        raise ttrk.TypeError("{:}.{:} was set to a non-{:} value ({:})".format(
             get_type_name(obj), attr_name, "collection" if allow_set else "list", value))
 
     if min_length is not None and len(value) < min_length:
-        raise trajtracker.TypeError(
+        raise ttrk.TypeError(
             "{:}.{:} cannot be assigned to a collection with {:} elements - a minimal of {:} elements are expected".
             format(get_type_name(obj), attr_name, len(value), min_length))
 
     if max_length is not None and len(value) > max_length:
-        raise trajtracker.TypeError(
+        raise ttrk.TypeError(
             "{:}.{:} cannot be assigned to a collection with {:} elements - a maximum of {:} elements is allowed".
             format(get_type_name(obj), attr_name, len(value), max_length))
 
@@ -123,20 +127,37 @@ def validate_attr_is_collection(obj, attr_name, value, min_length=None, max_leng
 #--------------------------------------
 def validate_attr_rgb(obj, attr_name, value, accept_single_num=False, none_allowed=False):
 
-    if none_allowed and value is None:
-        return None
+    new_value, is_ok = _is_rgb(value, accept_single_num, none_allowed)
+    if is_ok:
+        return new_value
+    else:
+        raise ttrk.TypeError("{:}.{:} was set to an invalid value ({:}) - expecting (red,green,blue)".format(get_type_name(obj), attr_name, value))
+
+
+#--------------------------------------
+def _is_rgb(value, accept_single_num=False, none_allowed=False):
+    """
+    Check if the value is an RGB.
+     
+    :return: tuple: (1) The proper value (2) whether it's valid or not  
+    """
+
+    if value is None:
+        return None, none_allowed
 
     if accept_single_num and isinstance(value, int) and 0 <= value < 2**24:
-        return int(np.floor(value / 2 ** 16)), int(np.floor(value / 256)) % 256, value % 256
+        return (int(np.floor(value / 2 ** 16)), int(np.floor(value / 256)) % 256, value % 256), True
 
-    validate_attr_type(obj, attr_name, value, tuple, type_name="(red,green,blue)")
+    if not isinstance(value, tuple):
+        return None, False
+    
     if len(value) != 3 or \
             not isinstance(value[0], int) or not (0 <= value[0] < 256) or \
             not isinstance(value[1], int) or not (0 <= value[1] < 256) or \
             not isinstance(value[2], int) or not (0 <= value[2] < 256):
-        raise trajtracker.TypeError("{:}.{:} was set to an invalid value ({:}) - expecting (red,green,blue)".format(get_type_name(obj), attr_name, value))
+        return None, False
 
-    return value
+    return value, True
 
 
 #--------------------------------------
@@ -160,14 +181,14 @@ def validate_attr_is_coord(obj, attr_name, value, change_none_to_0=False, allow_
 def validate_attr_numeric(obj, attr_name, value, none_value=NoneValues.Invalid):
     if value is None:
         if none_value == NoneValues.Invalid:
-            raise trajtracker.TypeError(ErrMsg.attr_invalid_type(get_type_name(obj), attr_name, "numeric", "None"))
+            raise ttrk.TypeError(ErrMsg.attr_invalid_type(get_type_name(obj), attr_name, "numeric", "None"))
         elif none_value == NoneValues.Valid:
             pass
         elif none_value == NoneValues.ChangeTo0:
             value = 0
 
     if value is not None and not isinstance(value, numbers.Number):
-        raise trajtracker.TypeError(ErrMsg.attr_invalid_type(get_type_name(obj), attr_name, "numeric", value))
+        raise ttrk.TypeError(ErrMsg.attr_invalid_type(get_type_name(obj), attr_name, "numeric", value))
 
     return value
 
@@ -176,14 +197,14 @@ def validate_attr_numeric(obj, attr_name, value, none_value=NoneValues.Invalid):
 def validate_attr_not_negative(obj, attr_name, value):
     if value is not None and value < 0:
         msg = "{:}.{:} was set to a negative value ({:})".format(get_type_name(obj), attr_name, value)
-        raise trajtracker.ValueError(msg)
+        raise ttrk.ValueError(msg)
 
 
 #--------------------------------------
 def validate_attr_positive(obj, attr_name, value):
     if value is not None and value <= 0:
         msg = "{:}.{:} was set to a negative/0 value ({:})".format(get_type_name(obj), attr_name, value)
-        raise trajtracker.ValueError(msg)
+        raise ttrk.ValueError(msg)
 
 
 #============================================================================
@@ -193,14 +214,22 @@ def validate_attr_positive(obj, attr_name, value):
 #-------------------------------------------------------------------------
 def validate_func_arg_type(obj, func_name, arg_name, value, arg_type, none_allowed=False, type_name=None):
 
-    if arg_type == "coord":
+    if arg_type == ttrk.TYPE_COORD:
         validate_func_arg_is_coord(obj, func_name, arg_name, value)
+
+    elif arg_type == ttrk.TYPE_RGB:
+        validate_func_type_rgb(obj, func_name, arg_name, value)
+
+    elif arg_type == ttrk.TYPE_CALLABLE:
+        if "__call__" not in dir(value):
+            raise ttrk.TypeError("{:}() was called with a non-callable {:} ({:})".format(
+                _get_func_name(obj, func_name), arg_name, value))
 
     elif (value is None and not none_allowed) or (value is not None and not isinstance(value, arg_type)):
         if type_name is None:
             type_name = get_type_name(arg_type)
 
-        raise trajtracker.TypeError("{:}() was called with a non-{:} {:} ({:})".format(
+        raise ttrk.TypeError("{:}() was called with a non-{:} {:} ({:})".format(
             _get_func_name(obj, func_name), type_name, arg_name, value))
 
 
@@ -219,14 +248,14 @@ def validate_func_arg_is_collection(obj, func_name, arg_name, value, min_length=
         value = ()
 
     if not is_collection(value, allow_set):
-        raise trajtracker.TypeError("{:}() was called with a non-{:} {:} ({:})".format(
+        raise ttrk.TypeError("{:}() was called with a non-{:} {:} ({:})".format(
             _get_func_name(obj, func_name), "collection" if allow_set else "list", arg_name, value))
 
     if min_length is not None and len(value) < min_length:
-        raise trajtracker.TypeError("Argument {:} of {:}() cannot be set to a collection with {:} elements - a minimal of {:} elements are expected".
+        raise ttrk.TypeError("Argument {:} of {:}() cannot be set to a collection with {:} elements - a minimal of {:} elements are expected".
                                     format(arg_name, _get_func_name(obj, func_name), len(value), min_length))
     if max_length is not None and len(value) > max_length:
-        raise trajtracker.TypeError("Argument {:} of {:}() cannot be set to a collection with {:} elements - a maximum of {:} elements is allowed".
+        raise ttrk.TypeError("Argument {:} of {:}() cannot be set to a collection with {:} elements - a maximum of {:} elements is allowed".
                                     format(arg_name, _get_func_name(obj, func_name), len(value), max_length))
 
     return value
@@ -235,7 +264,7 @@ def validate_func_arg_is_collection(obj, func_name, arg_name, value, min_length=
 #--------------------------------------------------------------------------------------
 def validate_func_arg_positive(obj, func_name, arg_name, value):
     if value is not None and value <= 0:
-        raise trajtracker.ValueError("Argument {:} of {:}() has a negative/0 value ({:})".format(arg_name, _get_func_name(obj, func_name), value))
+        raise ttrk.ValueError("Argument {:} of {:}() has a negative/0 value ({:})".format(arg_name, _get_func_name(obj, func_name), value))
 
 
 #--------------------------------------------------------------------------------------
@@ -253,6 +282,17 @@ def validate_func_arg_is_coord(obj, func_name, arg_name, value, change_none_to_0
     validate_func_arg_type(obj, func_name, "{:}[1]".format(arg_name), value[1], elem_type)
 
     return value
+
+
+#--------------------------------------
+def validate_func_type_rgb(obj, func_name, arg_name, value, accept_single_num=False, none_allowed=False):
+
+    new_value, is_ok = _is_rgb(value, accept_single_num, none_allowed)
+    if is_ok:
+        return new_value
+    else:
+        raise ttrk.TypeError("{:}.{:}(): argument {:} was set to an invalid value ({:}) - expecting (red,green,blue)".
+                                    format(get_type_name(obj), func_name, arg_name, value))
 
 
 #--------------------------------------------------------------------------------------
@@ -339,12 +379,12 @@ def parse_coord(value):
         return value
 
     if not isinstance(value, str):
-        raise trajtracker.TypeError('Invalid coordinates "{:}" - expecting a string'.format(value))
+        raise ttrk.TypeError('Invalid coordinates "{:}" - expecting a string'.format(value))
 
     m = re.match('^\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)\s*$', value)
 
     if m is None:
-        raise trajtracker.ValueError('Invalid coordinates "{:}"'.format(value))
+        raise ttrk.ValueError('Invalid coordinates "{:}"'.format(value))
 
     return int(m.group(1)), int(m.group(2))
 
@@ -356,12 +396,12 @@ def parse_rgb(value):
         return value
 
     if not isinstance(value, str):
-        raise trajtracker.TypeError('Invalid RGB "{:}" - expecting a string'.format(value))
+        raise ttrk.TypeError('Invalid RGB "{:}" - expecting a string'.format(value))
 
     m = re.match('^\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$', value)
 
     if m is None:
-        raise trajtracker.ValueError('Invalid RGB "{:}"'.format(value))
+        raise ttrk.ValueError('Invalid RGB "{:}"'.format(value))
 
     return int(m.group(1)), int(m.group(2)), int(m.group(3))
 
@@ -381,13 +421,13 @@ def parse_rgb_or_num(value):
 def parse_rgb_list(xml):
 
     if not isinstance(xml, ET.Element):
-        raise trajtracker.TypeError('Invalid RGB list "{:}" - expecting an XML object'.format(xml))
+        raise ttrk.TypeError('Invalid RGB list "{:}" - expecting an XML object'.format(xml))
 
     colors = []
 
     for child in xml:
         if child.tag != "color":
-            raise trajtracker.TypeError('Invalid XML format for a list of colors - expecting an XML block with several <color>...</color> blocks under it'.format(value))
+            raise ttrk.TypeError('Invalid XML format for a list of colors - expecting an XML block with several <color>...</color> blocks under it'.format(value))
         colors.append(parse_rgb(child.text.strip()))
 
     return colors

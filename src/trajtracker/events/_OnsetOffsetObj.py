@@ -20,8 +20,9 @@ class OnsetOffsetObj(object):
     @property
     def onset(self):
         """
-        The time when the object should appear on screen. This is defined as an :class:`~trajtracker.events.Event`.
-        Specify "None" to avoid automatic onset.
+        The time when the object should appear on screen. 
+        
+        :type: :class:`~trajtracker.events.Event`, or *None* to avoid automatic onset.
         """
         return self._onset
 
@@ -34,8 +35,9 @@ class OnsetOffsetObj(object):
     @property
     def offset(self):
         """
-        The time when the object should disappear from screen. This is defined as an :class:`~trajtracker.events.Event`.
-        Specify "None" to avoid automatic offset.
+        The time when the object should disappear from screen. 
+        
+        :type: :class:`~trajtracker.events.Event`, or *None* to avoid automatic offset.
         """
         return self._offset
 

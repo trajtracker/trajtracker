@@ -49,7 +49,9 @@ Using MultiTextBox without an EventManager
 
 - After these properties were set, call :func:`~trajtracker.stimuli.MultiTextBox.init_for_trial`.
 
-- To start showing the events, call :func:`~trajtracker.stimuli.MultiTextBox.start_showing`.
+- To start showing the stimuli, call :func:`~trajtracker.stimuli.MultiTextBox.start_showing`.
+
+- Call :func:`~trajtracker.stimuli.MultiTextBox.update_display` periodically - preferably once per frame.
 
 
 Methods and properties:

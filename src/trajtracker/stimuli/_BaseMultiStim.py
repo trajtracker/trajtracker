@@ -12,6 +12,7 @@ from operator import itemgetter
 
 from expyriment.misc.geometry import XYPoint
 
+import trajtracker
 import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
@@ -40,6 +41,8 @@ class BaseMultiStim(ttrk.TTrkObject):
 
         self._stimuli = []
         self._container = ttrk.stimuli.StimulusContainer(_u.get_type_name(self))
+
+        self._onset_offset_callbacks = []
 
 
     #----------------------------------------------------
@@ -92,7 +95,44 @@ class BaseMultiStim(ttrk.TTrkObject):
 
     #---------------------------------------------------
     def _set_visible(self, stimulus_num, visible):
+
         self._stimuli[stimulus_num].visible = visible
+
+        for func in self._onset_offset_callbacks:
+
+            # noinspection PyUnusedLocal
+            def on_stim_container_presented(sc, ids, present_time):
+                func(self, stimulus_num, visible, present_time)
+
+            self._container.register_callback(on_stim_container_presented)
+
+
+    #---------------------------------------------------
+    def register_onset_offset_callback_func(self, func):
+        """
+        Register a function that should be called when a stimulus is shown/hidden
+         
+        :param func: The function, which gets 4 parameters:
+            
+            1. The MultiStimulus/MultiTextBox object
+            2. The stimulus/text number (0=first)
+            3. Whether the stimulus is presented (True) or hidden (False)
+            4. The time when the corresponding present() function returned 
+        """
+        _u.validate_func_arg_type(self, "add_onset_offset_callback_func", "func", func, ttrk.TYPE_CALLABLE)
+        self._onset_offset_callbacks.append(func)
+
+    #---------------------------------------------------
+    def unregister_onset_offset_callback_func(self, func):
+        """
+        Unegister a callback function previously registered with unregister_onset_offset_callback_func() 
+         
+        :param func: The function
+        """
+        exists = func in self._onset_offset_callbacks.append
+        if exists:
+            self._onset_offset_callbacks.append.remove(func)
+        return exists
 
 
     #==============================================================================
@@ -184,8 +224,8 @@ class BaseMultiStim(ttrk.TTrkObject):
     def terminate_display(self):
         self._log_func_enters("_terminate_display")
         self._event_manager.unregister_operation(self._registered_ops, warn_if_op_missing=False)
-        for stim in self._stimuli:
-            stim.visible = False
+        for i in range(len(self._stimuli)):
+            self._set_visible(i, False)
 
     #==============================================================================
     #   API for working without events
@@ -264,7 +304,7 @@ class BaseMultiStim(ttrk.TTrkObject):
             if self._should_log(ttrk.log_trace):
                 self._log_write("{:} stimulus #{:} ({:})".format(
                     "showing" if visible else "hiding", stim_num, self._texts[stim_num]))
-            self._stimuli[stim_num].visible = visible
+            self._set_visible(stim_num, visible)
 
 
     #==============================================================================
@@ -420,7 +460,7 @@ class BaseMultiStim(ttrk.TTrkObject):
 
     @position.setter
     def position(self, value):
-        self._set_property("position", value, "coord")
+        self._set_property("position", value, trajtracker.TYPE_COORD)
         self._log_property_changed("position")
 
     #==============================================================================
@@ -432,10 +472,10 @@ class BaseMultiStim(ttrk.TTrkObject):
 
         if type(prop_type) == type:
             return isinstance(value, (tuple, list, np.ndarray))
-        elif prop_type == "RGB":
+        elif prop_type == trajtracker.TYPE_RGB:
             return isinstance(value, (tuple, list, np.ndarray)) and \
                     (len(value) == 0 or u.is_rgb(value[0]))
-        elif prop_type == "coord":
+        elif prop_type == trajtracker.TYPE_COORD:
             return isinstance(value, (tuple, list, np.ndarray)) and \
                     (len(value) == 0 or isinstance(value[0], (tuple, list, XYPoint, np.ndarray)))
         else:
@@ -473,22 +513,28 @@ class BaseMultiStim(ttrk.TTrkObject):
 # The operation that is registered to the event manager for hiding/showing
 #=====================================================================
 
+
+# --------------------------------------------------------------
+# noinspection PyProtectedMember
 class StimulusEnableDisableOp(object):
 
-    #---------------------------------
-    def __init__(self, control, stimulus_num, visible):
-        self._control = control
+
+    #--------------------------------------------------
+    def __init__(self, multistim, stimulus_num, visible):
+        self._multistim = multistim
         self._stimulus_num = stimulus_num
         self._visible = visible
 
-    #---------------------------------
-    def __call__(self, *args, **kwargs):
-        self._control._log_write_if(ttrk.log_info, str(self))
-        self._control._set_visible(self._stimulus_num, self._visible)
 
-    #---------------------------------
+    #--------------------------------------------------
+    def __call__(self, *args, **kwargs):
+        self._multistim._log_write_if(ttrk.log_info, str(self))
+        self._multistim._set_visible(self._stimulus_num, self._visible)
+
+
+    #--------------------------------------------------
     def __str__(self):
         return "{:} {:} #{:} ({:})".format("Show" if self._visible else "Hide",
-                                           self._control._value_type_desc(),
+                                           self._multistim._value_type_desc(),
                                            self._stimulus_num,
-                                           self._control._stimulus_to_string(self._stimulus_num))
+                                           self._multistim.get_stimulus_desc(self._stimulus_num))
