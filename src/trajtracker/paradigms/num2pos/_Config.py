@@ -25,6 +25,7 @@ class Config(object):
                  use_text_targets=True, use_generic_targets=False,
                  fixation_type='cross', fixation_text=None,
                  text_target_height=0.6, shuffle_trials=True,
+                 log_stimulus_onset_offset=False,
                  nl_length=0.9, min_numberline_value=0, max_numberline_value=100,
                  show_feedback=True, feedback_arrow_colors=xpy.misc.constants.C_GREEN,
                  feedback_accuracy_levels=None, post_response_target=False,
@@ -66,6 +67,9 @@ class Config(object):
 
         #: Default text to use for a text fixation
         self.fixation_text = fixation_text
+
+        #: Whether to create a CSV log file indicating the times when each stimulus was presented/hidden
+        self.log_stimulus_onset_offset = log_stimulus_onset_offset
 
         #----- Configuration of number line -----
 

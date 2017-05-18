@@ -21,7 +21,6 @@ Using this class:
 This class is used in slightly different ways depending on whether or not you use an
 :class:`~trajtracker.events.EventManager` in your application.
 
-
 Using MultiTextBox with an EventManager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -52,6 +51,16 @@ Using MultiTextBox without an EventManager
 - To start showing the stimuli, call :func:`~trajtracker.stimuli.MultiTextBox.start_showing`.
 
 - Call :func:`~trajtracker.stimuli.MultiTextBox.update_display` periodically - preferably once per frame.
+
+
+Other features
+^^^^^^^^^^^^^^
+
+**callback functions**: (available also for :class:`~trajtracker.stimuli.MultiStimulus`)
+
+   You can ask the MultiTextBox class to invoke a function of your choice whenever a text is displayed
+   or hidden. Register your function with :func:`~trajtracker.stimuli.MultiTextBox.register_onset_offset_callback_func`
+
 
 
 Methods and properties:

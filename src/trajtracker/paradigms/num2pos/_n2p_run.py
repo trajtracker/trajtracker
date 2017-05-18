@@ -361,8 +361,8 @@ def update_fixation_for_trial(exp_info, trial):
 
     _update_attr_by_csv_config(exp_info, trial, exp_info.fixation, 'fixation.position', 'position')
 
-    _update_obj_position(trial, exp_info.fixation, 'fixation', 'x')
-    _update_obj_position(trial, exp_info.fixation, 'fixation', 'y')
+    _update_obj_position(exp_info, trial, exp_info.fixation, 'fixation', 'x')
+    _update_obj_position(exp_info, trial, exp_info.fixation, 'fixation', 'y')
 
 
 #------------------------------------------------
@@ -376,8 +376,8 @@ def update_numberline_for_trial(exp_info, trial):
 
     _update_attr_by_csv_config(exp_info, trial, exp_info.numberline, 'nl.position', 'position')
 
-    _update_obj_position(trial, exp_info.numberline, 'nl', 'x')
-    _update_obj_position(trial, exp_info.numberline, 'nl', 'y')
+    _update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'x')
+    _update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'y')
 
 
 #------------------------------------------------
@@ -409,17 +409,21 @@ def _update_target_stimulus_position(exp_info, trial, target_holder, col_name_pr
     :type trial: trajtracker.paradigms.num2pos.TrialInfo
     """
 
-    if x_or_y != "x" and x_or_y != "y":
+    if x_or_y not in ('x', 'y'):
         raise Exception("Invalid x_or_y argument ({:})".format(x_or_y))
+    is_x = x_or_y == 'x'
 
-    csv_col = "%s.position.%s" % (col_name_prefix, x_or_y)
-    if csv_col not in trial.csv_data:
+    csv_col, coord_as_percentage = _get_x_or_y_col(trial, col_name_prefix, x_or_y)
+    if csv_col is None:
         return
 
     n_stim = target_holder.n_stim
 
     #-- Get the x/y coordinates as an array
     coord = trial.csv_data[csv_col]
+    if coord_as_percentage:
+        coord = coord_to_pixels(coord, csv_col, exp_info.config.data_source, is_x)
+
     if not isinstance(coord, list):
         coord = [coord] * n_stim
 
@@ -433,16 +437,13 @@ def _update_target_stimulus_position(exp_info, trial, target_holder, col_name_pr
         pos = [pos] * n_stim
 
     for i in range(min(len(pos), len(coord))):
-        if x_or_y == "x":
-            pos[i] = coord[i], pos[i][1]
-        else:
-            pos[i] = pos[i][0], coord[i]
+        pos[i] = (coord[i], pos[i][1]) if is_x else (pos[i][0], coord[i])
 
     target_holder.position = pos
 
 
 #------------------------------------------------
-def _update_obj_position(trial, visual_obj, col_name_prefix, x_or_y):
+def _update_obj_position(exp_info, trial, visual_obj, col_name_prefix, x_or_y):
     """
     Update the position of a visual object according to "position.x" or "position.y" columns
     
@@ -451,19 +452,65 @@ def _update_obj_position(trial, visual_obj, col_name_prefix, x_or_y):
 
     if x_or_y not in ('x', 'y'):
         raise Exception("Invalid x_or_y argument ({:})".format(x_or_y))
+    is_x = x_or_y == 'x'
 
-    csv_col = "%s.position.%s" % (col_name_prefix, x_or_y)
-    if csv_col not in trial.csv_data:
+    csv_col, coord_as_percentage = _get_x_or_y_col(trial, col_name_prefix, x_or_y)
+    if csv_col is None:
         return
 
     coord = trial.csv_data[csv_col]
+    if coord_as_percentage:
+        coord = coord_to_pixels(coord, csv_col, exp_info.config.data_source, is_x)
 
-    if x_or_y == "x":
-        new_position = coord, visual_obj.position[1]
+    visual_obj.position = (coord, visual_obj.position[1]) if is_x else (visual_obj.position[0], coord)
+
+
+#------------------------------------------------
+def _get_x_or_y_col(trial, col_name_prefix, x_or_y):
+    """
+    Get the CSV column name from which x/y coordinate should be taken
+     
+    :return: col_name(str), is_percentage(bool) 
+    """
+
+    csv_col = "{:}.position.{:}".format(col_name_prefix, x_or_y)
+    if csv_col in trial.csv_data:
+        return csv_col, False
+
     else:
-        new_position = visual_obj.position[0], coord
+        csv_col = "{:}.position.{:}%".format(col_name_prefix, x_or_y)
+        if csv_col not in trial.csv_data:
+            return None, None
 
-    visual_obj.position = new_position
+        return csv_col, True
+
+
+#------------------------------------------------
+def coord_to_pixels(coord, col_name, filename, is_x):
+    """
+    Convert screen coordinates, which were provided as percentage of the screen width/height,
+    into pixels.
+
+    :param coord: The coordinate, on a 0-1 scale; or a list of coordinates
+    :param col_name: The column name in the CSV file (just for logging)
+    :param filename: CSV file name (just for logging)
+    :param is_x: (bool) whether it's an x or y coordinate
+    :return: coordinate as pixels (int); or a list of coords
+    """
+
+    screen_size = ttrk.env.screen_size[0 if is_x else 1]
+
+    coord_list = coord if isinstance(coord, list) else [coord]
+    # noinspection PyTypeChecker
+    if sum([not (-1.5 <= c <= 2.5) for c in coord_list]) > 0:
+        # Some coordinates are way off the screen bounds
+        raise ttrk.ValueError("Invalid {:} in the CSV file {:}: within-screen coordinates are in the range 0-1".
+                              format(col_name, filename))
+
+    if isinstance(coord, list):
+        return [int(np.round((c - 0.5) * screen_size)) for c in coord]
+    else:
+        return int(np.round((coord - 0.5) * screen_size))
 
 
 #------------------------------------------------

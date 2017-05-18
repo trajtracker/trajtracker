@@ -14,22 +14,22 @@ General:
 --------
 
     **experiment_id**  (str, mandatory parameter)
-       A unique ID of the present experiment configuration. Will be saved as-is in the results file,
-       to help you identify the specific configuration you were executing.
+        A unique ID of the present experiment configuration. Will be saved as-is in the results file,
+        to help you identify the specific configuration you were executing.
 
 Targets to show
 ---------------
 
     **data_source** (str, mandatory parameter)
-       The name of a CSV file with the per trial data. See (TBD) for detailed description of this file format.
-       Alternatively, you can provide a list of numbers, each of which will be presented as a text target.
+        The name of a CSV file with the per trial data. See (TBD) for detailed description of this file format.
+        Alternatively, you can provide a list of numbers, each of which will be presented as a text target.
 
     **shuffle_trials** (bool, default: True)
-       Whether to randomize the order of trials, or to present them in the order in which they
-       were provided in data_source.
+        Whether to randomize the order of trials, or to present them in the order in which they
+        were provided in data_source.
 
     **use_text_targets** (bool, default: True)
-       Whether to present text targets. If True, you should have a *text.target* column in the CSV file.
+        Whether to present text targets. If True, you should have a *text.target* column in the CSV file.
 
     **text_target_height** (number, default: 1.0)
         The height of the text target, specified as percentage of the available distance
@@ -37,16 +37,19 @@ Targets to show
         The actual target size (in pixels) will be printed in the output file.
 
     **use_generic_targets** (bool, default: False)
-       Whether to present generic targets. A generic target is any Expyriment (or equivalent) stimulus - e.g.,
-       image, shape, etc.
+        Whether to present generic targets. A generic target is any Expyriment (or equivalent) stimulus - e.g.,
+        image, shape, etc.
 
     **fixation_type**
-       The type of fixation stimulus: 'cross', 'text', or None.
-       When using 'text' fixation, you can set the text via *fixation_text* or via the CSV config file.
+        The type of fixation stimulus: 'cross', 'text', or None.
+        When using 'text' fixation, you can set the text via *fixation_text* or via the CSV config file.
 
-    **fixation_text**
-       The default fixation text to use when *fixation_type='text'*.
-       This value can be overriden by column *fixation.text* in the CSV config file.
+    **fixation_text** (str)
+        The default fixation text to use when *fixation_type='text'*.
+        This value can be overriden by column *fixation.text* in the CSV config file.
+
+    **log_stimulus_onset_offset** (bool, default: False)
+        Whether to log (in a CSV file) the exact times when each stimulus appeared and disappeared
 
 
 Number line

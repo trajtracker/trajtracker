@@ -527,13 +527,15 @@ def load_data_source(config):
         loader.add_field('genstim.onset_time', getparser(float), optional=True)
         loader.add_field('genstim.duration', getparser(float), optional=True)
 
-        loader.add_field('fixation.position', getparser(ttrk.io.csv_formats.parse_coord), optional=True)
-        loader.add_field('fixation.position.x', getparser(int), optional=True)
-        loader.add_field('fixation.position.y', getparser(int), optional=True)
+        loader.add_field('fixation.position', ttrk.io.csv_formats.parse_coord, optional=True)
+        loader.add_field('fixation.position.x', int, optional=True)
+        loader.add_field('fixation.position.x%', float, optional=True)
+        loader.add_field('fixation.position.y', int, optional=True)
 
-        loader.add_field('nl.position', getparser(ttrk.io.csv_formats.parse_coord), optional=True)
-        loader.add_field('nl.position.x', getparser(int), optional=True)
-        loader.add_field('nl.position.y', getparser(int), optional=True)
+        loader.add_field('nl.position', ttrk.io.csv_formats.parse_coord, optional=True)
+        loader.add_field('nl.position.x', int, optional=True)
+        loader.add_field('nl.position.x%', float, optional=True)
+        loader.add_field('nl.position.y', int, optional=True)
 
         return loader.load_file(ds)
 
