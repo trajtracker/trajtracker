@@ -27,6 +27,7 @@ class Event(trajtracker.TTrkObject):
         """
         super(Event, self).__init__()
 
+        _u.validate_func_arg_type(self, "__init__", "event_id", event_id, str)
         _u.validate_func_arg_type(self, "__init__", "extends", extends, Event, True)
 
         self._event_id = event_id

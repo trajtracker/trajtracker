@@ -92,7 +92,9 @@ class TTrkObject(object):
     #-------------------------------------------------
     # Write to log when function returns a value
     #
-    def _log_func_returns(self, func_name, retval=None):
+    def _log_func_returns(self, func_name, retval=None, self_name=None):
         if self._should_log(ttrk.log_trace):
-            self._log_write("func_returns,{:},{:}".format(func_name, retval), prepend_self=True)
+            if self_name is None:
+                self_name = type(self).__name__
+            self._log_write("{:}.{:} returning {:}".format(self_name, func_name, retval))
 

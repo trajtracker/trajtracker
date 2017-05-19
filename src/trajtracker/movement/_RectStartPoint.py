@@ -67,6 +67,7 @@ class RectStartPoint(ttrk.TTrkObject):
     def _create_start_area(self):
         start_area = xpy.stimuli.Rectangle(size=self._size, position=self._position, colour=self._colour)
         start_area.rotate(self._rotation)
+        start_area.preload()
         return start_area
 
 

@@ -44,18 +44,23 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         :param clear: See in `Expyriment <http://docs.expyriment.org/expyriment.stimuli.Rectangle.html#expyriment.stimuli.Rectangle.present>`
         :param update: See in `Expyriment <http://docs.expyriment.org/expyriment.stimuli.Rectangle.html#expyriment.stimuli.Rectangle.present>`
+        :return: The duration (in seconds) this function took to run
         """
+
+        self._log_func_enters("{:}({:}).present".format(_u.get_type_name(self), self._name), [clear, update])
+
+        start_time = ttrk.utils.get_time()
 
         visible_stims = [stim for stim in self._stimuli.values() if stim['stimulus'].visible]
         visible_stims.sort(key=itemgetter('order'))
 
-        if self._should_log(ttrk.log_trace):
-            self._log_write("Present,stimuli={:}".format(";".join([str(s['id']) for s in visible_stims])))
+        if self._should_log(ttrk.log_debug):
+            self._log_write("present() - stimuli={:}".format(";".join([str(s['id']) for s in visible_stims])), prepend_self=True)
 
         if len(visible_stims) == 0:
             #-- If no stimuli to present: just clear/update
-            if self._should_log(ttrk.log_debug):
-                self._log_write("{:}.present(clear={:}, update={:}): no visible stimuli".format(self._myname(), clear, update))
+            if self._should_log(ttrk.log_trace):
+                self._log_write("present(): no visible stimuli, just invoking clear/update if needed")
 
             if clear:
                 _u.display_clear()
@@ -67,12 +72,19 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
             for i in range(len(visible_stims)):
                 c = clear and i == 0
                 u = update and i == len(visible_stims) - 1
-                visible_stims[i]['stimulus'].present(clear=c, update=u)
+                duration = visible_stims[i]['stimulus'].present(clear=c, update=u)
 
-                if self._should_log(ttrk.log_debug):
-                    self._log_write("{:}.present(clear={:}, update={:}) stimulus #{:}".format(self._myname(), visible_stims[i]['order'], c, u), True)
+                if self._should_log(ttrk.log_trace):
+                    self._log_write("{:}.present(): stimulus#{:}({:}).present(clear={:}, update={:}) took {:.4f} sec".
+                                    format(self._myname(), visible_stims[i]['order'], visible_stims[i]['id'],
+                                           c, u, duration))
+
+        total_duration = ttrk.utils.get_time() - start_time
 
         self._invoke_callbacks(visible_stims)
+
+        self._log_func_returns("present", total_duration)
+        return total_duration
 
 
     #-------------------------------------------------------

@@ -72,6 +72,8 @@ def run_trials(exp_info):
 
         trial_config = exp_info.trials.pop(0)
 
+        ttrk.log_write("====================== Starting trial #{:} =====================".format(trial_num))
+
         run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config, exp_info.config))
         if run_trial_rc == RunTrialResult.Aborted:
             print("   Trial aborted.")
@@ -270,7 +272,8 @@ def on_finger_started_moving(exp_info, trial):
 
     exp_info.stimuli.present()
 
-    trial.results['targets_t0'] = 0 if exp_info.config.stimulus_then_move else time_in_trial
+    #todo maybe not 0! set it to the time of present() after touching screen
+    trial.results['targets_t0'] = 0 if exp_info.config.stimulus_then_move else (get_time() - trial.start_time)
 
 
 #----------------------------------------------------------------

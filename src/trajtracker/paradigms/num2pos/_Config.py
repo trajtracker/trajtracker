@@ -158,7 +158,7 @@ class Config(object):
 
         # Text target
         self.text_target_font = "Arial"
-        self.text_target_width = 600         # Width of the text box
+        self.text_target_width = 300         # Width of the text box
         self.text_target_colour = xpy.misc.constants.C_WHITE
         self.text_target_justification = 1  # 1=center
         self.text_target_x_coord = 0         # Position

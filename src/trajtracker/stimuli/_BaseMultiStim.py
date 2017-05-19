@@ -96,15 +96,17 @@ class BaseMultiStim(ttrk.TTrkObject):
     #---------------------------------------------------
     def _set_visible(self, stimulus_num, visible):
 
+        self._log_write_if(ttrk.log_debug, "Set stimulus #{:} to {:}".format(stimulus_num, "visible" if visible else "invisible"), prepend_self=True)
+
         self._stimuli[stimulus_num].visible = visible
 
-        for func in self._onset_offset_callbacks:
+        callback_funcs = list(self._onset_offset_callbacks)  # take a snapshot copy of the list's present state
 
-            # noinspection PyUnusedLocal
-            def on_stim_container_presented(sc, ids, present_time):
+        def on_stim_container_presented(sc, ids, present_time):
+            for func in callback_funcs:
                 func(self, stimulus_num, visible, present_time)
 
-            self._container.register_callback(on_stim_container_presented)
+        self._container.register_callback(on_stim_container_presented)
 
 
     #---------------------------------------------------

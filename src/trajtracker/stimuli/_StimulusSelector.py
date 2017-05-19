@@ -79,7 +79,12 @@ class StimulusSelector(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
     #--------------------------------------------------
     def present(self, clear=True, update=True):
-        """ present the active stimulus """
+        """ 
+        present the active stimulus
+        :return: The function's running time
+        """
+
+        start_time = ttrk.utils.get_time()
 
         self._log_func_enters("present", [clear, update])
 
@@ -92,6 +97,8 @@ class StimulusSelector(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
                 _u.display_update()
         else:
             s.present(clear=clear, update=update)
+
+        return ttrk.utils.get_time() - start_time
 
 
     #--------------------------------------------------

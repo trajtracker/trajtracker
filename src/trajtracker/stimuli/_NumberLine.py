@@ -182,6 +182,8 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         self.plot(self._canvas)
         self._canvas.position = self.position
 
+        self._canvas.preload()
+
         return get_time() - start_time
 
 

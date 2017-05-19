@@ -133,6 +133,8 @@ def create_numberline(exp_info):
     exp_info.target_pointer.preload()
     exp_info.target_pointer_height = exp_info.target_pointer.size[1]
 
+    numberline.preload()
+
 
 #----------------------------------------------------------------
 def create_start_point(exp_info):
@@ -310,6 +312,8 @@ def create_textbox_fixation(exp_info):
     fixation.text_size = font_size
     ttrk.log_write("Fixation font size = {:}, height = {:.1f} pixels".format(font_size, font_size*hsr), print_to_console=True)
 
+    fixation.preload()
+
     exp_info.fixation = fixation
 
 
@@ -391,6 +395,7 @@ def create_fixation_cross(exp_info):
     y, height = get_target_y(exp_info)
     exp_info.fixation = ttrk.paradigms.general.FixationCross(radius=15)
     exp_info.fixation.position = (0, y)
+    exp_info.fixation.preload()
 
 
 #----------------------------------------------------------------
