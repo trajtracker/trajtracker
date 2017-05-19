@@ -87,3 +87,4 @@ import events
 import stimuli
 import movement
 import validators
+import paradigms

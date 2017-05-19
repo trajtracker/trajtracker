@@ -250,6 +250,12 @@ def initialize_trial(exp_info, trial):
 
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, get_time() - exp_info.session_start_time)
 
+    #-- Update the display to present stuff that may have been added by the TRIAL_INITIALIZED event listeners
+    exp_info.stimuli.present()
+
+    if config.stimulus_then_move:
+        trial.results['targets_t0'] = get_time() - trial.start_time
+
 
 #----------------------------------------------------------------
 def on_finger_started_moving(exp_info, trial):
@@ -272,8 +278,8 @@ def on_finger_started_moving(exp_info, trial):
 
     exp_info.stimuli.present()
 
-    #todo maybe not 0! set it to the time of present() after touching screen
-    trial.results['targets_t0'] = 0 if exp_info.config.stimulus_then_move else (get_time() - trial.start_time)
+    if not config.stimulus_then_move:
+        trial.results['targets_t0'] = get_time() - trial.start_time
 
 
 #----------------------------------------------------------------
