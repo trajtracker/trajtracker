@@ -1,6 +1,6 @@
 """
 
-TrajTracker - movement package - private utilities
+TrajTracker - internal utilities
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan

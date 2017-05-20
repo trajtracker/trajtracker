@@ -107,9 +107,7 @@ class MovementAngleValidator(trajtracker.TTrkObject, EnabledDisabledObj):
                 #-- Error
                 angle_deg = angle / (np.pi * 2) * 360
 
-                if self._log_level:
-                    # noinspection PyProtectedMember
-                    self._log_write("%s,InvalidAngle,%.1f" % (str(self.__class__), angle_deg))
+                self._log_write_if(ttrk.log_info, "InvalidAngle (%.1f degrees)" % angle_deg, prepend_self=True)
 
                 return trajtracker.validators.create_experiment_error(self, self.err_invalid_angle, "You moved in an incorrect direction",
                                                                       {self.arg_angle: angle_deg})

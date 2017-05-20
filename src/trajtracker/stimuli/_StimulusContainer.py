@@ -55,29 +55,24 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         visible_stims.sort(key=itemgetter('order'))
 
         if self._should_log(ttrk.log_debug):
-            self._log_write("present() - stimuli={:}".format(";".join([str(s['id']) for s in visible_stims])), prepend_self=True)
+            self._log_write("going to present() these stimuli: {:}".format(", ".join([str(s['id']) for s in visible_stims])), prepend_self=True)
 
-        if len(visible_stims) == 0:
-            #-- If no stimuli to present: just clear/update
+        if clear:
+            _u.display_clear()
+            self._log_write_if(ttrk.log_trace, "screen cleared")
+
+        #-- Present stimuli marked as visible
+        for i in range(len(visible_stims)):
+            duration = visible_stims[i]['stimulus'].present(clear=False, update=False)
+
             if self._should_log(ttrk.log_trace):
-                self._log_write("present(): no visible stimuli, just invoking clear/update if needed")
+                self._log_write("{:}.present(): stimulus#{:}({:}).present() took {:.4f} sec".
+                                format(self._myname(), visible_stims[i]['order'], visible_stims[i]['id'],
+                                       c, u, duration))
 
-            if clear:
-                _u.display_clear()
-            if update:
-                _u.display_update()
-
-        else:
-            #-- Present all stimuli
-            for i in range(len(visible_stims)):
-                c = clear and i == 0
-                u = update and i == len(visible_stims) - 1
-                duration = visible_stims[i]['stimulus'].present(clear=c, update=u)
-
-                if self._should_log(ttrk.log_trace):
-                    self._log_write("{:}.present(): stimulus#{:}({:}).present(clear={:}, update={:}) took {:.4f} sec".
-                                    format(self._myname(), visible_stims[i]['order'], visible_stims[i]['id'],
-                                           c, u, duration))
+        if update:
+            _u.display_update()
+            self._log_write_if(ttrk.log_trace, "screen updated (flip)")
 
         total_duration = ttrk.utils.get_time() - start_time
 

@@ -78,13 +78,13 @@ from trajtracker._ttrk_funcs import log_write, initialize
 
 from trajtracker._TTrkObject import TTrkObject
 
-import _utils
-import utils
+from . import _utils
+from . import utils
 
-import misc
-import io
-import events
-import stimuli
-import movement
-import validators
-import paradigms
+from . import misc
+from . import io
+from . import events
+from . import stimuli
+from . import movement
+from . import validators
+from . import paradigms

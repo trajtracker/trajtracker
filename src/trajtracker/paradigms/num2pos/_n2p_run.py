@@ -253,7 +253,7 @@ def initialize_trial(exp_info, trial):
     #-- Update the display to present stuff that may have been added by the TRIAL_INITIALIZED event listeners
     exp_info.stimuli.present()
 
-    if config.stimulus_then_move:
+    if exp_info.config.stimulus_then_move:
         trial.results['targets_t0'] = get_time() - trial.start_time
 
 
@@ -278,7 +278,7 @@ def on_finger_started_moving(exp_info, trial):
 
     exp_info.stimuli.present()
 
-    if not config.stimulus_then_move:
+    if not exp_info.config.stimulus_then_move:
         trial.results['targets_t0'] = get_time() - trial.start_time
 
 
