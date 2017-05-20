@@ -31,12 +31,6 @@ class StimulusContainerTests(unittest.TestCase):
         self.assertTrue(a.presented)
         self.assertTrue(b.presented)
 
-        self.assertEqual(True, a.presented_args['clear'])
-        self.assertEqual(False, a.presented_args['update'])
-
-        self.assertEqual(False, b.presented_args['clear'])
-        self.assertEqual(True, b.presented_args['update'])
-
 
     #-------------------------------------------
     def test_invisible(self):
@@ -51,11 +45,6 @@ class StimulusContainerTests(unittest.TestCase):
 
         self.assertEqual(True, a.presented)
         self.assertEqual(False, b.presented)
-
-        self.assertEqual(0, len(b.presented_args))
-
-        self.assertEqual(True, a.presented_args['clear'])
-        self.assertEqual(True, a.presented_args['update'])
 
 
     #-------------------------------------------

@@ -355,7 +355,8 @@ def display_clear():
     Clear previous objects that were drawn on the display buffer
     """
     # noinspection PyProtectedMember
-    xpy._internals.active_exp.screen.clear()
+    if xpy._internals.active_exp is not None and xpy._internals.active_exp.screen is not None:
+        xpy._internals.active_exp.screen.clear()
 
 
 def display_update():
@@ -364,7 +365,8 @@ def display_update():
     This shows all recent items that were displayed with present(update=False) 
     """
     # noinspection PyProtectedMember
-    xpy._internals.active_exp.screen.update()
+    if xpy._internals.active_exp is not None and xpy._internals.active_exp.screen is not None:
+        xpy._internals.active_exp.screen.update()
 
 
 #============================================================================

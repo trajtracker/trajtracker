@@ -13,7 +13,7 @@ import numbers
 import expyriment
 import numpy as np
 
-import trajtracker
+import trajtracker as ttrk
 import trajtracker._utils as _u
 import trajtracker.utils as u
 import trajtracker.validators
@@ -21,7 +21,7 @@ from trajtracker.misc import EnabledDisabledObj
 
 
 # noinspection PyAttributeOutsideInit
-class MovementAngleValidator(trajtracker.TTrkObject, EnabledDisabledObj):
+class MovementAngleValidator(ttrk.TTrkObject, EnabledDisabledObj):
 
 
     err_invalid_angle = "InvalidAngle"
@@ -39,7 +39,7 @@ class MovementAngleValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         :param grace_period: See :attr:`~trajtracker.movement.MovementAngleValidator.grace_period`
         :param enabled: See :attr:`~trajtracker.movement.MovementAngleValidator.enabled`
         """
-        trajtracker.TTrkObject.__init__(self)
+        ttrk.TTrkObject.__init__(self)
         EnabledDisabledObj.__init__(self, enabled=enabled)
 
         self.min_angle = min_angle
@@ -109,8 +109,8 @@ class MovementAngleValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
                 self._log_write_if(ttrk.log_info, "InvalidAngle (%.1f degrees)" % angle_deg, prepend_self=True)
 
-                return trajtracker.validators.create_experiment_error(self, self.err_invalid_angle, "You moved in an incorrect direction",
-                                                                      {self.arg_angle: angle_deg})
+                return ttrk.validators.create_experiment_error(self, self.err_invalid_angle, "You moved in an incorrect direction",
+                                                               {self.arg_angle: angle_deg})
 
         else:
             #-- Direction cannot be validated - the finger hasn't moved enough yet
@@ -123,7 +123,7 @@ class MovementAngleValidator(trajtracker.TTrkObject, EnabledDisabledObj):
     def _validate_time(self, time):
 
         if len(self._prev_locations) > 0 and self._prev_locations[-1][2] > time:
-            raise trajtracker.InvalidStateError("{0}.mouse_at() was called with time={1} after it was previously called with time={2}".format(self.__class__, time, self._prev_locations[-1][2]))
+            raise ttrk.InvalidStateError("{0}.mouse_at() was called with time={1} after it was previously called with time={2}".format(self.__class__, time, self._prev_locations[-1][2]))
 
 
     #-------------------------------------

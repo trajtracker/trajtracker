@@ -393,8 +393,7 @@ def create_fixation(exp_info):
 #----------------------------------------------------------------
 def create_fixation_cross(exp_info):
     y, height = get_target_y(exp_info)
-    exp_info.fixation = ttrk.paradigms.general.FixationCross(radius=15)
-    exp_info.fixation.position = (0, y)
+    exp_info.fixation = xpy.stimuli.FixCross(size=(30,30), position=(0, y), line_width=2)
     exp_info.fixation.preload()
 
 
