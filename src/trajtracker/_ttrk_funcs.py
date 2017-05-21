@@ -25,9 +25,10 @@ def log_write(msg, print_to_console=False):
 #-------------------------------------------------
 def initialize():
     """
-    Initialize TrajTracker and Expyriment
+    Initialize TrajTracker; and initialize Expyriment by calling
+    `expyriment.control.initialize() <http://docs.expyriment.org/expyriment.control.html>`_
     
-    :return: Expyriment's Experiment object 
+    :return: Expyriment's `Experiment <http://docs.expyriment.org/expyriment.design.Experiment.html>`_ object 
     """
 
     exp = xpy.control.initialize()

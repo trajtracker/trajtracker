@@ -1,10 +1,8 @@
-"""
-
- traj tracker - a set of tools for psychological experiments under expyriment
-
-@author: Dror Dotan
-@copyright: Copyright (c) 2017, Dror Dotan
-"""
+#
+# TrajTracker - a set of tools for psychological experiments under expyriment
+#
+# author: Dror Dotan
+# Copyright (c) 2017, Dror Dotan
 
 import expyriment as xpy
 
@@ -29,7 +27,7 @@ log_to_console = False
 #----------------------------------------------------------
 def version():
     """
-    Return trajtracker version number (major.minor.build)
+    Return trajtracker version number ("major.minor.build")
     
     :return: str
     """

@@ -178,6 +178,15 @@ def validate_attr_is_coord(obj, attr_name, value, change_none_to_0=False, allow_
 
 
 #--------------------------------------
+def validate_attr_is_stim_size(obj, attr_name, value, allow_float=False):
+    validate_attr_is_coord(obj, attr_name=attr_name, value=value, allow_float=allow_float)
+    if value[0] <= 0:
+        raise ttrk.ValueError("{:}.{:} was set to an invalid size (width = {:})".format(get_type_name(obj), attr_name, value))
+    if value[1] <= 0:
+        raise ttrk.ValueError("{:}.{:} was set to an invalid size (height = {:})".format(get_type_name(obj), attr_name, value))
+
+
+#--------------------------------------
 def validate_attr_numeric(obj, attr_name, value, none_value=NoneValues.Invalid):
     if value is None:
         if none_value == NoneValues.Invalid:
@@ -282,6 +291,17 @@ def validate_func_arg_is_coord(obj, func_name, arg_name, value, change_none_to_0
     validate_func_arg_type(obj, func_name, "{:}[1]".format(arg_name), value[1], elem_type)
 
     return value
+
+
+#--------------------------------------------------------------------------------------
+def validate_func_arg_is_stim_size(obj, func_name, arg_name, value, allow_float=False):
+    validate_func_arg_is_coord(obj, func_name, arg_name, value=value, allow_float=allow_float)
+    if value[0] <= 0:
+        raise ttrk.TypeError("Argument {:} of {:}() is a stimulus size and cannot be set to a non-positive width ({:})".
+                             format(arg_name, _get_func_name(obj, func_name), value[0]))
+    if value[1] <= 0:
+        raise ttrk.TypeError("Argument {:} of {:}() is a stimulus size and cannot be set to a non-positive height ({:})".
+                             format(arg_name, _get_func_name(obj, func_name), value[1]))
 
 
 #--------------------------------------

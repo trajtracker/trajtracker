@@ -9,6 +9,7 @@ TrajTracker - movement package - public utilities
 from __future__ import division
 from numpy import pi
 import numpy as np
+import decimal
 
 import pygame
 from pygame.ftfont import Font
@@ -125,3 +126,17 @@ def get_font_height_to_size_ratio(font_name):
     font = Font(find_font(font_name), size=100)
     size = font.size("hfbpqgXQ,")
     return size[1] / 100.0
+
+
+#--------------------------------------------------------------------------
+def round(x):
+    """
+    Round deicmal numbers to the nearest integer. This is different from Python's numpy.round()
+    in two ways:
+    
+    - Python rounds halves to the nearest even number (2.5 rounds to 2, and 3.5 rounds to 4).
+      This method rounds halves to the higher integer, as done in most programming languages:
+      round(2.5) == 3, round(3.5) == 4, round(-2.5) == -3
+    - Python's round() method returns a float, this method returns an int
+    """
+    return int(decimal.Decimal(x).to_integral(decimal.ROUND_HALF_UP))
