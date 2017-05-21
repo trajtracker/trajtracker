@@ -94,8 +94,8 @@ class SegmentedTrajectoryGenerator(trajtracker.TTrkObject):
         _u.validate_func_arg_positive(self, "add_segment", "duration", duration)
 
         if "get_traj_point" not in dir(traj_generator):
-            raise TypeError("trajtracker error: {:}.add_segment() was called with an invalid traj_generator argument ({:})".format(
-                type(self).__name__, traj_generator))
+            raise trajtracker.TypeError("{:}.add_segment() was called with an invalid traj_generator argument ({:})".format(
+                _u.get_type_name(self), traj_generator))
 
         self._segments.append(dict(generator=traj_generator, duration=duration))
 

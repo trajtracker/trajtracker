@@ -128,7 +128,7 @@ class TrajectoryTracker(ttrk.TTrkObject, EnabledDisabledObj):
             self._filename = filename
 
         if self._filename is None:
-            raise ttrk.ValueError("filename was not provided to {:}.init_output_file()".format(type(self).__name__))
+            raise ttrk.ValueError("filename was not provided to {:}.init_output_file()".format(_u.get_type_name(self)))
 
         self._xy_precision = xy_precision
         self._time_precision = time_precision

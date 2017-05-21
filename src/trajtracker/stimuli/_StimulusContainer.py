@@ -109,8 +109,8 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         _u.validate_func_arg_type(self, "add", "visible", visible, bool)
         if "present" not in dir(stimulus):
-            raise TypeError("trajtracker error: invalid stimulus ({:}) in {:}.add() - expecting an expyriment stimulus".format(
-                stimulus, type(self).__name__))
+            raise ttrk.TypeError("invalid stimulus ({:}) in {:}.add() - expecting an expyriment stimulus".format(
+                stimulus, _u.get_type_name(self)))
 
         stimulus.visible = visible
 

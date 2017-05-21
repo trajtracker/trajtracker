@@ -46,7 +46,7 @@ ValidationAxis.parse = staticmethod(_parse_validation_axis)
 #--------------------------------------------------------------------
 def create_experiment_error(self, err_code, message, err_args=None):
     if self._should_log(ttrk.log_info):
-        self._log_write("ExperimentError,{0},{1},{2},{3}".format(type(self).__name__, err_code, message, err_args))
+        self._log_write("ExperimentError,{0},{1},{2},{3}".format(_u.get_type_name(self), err_code, message, err_args))
 
     return ExperimentError(err_code, message, self, err_args)
 

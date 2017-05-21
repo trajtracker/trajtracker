@@ -43,7 +43,7 @@ class StartPoint(ttrk.TTrkObject):
         self._log_func_enters("__init__", [start_area, exit_area])
 
         if "position" not in dir(start_area):
-            raise ttrk.ValueError("invalid start_area provided to {:}.__init__".format(type(self).__name__))
+            raise ttrk.ValueError("invalid start_area provided to {:}.__init__".format(_u.get_type_name(self)))
 
         self._start_area = start_area
         self.exit_area = exit_area
@@ -80,7 +80,7 @@ class StartPoint(ttrk.TTrkObject):
             self._exit_area = value
             self._log_property_changed("exit_area", value="shape")
         else:
-            raise ttrk.ValueError("invalid value for %s.exit_area" % type(self).__name__)
+            raise ttrk.ValueError("invalid value for %s.exit_area" % _u.get_type_name(self))
 
         self._log_property_changed("exit_area")
 

@@ -62,13 +62,13 @@ class CustomTrajectoryGenerator(trajtracker.TTrkObject):
             if len(self._trajectories):
                 self.active_traj_id = list(self._trajectories.keys())[0]
             else:
-                raise trajtracker.InvalidStateError("{:}.get_traj_point() cannot be called before active_traj_id was set".format(type(self).__name__))
+                raise trajtracker.InvalidStateError("{:}.get_traj_point() cannot be called before active_traj_id was set".format(_u.get_type_name(self)))
 
         traj_inf = self._trajectories[self._active_traj_id]
 
         if time < traj_inf['times'][0]:
             raise trajtracker.ValueError("{:}.get_traj_point(time={:}): the active trajectory ({:}) starts from time={:}".format(
-                type(self).__name__, time, self._active_traj_id, traj_inf['times'][0]))
+                _u.get_type_name(self), time, self._active_traj_id, traj_inf['times'][0]))
 
         #-- Time can't exceed the trajectory duration
         if time > traj_inf['duration']:
@@ -123,7 +123,7 @@ class CustomTrajectoryGenerator(trajtracker.TTrkObject):
     @active_traj_id.setter
     def active_traj_id(self, value):
         if value is not None and value not in self._trajectories:
-            raise trajtracker.ValueError("invalid {:}.curr_traj_id ({:}) - no trajectory with this ID".format(type(self).__name__, value))
+            raise trajtracker.ValueError("invalid {:}.curr_traj_id ({:}) - no trajectory with this ID".format(_u.get_type_name(self), value))
         self._active_traj_id = value
 
 
@@ -153,7 +153,7 @@ class CustomTrajectoryGenerator(trajtracker.TTrkObject):
 
         _u.validate_func_arg_is_collection(self, "set_trajectory", "traj_data", traj_data, min_length=1)
         if traj_id is None:
-            raise TypeError("trajtracker error: {:}.set_trajectory(traj_id=None) is invalid".format(type(self).__name__))
+            raise trajtracker.TypeError("{:}.set_trajectory(traj_id=None) is invalid".format(_u.get_type_name(self)))
 
         coords = []
         times = []
@@ -173,7 +173,7 @@ class CustomTrajectoryGenerator(trajtracker.TTrkObject):
             time = time_point[0]
             if time <= prev_time:
                 raise trajtracker.ValueError(("{:}.set_trajectory() called with invalid value for trajectory '{:}' " +
-                                 "- timepoint {:} appeared after {:}").format(type(self).__name__, traj_id, time, prev_time))
+                                 "- timepoint {:} appeared after {:}").format(_u.get_type_name(self), traj_id, time, prev_time))
 
             prev_time = time
 
@@ -224,7 +224,7 @@ class CustomTrajectoryGenerator(trajtracker.TTrkObject):
 
         if len(self._trajectories) > 0 and not has_traj_id_col:
             raise trajtracker.BadFormatError(("Invalid file format in {:}.load_from_csv('{:}'): " +
-                                             "there is no traj_id column in the file").format(type(self).__name__, filename))
+                                             "there is no traj_id column in the file").format(_u.get_type_name(self), filename))
 
         loaded_traj_ids = set()
 
@@ -234,7 +234,7 @@ class CustomTrajectoryGenerator(trajtracker.TTrkObject):
                 if col_name not in reader.fieldnames:
                     raise trajtracker.BadFormatError(
                         "Invalid file format in {:}.load_from_csv('{:}'): there is no '{:}' column".format(
-                            type(self).__name__, filename, col_name))
+                            _u.get_type_name(self), filename, col_name))
 
 
             prev_traj_id = None
@@ -246,7 +246,7 @@ class CustomTrajectoryGenerator(trajtracker.TTrkObject):
                 if traj_id in loaded_traj_ids:
                     raise trajtracker.BadFormatError(
                         "Invalid file format in {:}.load_from_csv('{:}'): the lines of trajectory '{:}' are not consecutive".format(
-                            type(self).__name__, filename, traj_id))
+                            _u.get_type_name(self), filename, traj_id))
 
 
                 if prev_traj_id is None:
@@ -311,7 +311,7 @@ class CustomTrajectoryGenerator(trajtracker.TTrkObject):
                     self._validation_err = trajtracker.ValueError(
                         ("invalid trajectory configuration in {:}: when cyclic=True " +
                         "all trajectories must start from time=0, but trajectory '{:}' starts from " +
-                        "time={:}").format(type(self).__name__, traj_id, t0))
+                        "time={:}").format(_u.get_type_name(self), traj_id, t0))
                     raise self._validation_err
 
         self._validation_err = self._all_ok

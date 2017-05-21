@@ -174,7 +174,7 @@ class BaseMultiStim(ttrk.TTrkObject):
         event_manager.register_operation(event=self._trial_configured_event,
                                          operation=lambda t1, t2: self._init_trial_events(),
                                          recurring=True,
-                                         description="Setup {:}".format(type(self).__name__))
+                                         description="Setup {:}".format(_u.get_type_name(self)))
 
 
     #----------------------------------------------------
@@ -482,7 +482,7 @@ class BaseMultiStim(ttrk.TTrkObject):
                     (len(value) == 0 or isinstance(value[0], (tuple, list, XYPoint, np.ndarray)))
         else:
             raise Exception("Trajtracker internal error: {:}._validate_attr_type() does not support type={:}".format(
-                type(self).__name__, prop_type))
+                _u.get_type_name(self), prop_type))
 
 
     #-----------------------------------------------------------------
@@ -491,8 +491,7 @@ class BaseMultiStim(ttrk.TTrkObject):
         multiple_values = False
 
         if value is None and not allow_none:
-                raise ttrk.TypeError("trajtracker error: {:}.{:} cannot be set to None".format(
-                        type(self).__name__, prop_name))
+                raise ttrk.TypeError("{:}.{:} cannot be set to None".format(_u.get_type_name(self), prop_name))
 
         if value is not None:
 
@@ -504,8 +503,8 @@ class BaseMultiStim(ttrk.TTrkObject):
             elif allow_single_value:
                 _u.validate_attr_type(self, prop_name, value, prop_type, none_allowed=True)
             else:
-                raise ttrk.TypeError("trajtracker error: {:}.{:} must be set to a list of values; a single {:} is invalid".format(
-                    type(self).__name__, prop_name, prop_type.__name__ if isinstance(prop_type, type) else prop_type))
+                raise ttrk.TypeError("{:}.{:} must be set to a list of values; a single {:} is invalid".format(
+                    _u.get_type_name(self), prop_name, prop_type.__name__ if isinstance(prop_type, type) else prop_type))
 
         setattr(self, "_" + prop_name, value)
         setattr(self, "_" + prop_name + "_multiple", multiple_values)

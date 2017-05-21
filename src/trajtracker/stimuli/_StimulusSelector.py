@@ -61,7 +61,7 @@ class StimulusSelector(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
                 self._log_write("Activate,{:}".format(key), True)
             self._active_key = key
         else:
-            raise ttrk.ValueError("{:}.select(key={:}) - this stimulus was not defined".format(type(self).__name__, key))
+            raise ttrk.ValueError("{:}.select(key={:}) - this stimulus was not defined".format(_u.get_type_name(self), key))
 
 
     #--------------------------------------------------
@@ -118,4 +118,4 @@ class StimulusSelector(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
             s.position = value
 
         if self._should_log(ttrk.log_trace):
-            self._log_write("set_obj_attr,{:}.position,{:}".format(type(self).__name__, value))
+            self._log_write("set_obj_attr,{:}.position,{:}".format(_u.get_type_name(self), value))

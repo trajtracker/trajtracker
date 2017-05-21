@@ -90,9 +90,9 @@ class StimulusAnimator(trajtracker.TTrkObject):
     @animated_object.setter
     def animated_object(self, obj):
         if "present" not in dir(obj):
-            raise trajtracker.ValueError("{:}.animated_object must be an object with a present() method".format(type(self).__name__))
+            raise trajtracker.ValueError("{:}.animated_object must be an object with a present() method".format(_u.get_type_name(self)))
         if "position" not in dir(obj):
-            raise trajtracker.ValueError("{:}.animated_object must be an object with a 'position' property".format(type(self).__name__))
+            raise trajtracker.ValueError("{:}.animated_object must be an object with a 'position' property".format(_u.get_type_name(self)))
 
         self._animated_object = obj
         self._log_property_changed("animated_object")

@@ -30,7 +30,7 @@ class CircularTrajectoryGenerator(trajtracker.TTrkObject):
 
         if full_rotation_duration is not None and degrees_per_sec is not None:
             raise trajtracker.ValueError("you cannot provide both full_rotation_duration and degrees_per_sec " +
-                             "to the constructor of {:}".format(type(self).__name__))
+                             "to the constructor of {:}".format(_u.get_type_name(self)))
 
         self._center = None
         self._radius = None
@@ -66,11 +66,11 @@ class CircularTrajectoryGenerator(trajtracker.TTrkObject):
 
         _u.validate_func_arg_type(self, "get_xy", "time", time, numbers.Number)
         if self._center is None:
-            raise trajtracker.InvalidStateError("trajtracker error: {:}.get_xy() was called without setting center".format(type(self).__name__))
+            raise trajtracker.InvalidStateError("{:}.get_xy() was called without setting center".format(_u.get_type_name(self)))
         if self._degrees_per_sec is None:
-            raise trajtracker.InvalidStateError("trajtracker error: {:}.get_xy() was called without setting degrees_per_sec".format(type(self).__name__))
+            raise trajtracker.InvalidStateError("{:}.get_xy() was called without setting degrees_per_sec".format(_u.get_type_name(self)))
         if self._radius is None:
-            raise trajtracker.InvalidStateError("trajtracker error: {:}.get_xy() was called without setting radius".format(type(self).__name__))
+            raise trajtracker.InvalidStateError("{:}.get_xy() was called without setting radius".format(_u.get_type_name(self)))
 
         dps = self._degrees_per_sec * (1 if self._clockwise else -1)
         curr_degrees = (self._degrees_at_t0 + dps * time) % 360

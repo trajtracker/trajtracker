@@ -22,23 +22,6 @@ from trajtracker.validators import ValidationAxis, ExperimentError
 from trajtracker.movement import StimulusAnimator
 
 
-# -------------------------------------------------------------
-def _parse_xml_milestones(xml):
-    milestones = []
-    for child in xml:
-        if child.tag != "milestone":
-            raise trajtracker.BadFormatError(
-                "Invalid XML format for defining {:}'s milestones: XML block '{:}' is unknown".format(
-                    type(self).__name__, child.tag))
-        if 'time' not in child.attrib or 'distance' not in child.attrib:
-            raise trajtracker.BadFormatError(
-                "Invalid XML format for defining {:}'s milestones: either time=xxx or distance=xxx is missing from a 'milestone' XML block".format(
-                    type(self).__name__))
-        milestones.append(GlobalSpeedValidator.Milestone(float(child.attrib['time']), float(child.attrib['distance'])))
-
-    return milestones
-
-
 # noinspection PyAttributeOutsideInit
 class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
@@ -254,7 +237,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
     def _assert_initialized(self, value, attr_name):
         if value is None:
-            raise trajtracker.InvalidStateError("{:}.update_xyt() was called before {:} was initalized".format(type(self).__name__, attr_name))
+            raise trajtracker.InvalidStateError("{:}.update_xyt() was called before {:} was initalized".format(_u.get_type_name(self), attr_name))
 
     #----------------------------------------------------------------------------------
     # Get the coordinate expected
@@ -403,39 +386,39 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
             if not isinstance(milestone, GlobalSpeedValidator.Milestone):
                 #-- convert tuple/list to milestone
                 if len(milestone) != 2:
-                    raise trajtracker.ValueError("{:}.milestones[{:}] should be either a Milestone object or a (time,distance) tuple/list. Invalid value: {:}".format(type(self).__name__, i, milestone))
+                    raise trajtracker.ValueError("{:}.milestones[{:}] should be either a Milestone object or a (time,distance) tuple/list. Invalid value: {:}".format(_u.get_type_name(self), i, milestone))
                 milestone = GlobalSpeedValidator.Milestone(milestone[0], milestone[1])
 
             if not isinstance(milestone.distance_percentage, numbers.Number):
-                raise trajtracker.ValueError(GlobalSpeedValidator._errmsg_milestones_not_percentage.format("distance_percentage", type(self).__name__, i))
+                raise trajtracker.ValueError(GlobalSpeedValidator._errmsg_milestones_not_percentage.format("distance_percentage", _u.get_type_name(self), i))
             if not (0 < milestone.distance_percentage <= 1):
-                raise trajtracker.ValueError(GlobalSpeedValidator._errmsg_milestones_not_percentage.format("distance_percentage", type(self).__name__, i))
+                raise trajtracker.ValueError(GlobalSpeedValidator._errmsg_milestones_not_percentage.format("distance_percentage", _u.get_type_name(self), i))
 
             if not isinstance(milestone.time_percentage, numbers.Number):
-                raise trajtracker.ValueError(GlobalSpeedValidator._errmsg_milestones_not_percentage.format("time_percentage", type(self).__name__, i))
+                raise trajtracker.ValueError(GlobalSpeedValidator._errmsg_milestones_not_percentage.format("time_percentage", _u.get_type_name(self), i))
             if not (0 < milestone.time_percentage <= 1):
-                raise trajtracker.ValueError(GlobalSpeedValidator._errmsg_milestones_not_percentage.format("time_percentage", type(self).__name__, i))
+                raise trajtracker.ValueError(GlobalSpeedValidator._errmsg_milestones_not_percentage.format("time_percentage", _u.get_type_name(self), i))
             if milestone.distance_percentage <= total_distance:
-                raise trajtracker.ValueError("{:}.milestones[{:}] is invalid - the distance specified ({:}) must be later than in the previous milestone".format("distance_percentage", type(self).__name__, i, milestone.time_percentage))
+                raise trajtracker.ValueError("{:}.milestones[{:}] is invalid - the distance specified ({:}) must be later than in the previous milestone".format("distance_percentage", _u.get_type_name(self), i, milestone.time_percentage))
 
             total_time += milestone.time_percentage
             total_distance += milestone.distance_percentage
 
             if total_time > 1:
-                raise trajtracker.ValueError("{:}.milestones is invalid - the total time of all milestones exceeds 1.0".format(type(self).__name__))
+                raise trajtracker.ValueError("{:}.milestones is invalid - the total time of all milestones exceeds 1.0".format(_u.get_type_name(self)))
             if total_distance > 1:
-                raise trajtracker.ValueError("{:}.milestones is invalid - the total distance of all milestones exceeds 1.0".format(type(self).__name__))
+                raise trajtracker.ValueError("{:}.milestones is invalid - the total distance of all milestones exceeds 1.0".format(_u.get_type_name(self)))
 
             milestones.append(GlobalSpeedValidator.Milestone(milestone.time_percentage, milestone.distance_percentage))
 
         if total_time < 1:
             raise trajtracker.ValueError(
                 "{:}.milestones is invalid - the total time of all milestones sums to {:} rather than to 1.0".format(
-                    type(self).__name__, total_time))
+                    _u.get_type_name(self), total_time))
         if total_distance < 1:
             raise trajtracker.ValueError(
                 "{:}.milestones is invalid - the total distance of all milestones sums to {:} rather than to 1.0".format(
-                    type(self).__name__, total_distance))
+                    _u.get_type_name(self), total_distance))
 
         self._milestones = np.array(milestones)
 
@@ -636,7 +619,7 @@ class GlobalSpeedGuide(trajtracker.TTrkObject):
         if self._guide_line is None:
             self._create_guide_line()  # try creating again. Maybe the experiment was inactive
             if self._guide_line is None:
-                raise trajtracker.InvalidStateError("The visual guide for {:} cannot be created because the experiment is inactive".format(GlobalSpeedValidator.__name__))
+                raise trajtracker.InvalidStateError("The visual guide for {:} cannot be created because the experiment is inactive".format(_u.get_type_name(self)))
 
         _u.validate_func_arg_type(self, "show", "coord", coord, int)
         _u.validate_func_arg_type(self, "show", "line_mode", line_mode, self.LineMode)

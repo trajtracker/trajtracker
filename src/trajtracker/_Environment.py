@@ -22,7 +22,7 @@ class Environment(object):
         Provides access to the mouse.
         
         TrajTracker will always access the mouse (position and button presses) via this object.
-        By default, this object will connect with your computer's mouse (:class: `~trajtracker.io.Mouse`).
+        By default, this object is a :class:`~trajtracker.io.Mouse`, which connects with your computer's mouse.
         You can replace this object by another class (with the same interface) in order to use 
         alternative input source.
         """
@@ -40,7 +40,7 @@ class Environment(object):
         The default logging level for all trajtracker objects.
         If you change this, only objects created from now on will be affected.
         
-        **Type:** one of the log_xxx constants defined in the "trajtracker" module 
+        :type: one of the log_xxx constants defined in the "trajtracker" module 
         """
         return self._default_log_level
 

@@ -559,7 +559,7 @@ def load_data_source(config):
                 row[ttrk.io.CSVLoader.FLD_LINE_NUM] = 0
         return ds
 
-    raise TypeError("trajtracker error: invalid config.data_source")
+    raise ttrk.TypeError("invalid config.data_source")
 
 
 #-----------------------------------------------------------------------------------------

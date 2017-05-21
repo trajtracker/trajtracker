@@ -61,11 +61,11 @@ class LineTrajectoryGenerator(trajtracker.TTrkObject):
 
         _u.validate_func_arg_type(self, "get_xy", "time", time, numbers.Number)
         if self._start_point is None:
-            raise trajtracker.InvalidStateError("trajtracker error: {:}.get_xy() was called without setting start_point".format(type(self).__name__))
+            raise trajtracker.InvalidStateError("{:}.get_xy() was called without setting start_point".format(_u.get_type_name(self)))
         if self._end_point is None:
-            raise trajtracker.InvalidStateError("trajtracker error: {:}.get_xy() was called without setting end_point".format(type(self).__name__))
+            raise trajtracker.InvalidStateError("{:}.get_xy() was called without setting end_point".format(_u.get_type_name(self)))
         if self._duration is None:
-            raise trajtracker.InvalidStateError("trajtracker error: {:}.get_xy() was called without setting duration".format(type(self).__name__))
+            raise trajtracker.InvalidStateError("{:}.get_xy() was called without setting duration".format(_u.get_type_name(self)))
 
         max_duration = self._duration * (2 if self._return_to_start else 1)
         if self._cyclic:

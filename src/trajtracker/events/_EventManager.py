@@ -52,11 +52,15 @@ class EventManager(ttrk.TTrkObject):
         if es_obj is None:
             return
 
+        self._log_func_enters("register", [es_obj])
+
         if "on_registered" not in dir(es_obj):
-            raise TypeError("trajtracker error: EventManager.register() was called with an incorrect object " +
-                            "({:}) - the registered object must have a on_registered() method".format(es_obj))
+            raise ttrk.TypeError("EventManager.register() was called with an incorrect object " +
+                                 "({:}) - the registered object must have a on_registered() method".format(es_obj))
 
         es_obj.on_registered(self)
+
+        self._log_func_returns("register")
 
 
     #--------------------------------------------------------------
@@ -80,17 +84,19 @@ class EventManager(ttrk.TTrkObject):
         _u.validate_func_arg_type(self, "dispatch_event", "time_in_trial", time_in_trial, numbers.Number)
         _u.validate_func_arg_type(self, "dispatch_event", "time_in_session", time_in_session, numbers.Number)
 
-        if event.offset > 0 and self._should_log(ttrk.log_warn):
-            self._log_write("dispatch_event warning: you dispatched event {:}, which has offset > 0; the offset parameter is ignored".format(event), True)
+        if event.offset > 0:
+            self._log_write_if(ttrk.log_warn, "dispatch_event warning: you dispatched event {:}, which has offset > 0; the offset parameter is ignored".format(event), True)
 
-        if event._extended and self._should_log(ttrk.log_warn):
-            self._log_write("dispatch_event warning: you dispatched event {:}, which has some sub-events".format(event))
+        if event._extended:
+            self._log_write_if(ttrk.log_warn, "dispatch_event warning: you dispatched event {:}, which has some sub-events".format(event))
 
         self._dispatch_event(event, time_in_trial, time_in_session)
 
 
     #--------------------------------------------------------------
     def _dispatch_event(self, event, time_in_trial, time_in_session):
+
+        self._log_func_enters("_dispatch_event", [event, time_in_trial, time_in_session])
 
         #-- Dispatch base events
         if event.extends is not None:
@@ -106,24 +112,30 @@ class EventManager(ttrk.TTrkObject):
         op_infos = list(self._operations_by_event[event.event_id].values())
         for op_info in op_infos:
 
-            if not op_info['active']:
+            if not op_info.active:
                 #-- It was already invoked
                 continue
 
-            if not op_info['recurring']:
-                op_info['active'] = False
+            if not op_info.recurring:
+                op_info.active = False
 
-            if op_info['event'].offset == 0:
+            if op_info.event.offset == 0:
                 #-- Invoke operation immediately
-                self._invoke_operation(op_info['id'], time_in_trial, time_in_session)
+                self._invoke_operation(op_info.operation_id, time_in_trial, time_in_session)
 
             else:
                 #-- Remember for later
-                self._pending_operations.append((op_info['id'], time_in_session + op_info['event'].offset))
+                op_time = time_in_session + op_info.event.offset
+                if self._should_log(ttrk.log_trace):
+                    self._log_write("Operation {:} ({:}) is now pending to run later, at {:.3f} ({:})".
+                                    format(op_info.operation_id, op_info.description, op_time, op_info.event))
+                self._pending_operations.append((op_info.operation_id, op_time))
                 added_pending_op = True
 
         if added_pending_op:
             self._pending_operations.sort(key=itemgetter(1))
+
+        self._log_func_returns("_dispatch_event")
 
 
     #--------------------------------------------------------------
@@ -143,6 +155,10 @@ class EventManager(ttrk.TTrkObject):
         _u.validate_func_arg_type(self, "on_frame", "time_in_trial", time_in_trial, numbers.Number, none_allowed=True)
         _u.validate_func_arg_type(self, "on_frame", "time_in_session", time_in_session, numbers.Number)
 
+        if self._should_log(ttrk.log_trace):
+            self._log_write("{:}.on_frame(time_in_trial={:.3f}, time_in_session={:.3f}) called".
+                            format(_u.get_type_name(self), time_in_trial, time_in_session))
+
         n = 0
         while len(self._pending_operations) > 0 and self._pending_operations[0][1] <= time_in_session:
             op = self._pending_operations.pop(0)
@@ -161,6 +177,7 @@ class EventManager(ttrk.TTrkObject):
         In standard mode, there will be no need to call this function. You can call it, however, in case
         you want to reset everything and make sure you don't have any leftovers.
         """
+        self._log_func_enters("cancel_pending_operations")
         self._pending_operations = []
 
 
@@ -201,20 +218,20 @@ class EventManager(ttrk.TTrkObject):
                                   (ttrk.events.Event, list, tuple, set, np.ndarray))
         _u.validate_func_arg_type(self, "register_operation", "operation", operation, trajtracker.TYPE_CALLABLE)
 
+        self._log_func_enters("register_operation", [event, operation, recurring, cancel_pending_operation_on, description])
+
         if isinstance(cancel_pending_operation_on, Event):
             cancel_pending_operation_on = cancel_pending_operation_on,
 
         self._id_generator += 1
         operation_id = self._id_generator
 
-        op_info = dict(operation=operation,
-                       event=event,
-                       cancel_pending_operation_on=cancel_pending_operation_on,
-                       recurring=recurring,
-                       description=description,
-                       id=operation_id,
-                       active=True)
-
+        op_info = _RegisteredOperation(callback_function=operation,
+                                       event=event,
+                                       cancel_pending_operation_on=cancel_pending_operation_on,
+                                       recurring=recurring,
+                                       description=description,
+                                       operation_id=operation_id)
 
         #-- Register the operation
 
@@ -239,6 +256,7 @@ class EventManager(ttrk.TTrkObject):
                 cancel_events_desc,
                 operation_id), True)
 
+        self._log_func_returns("register_operation", operation_id)
         return operation_id
 
 
@@ -254,23 +272,27 @@ class EventManager(ttrk.TTrkObject):
         :param warn_if_op_missing: Print a warning to log if an operation ID is not registered in the event manager
         """
 
+        _u.validate_func_arg_type(self, "unregister_operation", "warn_if_op_missing", warn_if_op_missing, bool)
+
         if isinstance(operation_ids, int):
             operation_ids = operation_ids,
         else:
             _u.validate_func_arg_is_collection(self, "unregister_operation", "operation_id", operation_ids, allow_set=True)
+
+        self._log_func_enters("unregister_operation", [operation_ids, warn_if_op_missing])
 
         for op_id in operation_ids:
             if op_id in self._operations_by_id:
                 if self._should_log(ttrk.log_debug):
                     op_info = self._operations_by_id[op_id]
                     self._log_write('unregistering {:} operation "{:}" (ID={:}) from event {:}'.format(
-                        "recurring" if op_info['recurring'] else "non-recurring",
-                        op_info['operation'] if op_info['description'] is None else op_info['description'],
-                        op_id,
-                        op_info['event']), True)
+                        "recurring" if op_info.recurring else "non-recurring",
+                        op_info.description, op_id, op_info.event), True)
                 self._remove_operation(op_id, True)
             elif warn_if_op_missing:
                 self._log_write_if(ttrk.log_warn, "operation {:} is not in the event manager - not removed".format(op_id), True)
+
+        self._log_func_returns("unregister_operation")
 
     #======================================================================================
     # Internal stuff
@@ -280,7 +302,11 @@ class EventManager(ttrk.TTrkObject):
     def _remove_operation(self, operation_id, remove_pending):
 
         op_info = self._operations_by_id[operation_id]
-        op_event_id = op_info['event'].event_id
+        op_event_id = op_info.event.event_id
+
+        if self._should_log(ttrk.log_trace):
+            self._log_write("Remove operation {:} (registered to {:}){:}".
+                            format(op_info, op_info.event, ", including pending operations" if remove_pending else ""))
 
         #-- Remove the operation
         del self._operations_by_id[operation_id]
@@ -295,15 +321,38 @@ class EventManager(ttrk.TTrkObject):
     def _invoke_operation(self, operation_id, time_in_trial, time_in_session, remove_pending=True):
 
         op_info = self._operations_by_id[operation_id]
-        op_desc = str(op_info['operation']) if op_info['description'] is None else op_info['description']
 
-        # -- Invoke it
         if self._should_log(ttrk.log_trace):
             self._log_write("Invoking operation (id={:}, operation={:}, event={:})".format(
-                operation_id, op_desc, op_info['event']), True)
-        op = op_info['operation']
-        op(time_in_trial, time_in_session)
+                operation_id, op_info.description, op_info.event), True)
+
+        #-- Invoke it
+        op_info.function(time_in_trial, time_in_session)
 
         #-- After a one-time operation was invoked, remove it
-        if not op_info['recurring']:
+        if not op_info.recurring:
             self._remove_operation(operation_id, remove_pending)
+
+
+#=================================================================
+class _RegisteredOperation(object):
+    """
+    An operation registered in the event manager
+    """
+
+    def __init__(self, callback_function, event, cancel_pending_operation_on,
+                 recurring, description, operation_id):
+        self.function = callback_function
+        self.event = event
+        self.cancel_pending_operation_on = cancel_pending_operation_on
+        self.recurring = recurring
+        self._description = description
+        self.operation_id = operation_id
+        self.active = True
+
+    @property
+    def description(self):
+        return str(self.function) if self._description is None else self._description
+
+    def __str__(self):
+        return "{:} ({:})".format(self.operation_id, self.description)
