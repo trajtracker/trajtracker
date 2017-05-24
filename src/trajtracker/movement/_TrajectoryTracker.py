@@ -139,8 +139,7 @@ class TrajectoryTracker(ttrk.TTrkObject, EnabledDisabledObj):
 
         self._out_file_initialized = True
 
-        if self._log_level:
-            self._log_write("Trajectory,InitOutputFile,%s" % self._filename)
+        self._log_write_if(ttrk.log_debug, "Initializing output file %s" % self._filename, True)
 
     #----------------------------------------------------
     def save_to_file(self, trial_num):
@@ -163,8 +162,7 @@ class TrajectoryTracker(ttrk.TTrkObject, EnabledDisabledObj):
 
         fh.close()
 
-        if self._log_level:
-            self._log_write("Trajectory,SavedTrial,%s,%d,%d" % (self._filename, trial_num, len(rows)))
+        self._log_write_if(ttrk.log_debug, "Saved trial #{:} (with {:} rows) to {:}".format(trial_num, len(rows), self._filename), True)
 
         return len(rows)
 

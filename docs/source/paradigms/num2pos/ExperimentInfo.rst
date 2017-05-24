@@ -1,8 +1,8 @@
 .. TrajTracker : ExperimentInfo.py
 
 
-ExperimentInfo class
-====================
+N2PExperimentInfo class
+=======================
 
 This object keeps all the experiment data:
 
@@ -13,8 +13,16 @@ This object keeps all the experiment data:
 - The experiment results.
 
 
-
-.. autoclass:: trajtracker.paradigms.num2pos.ExperimentInfo
+.. autoclass:: trajtracker.paradigms.num2pos.N2PExperimentInfo
     :members:
-    :member-order: bysource
+    :member-order: alphabetical
+
+
+The N2PExperimentInfo class is an extension of BaseExperimentInfo so it contains all its properties
+too, as detailed below:
+
+.. autoclass:: trajtracker.paradigms.common.BaseExperimentInfo
+    :members:
+    :exclude-members: __init__
+    :member-order: alphabetical
 

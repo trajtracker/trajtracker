@@ -5,29 +5,18 @@ Functions to support the number-to-position paradigm
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
-import numbers
-import random
-import csv
-import numpy as np
-import time
-from enum import Enum
-# noinspection PyPep8Naming
-import xml.etree.cElementTree as ET
-
-
 import expyriment as xpy
+import numpy as np
+import random
 
 import trajtracker as ttrk
-# noinspection PyProtectedMember
-import trajtracker._utils as _u
-import trajtracker.utils as u
 from trajtracker.utils import get_time
 from trajtracker.validators import ExperimentError
 from trajtracker.movement import StartPoint
-from trajtracker.paradigms.num2pos import *
+from trajtracker.paradigms import common
+from trajtracker.paradigms.common import RunTrialResult, FINGER_STARTED_MOVING
 
-
-RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
+from trajtracker.paradigms.num2pos import ExperimentInfo, TrialInfo, create_experiment_objects
 
 
 #----------------------------------------------------------------
@@ -45,11 +34,11 @@ def run_full_experiment(config, xpy_exp, subj_id, subj_name=""):
     :param subj_name: The subject name from the num2pos app welcome screen (or an empty string) 
     """
 
-    exp_info = ttrk.paradigms.num2pos.ExperimentInfo(config, xpy_exp, subj_id, subj_name)
+    exp_info = ExperimentInfo(config, xpy_exp, subj_id, subj_name)
 
     create_experiment_objects(exp_info)
 
-    register_to_event_manager(exp_info)
+    common.register_to_event_manager(exp_info)
 
     run_trials(exp_info)
 
@@ -57,14 +46,7 @@ def run_full_experiment(config, xpy_exp, subj_id, subj_name=""):
 #----------------------------------------------------------------
 def run_trials(exp_info):
 
-    exp_info.session_start_localtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-
-    if exp_info.config.shuffle_trials:
-        random.shuffle(exp_info.trials)
-
-    exp_info.trajtracker.init_output_file()
-
-    exp_info.session_start_time = get_time()
+    common.init_experiment(exp_info)
 
     trial_num = 1
 
@@ -104,7 +86,7 @@ def run_trial(exp_info, trial):
     Run a single trial
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo
      
     :return: True if the trial ended successfully, False if it failed
     """
@@ -132,7 +114,7 @@ def run_trial(exp_info, trial):
             return RunTrialResult.Failed
 
         #-- Inform relevant objects (validators, trajectory tracker, event manager, etc.) of the progress
-        err = update_movement(exp_info, trial)
+        err = common.update_movement_in_traj_sensitive_objects(exp_info, trial)
         if err is not None:
             trial_failed(err, exp_info, trial)
             return RunTrialResult.Failed
@@ -159,13 +141,13 @@ def on_finger_touched_screen(exp_info, trial):
     This function should be called when the finger touches the screen
 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo
     """
 
     exp_info.errmsg_textbox.visible = False
     exp_info.target_pointer.visible = False
 
-    show_fixation(exp_info)
+    common.show_fixation(exp_info)
     update_numberline_for_trial(exp_info, trial)
 
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_STARTED, 0,
@@ -186,12 +168,12 @@ def wait_until_finger_moves(exp_info, trial):
     The function returns after the finger started moving (or on error)
 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo 
+
     :return: None if all OK, RunTrialResult.xxx if trial should terminate
     """
 
-    #-- Wait for the participant to start moving the finger
+    # -- Wait for the participant to start moving the finger
     exp_info.start_point.wait_until_exit(exp_info.xpy_exp,
                                          on_loop_present=exp_info.stimuli,
                                          event_manager=exp_info.event_manager,
@@ -200,26 +182,27 @@ def wait_until_finger_moves(exp_info, trial):
                                          max_wait_time=trial.finger_moves_max_time)
 
     if exp_info.start_point.state == StartPoint.State.aborted:
-        #-- Finger lifted
-        show_fixation(exp_info, False)
+        # -- Finger lifted
+        common.show_fixation(exp_info, False)
         return RunTrialResult.Aborted
 
     elif exp_info.start_point.state == StartPoint.State.error:
-        #-- Invalid start direction
-        trial_failed(ExperimentError("StartedSideways", "Start the trial by moving straight, not sideways!"), exp_info, trial)
+        # -- Invalid start direction
+        trial_failed(ExperimentError("StartedSideways", "Start the trial by moving straight, not sideways!"),
+                     exp_info, trial)
         return RunTrialResult.Failed
 
     elif exp_info.start_point.state == StartPoint.State.timeout:
-        #-- Finger moved too late
+        # -- Finger moved too late
         trial_failed(ExperimentError("FingerMovedTooLate", "You moved too late"), exp_info, trial)
         return RunTrialResult.Failed
 
     if trial.finger_moves_min_time is not None and get_time() - trial.start_time < trial.finger_moves_min_time:
-        #-- Finger moved too early
+        # -- Finger moved too early
         trial_failed(ExperimentError("FingerMovedTooEarly", "You moved too early"), exp_info, trial)
         return RunTrialResult.Failed
 
-    on_finger_started_moving(exp_info, trial)
+    common.on_finger_started_moving(exp_info, trial)
 
     return None
 
@@ -230,7 +213,7 @@ def initialize_trial(exp_info, trial):
     Initialize a trial
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo 
     """
 
     exp_info.start_point.reset()
@@ -241,10 +224,10 @@ def initialize_trial(exp_info, trial):
 
     exp_info.stimuli.present()  # reset the display
 
-    update_text_target_for_trial(exp_info, trial)
-    update_generic_target_for_trial(exp_info, trial)
+    common.update_text_target_for_trial(exp_info, trial)
+    common.update_generic_target_for_trial(exp_info, trial)
     if exp_info.fixation is not None:
-        update_fixation_for_trial(exp_info, trial)
+        common.update_fixation_for_trial(exp_info, trial)
 
     exp_info.numberline.target = trial.target
 
@@ -257,293 +240,19 @@ def initialize_trial(exp_info, trial):
         trial.results['targets_t0'] = get_time() - trial.start_time
 
 
-#----------------------------------------------------------------
-def on_finger_started_moving(exp_info, trial):
-    """
-    This function should be called when the finger leaves the "start" area and starts moving
-
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    """
-
-    show_fixation(exp_info, False)
-    t = get_time()
-    time_in_trial = t - trial.start_time
-    time_in_session = t - exp_info.session_start_time
-    trial.results['time_started_moving'] = time_in_trial
-
-    #-- This event is dispatched before calling present(), because it might trigger operations that
-    #-- show/hide stuff
-    exp_info.event_manager.dispatch_event(FINGER_STARTED_MOVING, time_in_trial, time_in_session)
-
-    exp_info.stimuli.present()
-
-    if not exp_info.config.stimulus_then_move:
-        trial.results['targets_t0'] = get_time() - trial.start_time
-
-
-#----------------------------------------------------------------
-def show_fixation(exp_info, visible=True):
-    if exp_info.fixation is not None:
-        exp_info.fixation.visible = visible
-
-
-#----------------------------------------------------------------
-def update_text_target_for_trial(exp_info, trial):
-    """
-    Update properties of the text stimuli according to the current trial info
-    
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    """
-
-    if not trial.use_text_targets:
-        # No text in this trial
-        exp_info.text_target.texts = []
-        return
-
-    if "text.target" in trial.csv_data:
-        #-- Set the text to show as target (or several, semicolon-separated texts, in case of RSVP)
-        trial.text_target = trial.csv_data["text.target"]
-    else:
-        trial.text_target = str(trial.target)
-
-    exp_info.text_target.texts = trial.text_target.split(";")
-
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.font', 'text_font')
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.text_size', 'text_size')
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.bold', 'text_bold')
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.italic', 'text_italic')
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.underline', 'text_underline')
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.justification', 'text_justification')
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.text_colour', 'text_colour')
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.background_colour', 'background_colour')
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.size', 'size')
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.position', 'position')
-    _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'x')
-    _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'y')
-
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.onset_time', 'onset_time')
-    _update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.duration', 'duration')
-
-
-# ----------------------------------------------------------------
-def update_generic_target_for_trial(exp_info, trial):
-    """
-    Update properties of the generic stimuli according to the current trial info
-
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    """
-
-    if not trial.use_generic_targets:
-        # No text in this trial
-        exp_info.generic_target.shown_stimuli = []
-        return
-
-    trial.generic_target = trial.csv_data["genstim.target"]
-
-    exp_info.generic_target.shown_stimuli = trial.csv_data['genstim.target'].split(";")
-
-    _update_attr_by_csv_config(exp_info, trial, exp_info.generic_target, 'genstim.position', 'position')
-
-    _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'x')
-    _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'y')
-
-
-#------------------------------------------------
-def update_fixation_for_trial(exp_info, trial):
-    """
-    Update the fixation when the trial is initialized
-
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
-    """
-
-    if exp_info.config.fixation_type == 'text':
-
-        if 'fixation.text' in trial.csv_data:
-            exp_info.fixation.text = trial.csv_data['fixation.text']
-
-        if exp_info.fixation.text == '':
-            ttrk.log_write("WARNING: No fixation text was set for trial #{:}".format(trial.trial_num))
-
-    _update_attr_by_csv_config(exp_info, trial, exp_info.fixation, 'fixation.position', 'position')
-
-    _update_obj_position(exp_info, trial, exp_info.fixation, 'fixation', 'x')
-    _update_obj_position(exp_info, trial, exp_info.fixation, 'fixation', 'y')
-
-
 #------------------------------------------------
 def update_numberline_for_trial(exp_info, trial):
     """
     Update the number line when the trial is initialized
 
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo
     """
 
-    _update_attr_by_csv_config(exp_info, trial, exp_info.numberline, 'nl.position', 'position')
+    common.update_attr_by_csv_config(exp_info, trial, exp_info.numberline, 'nl.position', 'position')
 
-    _update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'x')
-    _update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'y')
-
-
-#------------------------------------------------
-def _update_attr_by_csv_config(exp_info, trial, target_holder, csv_name, attr_name):
-    """
-    Update one attribute of the target object from the CSV file
-    
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    """
-
-    if csv_name not in trial.csv_data:
-        return
-
-    value = trial.csv_data[csv_name]
-    if isinstance(value, list) and len(value) < target_holder.n_stim:
-            raise Exception("Invalid value for column '{:}' in the data file {:}: the column has {:} values, expecting {:}".format(
-                attr_name, exp_info.config.data_source, len(value), target_holder.n_stim))
-
-    setattr(target_holder, attr_name, value)
-
-
-#------------------------------------------------
-def _update_target_stimulus_position(exp_info, trial, target_holder, col_name_prefix, x_or_y):
-    """
-    Update the stimulus position according to "position.x" or "position.y" columns
-    
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
-    """
-
-    if x_or_y not in ('x', 'y'):
-        raise Exception("Invalid x_or_y argument ({:})".format(x_or_y))
-    is_x = x_or_y == 'x'
-
-    csv_col, coord_as_percentage = _get_x_or_y_col(trial, col_name_prefix, x_or_y)
-    if csv_col is None:
-        return
-
-    n_stim = target_holder.n_stim
-
-    #-- Get the x/y coordinates as an array
-    coord = trial.csv_data[csv_col]
-    if coord_as_percentage:
-        coord = coord_to_pixels(coord, csv_col, exp_info.config.data_source, is_x)
-
-    if not isinstance(coord, list):
-        coord = [coord] * n_stim
-
-    if len(coord) < n_stim:
-        raise Exception(
-            "Invalid value for column '{:}' in the data file {:}: the column has {:} values, expecting {:}".format(
-                attr_name, exp_info.config.data_source, len(value), n_stim))
-
-    pos = target_holder.position
-    if not isinstance(pos, list):
-        pos = [pos] * n_stim
-
-    for i in range(min(len(pos), len(coord))):
-        pos[i] = (coord[i], pos[i][1]) if is_x else (pos[i][0], coord[i])
-
-    target_holder.position = pos
-
-
-#------------------------------------------------
-def _update_obj_position(exp_info, trial, visual_obj, col_name_prefix, x_or_y):
-    """
-    Update the position of a visual object according to "position.x" or "position.y" columns
-    
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
-    """
-
-    if x_or_y not in ('x', 'y'):
-        raise Exception("Invalid x_or_y argument ({:})".format(x_or_y))
-    is_x = x_or_y == 'x'
-
-    csv_col, coord_as_percentage = _get_x_or_y_col(trial, col_name_prefix, x_or_y)
-    if csv_col is None:
-        return
-
-    coord = trial.csv_data[csv_col]
-    if coord_as_percentage:
-        coord = coord_to_pixels(coord, csv_col, exp_info.config.data_source, is_x)
-
-    visual_obj.position = (coord, visual_obj.position[1]) if is_x else (visual_obj.position[0], coord)
-
-
-#------------------------------------------------
-def _get_x_or_y_col(trial, col_name_prefix, x_or_y):
-    """
-    Get the CSV column name from which x/y coordinate should be taken
-     
-    :return: col_name(str), is_percentage(bool) 
-    """
-
-    csv_col = "{:}.position.{:}".format(col_name_prefix, x_or_y)
-    if csv_col in trial.csv_data:
-        return csv_col, False
-
-    else:
-        csv_col = "{:}.position.{:}%".format(col_name_prefix, x_or_y)
-        if csv_col not in trial.csv_data:
-            return None, None
-
-        return csv_col, True
-
-
-#------------------------------------------------
-def coord_to_pixels(coord, col_name, filename, is_x):
-    """
-    Convert screen coordinates, which were provided as percentage of the screen width/height,
-    into pixels.
-
-    :param coord: The coordinate, on a 0-1 scale; or a list of coordinates
-    :param col_name: The column name in the CSV file (just for logging)
-    :param filename: CSV file name (just for logging)
-    :param is_x: (bool) whether it's an x or y coordinate
-    :return: coordinate as pixels (int); or a list of coords
-    """
-
-    screen_size = ttrk.env.screen_size[0 if is_x else 1]
-
-    coord_list = coord if isinstance(coord, list) else [coord]
-    # noinspection PyTypeChecker
-    if sum([not (-1.5 <= c <= 2.5) for c in coord_list]) > 0:
-        # Some coordinates are way off the screen bounds
-        raise ttrk.ValueError("Invalid {:} in the CSV file {:}: within-screen coordinates are in the range 0-1".
-                              format(col_name, filename))
-
-    if isinstance(coord, list):
-        return [int(np.round((c - 0.5) * screen_size)) for c in coord]
-    else:
-        return int(np.round((coord - 0.5) * screen_size))
-
-
-#------------------------------------------------
-def update_movement(exp_info, trial):
-    """
-    Update the trajectory-sensitive objects about the mouse/finger movement
-        
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
-    :return: None if all is OK; or an ExperimentError object if one of the validators issued an error
-    """
-
-    curr_time = get_time()
-    time_in_trial = curr_time - trial.start_time
-    time_in_session = curr_time - exp_info.session_start_time
-
-    for obj in exp_info.trajectory_sensitive_objects:
-        err = obj.update_xyt(ttrk.env.mouse.position, time_in_trial, time_in_session)
-        if err is not None:
-            return err
-
-    exp_info.event_manager.on_frame(time_in_trial, time_in_session)
-
-    return None
+    common.update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'x')
+    common.update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'y')
 
 
 #------------------------------------------------
@@ -556,10 +265,10 @@ def trial_failed(err, exp_info, trial):
 
     :type err: ExperimentError
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo 
     """
 
-    print("   ERROR in trial: " + err.message)
+    ttrk.log_write("ERROR in trial ({:}). Message shown to subject: {:}".format(err.err_code, err.message))
 
     curr_time = get_time()
 
@@ -584,7 +293,7 @@ def trial_succeeded(exp_info, trial):
     Called when the trial ends successfully (i.e. the finger touched the numberline - doesn't matter where)
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo 
     """
 
     print("   Trial ended successfully.")
@@ -607,29 +316,13 @@ def trial_succeeded(exp_info, trial):
 
 
 #------------------------------------------------
-def play_success_sound(exp_info, trial):
-    """
-    Play a "trial succeeded" sound. If required in the configuration, we select here the sound
-    depending on the endpoint error.
-    
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    """
-
-    endpoint_err = np.abs(exp_info.numberline.response_value - trial.target)
-    endpoint_err_ratio = min(1, endpoint_err / (exp_info.numberline.max_value - exp_info.numberline.min_value))
-    sound_ind = np.where(endpoint_err_ratio <= exp_info.sounds_ok_max_ep_err)[0][0]
-    exp_info.sounds_ok[sound_ind].play()
-
-
-#------------------------------------------------
 def trial_ended(exp_info, trial, time_in_trial, success_err_code):
     """
     This function is called whenever a trial ends, either successfully or with failure.
     It updates the result files.
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo 
     :param time_in_trial: 
     :param success_err_code: A string code to write as status for this trial 
     """
@@ -637,12 +330,11 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code):
     exp_info.stimuli.present()
 
     if exp_info.config.save_results:
-
         update_trials_file(exp_info, trial, time_in_trial, success_err_code)
 
         #-- Save the session at the end of each trial, to make sure it's always saved - even if
         #-- the experiment software unexpectedly terminates
-        save_session_file(exp_info)
+        common.save_session_file(exp_info, "NL")
 
 
 #------------------------------------------------
@@ -651,7 +343,7 @@ def update_trials_file(exp_info, trial, time_in_trial, success_err_code):
     Add an entry (line) to the trials.csv file
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo 
     :param time_in_trial: 
     :param success_err_code: A string code to write as status for this trial 
     """
@@ -704,64 +396,22 @@ def open_trials_file(exp_info):
     fields = ['trialNum', 'LineNum', 'target', 'presentedTarget', 'status', 'endPoint', 'movementTime',
               'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']
 
-    filename = xpy.io.defaults.datafile_directory + "/" + exp_info.trials_out_filename
-
-    exp_info.trials_out_fp = open(filename, 'w')
-    exp_info.trials_file_writer = csv.DictWriter(exp_info.trials_out_fp, fields)
-    exp_info.trials_file_writer.writeheader()
+    return common.open_trials_file(exp_info, fields)
 
 
-#------------------------------------------------
-def save_session_file(exp_info):
+# ------------------------------------------------
+def play_success_sound(exp_info, trial):
     """
-    Save the session.xml file 
+    Play a "trial succeeded" sound. If required in the configuration, we select here the sound
+    depending on the endpoint error.
+
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo 
     """
 
-    root = ET.Element("data")
+    endpoint_err = np.abs(exp_info.numberline.response_value - trial.target)
+    endpoint_err_ratio = min(1, endpoint_err / (exp_info.numberline.max_value - exp_info.numberline.min_value))
+    sound_ind = np.where(endpoint_err_ratio <= exp_info.sounds_ok_max_ep_err)[0][0]
+    exp_info.sounds_ok[sound_ind].play()
 
-    #-- Software version
-    source_node = ET.SubElement(root, "source")
-    ET.SubElement(source_node, "software", name="TrajTracker", version=ttrk.version())
-    ET.SubElement(source_node, "paradigm", name="NL", version=version())
-    ET.SubElement(source_node, "experiment", name=exp_info.config.experiment_id)
-
-    #-- Subject info
-    subj_node = ET.SubElement(root, "subject", id=exp_info.subject_id, expyriment_id=str(exp_info.xpy_exp.subject))
-    ET.SubElement(subj_node, "name").text = exp_info.subject_name
-
-    #-- Session data
-    session_node = ET.SubElement(root, "session", start_time=exp_info.session_start_localtime)
-
-    results_node = ET.SubElement(session_node, "exp_level_results")
-
-    for key, value in exp_info.exp_data.items():
-        value_type = "number" if isinstance(value, numbers.Number) else "string"
-        if isinstance(value, float):
-            value = "{:.6f}".format(value)
-        ET.SubElement(results_node, "data", name=key, value=str(value), type=value_type)
-
-    files_node = ET.SubElement(session_node, "files")
-    ET.SubElement(files_node, "file", type="trials", name=exp_info.trials_out_filename)
-    ET.SubElement(files_node, "file", type="trajectory", name=exp_info.traj_out_filename)
-
-    indent_xml(root)
-    tree = ET.ElementTree(root)
-    tree.write(xpy.io.defaults.datafile_directory + "/" + exp_info.session_out_filename, encoding="UTF-8")
-
-
-#------------------------------------------------------------
-def indent_xml(elem, level=0):
-    i = "\n" + level * "  "
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + "  "
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-        for elem in elem:
-            indent_xml(elem, level + 1)
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-    else:
-        if level and (not elem.tail or not elem.tail.strip()):
-            elem.tail = i
 

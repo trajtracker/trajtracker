@@ -14,5 +14,5 @@ Methods and properties:
 .. autoclass:: trajtracker.validators.LocationsValidator
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 

@@ -22,5 +22,5 @@ Methods and properties:
 .. autoclass:: trajtracker.movement.RectStartPoint
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 

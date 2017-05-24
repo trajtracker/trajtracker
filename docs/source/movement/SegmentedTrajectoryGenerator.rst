@@ -17,5 +17,5 @@ Methods and properties:
 .. autoclass:: trajtracker.movement.SegmentedTrajectoryGenerator
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 

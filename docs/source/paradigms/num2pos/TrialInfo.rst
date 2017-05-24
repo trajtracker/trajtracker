@@ -8,7 +8,7 @@ This object keeps all the data of a single trial.
 
 
 
-.. autoclass:: trajtracker.paradigms.num2pos.TrialInfo
+.. autoclass:: trajtracker.paradigms.common.TrialInfo
     :members:
-    :member-order: bysource
+    :member-order: alphabetical
 

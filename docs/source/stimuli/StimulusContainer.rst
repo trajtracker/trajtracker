@@ -29,6 +29,6 @@ Methods and properties:
 .. autoclass:: trajtracker.stimuli.StimulusContainer
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 
 

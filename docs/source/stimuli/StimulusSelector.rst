@@ -28,4 +28,4 @@ Methods and properties:
 .. autoclass:: trajtracker.stimuli.StimulusSelector
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical

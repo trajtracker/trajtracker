@@ -16,5 +16,5 @@ Methods and properties:
 .. autoclass:: trajtracker.movement.Hotspot
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 

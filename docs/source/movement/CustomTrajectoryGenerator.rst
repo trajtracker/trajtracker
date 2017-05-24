@@ -21,5 +21,5 @@ Methods and properties:
 .. autoclass:: trajtracker.movement.CustomTrajectoryGenerator
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 

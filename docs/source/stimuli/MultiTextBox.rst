@@ -69,6 +69,6 @@ Methods and properties:
 .. autoclass:: trajtracker.stimuli.MultiTextBox
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 
 

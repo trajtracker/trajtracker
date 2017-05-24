@@ -49,6 +49,6 @@ Methods and properties:
 .. autoclass:: trajtracker.events.Event
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 
 

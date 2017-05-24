@@ -32,7 +32,7 @@ if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
 
 #-- Get subject info
-(subj_id, subj_name) = ttrk.paradigms.general.get_subject_name_id()
+(subj_id, subj_name) = ttrk.paradigms.common.get_subject_name_id()
 
 #-- Run the experiment
 num2pos.run_full_experiment(config, exp, subj_id, subj_name)

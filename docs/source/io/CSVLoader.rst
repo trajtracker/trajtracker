@@ -23,6 +23,6 @@ Methods and properties:
 .. autoclass:: trajtracker.io.CSVLoader
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 
 

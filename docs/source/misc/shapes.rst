@@ -17,7 +17,7 @@ Rectangle
 .. autoclass:: trajtracker.misc.nvshapes.Rectangle
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 
 
 Circle
@@ -26,7 +26,7 @@ Circle
 .. autoclass:: trajtracker.misc.nvshapes.Circle
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 
 
 Sector
@@ -35,5 +35,5 @@ Sector
 .. autoclass:: trajtracker.misc.nvshapes.Sector
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 

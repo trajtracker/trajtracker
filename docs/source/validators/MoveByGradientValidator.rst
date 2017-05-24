@@ -47,7 +47,7 @@ Methods and properties:
 .. autoclass:: trajtracker.validators.MoveByGradientValidator
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 
 
 

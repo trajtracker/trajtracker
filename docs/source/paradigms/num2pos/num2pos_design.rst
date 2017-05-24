@@ -92,42 +92,69 @@ The operations triggered by events are:
   and disabling them on TRIAL_ENDED.
 
 
-Initialization functions (in _n2p_init.py)
-++++++++++++++++++++++++++++++++++++++++++
+Initialization functions
+++++++++++++++++++++++++
 
 Here, the main program calls *create_experiment_objects()*; this function takes care of the complete
 initialization process: it calls all the other functions in this file.
 
+Functions in _n2p_init.py (specific to number-to-position paradigm)
+-------------------------------------------------------------------
+
 .. autofunction:: trajtracker.paradigms.num2pos.create_experiment_objects
 .. autofunction:: trajtracker.paradigms.num2pos.create_numberline
-.. autofunction:: trajtracker.paradigms.num2pos.create_start_point
-.. autofunction:: trajtracker.paradigms.num2pos.create_traj_tracker
-.. autofunction:: trajtracker.paradigms.num2pos.create_validators
-.. autofunction:: trajtracker.paradigms.num2pos.create_textbox_target
-.. autofunction:: trajtracker.paradigms.num2pos.create_generic_target
-.. autofunction:: trajtracker.paradigms.num2pos.create_errmsg_textbox
-.. autofunction:: trajtracker.paradigms.num2pos.register_to_event_manager
 .. autofunction:: trajtracker.paradigms.num2pos.create_sounds
-.. autofunction:: trajtracker.paradigms.num2pos.load_sound
 .. autofunction:: trajtracker.paradigms.num2pos.load_data_source
 
 
+Functions in _common_funcs_init.py (common to several paradigms)
+----------------------------------------------------------------
 
-Runtime functions (in _n2p_run.py)
-++++++++++++++++++++++++++++++++++
+.. autofunction:: trajtracker.paradigms.common.create_errmsg_textbox
+.. autofunction:: trajtracker.paradigms.common.create_fixation
+.. autofunction:: trajtracker.paradigms.common.create_fixation_cross
+.. autofunction:: trajtracker.paradigms.common.create_generic_target
+.. autofunction:: trajtracker.paradigms.common.create_start_point
+.. autofunction:: trajtracker.paradigms.common.create_textbox_fixation
+.. autofunction:: trajtracker.paradigms.common.create_textbox_target
+.. autofunction:: trajtracker.paradigms.common.create_traj_tracker
+.. autofunction:: trajtracker.paradigms.common.create_validators
+.. autofunction:: trajtracker.paradigms.common.get_subject_name_id
+.. autofunction:: trajtracker.paradigms.common.load_sound
+.. autofunction:: trajtracker.paradigms.common.register_to_event_manager
+
+
+
+Functions that run the experiment
++++++++++++++++++++++++++++++++++
+
+
+Functions in _n2p_run.py (specific to number-to-position paradigm)
+------------------------------------------------------------------
 
 .. autofunction:: trajtracker.paradigms.num2pos.run_full_experiment
-.. autofunction:: trajtracker.paradigms.num2pos.run_trials
-.. autofunction:: trajtracker.paradigms.num2pos.run_trial
+
 .. autofunction:: trajtracker.paradigms.num2pos.initialize_trial
 .. autofunction:: trajtracker.paradigms.num2pos.on_finger_touched_screen
-.. autofunction:: trajtracker.paradigms.num2pos.wait_until_finger_moves
-.. autofunction:: trajtracker.paradigms.num2pos.on_finger_started_moving
-.. autofunction:: trajtracker.paradigms.num2pos.update_text_target_for_trial
-.. autofunction:: trajtracker.paradigms.num2pos.update_generic_target_for_trial
-.. autofunction:: trajtracker.paradigms.num2pos.update_movement
+.. autofunction:: trajtracker.paradigms.num2pos.play_success_sound
+.. autofunction:: trajtracker.paradigms.num2pos.run_trials
+.. autofunction:: trajtracker.paradigms.num2pos.run_trial
+.. autofunction:: trajtracker.paradigms.num2pos.trial_ended
 .. autofunction:: trajtracker.paradigms.num2pos.trial_failed
 .. autofunction:: trajtracker.paradigms.num2pos.trial_succeeded
-.. autofunction:: trajtracker.paradigms.num2pos.trial_ended
-.. autofunction:: trajtracker.paradigms.num2pos.play_success_sound
-.. autofunction:: trajtracker.paradigms.num2pos.save_session_file
+.. autofunction:: trajtracker.paradigms.num2pos.wait_until_finger_moves
+
+Functions in _common_funcs_run.py (common to several paradigms)
+---------------------------------------------------------------
+
+.. autofunction:: trajtracker.paradigms.common.init_experiment
+.. autofunction:: trajtracker.paradigms.common.on_finger_started_moving
+.. autofunction:: trajtracker.paradigms.common.open_trials_file
+.. autofunction:: trajtracker.paradigms.common.save_session_file
+.. autofunction:: trajtracker.paradigms.common.show_fixation
+.. autofunction:: trajtracker.paradigms.common.update_attr_by_csv_config
+.. autofunction:: trajtracker.paradigms.common.update_fixation_for_trial
+.. autofunction:: trajtracker.paradigms.common.update_generic_target_for_trial
+.. autofunction:: trajtracker.paradigms.common.update_movement_in_traj_sensitive_objects
+.. autofunction:: trajtracker.paradigms.common.update_text_target_for_trial
+.. autofunction:: trajtracker.paradigms.common.update_obj_position

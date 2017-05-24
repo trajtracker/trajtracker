@@ -6,46 +6,25 @@ This module has functions to support the number-to-position paradigm
 """
 
 
-def version():
-    return "1.0"
-
-
-from ._Config import Config, FINGER_STARTED_MOVING
-from ._TrialInfo import TrialInfo
+from ._Config import Config
 from ._ExperimentInfo import ExperimentInfo
+from ._TrialInfo import TrialInfo
 from ._DownArrow import DownArrow
 
 from ._n2p_init import \
-    create_errmsg_textbox, \
     create_experiment_objects, \
-    create_fixation, \
-    create_fixation_cross, \
-    create_generic_target, \
     create_numberline, \
     create_sounds, \
-    create_start_point, \
-    create_textbox_fixation, \
-    create_textbox_target, \
-    create_traj_tracker, \
-    create_validators, \
-    load_data_source, \
-    load_sound, \
-    register_to_event_manager
-
+    load_data_source
 
 from ._n2p_run import \
     initialize_trial, \
-    on_finger_started_moving, \
     on_finger_touched_screen, \
     play_success_sound, \
     run_full_experiment, \
     run_trial, \
     run_trials, \
-    save_session_file, \
     trial_ended, \
     trial_failed, \
     trial_succeeded, \
-    update_movement, \
-    update_generic_target_for_trial, \
-    update_text_target_for_trial, \
     wait_until_finger_moves

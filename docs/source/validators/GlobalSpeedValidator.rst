@@ -15,5 +15,5 @@ Methods and properties:
 .. autoclass:: trajtracker.validators.GlobalSpeedValidator
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 

@@ -31,7 +31,7 @@ def version():
     
     :return: str
     """
-    return "0.0.1"
+    return "0.1.1"
 
 
 #----------------------------------------------------------
@@ -39,6 +39,7 @@ def version():
 TYPE_COORD = "coord"
 TYPE_RGB = "RGB"
 TYPE_CALLABLE = "callable"
+
 
 #============================================================================
 #   Exception classes
@@ -51,31 +52,40 @@ class TrajTrackerError(Exception):
     def __str__(self):
         return "{:}: {:}".format(type(self).__name__, self.message)
 
+
 class InvalidStateError(TrajTrackerError):
     """ Exception indicating that a method was called when the object is an inappropriate state """
     pass
+
 
 class BadFormatError(TrajTrackerError):
     """ Exception indicating that data was provided in an invalid format (e.g., in a file) """
     pass
 
+
+# noinspection PyShadowingBuiltins
 class ValueError(TrajTrackerError):
     """ Exception indicating that an invalid value was encountered """
     pass
 
+
+# noinspection PyShadowingBuiltins
 class TypeError(TrajTrackerError):
     """ Exception indicating that a value of invalid type was encountered """
     pass
 
 
+# noinspection PyProtectedMember
 from trajtracker._ttrk_funcs import log_write, initialize
 
 #============================================================================
 #   Import the TrajTracker modules
 #============================================================================
 
+# noinspection PyProtectedMember
 from trajtracker._TTrkObject import TTrkObject
 
+# noinspection PyProtectedMember
 from . import _utils
 from . import utils
 

@@ -6,6 +6,9 @@ An error object, describing an invalid user behavior during the experiment
 @copyright: Copyright (c) 2017, Dror Dotan
 """
 
+import trajtracker as ttrk
+import trajtracker._utils as _u
+
 
 class ExperimentError(BaseException):
 
@@ -40,4 +43,12 @@ class ExperimentError(BaseException):
             raise AttributeError("Argument '{0}' does not exist in this exception".format(arg_name))
         return self._args[arg_name]
 
+
+#--------------------------------------------------------------------
+def create_experiment_error(self, err_code, message, err_args=None):
+
+    self._log_write_if(ttrk.log_info, "Experiment error detected by {:}: errcode={:}, message = {:}. Error parameters: {:}".
+                       format(_u.get_type_name(self), err_code, message, err_args))
+
+    return ExperimentError(err_code, message, self, err_args)
 

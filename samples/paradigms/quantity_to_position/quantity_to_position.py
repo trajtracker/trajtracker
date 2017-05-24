@@ -126,7 +126,7 @@ if not xpy.misc.is_android_running():
 stimuli = create_stimuli(0, 100)
 
 #-- Get subject info
-(subj_id, subj_name) = ttrk.paradigms.general.get_subject_name_id()
+(subj_id, subj_name) = ttrk.paradigms.common.get_subject_name_id()
 
 
 #-- Run the experiment

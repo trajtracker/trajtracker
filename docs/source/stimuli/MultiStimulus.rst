@@ -42,6 +42,6 @@ Methods and properties:
 .. autoclass:: trajtracker.stimuli.MultiStimulus
    :members:
    :inherited-members:
-   :member-order: bysource
+   :member-order: alphabetical
 
 
