@@ -13,12 +13,12 @@ This object keeps all the experiment data:
 - The experiment results.
 
 
-.. autoclass:: trajtracker.paradigms.num2pos.N2PExperimentInfo
+.. autoclass:: trajtracker.paradigms.num2pos.ExperimentInfo
     :members:
     :member-order: alphabetical
 
 
-The N2PExperimentInfo class is an extension of BaseExperimentInfo so it contains all its properties
+The ExperimentInfo class is an extension of BaseExperimentInfo so it contains all its properties
 too, as detailed below:
 
 .. autoclass:: trajtracker.paradigms.common.BaseExperimentInfo
