@@ -62,24 +62,40 @@ Columns to define visual properties
 
 All these columns are optional.
 
-**text.position**, **genstim.position**, **fixation.position**, **nl.position**
-    The position of the stimulus / fixation / number line - x and y coordinates, separated by
+| **text.position**
+| **genstim.position**
+| **fixation.position**
+| **nl.position**
+|   The position of the stimulus / fixation / number line - x and y coordinates, separated by
     a colon, e.g.: "10:20" for x=10, y=20.
 
-**text.position.x**, **text.position.y**, **genstim.position.x**, **genstim.position.y**, **fixation.position.x**, **fixation.position.y**, **nl.position.x**, **nl.position.y**
-    The position of the stimulus / fixation / number line - either x or y coordinates
+| **text.position.x**
+| **text.position.y**
+| **genstim.position.x**
+| **genstim.position.y**
+| **fixation.position.x**
+| **fixation.position.y**
+| **nl.position.x**
+| **nl.position.y**
+|   The position of the stimulus / fixation / number line - either x or y coordinates
     (the other coordinate can be defined either in another column or just in the initialization script).
 
-**text.onset_time**, **genstim.onset_time**
-    The time to present the stimulus, specified in seconds relatively
+| **nl.position.x%**
+| **fixation.position.x%**
+|     Specify the horizontal position of the fixation / number line as percentage of the screen width
+
+| **text.onset_time**
+| **genstim.onset_time**
+|   The time to present the stimulus, specified in seconds relatively
     to the baseline event (which is TRIAL_STARTED in case config.stimulusThenMove is True, and FINGER_STARTED_MOVING
     in case config.stimulusThenMove is False).
 
     If several targets were specified (in the **text.target** or
     **genstim.target** columns), you cannot specify a single onset_time - you must provide an onset_time per target.
 
-**text.duration**, **genstim.duration**
-    The duration of presenting the target (in seconds),
+| **text.duration**
+| **genstim.duration**
+|   The duration of presenting the target (in seconds),
     or a semicolon-separated list of durations - one per target.
 
 **text.font**
