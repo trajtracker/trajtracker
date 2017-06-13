@@ -58,8 +58,11 @@ Number line
     **max_numberline_value** (number, mandatory parameter)
         The value at the right end of the number line.
 
-    **min_numberline_value** (number)
+    **min_numberline_value** (number, default: 0)
         The value at the left end of the number line.
+
+    **nl_labels_visible** (bool, default: True)
+        Whether to show labels at the end of the number line (with min/max values)
 
     **nl_length** (number, default: 0.9)
         The length of the number line. The length is specified either in pixels (an int value larger than 1)
@@ -80,6 +83,28 @@ Number line
     **post_response_target** (bool, default: False)
         Whether to show the correct target location, as a downward-pointing arrow along the number line,
         after the response was made
+
+    **nl_line_width** (int)
+        Width (in pixels) of the number line
+
+    **nl_end_tick_height** (int)
+        height (in pixels) of the ticks at the end of the line
+
+    **nl_line_colour** (RGB)
+        The line colour
+
+    **nl_labels_box_size** (width, height)
+        Size (in pixels) of the end-of-line labels' text box
+
+    **nl_labels_font_name** (str, default: Arial)
+
+    **nl_labels_colour** (RGB)
+
+    **nl_labels_offset** (tuple (x, y); default: (0,0))
+        Offset to move labels (relatively to their default position)
+
+    **nl_distance_from_top** (int)
+        Distance of the numberline's main line from top-of-screen (in pixels)
 
 
 "Start" rectangle

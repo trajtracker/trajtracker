@@ -313,9 +313,10 @@ class StartPoint(ttrk.TTrkObject):
         *callback - event manager.on_frame() - present()*.
         
         :param exp: The Expyriment experiment object
-        :param on_loop_callback: A function (without arguments) to call on each loop iteration. 
+        :param on_loop_callback: A function to call on each loop iteration. 
                                  If the function returns any value other than *None*, the waiting will
                                  be terminated and that value will be returned.
+                                 The function gets 2 arguments: time_in_trial, time_in_session
         :param on_loop_present: A visual object that will be present()ed on each loop iteration.
         :param event_manager: The event manager's on_frame() will be called on each loop iteration.
                               If you provide an event manager, you also have to provide trial_start_time and
@@ -339,6 +340,10 @@ class StartPoint(ttrk.TTrkObject):
         #-- Wait
         while self._state not in [StartPoint.State.start, StartPoint.State.error]:
 
+            curr_time = u.get_time()
+            time_in_trial = None if trial_start_time is None else curr_time - trial_start_time
+            time_in_session = curr_time - session_start_time
+
             if ttrk.env.mouse.check_button_pressed(0):
                 #-- Finger still touching screen
                 finger_pos = ttrk.env.mouse.position
@@ -356,14 +361,12 @@ class StartPoint(ttrk.TTrkObject):
 
             # Invoke custom operations on each loop iteration
             if on_loop_callback is not None:
-                retval = on_loop_callback()
+                retval = on_loop_callback(time_in_trial, time_in_session)
                 if retval is not None:
                     return retval
 
             if event_manager is not None:
-                curr_time = u.get_time()
-                event_manager.on_frame(None if trial_start_time is None else curr_time - trial_start_time,
-                                       curr_time - session_start_time)
+                event_manager.on_frame(time_in_trial, time_in_session)
 
             if on_loop_present is not None:
                 on_loop_present.present()

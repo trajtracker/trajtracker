@@ -92,7 +92,7 @@ def create_numberline(exp_info):
     numberline.line_colour = config.nl_line_colour
 
     # -- The labels at the end of the line
-    numberline.labels_visible = True
+    numberline.labels_visible = config.nl_labels_visible
     numberline.labels_font_name = config.nl_labels_font_name
     numberline.labels_box_size = config.nl_labels_box_size
     hsr = u.get_font_height_to_size_ratio(numberline.labels_font_name)

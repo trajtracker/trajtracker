@@ -8,6 +8,7 @@ TrajTracker - stimuli package
 
 #  Import the package classes
 from ._BaseMultiStim import BaseMultiStim
+from ._FixationZoom import FixationZoom
 from ._NumberLine import NumberLine
 from ._StimulusContainer import StimulusContainer
 from ._StimulusSelector import StimulusSelector

@@ -68,6 +68,10 @@ def on_finger_started_moving(exp_info, trial):
 
 # ----------------------------------------------------------------
 def show_fixation(exp_info, visible=True):
+
+    if isinstance(exp_info.fixation, ttrk.stimuli.FixationZoom):
+        exp_info.fixation.reset()
+
     if exp_info.fixation is not None:
         exp_info.fixation.visible = visible
 

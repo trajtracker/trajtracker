@@ -18,15 +18,18 @@ FINGER_STARTED_MOVING = ttrk.events.Event("FINGER_STARTED_MOVING")
 class BaseConfig(object):
 
     def __init__(self, experiment_id, data_source, max_trial_duration,
-                 use_text_targets=True, use_generic_targets=False,
-                 fixation_type='cross', fixation_text=None,
-                 text_target_height=0.6, shuffle_trials=True,
-                 log_stimulus_onset_offset=False,
-                 min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=10,
-                 grace_period=0.3, max_zigzags=8, save_results=True, sounds_dir="sounds",
-                 stimulus_then_move=False, finger_moves_min_time=None, finger_moves_max_time=None,
-                 start_point_size=(40, 30), start_point_tilt=0,
-                 start_point_colour=xpy.misc.constants.C_GREY):
+                 use_text_targets, use_generic_targets,
+                 fixation_type, fixation_text,
+                 fixzoom_box_size, fixzoom_dot_radius, fixzoom_dot_colour,
+                 fixzoom_zoom_duration, fixzoom_stay_duration,
+                 fixzoom_show_event, fixzoom_start_zoom_event,
+                 text_target_height, shuffle_trials,
+                 log_stimulus_onset_offset,
+                 min_trial_duration, speed_guide_enabled, min_inst_speed,
+                 grace_period, max_zigzags, save_results, sounds_dir,
+                 stimulus_then_move, finger_moves_min_time, finger_moves_max_time,
+                 start_point_size, start_point_tilt,
+                 start_point_colour):
 
         #: A unique identifier of this experiment.
         #: This string is saved as-is to the results file, to identify the experiment.
@@ -55,14 +58,37 @@ class BaseConfig(object):
         # The actual target size will be printed in the output
         self.text_target_height = text_target_height
 
-        #: The type of fixation to use: 'cross', 'text', or None
+        #: Whether to create a CSV log file indicating the times when each stimulus was presented/hidden
+        self.log_stimulus_onset_offset = log_stimulus_onset_offset
+
+        #----- Configuration of the fixation -----
+
+        #: The type of fixation to use: 'cross', 'text', 'zoom', or None
         self.fixation_type = fixation_type
 
         #: Default text to use for a text fixation
         self.fixation_text = fixation_text
 
-        #: Whether to create a CSV log file indicating the times when each stimulus was presented/hidden
-        self.log_stimulus_onset_offset = log_stimulus_onset_offset
+        #: See :attr:`FixationZoom.box_size <trajtracker.stimuli.FixationZoom.box_size>`
+        self.fixzoom_box_size = fixzoom_box_size
+
+        #: See :attr:`FixationZoom.dot_radius <trajtracker.stimuli.FixationZoom.dot_radius>`
+        self.fixzoom_dot_radius = fixzoom_dot_radius
+
+        #: See :attr:`FixationZoom.dot_colour <trajtracker.stimuli.FixationZoom.dot_colour>`
+        self.fixzoom_dot_colour = fixzoom_dot_colour
+
+        #: See :attr:`FixationZoom.zoom_duration <trajtracker.stimuli.FixationZoom.zoom_duration>`
+        self.fixzoom_zoom_duration = fixzoom_zoom_duration
+
+        #: See :attr:`FixationZoom.stay_duration <trajtracker.stimuli.FixationZoom.stay_duration>`
+        self.fixzoom_stay_duration = fixzoom_stay_duration
+
+        #: See :attr:`FixationZoom.show_event <trajtracker.stimuli.FixationZoom.show_event>`
+        self.fixzoom_show_event = fixzoom_show_event
+
+        #: See :attr:`FixationZoom.start_zoom_event <trajtracker.stimuli.FixationZoom.start_zoom_event>`
+        self.fixzoom_start_zoom_event = fixzoom_start_zoom_event
 
         #----- Configuration of the "start" rectangle -----
 
@@ -156,3 +182,9 @@ class BaseConfig(object):
 
         # Start point
         self.start_point_x_coord = 0
+
+
+    #---------------------------------------------------
+    @property
+    def is_fixation_zoom(self):
+        return self.fixation_type == 'zoom'

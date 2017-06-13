@@ -19,17 +19,26 @@ class Config(BaseConfig):
 
     def __init__(self, experiment_id, data_source, max_trial_duration,
                  use_text_targets=True, use_generic_targets=False,
+
                  fixation_type='cross', fixation_text=None,
+                 fixzoom_box_size=(40, 40), fixzoom_dot_radius=3, fixzoom_dot_colour=xpy.misc.constants.C_GREY,
+                 fixzoom_zoom_duration=0.2, fixzoom_stay_duration=0.1,
+                 fixzoom_show_event=None, fixzoom_start_zoom_event=None,
+
                  text_target_height=0.6, shuffle_trials=True,
                  log_stimulus_onset_offset=False,
-                 nl_length=0.9, min_numberline_value=0, max_numberline_value=100,
-                 show_feedback=True, feedback_arrow_colors=xpy.misc.constants.C_GREEN,
-                 feedback_accuracy_levels=None, post_response_target=False,
                  min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=10,
                  grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None, sounds_dir="sounds",
                  stimulus_then_move=False, finger_moves_min_time=None, finger_moves_max_time=None,
                  start_point_size=(40, 30), start_point_tilt=0,
-                 start_point_colour=xpy.misc.constants.C_GREY):
+                 start_point_colour=xpy.misc.constants.C_GREY,
+
+                 nl_length=0.9, min_numberline_value=0, max_numberline_value=100, nl_labels_visible=True,
+                 show_feedback=True, feedback_arrow_colors=xpy.misc.constants.C_GREEN,
+                 feedback_accuracy_levels=None, post_response_target=False,
+                 nl_line_width=2, nl_end_tick_height=5, nl_line_colour=xpy.misc.constants.C_WHITE,
+                 nl_labels_font_name="Arial", nl_labels_box_size=(100, 30), nl_labels_offset=(0, 20),
+                 nl_labels_colour=xpy.misc.constants.C_GREY, nl_distance_from_top=80):
 
         super(Config, self).__init__(
             experiment_id=experiment_id,
@@ -39,6 +48,13 @@ class Config(BaseConfig):
             use_generic_targets=use_generic_targets,
             fixation_type=fixation_type,
             fixation_text=fixation_text,
+            fixzoom_box_size=fixzoom_box_size,
+            fixzoom_dot_radius=fixzoom_dot_radius,
+            fixzoom_dot_colour=fixzoom_dot_colour,
+            fixzoom_zoom_duration=fixzoom_zoom_duration,
+            fixzoom_stay_duration=fixzoom_stay_duration,
+            fixzoom_show_event=fixzoom_show_event,
+            fixzoom_start_zoom_event=fixzoom_start_zoom_event,
             text_target_height=text_target_height,
             shuffle_trials=shuffle_trials,
             log_stimulus_onset_offset=log_stimulus_onset_offset,
@@ -67,6 +83,9 @@ class Config(BaseConfig):
         self.min_numberline_value = min_numberline_value
         self.max_numberline_value = max_numberline_value
 
+        # Whether to show labels at the end of the number line
+        self.nl_labels_visible = nl_labels_visible
+
         # Whether to show a feedback arrow (where the finger landed on the number line)
         self.show_feedback = show_feedback
 
@@ -81,6 +100,14 @@ class Config(BaseConfig):
         # Whether to show the correct target location after the response was made
         self.post_response_target = post_response_target
 
+        self.nl_line_width = nl_line_width
+        self.nl_end_tick_height = nl_end_tick_height
+        self.nl_line_colour = nl_line_colour
+        self.nl_labels_font_name = nl_labels_font_name
+        self.nl_labels_box_size = nl_labels_box_size
+        self.nl_labels_offset = nl_labels_offset
+        self.nl_labels_colour = nl_labels_colour
+        self.nl_distance_from_top = nl_distance_from_top  # Distance of the numberline's main line from top-of-screen
 
         #----- Configuration of sounds -----
 
@@ -92,17 +119,3 @@ class Config(BaseConfig):
         # the program will play good.wav for endpoint errors up to 5% of the line length, and bad.wav for
         # any larger error
         self.sound_by_accuracy = sound_by_accuracy
-
-        #--------------------------------------------------------------------
-        #    Advanced configuration
-        #--------------------------------------------------------------------
-
-        # Number line (see documentation of NumberLine)
-        self.nl_line_width = 2
-        self.nl_end_tick_height = 5
-        self.nl_line_colour = xpy.misc.constants.C_WHITE
-        self.nl_labels_font_name = "Arial"
-        self.nl_labels_box_size = (100, 30)
-        self.nl_labels_offset = (0, 20)
-        self.nl_labels_colour = xpy.misc.constants.C_GREY
-        self.nl_distance_from_top = 80  # Distance of the numberline's main line from top-of-screen

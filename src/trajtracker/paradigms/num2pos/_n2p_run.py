@@ -174,8 +174,15 @@ def wait_until_finger_moves(exp_info, trial):
     """
 
     # -- Wait for the participant to start moving the finger
+    if exp_info.config.is_fixation_zoom:
+        def on_loop_callback(time_in_trial, time_in_session):
+            exp_info.fixation.update_xyt(time_in_session=time_in_session)
+    else:
+        on_loop_callback = None
+
     exp_info.start_point.wait_until_exit(exp_info.xpy_exp,
                                          on_loop_present=exp_info.stimuli,
+                                         on_loop_callback=on_loop_callback,
                                          event_manager=exp_info.event_manager,
                                          trial_start_time=trial.start_time,
                                          session_start_time=exp_info.session_start_time,

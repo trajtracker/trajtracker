@@ -7,6 +7,7 @@ Non-visual circle
 
 import numpy as np
 
+import trajtracker as ttrk
 import trajtracker._utils as _u
 
 
@@ -28,14 +29,25 @@ class Circle(object):
         self.y = y
         self.radius = radius
 
+
+    #-------------------------------------------------
     def overlapping_with_position(self, pos):
         x, y = pos
         distance_from_center = np.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
         return distance_from_center <= self.radius
 
+
+    #-------------------------------------------------
     @property
     def position(self):
         return self.x, self.y
+
+    @position.setter
+    def position(self, value):
+        _u.validate_attr_type(self, "position", value, ttrk.TYPE_COORD)
+        self.x = value[0]
+        self.y = value[1]
+
 
     #-------------------------------------------------
     def __str__(self):

@@ -223,6 +223,42 @@ def create_textbox_fixation(exp_info):
 
 
 #----------------------------------------------------------------
+def create_fixation_zoom(exp_info):
+    """
+    Create a :class:`~trajtracker.stimuli.FixationZoom` fixation 
+
+    :param exp_info: The experiment-level objects
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    """
+
+    config = exp_info.config
+
+    y, height = get_target_y(exp_info)
+
+    if config.fixzoom_start_zoom_event is None:
+        start_zoom_event = ttrk.events.TRIAL_STARTED + 0.2
+    elif config.fixzoom_start_zoom_event == ttrk.events.TRIAL_STARTED or config.fixzoom_start_zoom_event == ttrk.events.TRIAL_INITIALIZED:
+        raise ttrk.ValueError(('config.fixzoom_start_zoom_event was set to an invalid value ({:}): ' +
+                              'it can only be set to times AFTER the trial has already started (e.g., ttrk.events.TRIAL_STARTED + 0.1)').
+                              format(config.fixzoom_start_zoom_event))
+    else:
+        start_zoom_event = config.fixzoom_start_zoom_event
+
+    fixation = ttrk.stimuli.FixationZoom(
+        position=(config.text_target_x_coord, y),
+        box_size=config.fixzoom_box_size,
+        dot_radius=config.fixzoom_dot_radius,
+        dot_colour=config.fixzoom_dot_colour,
+        zoom_duration=config.fixzoom_zoom_duration,
+        stay_duration=config.fixzoom_stay_duration,
+        show_event=config.fixzoom_show_event,
+        start_zoom_event=start_zoom_event)
+
+    exp_info.fixation = fixation
+    exp_info.add_event_sensitive_object(exp_info.fixation)
+
+
+#----------------------------------------------------------------
 def _create_textbox_target_impl(exp_info, role):
 
     config = exp_info.config
@@ -290,6 +326,9 @@ def create_fixation(exp_info):
 
     elif fixtype == 'text':
         create_textbox_fixation(exp_info)
+
+    elif fixtype == 'zoom':
+        create_fixation_zoom(exp_info)
 
     else:
         raise ttrk.ValueError("Invalid config.fixation_type ({:})".format(fixtype))

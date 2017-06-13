@@ -25,6 +25,7 @@ Visual objects.
    :maxdepth: 1
    :glob:
 
+   FixationZoom: A fixation stimulus of four moving-in dots <stimuli/FixationZoom>
    MultiStimulus: controls the presentation of a sequence of stimuli <stimuli/MultiStimulus>
    MultiTextBox: controls the presentation of a sequence of texts <stimuli/MultiTextBox>
    NumberLine: show a number line, detect when it's touched <stimuli/NumberLine>

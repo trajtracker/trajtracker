@@ -8,6 +8,7 @@ Static elements common to several experiment types
 import expyriment as xpy
 
 import trajtracker as ttrk
+# noinspection PyProtectedMember
 import trajtracker._utils as _u
 
 
@@ -95,6 +96,14 @@ class BaseExperimentInfo(object):
         """
         return self._trajectory_sensitive_objects
 
+
+    def add_trajectory_sensitive_object(self, obj):
+        """
+        Add an object to :attr:`~trajtracker.paradigms.num2pos.trajectory_sensitive_objects`
+        """
+        self._trajectory_sensitive_objects.append(obj)
+
+
     # ---------------------------------------------------------------
     @property
     def event_sensitive_objects(self):
@@ -124,6 +133,7 @@ class BaseExperimentInfo(object):
         Add a validator to the experiment's set of validators.
         The validator will also be registered in :attr:`~trajtracker.paradigms.num2pos.trajectory_sensitive_objects` 
 
+        :param validator: The validator object
         :param name: The validator will also be saved as "exp_info.validator_<name>"
         """
 
@@ -225,5 +235,7 @@ class BaseExperimentInfo(object):
     @fixation.setter
     def fixation(self, value):
         self._fixation = value
-        if value is not None:
+        if isinstance(value, ttrk.stimuli.FixationZoom):
+            self.stimuli.add(value.stimulus, "fixation", visible=True)
+        elif value is not None:
             self.stimuli.add(value, "fixation", visible=False)
