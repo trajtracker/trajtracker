@@ -1,5 +1,5 @@
 """
-Functions to support the number-to-position paradigm
+Functions to support the discrete-decision paradigm
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
@@ -10,12 +10,13 @@ import numpy as np
 import random
 
 import trajtracker as ttrk
-from trajtracker.utils import get_time
+import trajtracker.utils as u
 from trajtracker.validators import ExperimentError
+from trajtracker.movement import StartPoint
 from trajtracker.paradigms import common
 from trajtracker.paradigms.common import RunTrialResult, FINGER_STARTED_MOVING
 
-from trajtracker.paradigms.num2pos import ExperimentInfo, TrialInfo, create_experiment_objects
+from trajtracker.paradigms.dchoice import ExperimentInfo, TrialInfo
 
 
 #----------------------------------------------------------------
@@ -23,9 +24,9 @@ def run_full_experiment(config, xpy_exp, subj_id, subj_name=""):
     """
     A default implementation for running a complete experiment, end-to-end: loading the data,
     initializing all objects, running all trials, and saving the results.
-    
+
     :param config:
-    :type config: trajtracker.paradigms.num2pos.Config 
+    :type config: trajtracker.paradigms.dchoice.Config 
 
     :param xpy_exp: Expyriment's `active experiment <http://docs.expyriment.org/expyriment.design.Experiment.html>`_
                     object
@@ -35,7 +36,7 @@ def run_full_experiment(config, xpy_exp, subj_id, subj_name=""):
 
     exp_info = ExperimentInfo(config, xpy_exp, subj_id, subj_name)
 
-    create_experiment_objects(exp_info)
+    common.create_experiment_objects(exp_info)
 
     common.register_to_event_manager(exp_info)
 
@@ -83,10 +84,10 @@ def run_trials(exp_info):
 def run_trial(exp_info, trial):
     """
     Run a single trial
-    
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
-     
+
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo 
+    :type trial: trajtracker.paradigms.dchoice.TrialInfo
+
     :return: True if the trial ended successfully, False if it failed
     """
 
@@ -97,7 +98,7 @@ def run_trial(exp_info, trial):
                                                        event_manager=exp_info.event_manager,
                                                        trial_start_time=trial.start_time,
                                                        session_start_time=exp_info.session_start_time)
-    on_finger_touched_screen(exp_info, trial)
+    common.on_finger_touched_screen(exp_info, trial)
 
     rc = common.wait_until_finger_moves(exp_info, trial)
     if rc is not None:
@@ -107,7 +108,7 @@ def run_trial(exp_info, trial):
 
     while True:  # This loop runs once per frame
 
-        #-- Update all displayable elements
+        # -- Update all displayable elements
         exp_info.stimuli.present()
 
         if not ttrk.env.mouse.check_button_pressed(0):
@@ -120,46 +121,52 @@ def run_trial(exp_info, trial):
             trial_failed(err, exp_info, trial)
             return RunTrialResult.Failed
 
-        #-- Check if the number line was reached
-        if exp_info.numberline.touched:
+        #-- Check if a response button was reached
+        user_response = get_touched_button(exp_info)
+        if user_response is not None:
 
-            movement_time = get_time() - trial.results['time_started_moving'] - trial.start_time
+            movement_time = u.get_time() - trial.results['time_started_moving'] - trial.start_time
             if movement_time < exp_info.config.min_trial_duration:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
                                              "Please move more slowly"),
                              exp_info, trial)
                 return RunTrialResult.Failed
 
-            trial_succeeded(exp_info, trial)
+            trial_succeeded(exp_info, trial, user_response)
             return RunTrialResult.Succeeded
 
         xpy.io.Keyboard.process_control_keys()
 
 
 #----------------------------------------------------------------
-def on_finger_touched_screen(exp_info, trial):
+def get_touched_button(exp_info):
     """
-    This function should be called when the finger touches the screen
+    Check if any response button was touched
 
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo 
+
+    :return: The number of the touched button, or None if no button was touched
     """
 
-    update_numberline_for_trial(exp_info, trial)
-    common.on_finger_touched_screen(exp_info, trial)
+    for hotspot in exp_info.response_buttons:
+        if hotspot.touched:
+            return hotspot.button_number
+
+    return None
 
 
 #----------------------------------------------------------------
 def initialize_trial(exp_info, trial):
     """
     Initialize a trial
-    
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo 
+    :type trial: trajtracker.paradigms.dchoice.TrialInfo 
     """
 
     exp_info.start_point.reset()
-    exp_info.numberline.reset()    # mark the line as yet-untouched
+    for hotspot in exp_info.response_hotspots:
+        hotspot.reset()
 
     exp_info.text_target.terminate_display()
     exp_info.generic_target.terminate_display()
@@ -171,136 +178,92 @@ def initialize_trial(exp_info, trial):
     if exp_info.fixation is not None:
         common.update_fixation_for_trial(exp_info, trial)
 
-    exp_info.numberline.target = trial.target
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, u.get_time() - exp_info.session_start_time)
 
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, get_time() - exp_info.session_start_time)
-
-    #-- Update the display to present stuff that may have been added by the TRIAL_INITIALIZED event listeners
+    # -- Update the display to present stuff that may have been added by the TRIAL_INITIALIZED event listeners
     exp_info.stimuli.present()
 
     if exp_info.config.stimulus_then_move:
-        trial.results['targets_t0'] = get_time() - trial.start_time
+        trial.results['targets_t0'] = u.get_time() - trial.start_time
 
 
-#------------------------------------------------
-def update_numberline_for_trial(exp_info, trial):
-    """
-    Update the number line when the trial is initialized
-
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo
-    """
-
-    common.update_attr_by_csv_config(exp_info, trial, exp_info.numberline, 'nl.position', 'position')
-
-    common.update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'x')
-    common.update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'y')
-
-
-#------------------------------------------------
-# This function is called when a trial ends with an error
-#
+#----------------------------------------------------------------
 def trial_failed(err, exp_info, trial):
     """
     Called when the trial failed for any reason 
     (only when a strict error occurred; pointing at an incorrect location does not count as failure) 
 
     :type err: ExperimentError
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo
+    :type trial: trajtracker.paradigms.dchoice.TrialInfo 
     """
     common.trial_failed_common(err, exp_info, trial)
-    trial_ended(exp_info, trial, time_in_trial, "ERR_" + err.err_code)
+    trial_ended(exp_info, trial, time_in_trial, "ERR_" + err.err_code, -1)
 
 
-#------------------------------------------------
-# This function is called when a trial ends with no error
-#
-def trial_succeeded(exp_info, trial):
-    """
-    Called when the trial ends successfully (i.e. the finger touched the numberline - doesn't matter where)
-    
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    """
+#----------------------------------------------------------------
+def trial_succeeded(exp_info, trial, user_response):
+
 
     print("   Trial ended successfully.")
 
-    if exp_info.config.post_response_target:
-        c = exp_info.numberline.value_to_coords(trial.target)
-        exp_info.target_pointer.position = c[0], c[1] + exp_info.target_pointer_height / 2
-        exp_info.target_pointer.visible = True
+    #todo: show feedback
 
-    curr_time = get_time()
+    curr_time = u.get_time()
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
 
-    play_success_sound(exp_info, trial)
+    exp_info.sounds_ok[0].play()
 
-    trial_ended(exp_info, trial, time_in_trial, "OK")
+    trial_ended(exp_info, trial, time_in_trial, "OK", user_response)
 
     exp_info.trajtracker.save_to_file(trial.trial_num)
 
 
 #------------------------------------------------
-def trial_ended(exp_info, trial, time_in_trial, success_err_code):
+def trial_ended(exp_info, trial, time_in_trial, success_err_code, user_response):
     """
     This function is called whenever a trial ends, either successfully or with failure.
     It updates the result files.
-    
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo 
+    :type trial: trajtracker.paradigms.dchoice.TrialInfo 
     :param time_in_trial: 
-    :param success_err_code: A string code to write as status for this trial 
+    :param success_err_code: A string code to write as status for this trial
+    :param user_response: The number of the button that was pressed (-1 = no button)
     """
 
     exp_info.stimuli.present()
 
     if exp_info.config.save_results:
-        update_trials_file(exp_info, trial, time_in_trial, success_err_code)
+        update_trials_file(exp_info, trial, time_in_trial, success_err_code, user_response)
 
         #-- Save the session at the end of each trial, to make sure it's always saved - even if
         #-- the experiment software unexpectedly terminates
-        common.save_session_file(exp_info, "NL")
+        common.save_session_file(exp_info, "DC")
 
 
 #------------------------------------------------
-def update_trials_file(exp_info, trial, time_in_trial, success_err_code):
+def update_trials_file(exp_info, trial, time_in_trial, success_err_code, user_response):
     """
     Add an entry (line) to the trials.csv file
-    
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
+
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo 
+    :type trial: trajtracker.paradigms.dchoice.TrialInfo 
     :param time_in_trial: 
     :param success_err_code: A string code to write as status for this trial 
+    :param user_response: The number of the button that was pressed (-1 = no button)
     """
 
     trial_out_row = common.prepare_trial_out_row(exp_info, trial, time_in_trial, success_err_code)
 
-    endpoint = exp_info.numberline.response_value
-    trial_out_row['endPoint'] = "" if endpoint is None else "{:.3g}".format(endpoint)
-    trial_out_row['target'] = trial.target
+    trial_out_row['expectedResponse'] = -1 if trial.expected_response is None else trial.expected_response
+    trial_out_row['UserResponse'] = user_response
 
     if exp_info.trials_file_writer is None:
-        common.open_trials_file(exp_info, ['target', 'endPoint'])
+        common.open_trials_file(exp_info, ['expectedResponse', 'UserResponse'])
 
     exp_info.trials_file_writer.writerow(trial_out_row)
     exp_info.trials_out_fp.flush()
-
-
-#------------------------------------------------
-def play_success_sound(exp_info, trial):
-    """
-    Play a "trial succeeded" sound. If required in the configuration, we select here the sound
-    depending on the endpoint error.
-
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    """
-
-    endpoint_err = np.abs(exp_info.numberline.response_value - trial.target)
-    endpoint_err_ratio = min(1, endpoint_err / (exp_info.numberline.max_value - exp_info.numberline.min_value))
-    sound_ind = np.where(endpoint_err_ratio <= exp_info.sounds_ok_max_ep_err)[0][0]
-    exp_info.sounds_ok[sound_ind].play()
 

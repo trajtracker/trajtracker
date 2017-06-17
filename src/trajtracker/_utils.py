@@ -19,7 +19,7 @@ from expyriment.misc import geometry
 import trajtracker as ttrk
 
 
-#--------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 class ErrMsg(object):
 
     _invalid_attr_type = "invalid attempt to set {0}.{1} to a non-{2} value ({3})"

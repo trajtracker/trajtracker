@@ -21,7 +21,8 @@ class Config(BaseConfig):
                  use_text_targets=True, use_generic_targets=False,
 
                  fixation_type='cross', fixation_text=None,
-                 fixzoom_box_size=(40, 40), fixzoom_dot_radius=3, fixzoom_dot_colour=xpy.misc.constants.C_GREY,
+                 fixzoom_box_size=(40, 40), fixzoom_dot_radius=3,
+                 fixzoom_dot_colour=xpy.misc.constants.C_GREY,
                  fixzoom_zoom_duration=0.2, fixzoom_stay_duration=0.1,
                  fixzoom_show_event=None, fixzoom_start_zoom_event=None,
 

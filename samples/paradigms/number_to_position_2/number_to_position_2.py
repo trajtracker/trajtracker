@@ -47,7 +47,7 @@ config = num2pos.Config("Num2Pos(D+U)",
                         data_source="number_to_position_2.csv",  # Read targets from this CSV file
                         text_target_height=0.5,
 
-                        fixation_type='zoom',
+                        fixation_type='cross',
 
                         post_response_target=True,         # After response was made, show the correct location
                         feedback_arrow_colors=[xpy.misc.constants.C_GREEN,

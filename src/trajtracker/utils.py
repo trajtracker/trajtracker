@@ -15,7 +15,11 @@ import pygame
 from pygame.ftfont import Font
 from pygame import freetype
 
-from expyriment.misc import _timer as xpy_timer, find_font
+from expyriment.misc import _timer as xpy_timer
+from expyriment.misc import geometry, find_font
+
+from trajtracker._utils import is_collection
+
 
 #--------------------------------------------------------------------------
 def get_angle(xy1, xy2, as_degrees=False):
@@ -78,6 +82,23 @@ def is_rgb(rgb):
                and 0 <= rgb[0] <= 255 and 0 <= rgb[1] <= 255 and 0 <= rgb[2] <= 255
     except:
         return False
+
+
+#--------------------------------------
+def is_coord(value, allow_float=False):
+    """
+    Check whether the given value is valid as (x,y) coordinates
+    :param allow_float: 
+    """
+
+    if isinstance(value, geometry.XYPoint):
+        return True
+
+    if not is_collection(value) or len(value) != 2:
+        return False
+
+    elem_type = numbers.Number if allow_float else int
+    return isinstance(value[0], elem_type) and isinstance(value[1], elem_type)
 
 
 #--------------------------------------------------------------------------

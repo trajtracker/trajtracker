@@ -17,7 +17,8 @@ import expyriment as xpy
 import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
-from trajtracker.utils import get_time
+import trajtracker.utils
+import trajtracker.utils as u
 
 
 # noinspection PyAttributeOutsideInit,PyProtectedMember
@@ -89,7 +90,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         #-- Touch parameters
         self._touch_directioned = True  # True: finger must be dragged to the NL from its initial direction
                                         # False: whenever the finger is close enough to the line, it's a touch
-        self._touch_distance = 0        # Issue a "touch" decision when the finger is closer than this to the line
+        self._touch_distance = 0        # Issue a "touch" dchoice when the finger is closer than this to the line
                                         # _touch_directioned=True and distance<0 means that finger must cross the line and get this far on the other side
 
         self.feedback_stimuli = feedback_stimuli
@@ -161,11 +162,11 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         :return: The time it took this function to run. (seconds)
         """
 
-        start_time = get_time()
+        start_time = u.get_time()
 
         if self._preloaded:
             # Already pre-loaded
-            return get_time() - start_time
+            return u.get_time() - start_time
 
         self.validate()
         self._preloaded = True
@@ -184,7 +185,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         self._canvas.preload()
 
-        return get_time() - start_time
+        return u.get_time() - start_time
 
 
     #-------------------------------------------------------
@@ -198,7 +199,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         :type update: bool
         :return: The time it took this function to run. (seconds)
         """
-        start_time = get_time()
+        start_time = u.get_time()
 
         self.preload()
 
@@ -207,7 +208,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         if self._feedback_stim_selector.visible:
             self._feedback_stim_selector.present(False, update)
 
-        return get_time() - start_time
+        return u.get_time() - start_time
 
 
     #-------------------------------------------------------
@@ -219,7 +220,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         :return: The time it took this function to run (seconds)
         """
 
-        start_time = get_time()
+        start_time = u.get_time()
 
         self.preload()
 
@@ -228,7 +229,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
             for k in self._visual_objects:
                 self._visual_objects[k].plot(stim)
 
-        return get_time() - start_time
+        return u.get_time() - start_time
 
 
     #-------------------------------------------------------
@@ -538,7 +539,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         :return: float
         """
 
-        if _u.is_coord(coord, allow_float=True):
+        if u.is_coord(coord, allow_float=True):
             coord = coord[0] if self.orientation == NumberLine.Orientation.Horizontal else coord[1]
         else:
             _u.validate_func_arg_type(self, "coord_to_value", "coord", coord, numbers.Number)
@@ -979,7 +980,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
             #-- A selector function was provided
             pass
 
-        elif _u.is_collection(value, allow_set=False) and sum([not isinstance(x, numbers.Number) for x in value]) == 0:
+        elif trajtracker.utils.is_collection(value, allow_set=False) and sum([not isinstance(x, numbers.Number) for x in value]) == 0:
 
             #-- A list of numbers was provided
             accuracy_levels = list(value)

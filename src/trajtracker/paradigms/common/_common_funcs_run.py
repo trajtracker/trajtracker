@@ -19,8 +19,9 @@ import expyriment as xpy
 
 import trajtracker as ttrk
 
-from trajtracker.utils import get_time
+import trajtracker.utils as u
 from trajtracker.validators import ExperimentError
+from trajtracker.movement import StartPoint
 
 # noinspection PyProtectedMember
 from trajtracker.paradigms.common._BaseConfig import FINGER_STARTED_MOVING
@@ -38,7 +39,33 @@ def init_experiment(exp_info):
 
     exp_info.trajtracker.init_output_file()
 
-    exp_info.session_start_time = get_time()
+    exp_info.session_start_time = u.get_time()
+
+
+#----------------------------------------------------------------
+def on_finger_touched_screen(exp_info, trial):
+    """
+    This function should be called when the finger touches the screen
+
+    :type exp_info: trajtracker.paradigms.common.BaseExperimentInfo
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo
+    """
+
+    exp_info.errmsg_textbox.visible = False
+    exp_info.target_pointer.visible = False
+
+    show_fixation(exp_info)
+
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_STARTED, 0,
+                                          u.get_time() - exp_info.session_start_time)
+
+    exp_info.stimuli.present()
+
+    trial.start_time = u.get_time()
+
+    #-- Reset all trajectory-sensitive objects
+    for obj in exp_info.trajectory_sensitive_objects:
+        obj.reset(0)
 
 
 #----------------------------------------------------------------
@@ -51,7 +78,7 @@ def on_finger_started_moving(exp_info, trial):
     """
 
     show_fixation(exp_info, False)
-    t = get_time()
+    t = u.get_time()
     time_in_trial = t - trial.start_time
     time_in_session = t - exp_info.session_start_time
     trial.results['time_started_moving'] = time_in_trial
@@ -63,7 +90,57 @@ def on_finger_started_moving(exp_info, trial):
     exp_info.stimuli.present()
 
     if not exp_info.config.stimulus_then_move:
-        trial.results['targets_t0'] = get_time() - trial.start_time
+        trial.results['targets_t0'] = u.get_time() - trial.start_time
+
+
+#----------------------------------------------------------------
+def wait_until_finger_moves(exp_info, trial):
+    """
+    The function returns after the finger started moving (or on error)
+
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo 
+
+    :return: None if all OK; if trial should terminate, a tuple with two values:
+             (1) RunTrialResult.xxx (2) An ExperimentError object
+    """
+
+    # -- Wait for the participant to start moving the finger
+    if exp_info.config.is_fixation_zoom:
+        # noinspection PyUnusedLocal
+        def on_loop_callback(time_in_trial, time_in_session):
+            exp_info.fixation.update_xyt(time_in_session=time_in_session)
+    else:
+        on_loop_callback = None
+
+    exp_info.start_point.wait_until_exit(exp_info.xpy_exp,
+                                         on_loop_present=exp_info.stimuli,
+                                         on_loop_callback=on_loop_callback,
+                                         event_manager=exp_info.event_manager,
+                                         trial_start_time=trial.start_time,
+                                         session_start_time=exp_info.session_start_time,
+                                         max_wait_time=trial.finger_moves_max_time)
+
+    if exp_info.start_point.state == StartPoint.State.aborted:
+        #-- Finger lifted
+        show_fixation(exp_info, False)
+        return RunTrialResult.Aborted, None
+
+    elif exp_info.start_point.state == StartPoint.State.error:
+        #-- Invalid start direction
+        return RunTrialResult.Failed, ExperimentError("StartedSideways", "Start the trial by moving straight, not sideways!")
+
+    elif exp_info.start_point.state == StartPoint.State.timeout:
+        #-- Finger moved too late
+        return RunTrialResult.Failed, ExperimentError("FingerMovedTooLate", "You moved too late")
+
+    if trial.finger_moves_min_time is not None and u.get_time() - trial.start_time < trial.finger_moves_min_time:
+        #-- Finger moved too early
+        return RunTrialResult.Failed, ExperimentError("FingerMovedTooEarly", "You moved too early")
+
+    on_finger_started_moving(exp_info, trial)
+
+    return None
 
 
 # ----------------------------------------------------------------
@@ -332,7 +409,7 @@ def update_movement_in_traj_sensitive_objects(exp_info, trial):
     :return: None if all is OK; or an ExperimentError object if one of the validators issued an error
     """
 
-    curr_time = get_time()
+    curr_time = u.get_time()
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
 
@@ -402,16 +479,87 @@ def indent_xml(elem, level=0):
 
 
 #------------------------------------------------
-def open_trials_file(exp_info, fields):
+def open_trials_file(exp_info, additional_fields):
     """
     :param exp_info:
     :type exp_info: trajtracker.paradigms.common.BaseExperimentInfo
      
-    :param fields: List of field names in the CSV file
+    :param additional_fields: List of field names in the CSV file (on top of the common fields)
     """
+
+    all_fields = _get_trials_csv_out_common_fields() + additional_fields
 
     filename = xpy.io.defaults.datafile_directory + "/" + exp_info.trials_out_filename
 
     exp_info.trials_out_fp = open(filename, 'w')
-    exp_info.trials_file_writer = csv.DictWriter(exp_info.trials_out_fp, fields)
+    exp_info.trials_file_writer = csv.DictWriter(exp_info.trials_out_fp, all_fields)
     exp_info.trials_file_writer.writeheader()
+
+
+#----------------------------------------------------------------
+def trial_failed_common(err, exp_info, trial):
+    """
+    Called when the trial failed for any reason 
+    (only when a strict error occurred; pointing at an incorrect location does not count as failure) 
+
+    :type err: ExperimentError
+    :type exp_info: trajtracker.paradigms.common.BaseExperimentInfo
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo 
+    """
+
+    ttrk.log_write("ERROR in trial ({:}). Message shown to subject: {:}".format(err.err_code, err.message))
+
+    curr_time = u.get_time()
+
+    time_in_trial = curr_time - trial.start_time
+    time_in_session = curr_time - exp_info.session_start_time
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_FAILED, time_in_trial, time_in_session)
+
+    exp_info.errmsg_textbox.unload()
+    exp_info.errmsg_textbox.text = err.message
+    exp_info.errmsg_textbox.visible = True
+
+    exp_info.sound_err.play()
+
+
+#----------------------------------------------------------------
+def prepare_trial_out_row(exp_info, trial, time_in_trial, success_err_code):
+    """
+    Get values to save in the trials.csv output file 
+    
+    :return: A dict with some values for the file 
+    """
+
+    if time_in_trial == 0 or 'time_started_moving' not in trial.results:
+        movement_time = 0
+    else:
+        movement_time = time_in_trial - trial.results['time_started_moving']
+
+    if trial.use_text_targets and trial.use_generic_targets:
+        presented_target = 'text="{:}";generic="{:}"'.format(trial.text_target, trial.generic_target)
+    elif trial.use_text_targets:
+        presented_target = trial.text_target
+    elif trial.use_generic_targets:
+        presented_target = trial.generic_target
+    else:
+        presented_target = ""
+
+    t_move = trial.results['time_started_moving'] if 'time_started_moving' in trial.results else -1
+    t_target = trial.results['targets_t0'] if 'targets_t0' in trial.results else -1
+
+    #todo: add custom fields? confidence?
+    return {
+        'trialNum': trial.trial_num,
+        'LineNum': trial.file_line_num,
+        'presentedTarget': presented_target,
+        'status': success_err_code,
+        'movementTime': "{:.3g}".format(movement_time),
+        'timeInSession': "{:.3g}".format(trial.start_time - exp_info.session_start_time),
+        'timeUntilFingerMoved': "{:.3g}".format(t_move),
+        'timeUntilTarget': "{:.3g}".format(t_target),
+    }
+
+#----------------------------------------------------------------
+def _get_trials_csv_out_common_fields():
+    return ['trialNum', 'LineNum', 'presentedTarget', 'status', 'movementTime',
+            'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']

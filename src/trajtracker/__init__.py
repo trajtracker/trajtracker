@@ -36,6 +36,7 @@ def version():
 
 #----------------------------------------------------------
 # TrajTracker types
+TYPE_SIZE = "size"
 TYPE_COORD = "coord"
 TYPE_RGB = "RGB"
 TYPE_CALLABLE = "callable"

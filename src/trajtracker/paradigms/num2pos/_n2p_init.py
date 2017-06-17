@@ -17,10 +17,11 @@ import expyriment as xpy
 import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
+import trajtracker.utils
 import trajtracker.utils as u
 
 from trajtracker.paradigms import common
-
+from trajtracker.paradigms.common import get_parser_for
 
 from trajtracker.paradigms.num2pos import DownArrow
 
@@ -34,30 +35,12 @@ def create_experiment_objects(exp_info):
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
-    config = exp_info.config
+    exp_info.trials = load_data_source(exp_info.config)
 
     create_numberline(exp_info)
+    common.create_common_experiment_objects(exp_info)
 
-    common.create_start_point(exp_info)
-    common.create_textbox_target(exp_info)
-    common.create_generic_target(exp_info)
-    common.create_fixation(exp_info)
-    common.create_errmsg_textbox(exp_info)
-    common.create_traj_tracker(exp_info)
-    common.create_validators(exp_info, direction_validator=True, global_speed_validator=True,
-                             inst_speed_validator=True, zigzag_validator=True)
     create_sounds(exp_info)
-
-    exp_info.trials = load_data_source(config)
-
-    #-- Initialize experiment-level data
-
-    exp_info.exp_data['WindowWidth'] = exp_info.screen_size[0]
-    exp_info.exp_data['WindowHeight'] = exp_info.screen_size[1]
-    exp_info.exp_data['nExpectedTrials'] = len(exp_info.trials)
-    exp_info.exp_data['nTrialsCompleted'] = 0
-    exp_info.exp_data['nTrialsFailed'] = 0
-    exp_info.exp_data['nTrialsSucceeded'] = 0
 
 
 #----------------------------------------------------------------
@@ -114,7 +97,7 @@ def create_numberline(exp_info):
         multicolor = len(config.feedback_arrow_colors) > 1
 
         colors = config.feedback_arrow_colors
-        colors = colors if _u.is_collection(colors) else [colors]
+        colors = colors if trajtracker.utils.is_collection(colors) else [colors]
         numberline.feedback_stimuli = [DownArrow(c) for c in colors]
         [s.preload() for s in numberline.feedback_stimuli]
 
@@ -192,37 +175,9 @@ def load_data_source(config):
 
     if isinstance(ds, str):
         #-- Load from file
-        loader = ttrk.io.CSVLoader()
+        loader = common.create_csv_loader()
+
         loader.add_field('target', lambda s: int(s) if s.isdigit() else float(s))
-        loader.add_field('use_text_targets', bool, optional=True)
-        loader.add_field('use_generic_targets', bool, optional=True)
-        loader.add_field('finger_moves_min_time', float, optional=True)
-        loader.add_field('finger_moves_max_time', float, optional=True)
-
-        loader.add_field('text.text_size', getparser(int), optional=True)
-        loader.add_field('text.bold', getparser(bool), optional=True)
-        loader.add_field('text.italic', getparser(bool), optional=True)
-        loader.add_field('text.underline', getparser(bool), optional=True)
-        loader.add_field('text.justification', getparser(ttrk.io.csv_formats.parse_text_justification), optional=True)
-        loader.add_field('text.text_colour', getparser(ttrk.io.csv_formats.parse_rgb), optional=True)
-        loader.add_field('text.background_colour', getparser(ttrk.io.csv_formats.parse_rgb), optional=True)
-        loader.add_field('text.size', getparser(ttrk.io.csv_formats.parse_size), optional=True)
-        loader.add_field('text.position', getparser(ttrk.io.csv_formats.parse_coord), optional=True)
-        loader.add_field('text.position.x', getparser(int), optional=True)
-        loader.add_field('text.position.y', getparser(int), optional=True)
-        loader.add_field('text.onset_time', getparser(float), optional=True)
-        loader.add_field('text.duration', getparser(float), optional=True)
-
-        loader.add_field('genstim.position', getparser(ttrk.io.csv_formats.parse_coord), optional=True)
-        loader.add_field('genstim.position.x', getparser(int), optional=True)
-        loader.add_field('genstim.position.y', getparser(int), optional=True)
-        loader.add_field('genstim.onset_time', getparser(float), optional=True)
-        loader.add_field('genstim.duration', getparser(float), optional=True)
-
-        loader.add_field('fixation.position', ttrk.io.csv_formats.parse_coord, optional=True)
-        loader.add_field('fixation.position.x', int, optional=True)
-        loader.add_field('fixation.position.x%', float, optional=True)
-        loader.add_field('fixation.position.y', int, optional=True)
 
         loader.add_field('nl.position', ttrk.io.csv_formats.parse_coord, optional=True)
         loader.add_field('nl.position.x', int, optional=True)
@@ -249,20 +204,3 @@ def load_data_source(config):
 
     raise ttrk.TypeError("invalid config.data_source")
 
-
-#-----------------------------------------------------------------------------------------
-def getparser(type_cast_function, delimiter=";", always_create_list=False):
-    """
-    Given a type name (or an str->type parsing function), return a function that can parse
-    both this type and delimited lists of this type
-    """
-    def parse(str_value):
-        if delimiter in str_value:
-            return [type_cast_function(s) for s in str_value.split(delimiter)]
-        else:
-            value = type_cast_function(str_value)
-            if always_create_list:
-                value = [value]
-            return value
-
-    return parse

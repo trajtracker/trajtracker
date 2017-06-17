@@ -26,5 +26,4 @@ from ._n2p_run import \
     run_trials, \
     trial_ended, \
     trial_failed, \
-    trial_succeeded, \
-    wait_until_finger_moves
+    trial_succeeded

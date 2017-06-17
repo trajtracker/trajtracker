@@ -3,9 +3,11 @@
 from __future__ import division
 
 import time
+import numbers
+import os
 
 import expyriment as xpy
-
+from expyriment.misc import geometry
 
 import trajtracker as ttrk
 # noinspection PyProtectedMember
@@ -39,6 +41,38 @@ def get_subject_name_id():
 
 
     return subj_id, subj_name
+
+
+#----------------------------------------------------------------
+def create_common_experiment_objects(exp_info):
+    """
+    Create configuration for the experiment - object common to several paradigms.
+    
+    exp_info.trials must be set before calling this function.
+
+    :param exp_info: 
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    """
+
+    if exp_info.trials is None:
+        raise ttrk.InvalidStateError('Please update exp_info.trials before calling create_common_experiment_objects()')
+
+    create_start_point(exp_info)
+    create_textbox_target(exp_info)
+    create_generic_target(exp_info)
+    create_fixation(exp_info)
+    create_errmsg_textbox(exp_info)
+    create_traj_tracker(exp_info)
+    create_validators(exp_info, direction_validator=True, global_speed_validator=True,
+                      inst_speed_validator=True, zigzag_validator=True)
+
+    #-- Initialize experiment-level data
+    exp_info.exp_data['WindowWidth'] = exp_info.screen_size[0]
+    exp_info.exp_data['WindowHeight'] = exp_info.screen_size[1]
+    exp_info.exp_data['nExpectedTrials'] = len(exp_info.trials)
+    exp_info.exp_data['nTrialsCompleted'] = 0
+    exp_info.exp_data['nTrialsFailed'] = 0
+    exp_info.exp_data['nTrialsSucceeded'] = 0
 
 
 #----------------------------------------------------------------
@@ -134,7 +168,7 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
     if global_speed_validator:
         v = ttrk.validators.GlobalSpeedValidator(
             origin_coord=exp_info.start_point.position[1] + exp_info.start_point.start_area.size[1] / 2,
-            end_coord=exp_info.numberline.position[1],
+            end_coord=exp_info.speed_validation_end_y_coord(),
             grace_period=config.grace_period,
             max_trial_duration=config.max_trial_duration,
             milestones=config.global_speed_validator_milestones,
@@ -199,7 +233,7 @@ def create_textbox_fixation(exp_info):
 
     config = exp_info.config
 
-    y, height = get_target_y(exp_info)
+    y, height = exp_info.get_default_target_y()
 
     text = exp_info.config.fixation_text
 
@@ -233,7 +267,7 @@ def create_fixation_zoom(exp_info):
 
     config = exp_info.config
 
-    y, height = get_target_y(exp_info)
+    y, height = exp_info.get_default_target_y()
 
     if config.fixzoom_start_zoom_event is None:
         start_zoom_event = ttrk.events.TRIAL_STARTED + 0.2
@@ -265,7 +299,7 @@ def _create_textbox_target_impl(exp_info, role):
 
     target = ttrk.stimuli.MultiTextBox()
 
-    y, height = get_target_y(exp_info)
+    y, height = exp_info.get_default_target_y()
     target.position = (config.text_target_x_coord, y)
     target.text_font = config.text_target_font
     target.size = (config.text_target_width, int(height))
@@ -295,7 +329,7 @@ def create_generic_target(exp_info):
 
     config = exp_info.config
 
-    y, height = get_target_y(exp_info)
+    y, height = exp_info.get_default_target_y()
     target = ttrk.stimuli.MultiStimulus(position=(config.generic_target_x_coord, y))
 
     target.onset_event = ttrk.events.TRIAL_STARTED if config.stimulus_then_move else FINGER_STARTED_MOVING
@@ -336,24 +370,9 @@ def create_fixation(exp_info):
 
 #----------------------------------------------------------------
 def create_fixation_cross(exp_info):
-    y, height = get_target_y(exp_info)
+    y, height = exp_info.get_default_target_y()
     exp_info.fixation = xpy.stimuli.FixCross(size=(30, 30), position=(0, y), line_width=2)
     exp_info.fixation.preload()
-
-
-#----------------------------------------------------------------
-def get_target_y(exp_info):
-    """
-    Create the y coordinate where the target should be presented 
-
-    :param exp_info: The experiment-level objects
-    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
-    """
-
-    screen_top = exp_info.screen_size[1] / 2
-    height = screen_top - exp_info.numberline.position[1] - exp_info.config.stimulus_distance_from_top - 1
-    y = int(screen_top - exp_info.config.stimulus_distance_from_top - height / 2)
-    return y, height
 
 
 #----------------------------------------------------------------
@@ -390,6 +409,111 @@ def register_to_event_manager(exp_info):
 
 #------------------------------------------------
 def load_sound(config, filename):
-    sound = xpy.stimuli.Audio(config.sounds_dir + "/" + filename)
+    full_path = config.sounds_dir + "/" + filename
+    if not os.path.isfile(full_path):
+        raise ttrk.ValueError('Sound file {:} does not exist. Please check the file name (or perhaps you need to change config.sounds_dir)')
+    sound = xpy.stimuli.Audio(full_path)
     sound.preload()
     return sound
+
+#-----------------------------------------------------------------------------------------
+def create_csv_loader():
+
+    loader = ttrk.io.CSVLoader()
+    loader.add_field('use_text_targets', bool, optional=True)
+    loader.add_field('use_generic_targets', bool, optional=True)
+    loader.add_field('finger_moves_min_time', float, optional=True)
+    loader.add_field('finger_moves_max_time', float, optional=True)
+
+    loader.add_field('text.text_size', get_parser_for(int), optional=True)
+    loader.add_field('text.bold', get_parser_for(bool), optional=True)
+    loader.add_field('text.italic', get_parser_for(bool), optional=True)
+    loader.add_field('text.underline', get_parser_for(bool), optional=True)
+    loader.add_field('text.justification', get_parser_for(ttrk.io.csv_formats.parse_text_justification), optional=True)
+    loader.add_field('text.text_colour', get_parser_for(ttrk.io.csv_formats.parse_rgb), optional=True)
+    loader.add_field('text.background_colour', get_parser_for(ttrk.io.csv_formats.parse_rgb), optional=True)
+    loader.add_field('text.size', get_parser_for(ttrk.io.csv_formats.parse_size), optional=True)
+    loader.add_field('text.position', get_parser_for(ttrk.io.csv_formats.parse_coord), optional=True)
+    loader.add_field('text.position.x', get_parser_for(int), optional=True)
+    loader.add_field('text.position.y', get_parser_for(int), optional=True)
+    loader.add_field('text.onset_time', get_parser_for(float), optional=True)
+    loader.add_field('text.duration', get_parser_for(float), optional=True)
+
+    loader.add_field('genstim.position', get_parser_for(ttrk.io.csv_formats.parse_coord), optional=True)
+    loader.add_field('genstim.position.x', get_parser_for(int), optional=True)
+    loader.add_field('genstim.position.y', get_parser_for(int), optional=True)
+    loader.add_field('genstim.onset_time', get_parser_for(float), optional=True)
+    loader.add_field('genstim.duration', get_parser_for(float), optional=True)
+
+    loader.add_field('fixation.position', ttrk.io.csv_formats.parse_coord, optional=True)
+    loader.add_field('fixation.position.x', int, optional=True)
+    loader.add_field('fixation.position.x%', float, optional=True)
+    loader.add_field('fixation.position.y', int, optional=True)
+
+    return loader
+
+
+#-----------------------------------------------------------------------------------------
+def get_parser_for(type_cast_function, delimiter=";", always_create_list=False):
+    """
+    Given a type name (or an str->type parsing function), return a function that can parse
+    both this type and delimited lists of this type.
+    
+    This is used for parsing CSV files
+    """
+    def parse(str_value):
+        if delimiter in str_value:
+            return [type_cast_function(s) for s in str_value.split(delimiter)]
+        else:
+            value = type_cast_function(str_value)
+            if always_create_list:
+                value = [value]
+            return value
+
+    return parse
+
+
+#-----------------------------------------------------------------------------------------
+def validate_config_param_type(param_name, param_type, param_value, none_allowed=False, type_name=None):
+    """
+    Validate that a certain configuration parameter is of the specified type
+    """
+
+    if none_allowed and value is None:
+        return
+
+    if isinstance(param_type, (type, tuple)):
+        if not isinstance(param_value, param_type):
+            if type_name is None:
+                type_name = _u.get_type_name(param_type)
+
+            raise ttrk.TypeError("config.{:} was set to a non-{:} value ({:})".format(param_name, type_name, param_value))
+
+    elif param_type == ttrk.TYPE_RGB:
+        if not _u._is_rgb(param_value, False, none_allowed):
+            ttrk.TypeError("config.{:} was set to an invalid value ({:}) - expecting (red,green,blue)".
+                           format(param_name, param_value))
+
+    elif param_type == ttrk.TYPE_COORD:
+        if not u.is_coord(param_value):
+            ttrk.TypeError("config.{:} was set to an invalid value ({:}) - expecting (x, y)".
+                           format(param_name, param_value))
+        if isinstance(param_value, geometry.XYPoint):
+            param_value = param_value.x, param_value.y
+
+    elif param_type == ttrk.TYPE_SIZE:
+        if not u.is_collection(param_value) or len(param_value) != 2 or \
+                not isinstance(param_value[0], numbers.Number) or \
+                not isinstance(param_value[1], numbers.Number):
+            ttrk.TypeError("config.{:} was set to an invalid value ({:}) - expecting size, i.e., (width, height) with two integers".
+                           format(param_name, param_value))
+
+    elif param_type == ttrk.TYPE_CALLABLE:
+        if "__call__" not in dir(value):
+            raise ttrk.TypeError(
+                "config.{:} was set to a non-callable value ({:})".format(param_name, param_value))
+
+    else:
+        raise Exception("trajtracker internal error: unsupported type '{:}'".format(param_type))
+
+    return param_value

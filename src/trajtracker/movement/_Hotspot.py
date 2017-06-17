@@ -27,11 +27,17 @@ class Hotspot(ttrk.TTrkObject):
         self.on_touched_callback = on_touched_callback
         self._start_touch_time = None
         self._dispatched = False
+        self._touched = False
 
 
     #==============================================================================
     #        Runtime API
     #==============================================================================
+
+
+    #----------------------------------------------------------------------------
+    def reset(self, time=None):
+        self._touched = False
 
 
     #----------------------------------------------------------------------------
@@ -71,6 +77,8 @@ class Hotspot(ttrk.TTrkObject):
     #----------------------------------------------------------------------------
     def _invoke_on_touched(self, time_in_trial, time_in_session):
 
+        self._touched = True
+
         #-- Directly invoke a callback action
         if self._on_touched_callback is not None:
             self._on_touched_callback(time_in_trial)
@@ -81,6 +89,16 @@ class Hotspot(ttrk.TTrkObject):
                 raise ttrk.ValueError("When {:} is dispatching an event, update_xyt() should get time_in_session".format(_u.get_type_name(self)))
 
             self._event_manager.dispatch_event(ttrk.events.Event(self._on_touched_dispatch_event), time_in_trial, time_in_session)
+
+
+    #----------------------------------------------------------------------------
+    @property
+    def touched(self):
+        """
+        Indicates whether the hotspot was touched during this trial (any time after reset() was called)
+        :return: bool
+        """
+        return self._touched
 
 
     #==============================================================================

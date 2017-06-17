@@ -26,8 +26,8 @@ For an overview of this paradigm under TrajTracker, see
    Technical: the TrialInfo class <paradigms/num2pos/TrialInfo>
 
 
-Dual choice
------------
+Discrete choice
+---------------
 
 Coming up soon
 

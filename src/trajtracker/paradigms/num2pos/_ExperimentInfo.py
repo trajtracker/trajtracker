@@ -73,3 +73,23 @@ class ExperimentInfo(BaseExperimentInfo):
 
         self._target_pointer = value
         self.stimuli.add(value, "target_pointer", visible=False)
+
+    #----------------------------------------------------------------
+    def get_default_target_y(self):
+        """
+        Get the y coordinate where the target should be presented by default
+        :return: tuple: (y coordinate, target height)
+        """
+
+        screen_top = self.screen_size[1] / 2
+        height = screen_top - self.numberline.position[1] - self.config.stimulus_distance_from_top - 1
+        y = int(screen_top - self.config.stimulus_distance_from_top - height / 2)
+        return y, height
+
+
+    #----------------------------------------------------------------
+    def speed_validation_end_y_coord(self):
+        """
+        Get the y coordinate where speed validation should end
+        """
+        return self.numberline.position[1]
