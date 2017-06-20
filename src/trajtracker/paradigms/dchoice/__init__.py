@@ -12,6 +12,18 @@ from ._TrialInfo import TrialInfo
 
 from ._dc_init import \
     create_experiment_objects, \
+    create_feedback_areas, \
     create_response_buttons, \
+    create_sounds, \
+    initialize_experiment, \
     load_data_source
 
+from ._dc_run import \
+    initialize_trial, \
+    get_touched_button, \
+    run_trials, \
+    run_trial, \
+    trial_ended, \
+    trial_failed, \
+    trial_succeeded, \
+    update_trials_file

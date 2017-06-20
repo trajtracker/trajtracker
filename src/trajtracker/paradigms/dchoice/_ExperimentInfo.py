@@ -10,7 +10,7 @@ import expyriment as xpy
 import trajtracker as ttrk
 import trajtracker._utils as _u
 
-from trajtracker.paradigms.common import BaseExperimentInfo
+from trajtracker.paradigms.common import BaseExperimentInfo, validate_config_param_type
 
 
 class ExperimentInfo(BaseExperimentInfo):
@@ -53,9 +53,28 @@ class ExperimentInfo(BaseExperimentInfo):
         """
 
         screen_top = self.screen_size[1] / 2
-        height = self.config.resp_btn_size[1]
+        height = self.get_response_buttons_size()[1]
         y = int(screen_top - self.config.stimulus_distance_from_top - height / 2)
         return y, height
+
+    #----------------------------------------------------------------
+    def get_response_buttons_size(self):
+
+        width, height = validate_config_param_type("resp_btn_size", ttrk.TYPE_SIZE,
+                                                   self.config.resp_btn_size)
+
+        # -- If width/height are between [-1,1], they mean percentage of screen size
+        if -1 < width < 1:
+            width = int(width * self.screen_size[0])
+        elif not isinstance(width, int):
+            raise ttrk.ValueError("Invalid config.resp_btn_size: a non-integer width was provided ({:})".format(width))
+        if -1 < height < 1:
+            height = int(height * self.screen_size[1])
+        elif not isinstance(height, int):
+            raise ttrk.ValueError(
+                "Invalid config.resp_btn_size: a non-integer height was provided ({:})".format(height))
+
+        return width, height
 
 
     #----------------------------------------------------------------

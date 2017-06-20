@@ -16,31 +16,7 @@ from trajtracker.movement import StartPoint
 from trajtracker.paradigms import common
 from trajtracker.paradigms.common import RunTrialResult, FINGER_STARTED_MOVING
 
-from trajtracker.paradigms.dchoice import ExperimentInfo, TrialInfo
-
-
-#----------------------------------------------------------------
-def run_full_experiment(config, xpy_exp, subj_id, subj_name=""):
-    """
-    A default implementation for running a complete experiment, end-to-end: loading the data,
-    initializing all objects, running all trials, and saving the results.
-
-    :param config:
-    :type config: trajtracker.paradigms.dchoice.Config 
-
-    :param xpy_exp: Expyriment's `active experiment <http://docs.expyriment.org/expyriment.design.Experiment.html>`_
-                    object
-    :param subj_id: The subject initials from the num2pos app welcome screen
-    :param subj_name: The subject name from the num2pos app welcome screen (or an empty string) 
-    """
-
-    exp_info = ExperimentInfo(config, xpy_exp, subj_id, subj_name)
-
-    common.create_experiment_objects(exp_info)
-
-    common.register_to_event_manager(exp_info)
-
-    run_trials(exp_info)
+from trajtracker.paradigms.dchoice import TrialInfo
 
 
 #----------------------------------------------------------------
@@ -103,7 +79,7 @@ def run_trial(exp_info, trial):
     rc = common.wait_until_finger_moves(exp_info, trial)
     if rc is not None:
         if rc[1] is not None:
-            trial_failed(rc[1], exp_info, trial)
+            trial_failed(rc[1], exp_info, trial, u.get_time() - trial.start_time)
         return rc[0]
 
     while True:  # This loop runs once per frame
@@ -112,13 +88,14 @@ def run_trial(exp_info, trial):
         exp_info.stimuli.present()
 
         if not ttrk.env.mouse.check_button_pressed(0):
-            trial_failed(ExperimentError("FingerLifted", "You lifted your finger in mid-trial"), exp_info, trial)
+            trial_failed(ExperimentError("FingerLifted", "You lifted your finger in mid-trial"),
+                         exp_info, trial, u.get_time() - trial.start_time)
             return RunTrialResult.Failed
 
         #-- Inform relevant objects (validators, trajectory tracker, event manager, etc.) of the progress
         err = common.update_movement_in_traj_sensitive_objects(exp_info, trial)
         if err is not None:
-            trial_failed(err, exp_info, trial)
+            trial_failed(err, exp_info, trial, u.get_time() - trial.start_time)
             return RunTrialResult.Failed
 
         #-- Check if a response button was reached
@@ -129,7 +106,7 @@ def run_trial(exp_info, trial):
             if movement_time < exp_info.config.min_trial_duration:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
                                              "Please move more slowly"),
-                             exp_info, trial)
+                             exp_info, trial, u.get_time() - trial.start_time)
                 return RunTrialResult.Failed
 
             trial_succeeded(exp_info, trial, user_response)
@@ -148,7 +125,7 @@ def get_touched_button(exp_info):
     :return: The number of the touched button, or None if no button was touched
     """
 
-    for hotspot in exp_info.response_buttons:
+    for hotspot in exp_info.response_hotspots:
         if hotspot.touched:
             return hotspot.button_number
 
@@ -188,14 +165,19 @@ def initialize_trial(exp_info, trial):
 
 
 #----------------------------------------------------------------
-def trial_failed(err, exp_info, trial):
+def trial_failed(err, exp_info, trial, time_in_trial):
     """
     Called when the trial failed for any reason 
     (only when a strict error occurred; pointing at an incorrect location does not count as failure) 
 
+    :param err: The error that occurred
     :type err: ExperimentError
+    :param exp_info:
     :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo
-    :type trial: trajtracker.paradigms.dchoice.TrialInfo 
+    :param trial:
+    :type trial: trajtracker.paradigms.dchoice.TrialInfo
+    :param time_in_trial:
+    :type time_in_trial: float
     """
     common.trial_failed_common(err, exp_info, trial)
     trial_ended(exp_info, trial, time_in_trial, "ERR_" + err.err_code, -1)

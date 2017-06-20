@@ -145,6 +145,7 @@ def on_finger_touched_screen(exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo
     """
 
+    exp_info.target_pointer.visible = False
     update_numberline_for_trial(exp_info, trial)
     common.on_finger_touched_screen(exp_info, trial)
 
@@ -166,7 +167,7 @@ def initialize_trial(exp_info, trial):
 
     exp_info.stimuli.present()  # reset the display
 
-    common.update_text_target_for_trial(exp_info, trial)
+    common.update_text_target_for_trial(exp_info, trial, use_numeric_target_as_default=True)
     common.update_generic_target_for_trial(exp_info, trial)
     if exp_info.fixation is not None:
         common.update_fixation_for_trial(exp_info, trial)

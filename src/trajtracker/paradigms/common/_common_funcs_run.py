@@ -52,7 +52,6 @@ def on_finger_touched_screen(exp_info, trial):
     """
 
     exp_info.errmsg_textbox.visible = False
-    exp_info.target_pointer.visible = False
 
     show_fixation(exp_info)
 
@@ -154,7 +153,7 @@ def show_fixation(exp_info, visible=True):
 
 
 # ----------------------------------------------------------------
-def update_text_target_for_trial(exp_info, trial):
+def update_text_target_for_trial(exp_info, trial, use_numeric_target_as_default=False):
     """
     Update properties of the text stimuli according to the current trial info
 
@@ -167,11 +166,13 @@ def update_text_target_for_trial(exp_info, trial):
         exp_info.text_target.texts = []
         return
 
-    if "text.target" in trial.csv_data:
+    if "text.target" not in trial.csv_data:
         # -- Set the text to show as target (or several, semicolon-separated texts, in case of RSVP)
         trial.text_target = trial.csv_data["text.target"]
-    else:
+    elif use_numeric_target_as_default:
         trial.text_target = str(trial.target)
+    else:
+        raise ttrk.BadFormatError("The input CSV file does not contain a 'text.target' column!")
 
     exp_info.text_target.texts = trial.text_target.split(";")
 

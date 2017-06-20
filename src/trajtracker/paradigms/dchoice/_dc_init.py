@@ -21,6 +21,31 @@ import trajtracker.utils as u
 
 from trajtracker.paradigms import common
 from trajtracker.paradigms.common import get_parser_for
+from trajtracker.paradigms.dchoice import ExperimentInfo
+
+
+#----------------------------------------------------------------
+def initialize_experiment(config, xpy_exp, subj_id, subj_name=""):
+    """
+    A default implementation for running a complete experiment, end-to-end: loading the data,
+    initializing all objects, running all trials, and saving the results.
+
+    :param config:
+    :type config: trajtracker.paradigms.dchoice.Config 
+
+    :param xpy_exp: Expyriment's `active experiment <http://docs.expyriment.org/expyriment.design.Experiment.html>`_
+                    object
+    :param subj_id: The subject initials from the num2pos app welcome screen
+    :param subj_name: The subject name from the num2pos app welcome screen (or an empty string) 
+    """
+
+    exp_info = ExperimentInfo(config, xpy_exp, subj_id, subj_name)
+
+    create_experiment_objects(exp_info)
+
+    common.register_to_event_manager(exp_info)
+
+    return exp_info
 
 
 #----------------------------------------------------------------
@@ -56,7 +81,7 @@ def create_response_buttons(exp_info):
 
     #-- Create buttons
 
-    size = _get_response_buttons_size(exp_info)
+    size = exp_info.get_response_buttons_size()
     positions = _get_response_buttons_positions(exp_info, size)
     colors = _get_response_buttons_colors(exp_info)
     texts = _get_response_buttons_texts(exp_info)
@@ -93,24 +118,7 @@ def create_response_buttons(exp_info):
         hotspot = ttrk.movement.Hotspot(area=area)
         hotspot.button_number = i
         exp_info.response_hotspots.append(hotspot)
-
-
-#----------------------------------------------------------------
-def _get_response_buttons_size(exp_info):
-
-    width, height = common.validate_config_param_type("resp_btn_size", ttrk.TYPE_SIZE, exp_info.config.resp_btn_size)
-
-    #-- If width/height are between [-1,1], they mean percentage of screen size
-    if -1 < width < 1:
-        width = int(width * exp_info.screen_size[0])
-    elif not isinstance(width, int):
-        raise ttrk.ValueError("Invalid config.resp_btn_size: a non-integer width was provided ({:})".format(width))
-    if -1 < height < 1:
-        height = int(height * exp_info.screen_size[1])
-    elif not isinstance(height, int):
-        raise ttrk.ValueError("Invalid config.resp_btn_size: a non-integer height was provided ({:})".format(height))
-
-    return width, height
+        exp_info.trajectory_sensitive_objects.append(hotspot)
 
 
 #----------------------------------------------------------------
@@ -127,7 +135,7 @@ def _get_response_buttons_positions(exp_info, button_size):
         x = max_x - int(button_size[0] / 2)
         y = max_y - int(button_size[1] / 2)
 
-        return (-x, -y), (x, -y)
+        return (-x, y), (x, y)
 
     if u.is_coord(position, allow_float=True):
         #-- One pair of coords given: this is for the left side
