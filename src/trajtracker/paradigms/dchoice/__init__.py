@@ -12,9 +12,10 @@ from ._TrialInfo import TrialInfo
 
 from ._dc_init import \
     create_experiment_objects, \
-    create_feedback_areas, \
+    create_feedback_stimuli, \
     create_response_buttons, \
     create_sounds, \
+    hide_feedback_stimuli, \
     initialize_experiment, \
     load_data_source
 

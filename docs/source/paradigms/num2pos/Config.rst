@@ -7,132 +7,102 @@ Configuration parameters for a number-to-position experiment.
 
 All parameters can be set directly and via the constructor.
 
-Some advanced config parameters are not documented here - see the source file for details.
+.. currentmodule:: trajtracker.paradigms.num2pos
 
-
-General:
---------
-
-    **experiment_id**  (str, mandatory parameter)
-        A unique ID of the present experiment configuration. Will be saved as-is in the results file,
-        to help you identify the specific configuration you were executing.
-
-Targets to show
----------------
-
-    **data_source** (str, mandatory parameter)
-        The name of a CSV file with the per trial data. See (TBD) for detailed description of this file format.
-        Alternatively, you can provide a list of numbers, each of which will be presented as a text target.
-
-    **shuffle_trials** (bool, default: True)
-        Whether to randomize the order of trials, or to present them in the order in which they
-        were provided in data_source.
-
-    **use_text_targets** (bool, default: True)
-        Whether to present text targets. If True, you should have a *text.target* column in the CSV file.
-
-    **text_target_height** (number, default: 1.0)
-        The height of the text target, specified as percentage of the available distance
-        between the number line and the top of the screen (value between 0 and 1).
-        The actual target size (in pixels) will be printed in the output file.
-
-    **use_generic_targets** (bool, default: False)
-        Whether to present generic targets. A generic target is any Expyriment (or equivalent) stimulus - e.g.,
-        image, shape, etc.
-
-    **fixation_type**
-        The type of fixation stimulus: 'cross', 'text', or None.
-        When using 'text' fixation, you can set the text via *fixation_text* or via the CSV config file.
-
-    **fixation_text** (str)
-        The default fixation text to use when *fixation_type='text'*.
-        This value can be overriden by column *fixation.text* in the CSV config file.
-
-    **log_stimulus_onset_offset** (bool, default: False)
-        Whether to log (in a CSV file) the exact times when each stimulus appeared and disappeared
+.. include:: Config_common.txt
 
 
 Number line
 -----------
 
-    **max_numberline_value** (number, mandatory parameter)
-        The value at the right end of the number line.
+.. autoinstanceattribute:: Config.max_numberline_value
+    :annotation: - number, mandatory parameter
 
-    **min_numberline_value** (number, default: 0)
-        The value at the left end of the number line.
+    The value at the right end of the number line.
 
-    **nl_labels_visible** (bool, default: True)
-        Whether to show labels at the end of the number line (with min/max values)
+.. autoinstanceattribute:: Config.min_numberline_value
+    :annotation: = 0 (number)
 
-    **nl_length** (number, default: 0.9)
-        The length of the number line. The length is specified either in pixels (an int value larger than 1)
-        or as percentage of the screen width (a number between 0 and 1).
+    The value at the left end of the number line.
 
-    **show_feedback** (bool, default: True)
-        Whether to show a feedback arrow (where the finger landed on the number line)
+.. autoinstanceattribute:: Config.nl_labels_visible
+    :annotation: = True (bool)
 
-    **feedback_accuracy_levels** (list of numbers, default: None)
-        Use this to show the feedback arrow in different colors, depending on the response accuracy.
-        Define a list of numbers between 0 and 1 (percentages of the number line length). Configure
-        the corresponding colors in *feedback_arrow_colors*.
+    Whether to show labels at the end of the number line (with min/max values)
 
-    **feedback_arrow_colors** (list of RGB colors, default: [Green])
-        Color of the feedback arrow (or a list of colors, in case you defined feedback_accuracy_levels;
-        in this case, the first color corresponds with best accuracy)
+.. autoinstanceattribute:: Config.nl_length
+    :annotation: = 0.9 (number)
 
-    **post_response_target** (bool, default: False)
-        Whether to show the correct target location, as a downward-pointing arrow along the number line,
-        after the response was made
+    The length of the number line. The length is specified either in pixels (an int value larger than 1)
+    or as percentage of the screen width (a number between 0 and 1).
 
-    **nl_line_width** (int)
-        Width (in pixels) of the number line
+.. autoinstanceattribute:: Config.show_feedback
+    :annotation: = True (bool)
 
-    **nl_end_tick_height** (int)
-        height (in pixels) of the ticks at the end of the line
+    Whether to show a feedback arrow (where the finger landed on the number line)
 
-    **nl_line_colour** (RGB)
-        The line colour
+.. autoinstanceattribute:: Config.feedback_accuracy_levels
+    :annotation: = None (list of numbers)
 
-    **nl_labels_box_size** (width, height)
-        Size (in pixels) of the end-of-line labels' text box
+    Use this to show the feedback arrow in different colors, depending on the response accuracy.
+    Define a list of numbers between 0 and 1 (percentages of the number line length). Configure
+    the corresponding colors in *feedback_arrow_colors*.
 
-    **nl_labels_font_name** (str, default: Arial)
+.. autoinstanceattribute:: Config.feedback_arrow_colors
+    :annotation: = [Green] (list of RGB colors)
 
-    **nl_labels_colour** (RGB)
+    Color of the feedback arrow (or a list of colors, in case you defined feedback_accuracy_levels;
+    in this case, the first color corresponds with best accuracy)
 
-    **nl_labels_offset** (tuple (x, y); default: (0,0))
-        Offset to move labels (relatively to their default position)
+.. autoinstanceattribute:: Config.post_response_target
+    :annotation: = False (bool)
 
-    **nl_distance_from_top** (int)
-        Distance of the numberline's main line from top-of-screen (in pixels)
+    Whether to show the correct target location, as a downward-pointing arrow along the number line,
+    after the response was made
 
+.. autoinstanceattribute:: Config.nl_line_width
+    :annotation: = 2 (int)
 
-"Start" rectangle
------------------
+    Width (in pixels) of the number line
 
-    **stimulus_then_move** (bool, default: False)
-        *True*: The software decides when the target appears, and then the finger must start moving
+.. autoinstanceattribute:: Config.nl_end_tick_height
+    :annotation: = 5 (int)
 
-        *False*: The finger moves at will and this is what triggers the appearance of the target
+    height (in pixels) of the ticks at the end of the line
 
-    **finger_moves_min_time, finger_moves_max_time** (number, default: None)
-        The minimal/maximal time (in seconds) in which the finger should start moving.
-        The time is specified relatively to the time point of touching the screen
+.. autoinstanceattribute:: Config.nl_line_colour
+    :annotation: = White (RGB)
 
-    **start_point_size** (tuple (width, height); default: (40, 30))
-        The size of the "start" rectangle, in pixels.
+    The line colour
 
-    **start_point_tilt** (number, default: 0)
-        Rotation of the "start" rectangle (clockwise degrees)
+.. autoinstanceattribute:: Config.nl_labels_box_size
+    :annotation: - (width, height)
 
-    **start_point_colour** (RGB color, default: Grey)
-        Colour of the "start" rectangle
+    Size (in pixels) of the end-of-line labels' text box
+
+.. autoinstanceattribute:: Config.nl_labels_font_name
+    :annotation: = 'Arial' (str)
+
+.. autoinstanceattribute:: Config.nl_labels_colour
+    :annotation: = Grey (RGB color)
+
+.. autoinstanceattribute:: Config.nl_labels_offset
+    :annotation: = (0, 0) (tuple x, y)
+
+    Offset to move labels (relatively to their default position)
+
+.. autoinstanceattribute:: Config.nl_distance_from_top
+    :annotation: = 80 (int)
+
+    Distance of the numberline's main line from top-of-screen (in pixels)
+
 
 
 Sounds
 ------
 
-    **sound_by_accuracy** (default: None)
+.. autoinstanceattribute:: Config.sound_by_accuracy
+    :annotation: = None
         Use this in order to play a different sound depending on the subject's accuracy.
         The parameter should be a list/tuple with several elements, each of which is a (endpoint_error, sound)
         tuple. "endpoint_error" indicates a top error (as ratio of the number line length),
@@ -142,37 +112,7 @@ Sounds
         the program will play good.wav for endpoint errors up to 5% of the line length, and bad.wav for
         any larger error
 
-    **sounds_dir** (str, default: "./sounds")
-        The name of the directory where the sound files are located
+.. autoinstanceattribute:: Config.sounds_dir
+    :annotation: = "./sounds" (str)
 
-
-Movement restrictions (validators)
-----------------------------------
-
-    **min_trial_duration** (number, default: 0.2)
-        Minimal valid time from leaving the "start" rectangle until reaching the number line (in seconds)
-
-    **max_trial_duration** (number, mandatory parameter)
-        Maximal valid time from leaving the "start" rectangle until reaching the number line (in seconds)
-        This parameter also affects the speed limit per time point (via
-        :class:`~trajtracker.validators.GlobalSpeedValidator` )
-
-    **speed_guide_enabled** (bool, default: False)
-        If True, the speed limit will be visualized as a moving line.
-        This parameter applies to :class:`~trajtracker.validators.GlobalSpeedValidator`
-
-    **min_inst_speed** (number, default: 10)
-        The minimal instantaneous speed (pixels per second).
-        This parameter applies to :class:`~trajtracker.validators.InstantaneousSpeedValidator`
-
-    **grace_period** (number, default: 0.3)
-        Duration (in seconds) in the beginning of the trial during which speed is not validated.
-        This parameter applies both to :class:`~trajtracker.validators.InstantaneousSpeedValidator` and to
-        :class:`~trajtracker.validators.GlobalSpeedValidator`
-
-    **max_zigzags** (int, default: 8)
-        Maximal number of left-right deviations allowed per trial.
-        This parameter applies to :class:`~trajtracker.validators.NCurvesValidator`
-
-    **save_results** (bool, default: True)
-        Whether to save the results (trials and trajectory).
+    The name of the directory where the sound files are located

@@ -16,7 +16,7 @@ from trajtracker.movement import StartPoint
 from trajtracker.paradigms import common
 from trajtracker.paradigms.common import RunTrialResult, FINGER_STARTED_MOVING
 
-from trajtracker.paradigms.dchoice import TrialInfo
+from trajtracker.paradigms.dchoice import TrialInfo, hide_feedback_stimuli
 
 
 #----------------------------------------------------------------
@@ -28,7 +28,7 @@ def run_trials(exp_info):
 
     while len(exp_info.trials) > 0:
 
-        trial_config = exp_info.trials.pop(0)
+        trial_config = exp_info.trials[0]
 
         ttrk.log_write("====================== Starting trial #{:} =====================".format(trial_num))
 
@@ -55,6 +55,8 @@ def run_trials(exp_info):
         else:
             raise Exception("Invalid result from run_trial(): {:}".format(run_trial_rc))
 
+        exp_info.trials.pop(0)
+
 
 #----------------------------------------------------------------
 def run_trial(exp_info, trial):
@@ -73,7 +75,10 @@ def run_trial(exp_info, trial):
                                                        on_loop_present=exp_info.stimuli,
                                                        event_manager=exp_info.event_manager,
                                                        trial_start_time=trial.start_time,
+
                                                        session_start_time=exp_info.session_start_time)
+
+    hide_feedback_stimuli(exp_info)
     common.on_finger_touched_screen(exp_info, trial)
 
     rc = common.wait_until_finger_moves(exp_info, trial)
@@ -148,7 +153,8 @@ def initialize_trial(exp_info, trial):
     exp_info.text_target.terminate_display()
     exp_info.generic_target.terminate_display()
 
-    exp_info.stimuli.present()  # reset the display
+    #-- Reset the display for this trial
+    exp_info.stimuli.present()
 
     common.update_text_target_for_trial(exp_info, trial)
     common.update_generic_target_for_trial(exp_info, trial)
@@ -185,16 +191,24 @@ def trial_failed(err, exp_info, trial, time_in_trial):
 
 #----------------------------------------------------------------
 def trial_succeeded(exp_info, trial, user_response):
-
+    """
+    Called when the trial ends successfully (this does not mean that the answer was correct) 
+    
+    :param exp_info:
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo
+    :param trial:
+    :type trial: trajtracker.paradigms.dchoice.TrialInfo
+    :param user_response: The button selected by the user (0=left, 1=right) 
+    """
 
     print("   Trial ended successfully.")
-
-    #todo: show feedback
 
     curr_time = u.get_time()
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
+
+    show_feedback(exp_info, trial, user_response)
 
     exp_info.sounds_ok[0].play()
 
@@ -202,6 +216,49 @@ def trial_succeeded(exp_info, trial, user_response):
 
     exp_info.trajtracker.save_to_file(trial.trial_num)
 
+
+#------------------------------------------------
+def show_feedback(exp_info, trial, user_response):
+    """
+    Show the feedback stimulus  
+
+    :param exp_info:
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo
+    :param trial:
+    :type trial: trajtracker.paradigms.dchoice.TrialInfo
+    :param user_response: The button selected by the user (0=left, 1=right) 
+    """
+
+    fb_ind = get_feedback_stim_num(exp_info, trial, user_response)
+    exp_info.feedback_stimuli[fb_ind].visible = True
+
+
+#------------------------------------------------
+def get_feedback_stim_num(exp_info, trial, user_response):
+    """
+    Return the number of the feedback stimulus to show (0 or 1)  
+
+    :param exp_info:
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo
+    :param trial:
+    :type trial: trajtracker.paradigms.dchoice.TrialInfo
+    :param user_response: The button selected by the user (0=left, 1=right) 
+    """
+
+    selectby = exp_info.config.feedback_select_by
+
+    if selectby == 'accuracy':
+        correct = trial.expected_response == user_response
+        return 1 - correct
+
+    elif selectby == 'response':
+        return user_response
+
+    elif selectby == 'expected':
+        return trial.expected_response
+
+    else:
+        raise ttrk.ValueError("Unsupported config.feedback_select_by ({:})".format(selectby))
 
 #------------------------------------------------
 def trial_ended(exp_info, trial, time_in_trial, success_err_code, user_response):

@@ -208,6 +208,7 @@ class EventManager(ttrk.TTrkObject):
                           some time after an event X occurred. If, between the time of event X and the operation's
                           due time, a second event Y occurs (and cancel_pending_operation_on=Y), the operation will
                           be discarded and not invoked.
+        :type cancel_pending_operation_on: either :class:`~trajtracker.events.Event` or a list of events
         :returns: a unique identifier of this operation. You can use it later to unregister the operation via
                         :func:`~trajtracker.events.EventManager.unregister_operation()`.
         """

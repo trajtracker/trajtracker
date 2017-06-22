@@ -62,7 +62,7 @@ def create_experiment_objects(exp_info):
     common.create_common_experiment_objects(exp_info)
 
     create_response_buttons(exp_info)
-    create_feedback_areas(exp_info)
+    create_feedback_stimuli(exp_info)
     create_sounds(exp_info)
 
 
@@ -85,6 +85,9 @@ def create_response_buttons(exp_info):
     positions = _get_response_buttons_positions(exp_info, size)
     colors = _get_response_buttons_colors(exp_info)
     texts = _get_response_buttons_texts(exp_info)
+
+    exp_info.response_button_size = size
+    exp_info.response_button_positions = positions
 
     if texts is None:
 
@@ -209,8 +212,207 @@ def _get_response_buttons_texts(exp_info):
 
 
 #----------------------------------------------------------------
-def create_feedback_areas(exp_info):
-    pass
+def create_feedback_stimuli(exp_info):
+    """
+    Create the stimuli to be used as feedback for the participant's response
+    :param exp_info:
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo
+    """
+
+    common.validate_config_param_values("feedback_stim_type", exp_info.config.feedback_stim_type,
+                                        ['rectangle', 'picture', None])
+    common.validate_config_param_values("feedback_select_by", exp_info.config.feedback_select_by,
+                                        ['response', 'expected', 'accuracy'])
+    common.validate_config_param_type("feedback_duration", numbers.Number, exp_info.config.feedback_duration)
+
+    if exp_info.config.feedback_select_by in ('accuracy', 'expected') and \
+                    len(exp_info.trials) > 0 and 'expected_response' not in exp_info.trials[0]:
+        raise ttrk.BadFormatError('Invalid format for {:}: when config.feedback_select_by=accuracy, you must include an expected_response column in the file'.
+                                  format(exp_info.config.data_source))
+
+    fb_type = exp_info.config.feedback_stim_type
+    if fb_type == 'picture':
+        _create_feedback_pictures(exp_info)
+
+    elif fb_type == 'rectangle':
+        _create_feedback_rectangles(exp_info)
+
+    positions = _get_feedback_stim_positions(exp_info)
+
+    for i in range(len(exp_info.feedback_stimuli)):
+
+        feedback_stim = exp_info.feedback_stimuli[i]
+        feedback_stim.position = positions[i]
+        feedback_stim.visible = False
+
+        #-- Hide feedback stimuli after delay
+        exp_info.event_manager.register_operation(ttrk.events.TRIAL_SUCCEEDED + exp_info.config.feedback_duration,
+                                                  lambda t1, t2: hide_feedback_stimuli(exp_info),
+                                                  recurring=True,
+                                                  cancel_pending_operation_on=ttrk.events.TRIAL_STARTED,
+                                                  description="Hide feedback stimulus")
+
+    # exp_info.event_manager.log_level = ttrk.log_debug
+
+
+#----------------------------------------------------------------
+def hide_feedback_stimuli(exp_info):
+    for stim in exp_info.feedback_stimuli:
+        stim.visible = False
+
+
+#----------------------------------------------------------------
+# Create two feedback stimuli - two pictures
+#
+def _create_feedback_pictures(exp_info):
+
+    pics = exp_info.config.feedback_pictures
+
+    if not u.is_collection(pics) or len(pics) != 2 or not isinstance(pics[0], xpy.stimuli.Picture) \
+            or not isinstance(pics[1], xpy.stimuli.Picture):
+        raise ttrk.TypeError("Invalid config.feedback_pictures: expecting two pictures")
+
+    for i in range(2):
+        exp_info.feedback_stimuli.append(pics[i])
+
+
+#----------------------------------------------------------------
+def _create_feedback_rectangles(exp_info):
+
+    sizes = _get_feedback_rect_sizes(exp_info)
+    colors = _get_feedback_rect_colors(exp_info)
+
+    for i in range(2):
+        fb_stim = xpy.stimuli.Rectangle(size=sizes[i], colour=colors[i])
+        exp_info.feedback_stimuli.append(fb_stim)
+        exp_info.stimuli.add(fb_stim, "feedback%d" % i)
+
+
+#----------------------------------------------------------------
+# Return two sizes - one for each of the feedback areas
+#
+def _get_feedback_rect_sizes(exp_info):
+
+    size_param = exp_info.config.feedback_rect_size
+
+    #-- If size was explicitly provided: use it
+    if size_param is not None and not isinstance(size_param, numbers.Number):
+
+        single_size = common.size_to_pixels(size_param, exp_info.screen_size)
+        if single_size is None:
+            #-- The "feedback_rect_size" argument is NOT a pair of numbers.
+            #-- So we expect it to be an array with two sets of coordinates.
+
+            common.validate_config_param_type("feedback_rect_size", (list, tuple, np.ndarray),
+                                              size_param, type_name="array/list/tuple")
+            result = [common.size_to_pixels(s, exp_info.screen_size) for s in size_param]
+            if len(size_param) != 2 or result[0] is None or result[1] is None:
+                raise ttrk.ValueError('Invalid config.feedback_rect_size: expecting either a size or a pair of sizes')
+
+            return result
+
+        else:
+            #-- The "feedback_rect_size" argument is a pair of numbers - already translated
+            #-- to pixels
+            return single_size, single_size
+
+    #-- feedback_rect_size was not specified explicitly: set it to default values
+
+    if exp_info.config.feedback_place == 'button':
+
+        #-- The feedback area overlaps with the buttons
+        return exp_info.response_button_size, exp_info.response_button_size
+
+    elif exp_info.config.feedback_place == 'middle':
+
+        #-- The feedback area is between the buttons
+
+        width = exp_info.screen_size[0] - 2 * exp_info.response_button_size[0]
+        if isinstance(size_param, int):
+            height = size_param
+        elif isinstance(size_param, numbers.Number):
+            height = int(np.round(size_param * exp_info.screen_size[1]))
+        else:
+            height = int(np.round(exp_info.response_button_size[1] / 4))
+
+        return (width, height), (width, height)
+
+    else:
+        raise ttrk.ValueError("Unsupported feedback_place({:})".format(exp_info.config.feedback_place))
+
+
+#----------------------------------------------------------------
+# Return (x,y) coordinates for each of the feedback areas - i.e., ((x1,y1), (x2,y2))
+#
+def _get_feedback_stim_positions(exp_info):
+
+    sizes = [s.size for s in exp_info.feedback_stimuli]
+    pos_param = exp_info.config.feedback_stim_position
+
+    #-- If position was explicitly provided: use it
+    if pos_param is not None:
+
+        common.validate_config_param_type("feedback_stim_position", (list, tuple, np.ndarray),
+                                          pos_param, type_name="array/list/tuple")
+        if u.is_coord(pos_param):
+            #-- One position given: use for both feedback areas
+            pos_param = tuple(pos_param)
+            return pos_param, pos_param
+
+        elif len(pos_param) == 2 and u.is_coord(pos_param[0]) and u.is_coord(pos_param[1]):
+            return tuple(pos_param)
+
+        else:
+            raise ttrk.ValueError("Invalid config.feedback_stim_position: expecting (x,y) or [(x1,y1), (x2,y2)]")
+
+    #-- Position was not explicitly provided: use default position
+
+    scr_width, scr_height = exp_info.screen_size
+
+    if exp_info.config.feedback_place == 'button':
+
+        #-- Position is top screen corners
+        x1 = - (scr_width / 2 - sizes[0][0] / 2)
+        y1 = scr_height / 2 - sizes[0][1] / 2
+        x2 = (scr_width / 2 - sizes[1][0] / 2)
+        y2 = scr_height / 2 - sizes[1][1] / 2
+
+        return (x1, y1), (x2, y2)
+
+    elif exp_info.config.feedback_place == 'middle':
+
+        #-- Position is top-middle of screen
+        y1 = scr_height / 2 - sizes[0][1] / 2
+        y2 = scr_height / 2 - sizes[1][1] / 2
+        return (0, y1), (0, y2)
+
+    else:
+        raise ttrk.ValueError("Unsupported config.feedback_place ({:})".format(config.feedback_place))
+
+
+#----------------------------------------------------------------
+def _get_feedback_rect_colors(exp_info):
+
+    colors_param = exp_info.config.feedback_btn_colours
+
+    if colors_param is None:
+        if exp_info.config.feedback_place == 'button':
+            return xpy.misc.constants.C_GREEN, xpy.misc.constants.C_GREEN
+        
+        elif exp_info.config.feedback_place == 'middle':
+            return xpy.misc.constants.C_GREEN, xpy.misc.constants.C_RED
+        
+        else:
+            raise ttrk.ValueError('Unsupported config.feedback_place ({:})'.format(exp_info.config.feedback_place))
+
+    if u.is_rgb(colors_param):
+        return colors_param, colors_param
+
+    if u.is_collection(colors_param) and u.is_rgb(colors_param[0]) and u.is_rgb(colors_param[1]):
+        return tuple(colors_param)
+
+    else:
+        raise ttrk.ValueError('Invalid config.feedback_btn_colours ({:}) - expecting a color (Red,Green,Blue) or an array.tuple with two colors'.format(colors_param))
 
 
 #=======================================================================================

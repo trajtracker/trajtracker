@@ -6,6 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = build
+SRCDIR        = source
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
@@ -54,10 +55,13 @@ clean:
 	rm -rf $(BUILDDIR)/*
 
 .PHONY: html
-html:
+html: copy_config_common
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+copy_config_common:
+	cat $(SRCDIR)/paradigms/num2pos/Config_common.txt | sed 's/currentmodule:: trajtracker.paradigms.num2pos/currentmodule:: trajtracker.paradigms.dchoice/' > $(SRCDIR)/paradigms/dchoice/Config_common.txt
 
 .PHONY: dirhtml
 dirhtml:

@@ -2,4 +2,4 @@
 docs/build/
 samples/**/data
 samples/**/events
-
+docs/source/paradigms/dchoice/Config_common.txt

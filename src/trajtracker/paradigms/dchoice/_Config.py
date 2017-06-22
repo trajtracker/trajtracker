@@ -37,10 +37,9 @@ class Config(BaseConfig):
                  resp_btn_texts=None,
                  resp_btn_text_colour=xpy.misc.constants.C_WHITE,
 
-                 feedback_mode=None,
-                 feedback_btn_colours=(xpy.misc.constants.C_GREEN, xpy.misc.constants.C_RED),
-                 feedback_duration=0.2,
-                 feedback_area_size=None, feedback_area_position=None,
+                 feedback_stim_type=None, feedback_place='button', feedback_select_by='response',
+                 feedback_btn_colours=None, feedback_duration=0.2,
+                 feedback_rect_size=None, feedback_stim_position=None,
                  feedback_pictures=None):
 
         super(Config, self).__init__(
@@ -109,16 +108,49 @@ class Config(BaseConfig):
 
         #----- Configuration of accuracy feedback -----
 
-        #: Whether and how to show the feedback after the participant responded:
+        #: The kind of feedback stimulus to show, following a participant response:
+        #: 'rectangle', 'picture', or None
+        self.feedback_stim_type = feedback_stim_type
+
+        #: Where to place the feedback stimuli. This affects the default values of
+        #: :attr:`~trajtracker.paradigms.dchoice.Config.feedback_stim_position` and
+        #: :attr:`~trajtracker.paradigms.dchoice.Config.feedback_btn_colours`
         #:
-        #: - 'touched_button': highlight the button that was touched
-        #: - 'correct_button': highlight the button of the correct response
-        #: - 'single': a single colored rectangle, which can be put anywhere
-        #: - 'picture': show a picture
-        #: - None: Don't show any feedback
+        #: Valid values:
         #:
-        #: To use feedback, the input CSV file must specify the correct response per trial.
-        self.feedback_mode = feedback_mode
+        #: - 'buttons': over the response buttons
+        #: - 'middle': between the buttons (on top of screen)
+        self.feedback_place = feedback_place
+
+        #: The size of the feedback stimuli (optional): either (width, height) if both have the same size,
+        #: or an array of two sizes i.e. [(width1, height1), (width2, height2)].
+        #:
+        #: - For feedback_place = 'button', the default size is the size of the response buttons.
+        #: - For feedback_place = 'middle', you should either specify feedback_rect_size and
+        #:   feedback_stim_position or neither of them.
+        #:   Default: the feedback rectangle will be at the top of the screen, between the two buttons.
+        #:
+        #:   For feedback_place = 'middle', if a single number is defined here, it denotes
+        #:   the rectangle's height.
+        self.feedback_rect_size = feedback_rect_size
+
+        #: The position of the feedback stimulus (optional) - either (x,y) coordinates (indicating that
+        #: both feedback areas are in the same location) or [(x1,y1), (x2,y2)].
+        #:
+        #: - For feedback_place = 'middle', the default position is in the middle-top of the screen.
+        #: - For feedback_place = 'button', the default position is at the two top corners of the screen.
+        self.feedback_stim_position = feedback_stim_position
+
+        #: How to determine which feedback to show.
+        #:
+        #: - *'response'*: The feedback is determined by the button touched
+        #: - *'expected'*: The feedback is the button that should be pressed
+        #: - *'accuracy'*: The feedback is determined by whether the touched button was correct.
+        #:                 (when configuring the two feedback stimuli, e.g., size and position,
+        #:                 the first one refers to correct response).
+        #:                 If you use this feature, you must include an "expected_response" column in the
+        #:                 trials CSV file.
+        self.feedback_select_by = feedback_select_by
 
         #: The colour of the feedback button/rectangle. If two colors are provided, the first colour will
         #: be used for correct responses and the second colour for incorrect responses
@@ -127,34 +159,6 @@ class Config(BaseConfig):
         #: Duration (in seconds) for which feedback is presented
         self.feedback_duration = feedback_duration
 
-        #: The size of the feedback stimulus.
-        #:
-        #: For feedback_mode = 'single', feedback_area_size and feedback_area_position are optional:
-        #: You can either define both of them or none of them. If they are not defined, the feedback
-        #: rectangle will be at the top of the screen, between the two buttons.
-        #:
-        #: For feedback_mode = 'single', if a single number is defined here, it denotes
-        #: the rectangle's height.
-        #:
-        #: For feedback_mode = 'touched_button' or 'correct_button', this parameter can be used to
-        #: flicked a feedback in a size different from the button size.
-        self.feedback_area_size = feedback_area_size
-
-        #: The position of the feedback stimulus (x,y).
-        #:
-        #: For feedback_mode = 'single', feedback_area_size and feedback_area_position are optional:
-        #: You can either define both of them or none of them. If they are not defined, the feedback
-        #: rectangle will be at the top of the screen, between the two buttons.
-        #:
-        #: For feedback_mode = 'touched_button' or 'correct_button', this parameter can be used to
-        #: move the feedback button location. You can define either one set of (x,y) coordinates,
-        #: indicating the right feedback location (the left one will be symmetric), or a list of
-        #: [(xleft,yleft), (xright,yright)]
-        self.feedback_area_position = feedback_area_position
-
         #: Pictures to use as feedback (when feedback_mode = 'picture').
-        #: You can specify here one picture (presented on any response) or two pictures (for correct
-        #: and incorrect responses, correspondingly). Each picture is an
-        #: expyriment.stimuli.Picture object.
+        #: Specify here two expyriment.stimuli.Picture objects.
         self.feedback_pictures = feedback_pictures
-

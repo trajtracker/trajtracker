@@ -18,17 +18,15 @@ if not xpy.misc.is_android_running():
 
 config = dchoice.Config("ChooseArrowDir", max_trial_duration=2, data_source="choice_1.csv",
                         use_generic_targets=True, use_text_targets=False,
-
+                        feedback_stim_type='rectangle', feedback_select_by='accuracy',
+                        feedback_place='middle',
                         speed_guide_enabled=True, sounds_dir="../sounds")
-
-#----------------------------------------------------
 
 stimuli = {
     'left': xpy.stimuli.Picture("arrow-left.bmp"),
     'right': xpy.stimuli.Picture("arrow-right.bmp")
 }
 
-#----------------------------------------------------
 
 #-- Initialize Expyriment
 

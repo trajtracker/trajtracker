@@ -26,7 +26,9 @@ from ._common_funcs_init import \
     get_subject_name_id, \
     load_sound, \
     register_to_event_manager, \
-    validate_config_param_type
+    size_to_pixels, \
+    validate_config_param_type, \
+    validate_config_param_values
 
 from ._common_funcs_run import \
     init_experiment, \

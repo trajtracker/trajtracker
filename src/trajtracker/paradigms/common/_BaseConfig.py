@@ -69,25 +69,12 @@ class BaseConfig(object):
         #: Default text to use for a text fixation
         self.fixation_text = fixation_text
 
-        #: See :attr:`FixationZoom.box_size <trajtracker.stimuli.FixationZoom.box_size>`
         self.fixzoom_box_size = fixzoom_box_size
-
-        #: See :attr:`FixationZoom.dot_radius <trajtracker.stimuli.FixationZoom.dot_radius>`
         self.fixzoom_dot_radius = fixzoom_dot_radius
-
-        #: See :attr:`FixationZoom.dot_colour <trajtracker.stimuli.FixationZoom.dot_colour>`
         self.fixzoom_dot_colour = fixzoom_dot_colour
-
-        #: See :attr:`FixationZoom.zoom_duration <trajtracker.stimuli.FixationZoom.zoom_duration>`
         self.fixzoom_zoom_duration = fixzoom_zoom_duration
-
-        #: See :attr:`FixationZoom.stay_duration <trajtracker.stimuli.FixationZoom.stay_duration>`
         self.fixzoom_stay_duration = fixzoom_stay_duration
-
-        #: See :attr:`FixationZoom.show_event <trajtracker.stimuli.FixationZoom.show_event>`
         self.fixzoom_show_event = fixzoom_show_event
-
-        #: See :attr:`FixationZoom.start_zoom_event <trajtracker.stimuli.FixationZoom.start_zoom_event>`
         self.fixzoom_start_zoom_event = fixzoom_start_zoom_event
 
         #----- Configuration of the "start" rectangle -----
@@ -140,6 +127,7 @@ class BaseConfig(object):
         #--------------------------------------------------------------------
         #    Advanced configuration
         #--------------------------------------------------------------------
+        #todo: add these parameters to the documentation
 
         # Text target
         self.text_target_font = "Arial"

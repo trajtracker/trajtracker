@@ -85,8 +85,10 @@ A trial can include the following events:
 
 The operations triggered by events are:
 
-- Showing/hiding stimuli: this happens in certain delay after TRIAL_STARTED (when config.stimulusThenMove=True)
-  or after FINGER_STARTED_MOVING (when config.stimulusThenMove=False)
+- Showing/hiding stimuli: this happens in certain delay after TRIAL_STARTED (when
+  :attr:`config.stimulus_then_move <trajtracker.paradigms.num2pos.Config.stimulus_then_move>` = True)
+  or after FINGER_STARTED_MOVING (when
+  :attr:`config.stimulus_then_move <trajtracker.paradigms.num2pos.Config.stimulus_then_move>` = False)
 - Hiding the feedback arrow (runs on TRIAL_STARTED)
 - Enabling the :class:`~trajtracker.movement.TrajectoryTracker` and all validators on FINGER_STARTED_MOVING,
   and disabling them on TRIAL_ENDED.
@@ -142,7 +144,6 @@ Functions in _n2p_run.py (specific to number-to-position paradigm)
 .. autofunction:: trajtracker.paradigms.num2pos.trial_ended
 .. autofunction:: trajtracker.paradigms.num2pos.trial_failed
 .. autofunction:: trajtracker.paradigms.num2pos.trial_succeeded
-.. autofunction:: trajtracker.paradigms.num2pos.wait_until_finger_moves
 
 Functions in _common_funcs_run.py (common to several paradigms)
 ---------------------------------------------------------------
@@ -158,3 +159,4 @@ Functions in _common_funcs_run.py (common to several paradigms)
 .. autofunction:: trajtracker.paradigms.common.update_movement_in_traj_sensitive_objects
 .. autofunction:: trajtracker.paradigms.common.update_text_target_for_trial
 .. autofunction:: trajtracker.paradigms.common.update_obj_position
+.. autofunction:: trajtracker.paradigms.common.wait_until_finger_moves

@@ -5,6 +5,7 @@ from __future__ import division
 import time
 import numbers
 import os
+import numpy as np
 
 import expyriment as xpy
 from expyriment.misc import geometry
@@ -491,22 +492,23 @@ def validate_config_param_type(param_name, param_type, param_value, none_allowed
 
     elif param_type == ttrk.TYPE_RGB:
         if not _u._is_rgb(param_value, False, none_allowed):
-            ttrk.TypeError("config.{:} was set to an invalid value ({:}) - expecting (red,green,blue)".
-                           format(param_name, param_value))
+            raise ttrk.TypeError("config.{:} was set to an invalid value ({:}) - expecting (red,green,blue)".
+                                 format(param_name, param_value))
 
     elif param_type == ttrk.TYPE_COORD:
         if not u.is_coord(param_value):
-            ttrk.TypeError("config.{:} was set to an invalid value ({:}) - expecting (x, y)".
-                           format(param_name, param_value))
+            raise ttrk.TypeError("config.{:} was set to an invalid value ({:}) - expecting (x, y)".
+                                 format(param_name, param_value))
         if isinstance(param_value, geometry.XYPoint):
             param_value = param_value.x, param_value.y
 
     elif param_type == ttrk.TYPE_SIZE:
-        if not u.is_collection(param_value) or len(param_value) != 2 or \
+        if not u.is_collection(param_value) or \
+                        len(param_value) != 2 or \
                 not isinstance(param_value[0], numbers.Number) or \
                 not isinstance(param_value[1], numbers.Number):
-            ttrk.TypeError("config.{:} was set to an invalid value ({:}) - expecting size, i.e., (width, height) with two integers".
-                           format(param_name, param_value))
+            raise ttrk.TypeError("config.{:} was set to an invalid value '{:}' - expecting size, i.e., (width, height) with two integers".
+                                 format(param_name, param_value))
 
     elif param_type == ttrk.TYPE_CALLABLE:
         if "__call__" not in dir(value):
@@ -517,3 +519,44 @@ def validate_config_param_type(param_name, param_type, param_value, none_allowed
         raise Exception("trajtracker internal error: unsupported type '{:}'".format(param_type))
 
     return param_value
+
+#-----------------------------------------------------------------------------------------
+def validate_config_param_values(param_name, param_value, allowed_values):
+    """
+    Validate that a certain configuration parameter is one of the listed values
+    """
+
+    if param_value not in allowed_values:
+        allowed_values_str = ", ".join([str(v) for v in allowed_values])
+        raise ttrk.TypeError("config.{:} was set to an invalid value ({:}). Allowed values are: {:}".
+                       format(param_name, param_value, allowed_values_str))
+
+#-----------------------------------------------------------------------------------------
+def size_to_pixels(value, screen_size=None):
+    """
+    Check if the given value denotes a stimulus size, and return it in pixels
+    :param screen_size: If provided, the function will  
+    :return: The size in pixels, as tuple
+    """
+    if not u.is_collection(value) or len(value) != 2:
+        return None
+
+    result = []
+    for i in range(2):
+        v = value[i]
+        if isinstance(v, int) and v > 0:
+            pass
+
+        elif isinstance(v, numbers.Number) and 0 < v <= 1:
+            if screen_size is None:
+                ttrk.log_write("TrajTracker warning in paradigms.common.size_to_pixels(): got 0 < size <= 1, but screen_size was not provided. Returned None.", True)
+                return None
+            else:
+                v = int(np.round(v * screen_size[i]))
+
+        else:
+            return None
+
+        result.append(v)
+
+    return tuple(result)

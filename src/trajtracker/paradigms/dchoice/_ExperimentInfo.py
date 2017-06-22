@@ -45,6 +45,12 @@ class ExperimentInfo(BaseExperimentInfo):
         return self._response_hotspots
 
 
+    #---------------------------------------------------------------
+    @property
+    def feedback_stimuli(self):
+        return self._feedback_stimuli
+
+
     #----------------------------------------------------------------
     def get_default_target_y(self):
         """
