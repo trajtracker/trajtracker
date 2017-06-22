@@ -106,7 +106,7 @@ class Config(BaseConfig):
         self.resp_btn_text_colour = resp_btn_text_colour
 
 
-        #----- Configuration of accuracy feedback -----
+        #----- Configuration of visual feedback -----
 
         #: The kind of feedback stimulus to show, following a participant response:
         #: 'rectangle', 'picture', or None

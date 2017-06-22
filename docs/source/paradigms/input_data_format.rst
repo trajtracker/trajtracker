@@ -2,6 +2,9 @@
 CSV configuration file
 ======================
 
+The file format for number-to-position experiments and discrete-choice experiments is very similar.
+This page describes both.
+
 Overview
 ++++++++
 
@@ -9,11 +12,11 @@ The CSV file contains one line per trial. The possible columns in this file are 
 
 Via the CSV config file, you can define per trial:
 
-- The target location
 - The stimuli to show
 - The time when stimuli appear / disappear
-- The fixation text (in case you used :doc:`config <Config>` .fixation = 'text')
+- The fixation text (in case you used *config.use_text_targets = True*)
 - Visual properties of the stimuli, the fixation, and the number line (e.g., position, font, etc.)
+- The target location (in case of number-to-position experiments)
 
 All columns that refer to stimuli can contain either a single value or a semicolon-separated list of values
 (at least one per target; excessive values are ignored).
@@ -25,7 +28,7 @@ Conventions for column names
 - Columns that refer to the text stimuli (the :class:`~trajtracker.stimuli.MultiTextBox`) are called *text.<something>*.
 - Columns that refer to non-text stimuli (the :class:`~trajtracker.stimuli.MultiStimulus`) are called *genstim.<something>*.
 - Columns that refer to the fixation stimulus are called *fixation.<something>*.
-- Columns that refer to the number line are called *nl.<something>*.
+- In the number-to-position paradigm: Columns that refer to the number line are called *nl.<something>*.
 
 
 
@@ -51,10 +54,18 @@ and disappear.
 
     This column is mandatory if you are using generic stimuli (*config.use_generic_targets = True*)
 
-**target** (mandatory column)
+**target** (mandatory column, exists only in the number-to-position paradigm)
     The target location on the number line. If you use text stimuli
     (*config.use_text_targets = True*) and the *text.target* column was not defined, the *target* column
     indicates not only the target location, but also the single text stimulus.
+
+
+**expected_response**
+    In the discrete-choice paradigm, this column indicates which is the correct response button:
+    0 (left) or 1 (right).
+
+**left_resp_btn.text, right_resp_btn.text**
+    In the discrete-choice paradigm: text to write on each of the response buttons
 
 
 Columns to define visual properties

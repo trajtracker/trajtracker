@@ -21,6 +21,9 @@ General:
 Targets to show
 ---------------
 
+Main parameters
++++++++++++++++
+
 .. autoinstanceattribute:: Config.data_source
     :annotation: - str, mandatory parameter
 
@@ -44,6 +47,38 @@ Targets to show
     Whether to present generic targets. A generic target is any Expyriment (or equivalent) stimulus - e.g.,
     image, shape, etc.
 
+
+Additional parameters
++++++++++++++++++++++
+
+
+.. autoinstanceattribute:: Config.stimulus_distance_from_top
+    :annotation: = 5 (int)
+
+    The distance (in pixels) between top of screen and the target's top
+
+.. autoinstanceattribute:: Config.target_onset_time
+    :annotation: = [0.0] (list of numbers)
+
+    Default onset time for the target. If more than one target is specified, one onset time per target is due.
+    See `~trajtracker.stimuli.MultiStimulus.onset_time`
+
+.. autoinstanceattribute:: Config.target_duration
+    :annotation: = [1000.0] (list of numbers)
+
+
+
+Additional parameters when config.use_text_targets = True
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+.. autoinstanceattribute:: Config.text_target_colour
+    :annotation: = White (RGB color)
+
+.. autoinstanceattribute:: Config.text_target_font
+    :annotation: = 'Arial' (str)
+
+    Font name.
+
 .. autoinstanceattribute:: Config.text_target_height
     :annotation: = 1.0 (number)
 
@@ -51,8 +86,45 @@ Targets to show
     between the number line and the top of the screen (value between 0 and 1).
     The actual target size (in pixels) will be printed in the output file.
 
+.. autoinstanceattribute:: Config.text_target_justification
+    :annotation: = 1
 
-For additional advanced configuration items, see the class definition.
+    0 = left, 1 = center, 2 = right
+
+.. autoinstanceattribute:: Config.text_target_last_stimulus_remains
+    :annotation: = False (boolean)
+
+    When showing multiple texts, this indicates if the last one should remain on screen or
+    disappear after a delay (see :attr:`MultiTextBox.last_stimulus_remains <trajtracker.stimuli.MultiTextBox.last_stimulus_remains>`)
+
+.. autoinstanceattribute:: Config.text_target_width
+    :annotation: = 300 (int)
+
+    Width (in pixels) of the target's text box
+
+.. autoinstanceattribute:: Config.text_target_x_coord
+    :annotation: = 0 (int)
+
+    The x position of the target text box
+
+
+
+Additional parameters when config.use_generic_targets = True
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+.. autoinstanceattribute:: Config.generic_target_x_coord
+    :annotation: = 0 (int)
+
+    The x position of the generic target
+
+.. autoinstanceattribute:: Config.generic_target_last_stimulus_remains
+    :annotation: = False (boolean)
+
+    When showing multiple texts, this indicates if the last one should remain on screen or
+    disappear after a delay (see :attr:`MultiStimulus.last_stimulus_remains <trajtracker.stimuli.MultiStimulus.last_stimulus_remains>`)
+
+
 
 
 Fixation stimulus
@@ -162,6 +234,25 @@ Fixation stimulus
     X position the "start" rectangle
 
 
+Error-message text box
+----------------------
+
+.. autoinstanceattribute:: Config.errmsg_textbox_coords
+    :annotation: = (0, 0)  (tuple x, y)
+
+.. autoinstanceattribute:: Config.errmsg_textbox_size
+    :annotation: = (290, 180)  (tuple width, height)
+
+.. autoinstanceattribute:: Config.errmsg_textbox_font_size
+    :annotation: = 16 (int)
+
+.. autoinstanceattribute:: Config.errmsg_textbox_font_name
+    :annotation: = 'Arial' (str)
+
+.. autoinstanceattribute:: Config.errmsg_textbox_font_colour
+    :annotation: = Red (RGB color)
+
+
 Movement restrictions (validators)
 ----------------------------------
 
@@ -238,5 +329,3 @@ Movement restrictions (validators)
 
     See :attr:`NCurvesValidator.min_angle_change_per_curve <trajtracker.validators.NCurvesValidator.min_angle_change_per_curve>`
 
-
-For additional advanced configuration items, see the class definition.

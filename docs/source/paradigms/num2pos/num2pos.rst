@@ -29,7 +29,7 @@ with almost no programming. To use them, you should:
   *samples/paradigms/number_to_position_1* in the TrajTracker distribution).
 - In your script, set the experiment's general configuration parameters.
   This is done by updating the :doc:`Config <Config>` object.
-- Create a CSV file with the per-trial data. See :doc:`here <input_data_format>`
+- Create a CSV file with the per-trial data. See :doc:`here <../input_data_format>`
   a detailed description of this file format.
 
 

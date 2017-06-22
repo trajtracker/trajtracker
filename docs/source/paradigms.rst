@@ -11,7 +11,7 @@ Number-to-position mapping
 --------------------------
 
 For an overview of this paradigm under TrajTracker, see
-`this page <https://drordotan.wixsite.com/trajtracker/ttrk-exp-num2pos>`_.
+`the number-to-position page <https://drordotan.wixsite.com/trajtracker/ttrk-exp-num2pos>`_.
 
 .. toctree::
    :maxdepth: 1
@@ -19,7 +19,7 @@ For an overview of this paradigm under TrajTracker, see
 
    Overview <paradigms/num2pos/num2pos>
    Configuration: the Config class <paradigms/num2pos/Config>
-   Configuration: input CSV file format <paradigms/num2pos/input_data_format>
+   Configuration: input CSV file format <paradigms/input_data_format>
    The result files <paradigms/num2pos/results>
    Technical: the software design <paradigms/num2pos/num2pos_design>
    Technical: the ExperimentInfo class <paradigms/num2pos/ExperimentInfo>
@@ -29,6 +29,15 @@ For an overview of this paradigm under TrajTracker, see
 Discrete choice
 ---------------
 
-Coming up soon
+For an overview of this paradigm under TrajTracker, see
+`the discrete-choice page <https://drordotan.wixsite.com/trajtracker/ttrk-exp-dchoice>`_.
 
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   Configuration: the Config class <paradigms/dchoice/Config>
+   Configuration: input CSV file format <paradigms/input_data_format>
+   Technical: the ExperimentInfo class <paradigms/dchoice/ExperimentInfo>
+   Technical: the TrialInfo class <paradigms/dchoice/TrialInfo>
 

@@ -7,9 +7,9 @@ Configuration parameters for a number-to-position experiment.
 
 All parameters can be set directly and via the constructor.
 
-.. currentmodule:: trajtracker.paradigms.num2pos
-
 .. include:: Config_common.txt
+
+.. currentmodule:: trajtracker.paradigms.num2pos
 
 
 Number line
@@ -103,6 +103,7 @@ Sounds
 
 .. autoinstanceattribute:: Config.sound_by_accuracy
     :annotation: = None
+
         Use this in order to play a different sound depending on the subject's accuracy.
         The parameter should be a list/tuple with several elements, each of which is a (endpoint_error, sound)
         tuple. "endpoint_error" indicates a top error (as ratio of the number line length),
@@ -110,9 +111,26 @@ Sounds
 
         The worst accuracy is ignored (e.g., if you specify [(0.05, 'good.wav'), (0.5, 'bad.wav')]
         the program will play good.wav for endpoint errors up to 5% of the line length, and bad.wav for
-        any larger error
+        any larger error.
+
+        If you only use a single sound for good trials, don't use this parameter; use
+        :attr:`~trajtracker.paradigms.num2pos.Config.sound_ok` instead
 
 .. autoinstanceattribute:: Config.sounds_dir
     :annotation: = "./sounds" (str)
 
     The name of the directory where the sound files are located
+
+.. autoinstanceattribute:: Config.sound_err
+    :annotation: = 'error.wav' (str)
+
+    Name of a WAV file (in :attr:`~trajtracker.paradigms.num2pos.Config.sounds_dir`) - sound to play
+    in case of error (i.e. failed trial).
+
+.. autoinstanceattribute:: Config.sound_ok
+    :annotation: = 'click.wav' (str)
+
+    Name of a WAV file (in :attr:`~trajtracker.paradigms.num2pos.Config.sounds_dir`) - sound to play
+    when the trial ended successfully.
+
+    No need for this if :attr:`~trajtracker.paradigms.num2pos.Config.sound_by_accuracy` was specified.
