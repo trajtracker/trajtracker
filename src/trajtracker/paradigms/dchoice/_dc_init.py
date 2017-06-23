@@ -344,9 +344,10 @@ def _get_feedback_rect_sizes(exp_info):
 #----------------------------------------------------------------
 # Return (x,y) coordinates for each of the feedback areas - i.e., ((x1,y1), (x2,y2))
 #
-def _get_feedback_stim_positions(exp_info):
+def _get_feedback_stim_positions(exp_info, sizes=None):
 
-    sizes = [s.size for s in exp_info.feedback_stimuli]
+    if sizes is None:
+        sizes = [s.size for s in exp_info.feedback_stimuli]
     pos_param = exp_info.config.feedback_stim_position
 
     #-- If position was explicitly provided: use it

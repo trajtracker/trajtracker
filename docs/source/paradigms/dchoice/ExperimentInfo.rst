@@ -1,8 +1,8 @@
 .. TrajTracker : ExperimentInfo.py
 
 
-ExperimentInfo class
-====================
+ExperimentInfo class (discrete choice)
+======================================
 
 This object keeps all the experiment data:
 

@@ -1,7 +1,7 @@
 .. TrajTracker : Config.py
 
-Config class
-============
+Config class (discrete choice)
+==============================
 
 Configuration parameters for a discrete-choice experiment.
 

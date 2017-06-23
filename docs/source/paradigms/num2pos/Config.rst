@@ -1,7 +1,7 @@
 .. TrajTracker : Config.py
 
-Config class
-============
+Config class (number-to-position)
+=================================
 
 Configuration parameters for a number-to-position experiment.
 

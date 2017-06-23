@@ -1,6 +1,8 @@
+:orphan:
 
-Number-to-position experiment results
-=====================================
+
+Experiment results
+==================
 
 Each experiment session yields 3 results files, stored in the *data* sub-directory:
 
@@ -78,9 +80,7 @@ The trials file contains one line per completed trial (both succeeded and failed
 
 - **trialNum**: The trial's serial number
 - **LineNum**: The line number in the input CSV trials file
-- **target**: The target location
 - **presentedTarget**: The stimulus presented
-- **endPoint**: The location mrked by the subject on the number line, using the number line's scale
 - **status**: Either "OK" or "ERR_<error-code>"
 - **movementTime**: Time (in seconds) between the finger starting to move and reaching the number line
 - **timeInSession**: The time when the trial started, relatively to the session start time.
@@ -89,6 +89,15 @@ The trials file contains one line per completed trial (both succeeded and failed
   onset_time > 0 for all targets, this time will be earlier than the targets' actual onset time).
   In stimulusThenMove mode, this value is always 0.
 
+In the number-to-position paradigm, the file also contains these columns:
+
+- **target**: The target location
+- **endPoint**: The location mrked by the subject on the number line, using the number line's scale
+
+In the discrete-choice paradigm, the file also contains these columns:
+
+- **expectedResponse**: The button expected to be selected (0 = left, 1 = right, -1 = unknown)
+- **UserResponse**: The button actually selected (0 = left, 1 = right)
 
 Trajectory file
 ---------------

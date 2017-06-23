@@ -1,8 +1,8 @@
 .. TrajTracker : TrialInfo.py
 
 
-TrialInfo class
-===============
+TrialInfo class (number-to-position)
+====================================
 
 This object keeps all the data of a single trial.
 
