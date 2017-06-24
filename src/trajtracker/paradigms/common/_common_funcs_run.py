@@ -166,7 +166,7 @@ def update_text_target_for_trial(exp_info, trial, use_numeric_target_as_default=
         exp_info.text_target.texts = []
         return
 
-    if "text.target" not in trial.csv_data:
+    if "text.target" in trial.csv_data:
         # -- Set the text to show as target (or several, semicolon-separated texts, in case of RSVP)
         trial.text_target = trial.csv_data["text.target"]
     elif use_numeric_target_as_default:
