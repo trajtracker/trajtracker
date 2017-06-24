@@ -73,5 +73,16 @@ class StartPointTests(unittest.TestCase):
         self.assertEqual(sp.State.start, sp.state)
 
 
+    #------------------------------------------------
+    def test_start_with_exit_area_none(self):
+        sp = StartPoint(nvshapes.Rectangle((100, 50)), exit_area=None)
+        sp._state = StartPoint.State.mouse_up
+
+        self.assertTrue(sp.check_xy(0, 0))
+        self.assertEqual(sp.State.init, sp.state)
+        self.assertTrue(sp.check_xy(-51, 0))
+        self.assertEqual(sp.State.start, sp.state)
+
+
 if __name__ == '__main__':
     unittest.main()

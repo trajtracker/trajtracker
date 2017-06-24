@@ -15,6 +15,7 @@ import expyriment as xpy
 
 import trajtracker as ttrk
 import trajtracker.utils as u
+# noinspection PyProtectedMember
 import trajtracker._utils as _u
 from trajtracker.misc import nvshapes
 
@@ -64,16 +65,21 @@ class StartPoint(ttrk.TTrkObject):
         for the trial to start. Otherwise, it would count as an error.
         This object must support the overlapping_with_position() method. It can be
         an expyriment stimulus, a shape from :func:`~trajtracker.misc.nvshapes`, or your own object.
+        
         Also, you can use any of the predefined keywords "above", "below", "right" and "left". Each of those
         define a region that is a 90-degrees sector, centered on start_area's center
-        ("above" = -45 degrees to 45 degrees; the others accordingly),
+        ("above" = -45 degrees to 45 degrees; the others accordingly)
+        
+        Setting exit_area to None means that any exit direction from the start point would be valid. 
         """
         return self._exit_area
 
 
     @exit_area.setter
     def exit_area(self, value):
-        if isinstance(value, str):
+        if value is None:
+            self._exit_area = None
+        elif isinstance(value, str):
             self._exit_area = self._create_default_exit_area(value)
             self._log_property_changed("exit_area", value=value)
         elif "overlapping_with_position" in dir(value):
@@ -185,7 +191,7 @@ class StartPoint(ttrk.TTrkObject):
                     self._log_write("still in start area: ({:},{:})".format(x_coord, y_coord), True)
                 return False
 
-            elif self._exit_area.overlapping_with_position((x_coord, y_coord)):
+            elif self._exit_area is None or self._exit_area.overlapping_with_position((x_coord, y_coord)):
                 # Left the start area into the exit area
                 if self._should_log(ttrk.log_info):
                     self._log_write("touched in exit area: ({:},{:}). Setting state=start".format(x_coord, y_coord), True)
