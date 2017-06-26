@@ -414,7 +414,8 @@ def register_to_event_manager(exp_info):
 def load_sound(config, filename):
     full_path = config.sounds_dir + "/" + filename
     if not os.path.isfile(full_path):
-        raise ttrk.ValueError('Sound file {:} does not exist. Please check the file name (or perhaps you need to change config.sounds_dir)')
+        raise ttrk.ValueError('Sound file {:} does not exist. Please check the file name (or perhaps you need to change config.sounds_dir)'.
+                              format(full_path))
     sound = xpy.stimuli.Audio(full_path)
     sound.preload()
     return sound

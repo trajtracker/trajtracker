@@ -18,7 +18,7 @@ config = dchoice.Config("ChooseDir", max_trial_duration=2, data_source="choice_1
                         use_text_targets=True,
                         feedback_stim_type='rectangle', feedback_select_by='response',
                         feedback_place='button',
-                        speed_guide_enabled=True, sounds_dir="../sounds")
+                        speed_guide_enabled=True)
 
 #-- Initialize Expyriment
 exp = ttrk.initialize()

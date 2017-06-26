@@ -92,7 +92,7 @@ class Slider(ttrk.TTrkObject):
 
 
     #------------------------------------------------------------------
-    def update(self, clicked, mouse_position):
+    def update(self, clicked, xy):
         """
         Update the slider according to mouse movement
         
@@ -100,17 +100,17 @@ class Slider(ttrk.TTrkObject):
         when the mouse is unclicked.
         
         :param clicked: Whether the mouse is presently clicked or not 
-        :param mouse_position: The mouse position (ignored when clicked=False)
+        :param xy: The coordinate to which the gauge is being dragged (x, y). This parameter is ignored in some 
+                   situations, e.g., when clicked=False, when slider is locked, etc.
         """
-
         _u.validate_func_arg_type(self, "update", "clicked", clicked, (bool, int))
         clicked = bool(clicked)
-        _u.validate_func_arg_type(self, "update", "mouse_position", mouse_position, ttrk.TYPE_COORD)
+        _u.validate_func_arg_type(self, "update", "xy", xy, ttrk.TYPE_COORD)
 
         if self.locked:
             return
 
-        clicked = clicked and self._is_valid_mouse_pos(mouse_position)
+        clicked = clicked and self._is_valid_mouse_pos(xy)
 
         if clicked:
 
@@ -121,7 +121,7 @@ class Slider(ttrk.TTrkObject):
                 self._log_write_if(ttrk.log_trace, "Start moving slider")
                 self._now_dragging = True
 
-            coord = mouse_position[self._orientation_ind]
+            coord = xy[self._orientation_ind]
             self._current_value = self._coord_to_value(coord)
             self._move_gauge_to_coord(coord)
 
@@ -467,7 +467,9 @@ class Slider(ttrk.TTrkObject):
         :attr:`~trajtracker.stimuli.Slider.orientation`). 
         Specified in pixels, relatively to the stimulus position.
         
-        *None* means that the range is determined by the size of :attr:`~trajtracker.stimuli.Slider.bgnd_stimulus` 
+        *None* means that the range is determined by the size of :attr:`~trajtracker.stimuli.Slider.bgnd_stimulus`
+         
+        :type: tuple with two integers (min, max)
         """
         return self._slidable_range
 

@@ -49,8 +49,7 @@ config = num2pos.Config("Q2Pos(D+U)",
                         feedback_accuracy_levels=accuracy_levels,
                         sound_by_accuracy=((accuracy_levels[0], 'feedback-accuracy-0.wav'),
                                            (accuracy_levels[1], 'feedback-accuracy-1.wav'),
-                                           (1, 'feedback-accuracy-2.wav')),
-                        sounds_dir='../sounds'
+                                           (1, 'feedback-accuracy-2.wav'))
                         )
 
 #=================================================================================

@@ -9,6 +9,7 @@ from enum import Enum
 import expyriment as xpy
 # noinspection PyProtectedMember
 from trajtracker.paradigms.common._BaseConfig import BaseConfig
+from trajtracker.paradigms import sounds_dir
 
 
 class Config(BaseConfig):
@@ -29,7 +30,8 @@ class Config(BaseConfig):
                  text_target_height=0.6, shuffle_trials=True,
                  log_stimulus_onset_offset=False,
                  min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=10,
-                 grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None, sounds_dir="sounds",
+                 grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None,
+                 sounds_dir=sounds_dir,
                  stimulus_then_move=False, finger_must_start_upwards=True,
                  finger_moves_min_time=None, finger_moves_max_time=None,
                  start_point_size=(40, 30), start_point_tilt=0,

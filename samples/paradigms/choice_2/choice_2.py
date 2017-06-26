@@ -18,7 +18,7 @@ config = dchoice.Config("ChooseArrowDir", max_trial_duration=2, data_source="cho
                         use_generic_targets=True, use_text_targets=False,
                         feedback_stim_type='rectangle', feedback_select_by='accuracy',
                         feedback_place='middle',
-                        speed_guide_enabled=True, sounds_dir="../sounds")
+                        speed_guide_enabled=True)
 
 stimuli = {
     'left': xpy.stimuli.Picture("arrow-left.bmp"),

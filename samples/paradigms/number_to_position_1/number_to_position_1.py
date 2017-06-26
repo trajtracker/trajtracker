@@ -19,8 +19,7 @@ if not xpy.misc.is_android_running():
 
 
 config = num2pos.Config("Num2Pos(0-100*2)", max_trial_duration=2, max_numberline_value=100,
-                        speed_guide_enabled=True, data_source=range(101) * 2,
-                        sounds_dir="../sounds")
+                        speed_guide_enabled=True, data_source=range(101) * 2)
 
 
 #-- Initialize Expyriment

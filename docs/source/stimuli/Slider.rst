@@ -3,15 +3,18 @@
 Slider class
 ============
 
-A slider shows a certain fixed stimulus (e.g. a line) and a gauge that can move along this stimulus.
-The gauge can be moved by dragging it. The slider can tell its value at any time.
+A slider is used to set a value on a given scale: you use the mouse to drag a gauge along a given
+line (or any other stimulus on your choice). The gauge's physical coordinate
+is translated to a value on a customizable linear scale.
+
 
 Main features:
 
-- Vertical / horizontal slider
-- Get the slider value using a numeric scale of your choice
-- Track the number of times the gauge was moved since the trial started
-- Limit the gauge movement (how far it can move, how many times it can move)
+- Vertical / horizontal slider.
+- Get the slider value using a numeric scale of your choice.
+- Track the number of times the gauge was moved since the trial started.
+- Limit the gauge movement (how far it can move, how many times it can move).
+- Configurable background stimulus (e.g. a line) and gauge stimulus
 
 
 Using this class:
@@ -38,7 +41,7 @@ Using this class:
 - (Optional) set :attr:`~trajtracker.stimuli.Slider.max_moves` to limit the number of times the gauge can move.
   If this number is exceeded, the slider will become :attr:`~trajtracker.stimuli.Slider.locked`.
 
-- Add :attr:`Slider.stimulus <trajtracker.stimuli.Slider.stimulus>` to a :class:`trajtracker.stimuli.StimulusContainer`
+- Add :attr:`Slider.stimulus <trajtracker.stimuli.Slider.stimulus>` to a :class:`~trajtracker.stimuli.StimulusContainer`
   (or present() it directly)
 
 
