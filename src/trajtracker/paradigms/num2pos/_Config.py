@@ -30,7 +30,8 @@ class Config(BaseConfig):
                  log_stimulus_onset_offset=False,
                  min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=10,
                  grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None, sounds_dir="sounds",
-                 stimulus_then_move=False, finger_moves_min_time=None, finger_moves_max_time=None,
+                 stimulus_then_move=False, finger_must_start_upwards=True,
+                 finger_moves_min_time=None, finger_moves_max_time=None,
                  start_point_size=(40, 30), start_point_tilt=0,
                  start_point_colour=xpy.misc.constants.C_GREY,
 
@@ -67,6 +68,7 @@ class Config(BaseConfig):
             save_results=save_results,
             sounds_dir=sounds_dir,
             stimulus_then_move=stimulus_then_move,
+            finger_must_start_upwards=finger_must_start_upwards,
             finger_moves_min_time=finger_moves_min_time,
             finger_moves_max_time=finger_moves_max_time,
             start_point_size=start_point_size,

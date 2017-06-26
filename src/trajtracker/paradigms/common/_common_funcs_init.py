@@ -95,6 +95,8 @@ def create_start_point(exp_info):
                                                         position=start_area_position,
                                                         rotation=config.start_point_tilt,
                                                         colour=config.start_point_colour)
+    if not exp_info.config.finger_must_start_upwards:
+        exp_info.start_point.exit_area = None
 
     exp_info.stimuli.add(exp_info.start_point.start_area, "start_point")
 
@@ -417,6 +419,7 @@ def load_sound(config, filename):
     sound.preload()
     return sound
 
+
 #-----------------------------------------------------------------------------------------
 def create_csv_loader():
 
@@ -491,7 +494,7 @@ def validate_config_param_type(param_name, param_type, param_value, none_allowed
             raise ttrk.TypeError("config.{:} was set to a non-{:} value ({:})".format(param_name, type_name, param_value))
 
     elif param_type == ttrk.TYPE_RGB:
-        if not _u._is_rgb(param_value, False, none_allowed):
+        if not u.is_rgb(param_value):
             raise ttrk.TypeError("config.{:} was set to an invalid value ({:}) - expecting (red,green,blue)".
                                  format(param_name, param_value))
 
@@ -520,6 +523,7 @@ def validate_config_param_type(param_name, param_type, param_value, none_allowed
 
     return param_value
 
+
 #-----------------------------------------------------------------------------------------
 def validate_config_param_values(param_name, param_value, allowed_values):
     """
@@ -529,9 +533,11 @@ def validate_config_param_values(param_name, param_value, allowed_values):
     if param_value not in allowed_values:
         allowed_values_str = ", ".join([str(v) for v in allowed_values])
         raise ttrk.TypeError("config.{:} was set to an invalid value ({:}). Allowed values are: {:}".
-                       format(param_name, param_value, allowed_values_str))
+                             format(param_name, param_value, allowed_values_str))
+
 
 #-----------------------------------------------------------------------------------------
+# noinspection PyIncorrectDocstring
 def size_to_pixels(value, screen_size=None):
     """
     Check if the given value denotes a stimulus size, and return it in pixels

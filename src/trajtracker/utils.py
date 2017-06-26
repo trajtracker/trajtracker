@@ -10,14 +10,17 @@ from __future__ import division
 from numpy import pi
 import numpy as np
 import decimal
+import numbers
 
 import pygame
 from pygame.ftfont import Font
 from pygame import freetype
 
+# noinspection PyProtectedMember
 from expyriment.misc import _timer as xpy_timer
 from expyriment.misc import geometry, find_font
 
+# noinspection PyProtectedMember
 from trajtracker._utils import is_collection
 
 
@@ -28,6 +31,8 @@ def get_angle(xy1, xy2, as_degrees=False):
 
     :param xy1: Coordinates in time point #1
     :param xy2: Coordinates in a later time point
+    :param as_degrees: Whether the angle should be returned as degrees or radians
+    :type as_degrees: bool
     """
 
     dx = xy2[0] - xy1[0]
@@ -59,7 +64,7 @@ def color_rgb_to_num(rgb):
     """
     if not is_rgb(rgb):
         raise trajtracker.ValueError("invalid argument to color_rgb_to_num(), expecting a 3*integer list/tuple")
-    return (rgb[0]<<16) + (rgb[1]<<8) + rgb[2]
+    return (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]
 
 
 def color_num_to_rgb(value):
@@ -67,7 +72,7 @@ def color_num_to_rgb(value):
     Convert an int value (between 0 and 0xFFFFFF) to RGB color (3 integers, each 0-255)
     """
     if isinstance(value, int) and 0 <= value <= 0xFFFFFF:
-        return (int(np.floor(value / 2 ** 16)), int(np.floor(value / 256)) % 256, value % 256)
+        return int(np.floor(value / 2 ** 16)), int(np.floor(value / 256)) % 256, value % 256
     else:
         raise trajtracker.ValueError("invalid argument to color_num_to_rgb(), expecting a 3*integer list/tuple")
 
@@ -77,14 +82,13 @@ def is_rgb(rgb):
     """
     Check if the given value is a valid RGB color (3 integers, each 0-255)
     """
-    try:
-        return isinstance(rgb, (list, tuple, np.ndarray)) and len(rgb) == 3 \
-               and 0 <= rgb[0] <= 255 and 0 <= rgb[1] <= 255 and 0 <= rgb[2] <= 255
-    except:
-        return False
+    return isinstance(rgb, (list, tuple, np.ndarray)) and len(rgb) == 3 \
+           and sum([isinstance(c, numbers.Number) for c in rgb]) == 3 \
+           and sum([0 <= c <= 255 for c in rgb]) == 3
 
 
 #--------------------------------------
+# noinspection PyIncorrectDocstring
 def is_coord(value, allow_float=False):
     """
     Check whether the given value is valid as (x,y) coordinates
@@ -102,7 +106,7 @@ def is_coord(value, allow_float=False):
 
 
 #--------------------------------------------------------------------------
-def rotate_coord(coord, angle, origin=(0,0), is_radians=False):
+def rotate_coord(coord, angle, origin=(0, 0), is_radians=False):
     """
     Rotate the given coordinate about the origin
 
@@ -123,6 +127,7 @@ def rotate_coord(coord, angle, origin=(0,0), is_radians=False):
     y1 = y * np.cos(angle) - x * np.sin(angle)
 
     return x1 + origin[0], y1 + origin[1]
+
 
 #--------------------------------------------------------------------------
 def get_time():
@@ -150,6 +155,7 @@ def get_font_height_to_size_ratio(font_name):
 
 
 #--------------------------------------------------------------------------
+# noinspection PyShadowingBuiltins
 def round(x):
     """
     Round deicmal numbers to the nearest integer. This is different from Python's numpy.round()

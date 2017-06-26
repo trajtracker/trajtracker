@@ -1,10 +1,12 @@
 
+from trajtracker.misc.nvshapes import Rectangle
 
-class DummyStimulus(object):
 
-    def __init__(self):
+class DummyStimulus(Rectangle):
+
+    def __init__(self, position=(0, 0), size=(100, 100)):
+        super(DummyStimulus, self).__init__(size, position)
         self.presented = False
-        self.position = (0, 0)
         self.presented_args = {}
 
     def present(self, update=True, clear=True):

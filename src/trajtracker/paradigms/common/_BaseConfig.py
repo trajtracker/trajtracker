@@ -27,6 +27,7 @@ class BaseConfig(object):
                  log_stimulus_onset_offset,
                  min_trial_duration, speed_guide_enabled, min_inst_speed,
                  grace_period, max_zigzags, save_results, sounds_dir,
+                 finger_must_start_upwards,
                  stimulus_then_move, finger_moves_min_time, finger_moves_max_time,
                  start_point_size, start_point_tilt,
                  start_point_colour):
@@ -82,6 +83,8 @@ class BaseConfig(object):
         # True: The software decides when the target appears, and then the finger must start moving
         # False: The finger moves at will and this is what triggers the appearance of the target
         self.stimulus_then_move = stimulus_then_move
+
+        self.finger_must_start_upwards = finger_must_start_upwards
 
         # The minimal/maximal time in which the finger should start moving.
         # The time is specified relatively to the time when the finger touched the screen

@@ -213,6 +213,11 @@ Fixation stimulus
     The minimal time (in seconds) in which the finger should start moving.
     The time is specified relatively to the time point of touching the screen
 
+.. autoinstanceattribute:: Config.finger_must_start_upwards
+    :annotation: = True (boolean)
+
+    Whether the finger must leave the "start" point upwards, or can leave it in any direction (including sideways)
+
 .. autoinstanceattribute:: Config.start_point_colour
     :annotation: = Grey (RGB color)
 

@@ -29,6 +29,7 @@ Visual objects.
    MultiStimulus: controls the presentation of a sequence of stimuli <stimuli/MultiStimulus>
    MultiTextBox: controls the presentation of a sequence of texts <stimuli/MultiTextBox>
    NumberLine: show a number line, detect when it's touched <stimuli/NumberLine>
+   Slider: for choosing a value on a continuous scale <stimuli/Slider>
    StimulusContainer: present several stimuli, easily toggle them on/off <stimuli/StimulusContainer>
    StimulusSelector: create a "virtual stimulus" that can present one of several underlying stimuli <stimuli/StimulusSelector>
 

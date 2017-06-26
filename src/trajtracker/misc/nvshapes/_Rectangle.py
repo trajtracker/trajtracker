@@ -10,10 +10,22 @@ from __future__ import division
 import numbers
 import numpy as np
 
+import trajtracker as ttrk
 import trajtracker._utils as _u
 
 
 class Rectangle(object):
+
+    #---------------------------------------------------
+    @staticmethod
+    def clone(rect):
+        """
+        Clone an existing rectangle 
+        :param rect: A rectangle object (can also be an Expyriment rectangle)
+        """
+        rotation = rect.rotation if "rotation" in dir(rect) else 0
+        return Rectangle(size=rect.size, position=rect.position, rotation=rotation)
+
 
     #---------------------------------------------------
     def __init__(self, size, position=(0, 0), rotation=0):
@@ -72,6 +84,23 @@ class Rectangle(object):
         _u.validate_attr_positive(self, "size[0]", value[0])
         _u.validate_attr_positive(self, "size[1]", value[1])
         self._size = (value[0], value[1])
+
+
+    #-----------------------------------------------------
+    def extend(self, extend_by):
+        """
+        Extend the rectangle by the given value
+        
+        :param extend_by: If a pair of values, the mean (w, h): extend the rectangle's width by w and its height by h.
+                          If this is a single value, it is used for extending the width as well as the height.
+        """
+
+        if isinstance(extend_by, numbers.Number):
+            extend_by = extend_by, extend_by
+        else:
+            _u.validate_func_arg_type(self, "extend", "extend_by", extend_by, ttrk.TYPE_SIZE)
+
+        self.size = self._size[0] + extend_by[0], self._size[1] + extend_by[1]
 
 
     #-----------------------------------------------------

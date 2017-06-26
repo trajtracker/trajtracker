@@ -12,13 +12,11 @@ from operator import itemgetter
 
 from expyriment.misc.geometry import XYPoint
 
-import trajtracker
 import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 import trajtracker.utils as u
-from trajtracker.events import Event
-from trajtracker.events import TRIAL_INITIALIZED, TRIAL_ENDED
+from trajtracker.events import Event, TRIAL_INITIALIZED, TRIAL_ENDED
 
 
 # noinspection PyProtectedMember
@@ -462,7 +460,7 @@ class BaseMultiStim(ttrk.TTrkObject):
 
     @position.setter
     def position(self, value):
-        self._set_property("position", value, trajtracker.TYPE_COORD)
+        self._set_property("position", value, ttrk.TYPE_COORD)
         self._log_property_changed("position")
 
     #==============================================================================
@@ -474,10 +472,10 @@ class BaseMultiStim(ttrk.TTrkObject):
 
         if type(prop_type) == type:
             return isinstance(value, (tuple, list, np.ndarray))
-        elif prop_type == trajtracker.TYPE_RGB:
+        elif prop_type == ttrk.TYPE_RGB:
             return isinstance(value, (tuple, list, np.ndarray)) and \
                     (len(value) == 0 or u.is_rgb(value[0]))
-        elif prop_type == trajtracker.TYPE_COORD:
+        elif prop_type == ttrk.TYPE_COORD:
             return isinstance(value, (tuple, list, np.ndarray)) and \
                     (len(value) == 0 or isinstance(value[0], (tuple, list, XYPoint, np.ndarray)))
         else:

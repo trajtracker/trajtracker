@@ -1,6 +1,7 @@
 import unittest
 
 import trajtracker
+# noinspection PyProtectedMember
 import trajtracker._utils as _u
 
 from trajtracker import BadFormatError
@@ -9,10 +10,10 @@ from trajtracker import BadFormatError
 class _UtilsTests(unittest.TestCase):
 
     def test_parse_coords(self):
-        self.assertEqual((1,2), _u.parse_coord('(1,2)'))
-        self.assertEqual((1,2), _u.parse_coord('(1, 2)'))
-        self.assertEqual((1,2), _u.parse_coord('( 1,2)'))
-        self.assertEqual((1,2), _u.parse_coord('  ( 1 , 2 )  '))
+        self.assertEqual((1, 2), _u.parse_coord('(1,2)'))
+        self.assertEqual((1, 2), _u.parse_coord('(1, 2)'))
+        self.assertEqual((1, 2), _u.parse_coord('( 1,2)'))
+        self.assertEqual((1, 2), _u.parse_coord('  ( 1 , 2 )  '))
 
 
     def test_parse_coords_bad_format(self):

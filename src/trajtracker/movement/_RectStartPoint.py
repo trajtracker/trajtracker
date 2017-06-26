@@ -16,6 +16,7 @@ from enum import Enum
 import expyriment as xpy
 
 import trajtracker as ttrk
+# noinspection PyProtectedMember
 import trajtracker._utils as _u
 from trajtracker.misc import nvshapes
 
@@ -26,7 +27,8 @@ EXIT_AREA_HEIGHT = 200
 class RectStartPoint(ttrk.TTrkObject):
 
     #-------------------------------------------------
-    def __init__(self, size=None, position=(0,0), rotation=0, colour=xpy.misc.constants.C_GREY):
+    def __init__(self, size=None, position=(0, 0), rotation=0, colour=xpy.misc.constants.C_GREY,
+                 can_exit_in_any_direction=False):
         super(RectStartPoint, self).__init__()
 
         self._preloaded = False
@@ -36,6 +38,7 @@ class RectStartPoint(ttrk.TTrkObject):
         self.position = position
         self.rotation = rotation
         self.colour = colour
+        self.can_exit_in_any_direction = can_exit_in_any_direction
 
 
     #-------------------------------------------------
@@ -239,6 +242,10 @@ class RectStartPoint(ttrk.TTrkObject):
     #-------------------------------------------------
     @property
     def colour(self):
+        """
+        Color of the start rectangle
+        :type: tuple (red, green, blue) 
+        """
         return self._colour
 
     @colour.setter
@@ -252,7 +259,26 @@ class RectStartPoint(ttrk.TTrkObject):
         self._log_property_changed("colour")
 
 
-    #--------------------------------------------------------------------------
+    #---------------------------------------------------
+    @property
+    def can_exit_in_any_direction(self):
+        """
+        Whether the finger/mouse can exit the "start" rectangle in any direction (True) or only upwards (False)
+        
+        *This property cannot be updated after the start point was preloaded*
+        """
+        return self._can_exit_in_any_direction
+
+    @can_exit_in_any_direction.setter
+    def can_exit_in_any_direction(self, value):
+        if self._preloaded:
+            raise ttrk.InvalidStateError("{:}.can_exit_in_any_direction cannot be set after the object was preloaded".format(_u.get_type_name(self)))
+        _u.validate_attr_type(self, "can_exit_in_any_direction", value, bool)
+        self._can_exit_in_any_direction = value
+        self._log_property_changed("can_exit_in_any_direction")
+
+
+    #---------------------------------------------------
     def _set_log_level(self, level):
         self._log_level = level
         if "_start_point" in dir(self):

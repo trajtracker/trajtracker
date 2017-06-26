@@ -105,7 +105,7 @@ def validate_attr_is_collection(obj, attr_name, value, min_length=None, max_leng
                                 none_allowed=False, allow_set=False):
 
     if value is None and none_allowed:
-        value = ()
+        return ()
 
     if not is_collection(value, allow_set):
         raise ttrk.TypeError("{:}.{:} was set to a non-{:} value ({:})".format(

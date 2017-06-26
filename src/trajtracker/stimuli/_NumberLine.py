@@ -8,7 +8,6 @@ Number line: The NumberLine class presents a number line, detect when finger/mou
 
 from __future__ import division
 
-from enum import Enum
 import numbers
 import numpy as np
 
@@ -19,12 +18,11 @@ import trajtracker as ttrk
 import trajtracker._utils as _u
 import trajtracker.utils
 import trajtracker.utils as u
+from trajtracker.stimuli import Orientation
 
 
 # noinspection PyAttributeOutsideInit,PyProtectedMember
 class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
-
-    Orientation = Enum('Orientation', 'Horizontal Vertical')
 
     #TODO: even after preloaded, allow chaning properties. We just need to know what should be changed.
 
@@ -40,7 +38,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         Constructor - invoked when you create a new object by writing NumberLine()
 
         :param position: the (x,y) coordinates of the middle of the line
-        :param orientation: NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical
+        :param orientation: Orientation.Horizontal or Orientation.Vertical
         :param line_length: the length of the line, in pixels
         :param line_width: the width (thickness) of the line, in pixels (default = 1)
         :param line_colour: the color of the line (default = None)
@@ -251,7 +249,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         xmax, ymax = self._main_line_end()
 
         # Apply tick marks
-        if self._orientation == NumberLine.Orientation.Horizontal:
+        if self._orientation == Orientation.Horizontal:
             ymax += self.end_tick_height
         else:
             xmax += self.end_tick_height
@@ -292,8 +290,8 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
     #-------------------------------------------------------
     def _prepare_end_of_line_ticks(self):
-        tick_dx = 0 if self._orientation == NumberLine.Orientation.Horizontal else self._end_tick_height
-        tick_dy = self._end_tick_height if self._orientation == NumberLine.Orientation.Horizontal else 0
+        tick_dx = 0 if self._orientation == Orientation.Horizontal else self._end_tick_height
+        tick_dy = self._end_tick_height if self._orientation == Orientation.Horizontal else 0
 
         pt1 = self._main_line_start()
         pt2 = self._main_line_end()
@@ -341,14 +339,14 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
     # Get start/end points of the main line relatively to the canvas
     #
     def _main_line_start(self):
-        if self._orientation == NumberLine.Orientation.Horizontal:
+        if self._orientation == Orientation.Horizontal:
             return -self._line_length/2, 0
         else:
             return 0, -self._line_length/2
 
 
     def _main_line_end(self):
-        if self._orientation == NumberLine.Orientation.Horizontal:
+        if self._orientation == Orientation.Horizontal:
             return self._line_length/2, 0
         else:
             return 0, self._line_length/2
@@ -408,7 +406,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
             return
 
         #-- Get the relevant coordinates (x or y)
-        if self._orientation == NumberLine.Orientation.Horizontal:
+        if self._orientation == Orientation.Horizontal:
             mouse_coord = y_coord
             line_coord = self._main_line_start()[1] + self._mid_y
             touch_coord = x_coord - self._mid_x
@@ -430,7 +428,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
             self._initial_mouse_dir = np.sign(distance)
             touched = False
             if self._should_log(ttrk.log_debug):
-                if self.orientation == NumberLine.Orientation.Horizontal:
+                if self.orientation == Orientation.Horizontal:
                     sdir = "below" if self._initial_mouse_dir == 1 else "above"
                 else:
                     sdir = "left of" if self._initial_mouse_dir == 1 else "right of"
@@ -508,7 +506,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         value01 = (value - self._min_value) / numberline_len
 
         #-- Convert to coordinates
-        mid_coord = self._mid_x if self.orientation == NumberLine.Orientation.Horizontal else self._mid_y
+        mid_coord = self._mid_x if self.orientation == Orientation.Horizontal else self._mid_y
         return mid_coord + (value01 - 0.5) * self.line_length
 
 
@@ -523,7 +521,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
         c = self.value_to_coord(value)
 
-        if self.orientation == NumberLine.Orientation.Horizontal:
+        if self.orientation == Orientation.Horizontal:
             return c, self._mid_y
         else:
             return self._mid_x, c
@@ -534,18 +532,18 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         """
         Get the numberline value for a given screen coordinate
 
-        :param coord: The x or y coordinate, (depending on the number line's :attr:`~trajtracker.stimuli.NumberLine.orientation`).
+        :param coord: The x or y coordinate, (depending on the number line's :attr:`~trajtracker.stimuli.Orientation`).
                       If you specify an (x,y) tuple, either x or y will be used, as appropriate 
         :return: float
         """
 
         if u.is_coord(coord, allow_float=True):
-            coord = coord[0] if self.orientation == NumberLine.Orientation.Horizontal else coord[1]
+            coord = coord[0] if self.orientation == Orientation.Horizontal else coord[1]
         else:
             _u.validate_func_arg_type(self, "coord_to_value", "coord", coord, numbers.Number)
 
         #-- Convert the coordinate into a position using a 0-1 scale
-        mid_coord = self._mid_x if self.orientation == NumberLine.Orientation.Horizontal else self._mid_y
+        mid_coord = self._mid_x if self.orientation == Orientation.Horizontal else self._mid_y
         pos01 = (coord - mid_coord) / self.line_length + 0.5
 
         # noinspection PyUnresolvedReferences
@@ -581,7 +579,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         if self._response_relative_coord is None:
             return None
 
-        return self._response_relative_coord + (self._mid_x if self.orientation == NumberLine.Orientation.Horizontal else self._mid_y)
+        return self._response_relative_coord + (self._mid_x if self.orientation == Orientation.Horizontal else self._mid_y)
 
 
     #---------------------------------------------------------
@@ -596,7 +594,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         if not self.touched:
             return None
 
-        if self._orientation == NumberLine.Orientation.Horizontal:
+        if self._orientation == Orientation.Horizontal:
             return self._mid_x + self._response_relative_coord, self._mid_y
         else:
             return self._mid_x, self._mid_y + self._response_relative_coord
@@ -673,7 +671,9 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
     @property
     def orientation(self):
         """ 
-        The number line's orientation (NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical) 
+        The number line's orientation (horizontal or vertical)
+         
+        :type: trajtracker.stimuli.Orientation
         """
         return self._orientation
 
@@ -681,11 +681,12 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
     def orientation(self, value):
         self._validate_unlocked()
 
-        if not isinstance(value, ttrk.stimuli.NumberLine.Orientation):
-            raise ttrk.ValueError("invalid value for NumberLine.orientation ({:}) - expecting NumberLine.Orientation.Horizontal or NumberLine.Orientation.Vertical".format(value))
+        if not isinstance(value, ttrk.stimuli.Orientation):
+            raise ttrk.ValueError("invalid value for NumberLine.orientation ({:}) - expecting Orientation.Horizontal or Orientation.Vertical".format(value))
 
         self._orientation = value
         self._log_property_changed("orientation")
+
 
     #-----------------------------------------------------------
     @property

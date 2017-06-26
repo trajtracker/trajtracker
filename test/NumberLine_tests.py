@@ -1,7 +1,7 @@
 import unittest
 
 import trajtracker
-from trajtracker.stimuli import NumberLine
+from trajtracker.stimuli import NumberLine, Orientation
 
 
 class NumberLineTestCase(unittest.TestCase):
@@ -18,7 +18,7 @@ class NumberLineTestCase(unittest.TestCase):
         self.assertEqual(nl.min_value, 0)
         self.assertEqual(nl.max_value, 100)
         self.assertEqual(nl.line_length, 1000)
-        self.assertEqual(nl.orientation, NumberLine.Orientation.Horizontal)
+        self.assertEqual(nl.orientation, Orientation.Horizontal)
 
 
     #-- Validate() should fail when min>max
@@ -43,7 +43,7 @@ class NumberLineTestCase(unittest.TestCase):
     #-----------------------------------------------------------------
     #-- Touch mode = undirectioned, horizontal line
     def test_touch_line_undirectioned_horizontal(self):
-        nl = NumberLine((0,0), 100, 100, orientation=NumberLine.Orientation.Horizontal)
+        nl = NumberLine((0,0), 100, 100, orientation=Orientation.Horizontal)
         nl.touch_directioned = False
         nl.touch_distance = 10
 
@@ -65,7 +65,7 @@ class NumberLineTestCase(unittest.TestCase):
     #-----------------------------------------------------------------
     #-- Touch mode = undirectioned, vertical line
     def test_touch_line_undirectioned_vertical(self):
-        nl = NumberLine((0,0), 100, 100, orientation=NumberLine.Orientation.Vertical)
+        nl = NumberLine((0,0), 100, 100, orientation=Orientation.Vertical)
         nl.touch_directioned = False
         nl.touch_distance = 10
 
@@ -87,7 +87,7 @@ class NumberLineTestCase(unittest.TestCase):
     #-----------------------------------------------------------------
     #-- Touch mode = directioned, horizontal line
     def test_touch_line_directioned_horizontal(self):
-        nl = NumberLine((0,0), 100, 100, orientation=NumberLine.Orientation.Horizontal)
+        nl = NumberLine((0,0), 100, 100, orientation=Orientation.Horizontal)
         nl.touch_directioned = True
         nl.touch_distance = 10
 
@@ -125,7 +125,7 @@ class NumberLineTestCase(unittest.TestCase):
     #-----------------------------------------------------------------
     #-- Touch mode = directioned, vertical line
     def test_touch_line_directioned_vertical(self):
-        nl = NumberLine((0,0), 100, 100, orientation=NumberLine.Orientation.Vertical)
+        nl = NumberLine((0,0), 100, 100, orientation=Orientation.Vertical)
         nl.touch_directioned = True
         nl.touch_distance = 10
 
@@ -163,7 +163,7 @@ class NumberLineTestCase(unittest.TestCase):
     #-----------------------------------------------------------------
     #-- Touch mode = directioned, negative distance
     def test_touch_line_directioned_negative_distance(self):
-        nl = NumberLine((0,0), 100, 100, orientation=NumberLine.Orientation.Horizontal)
+        nl = NumberLine((0,0), 100, 100, orientation=Orientation.Horizontal)
         nl.touch_directioned = True
         nl.touch_distance = -10
 
@@ -183,7 +183,7 @@ class NumberLineTestCase(unittest.TestCase):
 
     #-----------------------------------------------------------------
     def test_response_coord(self):
-        nl = NumberLine((0,0), 100, 40, orientation=NumberLine.Orientation.Horizontal)
+        nl = NumberLine((0,0), 100, 40, orientation=Orientation.Horizontal)
 
         self.assertIsNone(nl.response_coord)
         self.assertIsNone(nl.response_value)
@@ -207,21 +207,21 @@ class NumberLineTestCase(unittest.TestCase):
 
     #-----------------------------------------------------------------
     def test_value_to_coord(self):
-        nl = NumberLine((10, 50), 100, 50, orientation=NumberLine.Orientation.Horizontal)
+        nl = NumberLine((10, 50), 100, 50, orientation=Orientation.Horizontal)
         self.assertEqual(-20, nl.value_to_coord(10))
         self.assertEqual(-42, nl.value_to_coord(-1))
 
-        nl = NumberLine((50, 10), 100, 50, orientation=NumberLine.Orientation.Vertical)
+        nl = NumberLine((50, 10), 100, 50, orientation=Orientation.Vertical)
         self.assertEqual(-20, nl.value_to_coord(10))
         self.assertEqual(-42, nl.value_to_coord(-1))
 
     #-----------------------------------------------------------------
     def test_value_to_coords(self):
-        nl = NumberLine((10, 50), 100, 50, orientation=NumberLine.Orientation.Horizontal)
+        nl = NumberLine((10, 50), 100, 50, orientation=Orientation.Horizontal)
         self.assertEqual((-20, 50), nl.value_to_coords(10))
         self.assertEqual((-42, 50), nl.value_to_coords(-1))
 
-        nl = NumberLine((50, 10), 100, 50, orientation=NumberLine.Orientation.Vertical)
+        nl = NumberLine((50, 10), 100, 50, orientation=Orientation.Vertical)
         self.assertEqual((50, -20), nl.value_to_coords(10))
         self.assertEqual((50, -42), nl.value_to_coords(-1))
 
@@ -229,11 +229,11 @@ class NumberLineTestCase(unittest.TestCase):
     #-----------------------------------------------------------------
     # noinspection PyTypeChecker
     def test_coord_to_value(self):
-        nl = NumberLine((10, 50), 100, 50, orientation=NumberLine.Orientation.Horizontal)
+        nl = NumberLine((10, 50), 100, 50, orientation=Orientation.Horizontal)
         self.assertTrue(nl.coord_to_value(-20) - 10 < .0000001)
         self.assertTrue(nl.coord_to_value(-42) - (-1) < .000001)
 
-        nl = NumberLine((50, 10), 100, 50, orientation=NumberLine.Orientation.Vertical)
+        nl = NumberLine((50, 10), 100, 50, orientation=Orientation.Vertical)
         self.assertTrue(nl.coord_to_value(-20) - 10 < .0000001)
         self.assertTrue(nl.coord_to_value(-42) - (-1) < .000001)
 

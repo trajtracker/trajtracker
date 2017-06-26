@@ -91,5 +91,21 @@ class NVRectangleTests(unittest.TestCase):
         self.assertFalse(r.overlapping_with_position((x-.01, y)))
 
 
+    #-----------------------------------------------------
+    def test_clone(self):
+        r = nvshapes.Rectangle(size=(10, 20), position=(50, 100))
+        r1 = nvshapes.Rectangle.clone(r)
+        self.assertEqual(r1.size, (10, 20))
+        self.assertEqual(r1.position, (50, 100))
+
+
+    #-----------------------------------------------------
+    def test_extend(self):
+        r = nvshapes.Rectangle(size=(10, 20))
+        r.extend(10)
+        self.assertEqual(r.size, (20, 30))
+
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -24,8 +24,11 @@ possible things you can configure via this file, are explained :doc:`here <parad
 The results of each experiment session are saved in 3 files: a file with general data, a file with
 trials information, and a trajectory file. See details :doc:`here <paradigms/results>`.
 
+Supported paradigms
+-------------------
+
 Number-to-position mapping
---------------------------
+++++++++++++++++++++++++++
 
 This paradigm shows a number line and various possible stimuli. The response is indicated by
 dragging the finger to a location on the number line.
@@ -44,7 +47,7 @@ For an overview of this paradigm under TrajTracker, see
 
 
 Discrete choice
----------------
++++++++++++++++
 
 This paradigm shows two response buttons (in the top corners of the screen) and various possible stimuli.
 The response is indicated by dragging the finger to one of the buttons.
@@ -62,8 +65,11 @@ For an overview of this paradigm under TrajTracker, see
    Technical: the TrialInfo class <paradigms/dchoice/TrialInfo>
 
 
-Create a simple experiment (that uses only the supported features)
-------------------------------------------------------------------
+How to use these paradigms
+--------------------------
+
+Creating a simple experiment (that uses only the supported features)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Several features are already supported by the paradigm we wrote. These features can be used
 with almost no programming. To use them, you should:
@@ -86,8 +92,8 @@ you would have to create them yourself (e.g., see the
 sample experiment we created, where the stimuli are sets of dots).
 
 
-Make advanced changes by modifying the code
--------------------------------------------
+Making advanced changes by modifying the code
++++++++++++++++++++++++++++++++++++++++++++++
 
 If your experiment requires features that are not supported via the above configuration, you can modify
 the relevant python functions. To help you on this, the following pages describe how the experiment
