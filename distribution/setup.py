@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='trajtracker',
-      version='0.0.1',
+      version='0.2.2',
       description='Framework for creating trajectory-tracking experiments',
       url='http://trajtracker.com',
       author='Dror Dotan',
@@ -14,10 +14,11 @@ setup(name='trajtracker',
                 'trajtracker.misc.nvshapes',
                 'trajtracker.movement',
                 'trajtracker.paradigms',
-                'trajtracker.paradigms.general',
+                'trajtracker.paradigms.common',
+                'trajtracker.paradigms.dchoice',
                 'trajtracker.paradigms.num2pos',
                 'trajtracker.stimuli',
                 'trajtracker.validators'],
-      install_requires=['expyriment'],
+      install_requires=['expyriment', 'numpy'],
       zip_safe=False)
 
