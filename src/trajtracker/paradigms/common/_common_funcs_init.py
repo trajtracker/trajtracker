@@ -32,7 +32,7 @@ import trajtracker as ttrk
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 import trajtracker.utils as u
-from trajtracker.paradigms.common import FINGER_STARTED_MOVING
+from trajtracker.paradigms.common import FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING
 
 
 #---------------------------------------------------------------------
@@ -84,7 +84,7 @@ def create_common_experiment_objects(exp_info):
     create_traj_tracker(exp_info)
     create_validators(exp_info, direction_validator=True, global_speed_validator=True,
                       inst_speed_validator=True, zigzag_validator=True)
-    create_post_trial_operations(exp_info)
+    create_confidence_slider(exp_info)
 
     #-- Initialize experiment-level data
     exp_info.exp_data['WindowWidth'] = exp_info.screen_size[0]
@@ -144,7 +144,7 @@ def create_traj_tracker(exp_info):
     traj_file_path = xpy.io.defaults.datafile_directory + "/" + exp_info.traj_out_filename
     exp_info.trajtracker = ttrk.movement.TrajectoryTracker(traj_file_path)
     exp_info.trajtracker.enable_event = FINGER_STARTED_MOVING
-    exp_info.trajtracker.disable_event = ttrk.events.TRIAL_ENDED
+    exp_info.trajtracker.disable_event = FINGER_STOPPED_MOVING
 
 
 #----------------------------------------------------------------
@@ -183,7 +183,7 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
             max_angle=config.dir_validator_max_angle,
             calc_angle_interval=config.dir_validator_calc_angle_interval)
         v.enable_event = FINGER_STARTED_MOVING
-        v.disable_event = ttrk.events.TRIAL_ENDED
+        v.disable_event = FINGER_STOPPED_MOVING
         exp_info.add_validator(v, 'direction')
 
 
@@ -198,7 +198,7 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
         v.do_present_guide = False
         v.movement_started_event = FINGER_STARTED_MOVING
         v.enable_event = FINGER_STARTED_MOVING
-        v.disable_event = ttrk.events.TRIAL_ENDED
+        v.disable_event = FINGER_STOPPED_MOVING
         exp_info.add_validator(v, 'global_speed')
         exp_info.stimuli.add(v.guide.stimulus, "speed_guide", visible=False)
 
@@ -209,7 +209,7 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
             grace_period=config.grace_period,
             calculation_interval=0.05)
         v.enable_event = FINGER_STARTED_MOVING
-        v.disable_event = ttrk.events.TRIAL_ENDED
+        v.disable_event = FINGER_STOPPED_MOVING
         exp_info.add_validator(v, 'inst_speed')
 
 
@@ -217,7 +217,7 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
         v = ttrk.validators.NCurvesValidator(max_curves_per_trial=config.max_zigzags)
         v.direction_monitor.min_angle_change_per_curve = config.zigzag_validator_min_angle_change_per_curve
         v.enable_event = FINGER_STARTED_MOVING
-        v.disable_event = ttrk.events.TRIAL_ENDED
+        v.disable_event = FINGER_STOPPED_MOVING
         exp_info.add_validator(v, 'zigzag')
 
 
@@ -431,6 +431,12 @@ def register_to_event_manager(exp_info):
 
 #------------------------------------------------
 def load_sound(config, filename):
+    """
+    Load a sound file
+    
+    :param config: The experiment configuration object 
+    :param filename: No path needed. The file is expected to be under config.sounds_dir 
+    """
     full_path = config.sounds_dir + "/" + filename
     if not os.path.isfile(full_path):
         raise ttrk.ValueError('Sound file {:} does not exist. Please check the file name (or perhaps you need to change config.sounds_dir)'.
@@ -442,6 +448,10 @@ def load_sound(config, filename):
 
 #-----------------------------------------------------------------------------------------
 def create_csv_loader():
+    """
+    Create a :class:`~trajtracker.io.CSVLoader` for loading the data from the CSV file; 
+    initialize the loader with definitions of the columns common to all paradigms. 
+    """
 
     loader = ttrk.io.CSVLoader()
     loader.add_field('use_text_targets', bool, optional=True)
@@ -561,6 +571,7 @@ def validate_config_param_values(param_name, param_value, allowed_values):
 def size_to_pixels(value, screen_size=None):
     """
     Check if the given value denotes a stimulus size, and return it in pixels
+    
     :param screen_size: If provided, the function will  
     :return: The size in pixels, as tuple
     """
@@ -589,24 +600,58 @@ def size_to_pixels(value, screen_size=None):
 
 
 #-----------------------------------------------------------------------------------------
-def create_post_trial_operations(exp_info):
+def create_confidence_slider(exp_info):
+    """
+    Create a :class:`~trajtracker.stimuli.Slider` for measuring subjective confidence rating
+    
+    :param exp_info: The experiment-level objects
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    """
+    config = exp_info.config
 
-    validate_config_param_type("confidence_rating", bool, exp_info.config.confidence_rating)
-    if exp_info.config.confidence_rating:
-        exp_info.operations_after_successful_trial.append(create_get_confidence_op(exp_info))
+    validate_config_param_type("confidence_rating", bool, config.confidence_rating)
+    if not exp_info.config.confidence_rating:
+        return
+
+    #-- Create the confidence slider
+    slider_bgnd = _create_confidence_slider_background(config.confidence_slider_picture, config.confidence_slider_height, exp_info)
+    gauge = _create_slider_gauge(slider_bgnd.surface_size[0])
+    slider = ttrk.stimuli.Slider(slider_bgnd, gauge, orientation=ttrk.stimuli.Orientation.Vertical,
+                                 min_value=0, max_value=100)
+
+    exp_info.stimuli.add(slider.stimulus, "confidence_slider", visible=False)
+    exp_info.confidence_slider = slider
 
 
 #-----------------------------------------------------------------------------------------
-def create_get_confidence_op(exp_info):
+def _create_confidence_slider_background(filename, height, exp_info):
 
-    config = exp_info.config
-    validate_config_param_type("confidence_slider_height", numbers.Number, config.confidence_slider_height)
-    validate_config_param_type("confidence_slider_picture", str, config.confidence_slider_picture)
+    validate_config_param_type("confidence_slider_height", numbers.Number, height)
+    validate_config_param_type("confidence_slider_picture", str, filename)
 
-    #todo:
-    # convert size to pixels
-    # load picture and resize it
-    # Create the gauge (two white rectangles)
-    # Create slider (invisible), add it to stim holder
+    #-- Find slider height in pixels
+    if isinstance(height, numbers.Number) and 0 < height <= 1:
+        height = int(np.round(height* exp_info.screen_size[1]))
 
-    exp_info.operations_after_successful_trial.append(run_get_confidence_rating)
+    #-- Load picture
+    file_path = ttrk.paradigms.images_dir + os.path.sep + filename
+    slider_pic = xpy.stimuli.Picture(file_path)
+
+    #-- Resize picture
+    # noinspection PyTypeChecker
+    slider_pic.scale(height / slider_pic.surface_size[1])
+
+    slider_pic.preload()
+
+    return slider_pic
+
+
+#-----------------------------------------------------------------------------------------
+def _create_slider_gauge(width):
+
+    rect1 = xpy.stimuli.Rectangle(size=(width, 5), position=(0, 0), colour=xpy.misc.constants.C_WHITE)
+    rect2 = xpy.stimuli.Rectangle(size=(int(width*1.2), 3), position=(0, 0), colour=xpy.misc.constants.C_WHITE)
+
+    rect2.plot(rect1)
+
+    return rect1

@@ -28,7 +28,7 @@ import trajtracker as ttrk
 import trajtracker.utils as u
 from trajtracker.validators import ExperimentError
 from trajtracker.paradigms import common
-from trajtracker.paradigms.common import RunTrialResult, FINGER_STARTED_MOVING
+from trajtracker.paradigms.common import RunTrialResult, FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING
 
 from trajtracker.paradigms.num2pos import ExperimentInfo, TrialInfo, create_experiment_objects
 
@@ -130,7 +130,10 @@ def run_trial(exp_info, trial, trial_already_initiated):
 
         #-- Update all displayable elements
         exp_info.stimuli.present()
+        time_in_trial = u.get_time() - trial.start_time
+        time_in_session = u.get_time() - exp_info.session_start_time
 
+        #-- Validate that finger still touches the screen
         if not ttrk.env.mouse.check_button_pressed(0):
             trial_failed(ExperimentError("FingerLifted", "You lifted your finger in mid-trial"), exp_info, trial)
             return RunTrialResult.Failed
@@ -144,15 +147,19 @@ def run_trial(exp_info, trial, trial_already_initiated):
         #-- Check if the number line was reached
         if exp_info.numberline.touched:
 
-            movement_time = u.get_time() - trial.results['time_started_moving'] - trial.start_time
+            #-- Validate that it wasn't too fast
+            movement_time = time_in_trial - trial.results['time_started_moving']
             if movement_time < exp_info.config.min_trial_duration:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
                                              "Please move more slowly"),
                              exp_info, trial)
                 return RunTrialResult.Failed
 
-            run_trial_result = common.run_post_trial_operations(exp_info, trial)
+            exp_info.event_manager.dispatch_event(FINGER_STOPPED_MOVING, time_in_trial, time_in_session)
+            trial.stopped_moving_event_dispatched = True
 
+            #-- Optionally, run additional stages
+            run_trial_result = common.run_post_trial_operations(exp_info, trial)
             if run_trial_result in (RunTrialResult.Succeeded, RunTrialResult.SucceededAndProceed):
                 trial_succeeded(exp_info, trial)
 

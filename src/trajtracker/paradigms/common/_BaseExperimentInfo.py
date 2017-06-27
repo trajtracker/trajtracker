@@ -101,7 +101,11 @@ class BaseExperimentInfo(object):
         #: a DictWriter for the trials.csv file
         self.trials_file_writer = None
 
-    # ---------------------------------------------------------------
+        #: A :class:`~trajtracker.stimuli.Slider` for measuing subjective confidence rating
+        self.confidence_slider = None
+
+
+    #---------------------------------------------------------------
     @property
     def trajectory_sensitive_objects(self):
         """

@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License
 along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ._BaseConfig import BaseConfig, FINGER_STARTED_MOVING
+from ._BaseConfig import BaseConfig, FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING
 from ._BaseExperimentInfo import BaseExperimentInfo
 from ._BaseTrialInfo import BaseTrialInfo
 
@@ -32,8 +32,7 @@ from ._common_funcs_init import \
     create_fixation, \
     create_fixation_cross, \
     create_generic_target, \
-    create_get_confidence_op, \
-    create_post_trial_operations, \
+    create_confidence_slider, \
     create_start_point, \
     create_textbox_fixation, \
     create_textbox_target, \

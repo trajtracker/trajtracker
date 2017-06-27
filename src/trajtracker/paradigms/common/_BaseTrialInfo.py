@@ -60,3 +60,5 @@ class BaseTrialInfo(object):
 
         #: The latest time (relatively to the touch-screen time) when the finger must move
         self.finger_moves_max_time = csv_row['finger_moves_max_time'] if 'finger_moves_max_time' in csv_row else exp_config.finger_moves_max_time
+
+        self.stopped_moving_event_dispatched = False

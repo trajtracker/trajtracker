@@ -39,7 +39,8 @@ from trajtracker.validators import ExperimentError
 from trajtracker.movement import StartPoint
 
 # noinspection PyProtectedMember
-from trajtracker.paradigms.common._BaseConfig import FINGER_STARTED_MOVING
+from trajtracker.paradigms.common._BaseConfig import FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING
+
 
 RunTrialResult = Enum('RunTrialResult', 'Succeeded SucceededAndProceed Failed Aborted')
 
@@ -529,6 +530,11 @@ def trial_failed_common(err, exp_info, trial):
 
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
+
+    if not trial.stopped_moving_event_dispatched:
+        exp_info.event_manager.dispatch_event(FINGER_STOPPED_MOVING, time_in_trial, time_in_session)
+        trial.stopped_moving_event_dispatched = True
+
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_FAILED, time_in_trial, time_in_session)
 
     exp_info.errmsg_textbox.unload()
@@ -596,6 +602,13 @@ def _get_trials_csv_out_common_fields(exp_info):
 
 #----------------------------------------------------------------
 def run_post_trial_operations(exp_info, trial):
+    """
+    Run operations that are needed after the main part of the trial. 
+    
+    :param exp_info: 
+    :param trial: 
+    :return: 
+    """
     #todo: doc
 
     if exp_info.config.confidence_rating:
@@ -616,9 +629,10 @@ def acquire_confidence_rating(exp_info, trial):
     mouse = ttrk.env.mouse
 
     def update_slider():
-        slider.update(mouse.check_button_pressed(), mouse.position)
+        slider.update(mouse.check_button_pressed(0), mouse.position)
 
     #-- Wait until START is clicked; meanwhile, update the confidence slider
+    exp_info.start_point.reset()
     #todo: what if you slide through the start point? I don't want that! add arg to the wait function?
     exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp,
                                                        on_loop_callback=update_slider)

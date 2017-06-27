@@ -29,6 +29,10 @@ import trajtracker as ttrk
 #-- the number line
 FINGER_STARTED_MOVING = ttrk.events.Event("FINGER_STARTED_MOVING")
 
+#-- This event is dispatched when the finger stops moving - either a response was made,
+#-- or the trial failed.
+FINGER_STOPPED_MOVING = ttrk.events.Event("FINGER_STOPPED_MOVING")
+
 
 class BaseConfig(object):
 

@@ -8,8 +8,10 @@ A trial can include the following events:
 - *trajtracker.events.TRIAL_INITIALIZED* - when the trial was initialized (right after the previous trial ended)
 - *trajtracker.events.TRIAL_STARTED* - when the finger touches the "start" rectangle
 - *FINGER_STARTED_MOVING* - when the finger starts moving
-- *trajtracker.events.TRIAL_SUCCEEDED* - when the trial ended successfully (this has nothing to do with
-  the location marked by the subject; it only indicates that the subject marked *some* location on the number line)
+- *FINGER_STOPPED_MOVING* - when the finger stops moving (either when a response was made or when the trial failed)
+- *trajtracker.events.TRIAL_SUCCEEDED* - when the trial ended successfully (this does not mean that the subject's
+  response was good; it only means that some response was made). In case there are post-trial operations
+  (e.g., get subjective confidence rating), the event will be dispatched these operations finished.
 - *trajtracker.events.TRIAL_FAILED* - when the trial failed, for any reason
 - *trajtracker.events.TRIAL_ENDED* - this event is dispatched whenever a TRIAL_SUCCEEDED or TRIAL_FAILED
   events are dispatched.
@@ -17,10 +19,7 @@ A trial can include the following events:
 The operations triggered by events are:
 
 - Showing/hiding stimuli: this happens in certain delay after TRIAL_STARTED (when
-  *config.stimulus_then_move = True*) or after FINGER_STARTED_MOVING (when
-  *config.stimulus_then_move = False*)
+  *config.stimulus_then_move = True*) or after FINGER_STARTED_MOVING (when *config.stimulus_then_move = False*)
 - Hiding the feedback arrow (runs on TRIAL_STARTED)
 - Enabling the :class:`~trajtracker.movement.TrajectoryTracker` and all validators on FINGER_STARTED_MOVING,
-  and disabling them on TRIAL_ENDED.
-
-
+  and disabling them on FINGER_STOPPED_MOVING.
