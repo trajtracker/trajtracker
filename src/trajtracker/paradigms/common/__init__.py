@@ -4,6 +4,21 @@ TrajTracker - general stuff for all paradigms
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
+
+This file is part of TrajTracker.
+
+TrajTracker is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+TrajTracker is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from ._BaseConfig import BaseConfig, FINGER_STARTED_MOVING
@@ -17,6 +32,8 @@ from ._common_funcs_init import \
     create_fixation, \
     create_fixation_cross, \
     create_generic_target, \
+    create_get_confidence_op, \
+    create_post_trial_operations, \
     create_start_point, \
     create_textbox_fixation, \
     create_textbox_target, \
@@ -31,11 +48,13 @@ from ._common_funcs_init import \
     validate_config_param_values
 
 from ._common_funcs_run import \
+    acquire_confidence_rating, \
     init_experiment, \
     on_finger_started_moving, \
     on_finger_touched_screen, \
     open_trials_file, \
     prepare_trial_out_row, \
+    run_post_trial_operations, \
     save_session_file, \
     show_fixation, \
     trial_failed_common, \

@@ -1,4 +1,22 @@
+"""
+@author: Dror Dotan
+@copyright: Copyright (c) 2017, Dror Dotan
 
+This file is part of TrajTracker.
+
+TrajTracker is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+TrajTracker is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 from __future__ import division
 
@@ -66,6 +84,7 @@ def create_common_experiment_objects(exp_info):
     create_traj_tracker(exp_info)
     create_validators(exp_info, direction_validator=True, global_speed_validator=True,
                       inst_speed_validator=True, zigzag_validator=True)
+    create_post_trial_operations(exp_info)
 
     #-- Initialize experiment-level data
     exp_info.exp_data['WindowWidth'] = exp_info.screen_size[0]
@@ -567,3 +586,27 @@ def size_to_pixels(value, screen_size=None):
         result.append(v)
 
     return tuple(result)
+
+
+#-----------------------------------------------------------------------------------------
+def create_post_trial_operations(exp_info):
+
+    validate_config_param_type("confidence_rating", bool, exp_info.config.confidence_rating)
+    if exp_info.config.confidence_rating:
+        exp_info.operations_after_successful_trial.append(create_get_confidence_op(exp_info))
+
+
+#-----------------------------------------------------------------------------------------
+def create_get_confidence_op(exp_info):
+
+    config = exp_info.config
+    validate_config_param_type("confidence_slider_height", numbers.Number, config.confidence_slider_height)
+    validate_config_param_type("confidence_slider_picture", str, config.confidence_slider_picture)
+
+    #todo:
+    # convert size to pixels
+    # load picture and resize it
+    # Create the gauge (two white rectangles)
+    # Create slider (invisible), add it to stim holder
+
+    exp_info.operations_after_successful_trial.append(run_get_confidence_rating)

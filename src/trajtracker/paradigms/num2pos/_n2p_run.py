@@ -3,6 +3,21 @@ Functions to support the number-to-position paradigm
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
+
+This file is part of TrajTracker.
+
+TrajTracker is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+TrajTracker is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import expyriment as xpy
@@ -10,7 +25,7 @@ import numpy as np
 import random
 
 import trajtracker as ttrk
-from trajtracker.utils import get_time
+import trajtracker.utils as u
 from trajtracker.validators import ExperimentError
 from trajtracker.paradigms import common
 from trajtracker.paradigms.common import RunTrialResult, FINGER_STARTED_MOVING
@@ -49,13 +64,15 @@ def run_trials(exp_info):
 
     trial_num = 1
 
+    next_trial_already_initiated = False
+
     while len(exp_info.trials) > 0:
 
         trial_config = exp_info.trials.pop(0)
 
         ttrk.log_write("====================== Starting trial #{:} =====================".format(trial_num))
 
-        run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config, exp_info.config))
+        run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config, exp_info.config), next_trial_already_initiated)
         if run_trial_rc == RunTrialResult.Aborted:
             print("   Trial aborted.")
             continue
@@ -64,9 +81,10 @@ def run_trials(exp_info):
 
         exp_info.exp_data['nTrialsCompleted'] += 1
 
-        if run_trial_rc == RunTrialResult.Succeeded:
+        if run_trial_rc in (RunTrialResult.Succeeded, RunTrialResult.SucceededAndProceed):
 
             exp_info.exp_data['nTrialsSucceeded'] += 1
+            next_trial_already_initiated = (run_trial_rc == RunTrialResult.SucceededAndProceed)
 
         elif run_trial_rc == RunTrialResult.Failed:
 
@@ -80,23 +98,26 @@ def run_trials(exp_info):
 
 
 #----------------------------------------------------------------
-def run_trial(exp_info, trial):
+def run_trial(exp_info, trial, trial_already_initiated):
     """
     Run a single trial
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
     :type trial: trajtracker.paradigms.num2pos.TrialInfo
-     
-    :return: True if the trial ended successfully, False if it failed
+    :param trial_already_initiated: Indicates if the "start" point was already touched
+    
+    :return: RunTrialResult
     """
 
     initialize_trial(exp_info, trial)
 
-    exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp,
-                                                       on_loop_present=exp_info.stimuli,
-                                                       event_manager=exp_info.event_manager,
-                                                       trial_start_time=trial.start_time,
-                                                       session_start_time=exp_info.session_start_time)
+    if (not trial_already_initiated) or (exp_info.start_point.state != StartPoint.State.init):
+
+        exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp,
+                                                           on_loop_present=exp_info.stimuli,
+                                                           event_manager=exp_info.event_manager,
+                                                           trial_start_time=trial.start_time,
+                                                           session_start_time=exp_info.session_start_time)
     on_finger_touched_screen(exp_info, trial)
 
     rc = common.wait_until_finger_moves(exp_info, trial)
@@ -123,15 +144,19 @@ def run_trial(exp_info, trial):
         #-- Check if the number line was reached
         if exp_info.numberline.touched:
 
-            movement_time = get_time() - trial.results['time_started_moving'] - trial.start_time
+            movement_time = u.get_time() - trial.results['time_started_moving'] - trial.start_time
             if movement_time < exp_info.config.min_trial_duration:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
                                              "Please move more slowly"),
                              exp_info, trial)
                 return RunTrialResult.Failed
 
-            trial_succeeded(exp_info, trial)
-            return RunTrialResult.Succeeded
+            run_trial_result = common.run_post_trial_operations(exp_info, trial)
+
+            if run_trial_result in (RunTrialResult.Succeeded, RunTrialResult.SucceededAndProceed):
+                trial_succeeded(exp_info, trial)
+
+            return run_trial_result
 
         xpy.io.Keyboard.process_control_keys()
 
@@ -174,13 +199,13 @@ def initialize_trial(exp_info, trial):
 
     exp_info.numberline.target = trial.target
 
-    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, get_time() - exp_info.session_start_time)
+    exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_INITIALIZED, 0, u.get_time() - exp_info.session_start_time)
 
     #-- Update the display to present stuff that may have been added by the TRIAL_INITIALIZED event listeners
     exp_info.stimuli.present()
 
     if exp_info.config.stimulus_then_move:
-        trial.results['targets_t0'] = get_time() - trial.start_time
+        trial.results['targets_t0'] = u.get_time() - trial.start_time
 
 
 #------------------------------------------------
@@ -211,7 +236,7 @@ def trial_failed(err, exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
     common.trial_failed_common(err, exp_info, trial)
-    trial_ended(exp_info, trial, time_in_trial, "ERR_" + err.err_code)
+    trial_ended(exp_info, trial, u.get_time() - trial.start_time, "ERR_" + err.err_code)
 
 
 #------------------------------------------------
@@ -232,7 +257,7 @@ def trial_succeeded(exp_info, trial):
         exp_info.target_pointer.position = c[0], c[1] + exp_info.target_pointer_height / 2
         exp_info.target_pointer.visible = True
 
-    curr_time = get_time()
+    curr_time = u.get_time()
     time_in_trial = curr_time - trial.start_time
     time_in_session = curr_time - exp_info.session_start_time
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)

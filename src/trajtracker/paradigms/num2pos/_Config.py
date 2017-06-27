@@ -3,6 +3,21 @@ Configuration of a number-to-position experiment
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
+
+This file is part of TrajTracker.
+
+TrajTracker is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+TrajTracker is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from enum import Enum
@@ -34,8 +49,11 @@ class Config(BaseConfig):
                  sounds_dir=sounds_dir,
                  stimulus_then_move=False, finger_must_start_upwards=True,
                  finger_moves_min_time=None, finger_moves_max_time=None,
+
                  start_point_size=(40, 30), start_point_tilt=0,
                  start_point_colour=xpy.misc.constants.C_GREY,
+
+                 confidence_rating=False,
 
                  nl_length=0.9, min_numberline_value=0, max_numberline_value=100, nl_labels_visible=True,
                  show_feedback=True, feedback_arrow_colors=xpy.misc.constants.C_GREEN,
@@ -75,7 +93,8 @@ class Config(BaseConfig):
             finger_moves_max_time=finger_moves_max_time,
             start_point_size=start_point_size,
             start_point_tilt=start_point_tilt,
-            start_point_colour=start_point_colour
+            start_point_colour=start_point_colour,
+            confidence_rating=confidence_rating
         )
 
         #----- Configuration of number line -----

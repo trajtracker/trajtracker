@@ -3,6 +3,21 @@ Functions common to several paradigms
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
+
+This file is part of TrajTracker.
+
+TrajTracker is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+TrajTracker is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 
@@ -26,7 +41,7 @@ from trajtracker.movement import StartPoint
 # noinspection PyProtectedMember
 from trajtracker.paradigms.common._BaseConfig import FINGER_STARTED_MOVING
 
-RunTrialResult = Enum('RunTrialResult', 'Succeeded Failed Aborted')
+RunTrialResult = Enum('RunTrialResult', 'Succeeded SucceededAndProceed Failed Aborted')
 
 
 #----------------------------------------------------------------
@@ -488,7 +503,7 @@ def open_trials_file(exp_info, additional_fields):
     :param additional_fields: List of field names in the CSV file (on top of the common fields)
     """
 
-    all_fields = _get_trials_csv_out_common_fields() + additional_fields
+    all_fields = _get_trials_csv_out_common_fields(exp_info) + additional_fields
 
     filename = xpy.io.defaults.datafile_directory + "/" + exp_info.trials_out_filename
 
@@ -548,8 +563,7 @@ def prepare_trial_out_row(exp_info, trial, time_in_trial, success_err_code):
     t_move = trial.results['time_started_moving'] if 'time_started_moving' in trial.results else -1
     t_target = trial.results['targets_t0'] if 'targets_t0' in trial.results else -1
 
-    #todo: add custom fields? confidence?
-    return {
+    row = {
         'trialNum': trial.trial_num,
         'LineNum': trial.file_line_num,
         'presentedTarget': presented_target,
@@ -560,7 +574,63 @@ def prepare_trial_out_row(exp_info, trial, time_in_trial, success_err_code):
         'timeUntilTarget': "{:.3g}".format(t_target),
     }
 
+    if exp_info.config.confidence_rating:
+        c = trial.results['confidence'] if 'confidence' in trial.results else None
+        row['confidence'] = "" if (c is None) else c
+        row['confidence_n_moves'] = trial.results['confidence_n_moves'] if 'confidence_n_moves' in trial.results else 0
+
+    return row
+
 #----------------------------------------------------------------
-def _get_trials_csv_out_common_fields():
-    return ['trialNum', 'LineNum', 'presentedTarget', 'status', 'movementTime',
-            'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']
+def _get_trials_csv_out_common_fields(exp_info):
+
+    fields = ['trialNum', 'LineNum', 'presentedTarget', 'status', 'movementTime',
+              'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']
+
+    if exp_info.config.confidence_rating:
+        fields.append('confidence')
+        fields.append('confidence_n_moves')
+
+    return fields
+
+
+#----------------------------------------------------------------
+def run_post_trial_operations(exp_info, trial):
+    #todo: doc
+
+    if exp_info.config.confidence_rating:
+        return acquire_confidence_rating(exp_info, trial)
+
+    return RunTrialResult.Succeeded
+
+
+#-----------------------------------------------------------------------------------------
+def acquire_confidence_rating(exp_info, trial):
+
+    slider = exp_info.confidence_slider
+    slider.reset()
+    slider.visible = True
+
+    #todo: Hide number line / response buttons (remember to show them later)
+
+    mouse = ttrk.env.mouse
+
+    def update_slider():
+        slider.update(mouse.check_button_pressed(), mouse.position)
+
+    #-- Wait until START is clicked; meanwhile, update the confidence slider
+    #todo: what if you slide through the start point? I don't want that! add arg to the wait function?
+    exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp,
+                                                       on_loop_callback=update_slider)
+
+    #-- Trial was aborted without selecting confidence
+    if slider.current_value is None:
+        trial.results['confidence'] = None
+        trial.results['confidence_n_moves'] = 0
+        return RunTrialResult.Aborted
+
+    #-- Confidence selected!
+    trial.results['confidence'] = slider.current_value
+    trial.results['confidence_n_moves'] = slider.n_moves
+
+    return RunTrialResult.SucceededAndProceed

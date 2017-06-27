@@ -3,6 +3,21 @@ Configuration of a discrete-choice experiment
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
+
+This file is part of TrajTracker.
+
+TrajTracker is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+TrajTracker is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from enum import Enum
@@ -31,6 +46,8 @@ class Config(BaseConfig):
                  finger_moves_min_time=None, finger_moves_max_time=None,
                  start_point_size=(40, 30), start_point_tilt=0,
                  start_point_colour=xpy.misc.constants.C_GREY,
+
+                 confidence_rating=False,
 
                  resp_btn_size=(0.05, 0.1), resp_btn_positions=None,
                  resp_btn_colours=xpy.misc.constants.C_GREY,
@@ -74,7 +91,8 @@ class Config(BaseConfig):
             finger_moves_max_time=finger_moves_max_time,
             start_point_size=start_point_size,
             start_point_tilt=start_point_tilt,
-            start_point_colour=start_point_colour
+            start_point_colour=start_point_colour,
+            confidence_rating=confidence_rating,
         )
 
 

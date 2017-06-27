@@ -3,6 +3,21 @@ Base class for experiment configuration
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
+
+This file is part of TrajTracker.
+
+TrajTracker is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+TrajTracker is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from enum import Enum
@@ -17,18 +32,22 @@ FINGER_STARTED_MOVING = ttrk.events.Event("FINGER_STARTED_MOVING")
 
 class BaseConfig(object):
 
-    def __init__(self, experiment_id, data_source, max_trial_duration,
+    def __init__(self, experiment_id, data_source, shuffle_trials,
                  use_text_targets, use_generic_targets,
+
                  fixation_type, fixation_text,
                  fixzoom_box_size, fixzoom_dot_radius, fixzoom_dot_colour,
                  fixzoom_zoom_duration, fixzoom_stay_duration,
                  fixzoom_show_event, fixzoom_start_zoom_event,
-                 text_target_height, shuffle_trials,
-                 log_stimulus_onset_offset,
-                 min_trial_duration, speed_guide_enabled, min_inst_speed,
+
+                 text_target_height, log_stimulus_onset_offset,
+                 min_trial_duration, max_trial_duration,
+                 speed_guide_enabled, min_inst_speed,
                  grace_period, max_zigzags, save_results, sounds_dir,
                  finger_must_start_upwards,
                  stimulus_then_move, finger_moves_min_time, finger_moves_max_time,
+                 confidence_rating,
+
                  start_point_size, start_point_tilt,
                  start_point_colour):
 
@@ -130,7 +149,6 @@ class BaseConfig(object):
         #--------------------------------------------------------------------
         #    Advanced configuration
         #--------------------------------------------------------------------
-        #todo: add these parameters to the documentation
 
         # Text target
         self.text_target_font = "Arial"
@@ -173,6 +191,17 @@ class BaseConfig(object):
 
         # Start point
         self.start_point_x_coord = 0
+
+        #--------------------------------------------------------------------
+        #    Post-trial operations
+        #--------------------------------------------------------------------
+
+        #: Whether to get confidence rating at the end of the trial
+        self.confidence_rating = confidence_rating
+
+        self.confidence_slider_labels = ['Correct', '?', 'Error']
+        self.confidence_slider_height = 0.8
+        self.confidence_slider_picture = 'confidence_slider_grey.bmp'
 
 
     #---------------------------------------------------
