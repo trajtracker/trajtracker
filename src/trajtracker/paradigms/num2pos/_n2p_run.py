@@ -211,7 +211,7 @@ def trial_failed(err, exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
     common.trial_failed_common(err, exp_info, trial)
-    trial_ended(exp_info, trial, time_in_trial, "ERR_" + err.err_code)
+    trial_ended(exp_info, trial, get_time() - trial.start_time, "ERR_" + err.err_code)
 
 
 #------------------------------------------------
