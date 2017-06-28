@@ -166,7 +166,13 @@ class RectStartPoint(ttrk.TTrkObject):
     #-----------------------------------------------------------------
     @property
     def state(self):
+        """ See :attr:`StartPoint.state <trajtracker.movement.StartPoint.state>` """
         return self._start_point.state
+
+    #-----------------------------------------------------------------
+    def mark_as_initialized(self):
+        """ See :func:`StartPoint.mark_as_initialized() <trajtracker.movement.StartPoint.mark_as_initialized>` """
+        self._start_point.mark_as_initialized()
 
     #================================================================================
     #   Configuration

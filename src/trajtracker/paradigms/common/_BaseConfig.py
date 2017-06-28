@@ -164,7 +164,7 @@ class BaseConfig(object):
 
         # Generic target
         self.generic_target_x_coord = 0
-        self.generic_target_last_stimulus_remains = False # See MultiStimulus.last_stimulus_remains
+        self.generic_target_last_stimulus_remains = False  # See MultiStimulus.last_stimulus_remains
 
         # For text and non-text targets
         self.stimulus_distance_from_top = 5   # Distance of top of stimulus from top of screen
@@ -204,7 +204,8 @@ class BaseConfig(object):
         self.confidence_rating = confidence_rating
 
         self.confidence_slider_labels = ['Correct', '?', 'Error']
-        self.confidence_slider_height = 0.8
+        self.confidence_slider_height = 0.7
+        self.confidence_slider_y = -0.05
         self.confidence_slider_picture = 'confidence_slider_grey.bmp'
 
 

@@ -57,7 +57,7 @@ class Slider(ttrk.TTrkObject):
         self.gauge_stimulus = gauge_stimulus
 
         self._stimulus = ttrk.stimuli.StimulusContainer("slider")
-        self._stimulus.add(bgnd_stimulus, visible=False)
+        self._stimulus.add(bgnd_stimulus)
         self._stimulus.add(gauge_stimulus, visible=False)
 
         self.orientation = orientation
@@ -256,7 +256,7 @@ class Slider(ttrk.TTrkObject):
         pos = self.bgnd_stimulus.position[i]
 
         if self._slidable_range is None:
-            size = int(self._bgnd_stimulus.size[i] / 2)
+            size = int(self._bgnd_stimulus.surface_size[i] / 2)
             slidable_range = -size, size
         else:
             slidable_range = self._slidable_range
@@ -282,8 +282,8 @@ class Slider(ttrk.TTrkObject):
     def visible(self, visible):
         _u.validate_attr_type(self, "visible", visible, bool)
         self._visible = visible
-        self.bgnd_stimulus.visible = visible
-        self.gauge_stimulus.visible = visible and self._current_value is not None
+        self._gauge_stimulus.visible = visible and (self._current_value is not None)
+        self._stimulus.visible = visible
         self._log_property_changed("visible")
 
     # ------------------------------------------------------------------
@@ -440,7 +440,7 @@ class Slider(ttrk.TTrkObject):
         
         :type: tuple (width, height) 
         """
-        return self._bgnd_stimulus.size
+        return self._bgnd_stimulus.surface_size
 
 
     #------------------------------------------------------------------

@@ -54,6 +54,7 @@ class BaseExperimentInfo(object):
         self._trajtracker = None
         self._trajectory_sensitive_objects = []
         self._event_sensitive_objects = []
+        self._main_task_visual_objects = []
 
         #: A :class:`~trajtracker.stimuli.StimulusContainer` object, containing all stimuli.
         self.stimuli = ttrk.stimuli.StimulusContainer("main")
@@ -123,7 +124,20 @@ class BaseExperimentInfo(object):
         self._trajectory_sensitive_objects.append(obj)
 
 
-    # ---------------------------------------------------------------
+    #---------------------------------------------------------------
+    @property
+    def main_task_visual_objects(self):
+        """
+        Visual objects that remain on screen during the main task. 
+        These objects will be hidden during post-trial operations, and then re-presented 
+        when the next trial starts.
+        
+        :type: list
+        """
+        return self._main_task_visual_objects
+
+
+    #---------------------------------------------------------------
     @property
     def event_sensitive_objects(self):
         """

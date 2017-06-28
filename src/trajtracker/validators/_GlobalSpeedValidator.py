@@ -114,8 +114,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         self._should_set_guide_visible = False
 
         self._time0 = None
-        self.movement_started_event = None
-        self.movement_ended_event = trajtracker.events.TRIAL_ENDED
+        self.disable_event = trajtracker.events.TRIAL_ENDED
         self._registered = False
 
 
@@ -124,9 +123,9 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
     #
     def on_registered(self, event_manager):
 
-        if self._movement_started_event is None:
+        if self.enable_event is None:
             raise trajtracker.InvalidStateError(
-                "{:} was registered to an event manager before updating movement_started_event".format(
+                "{:} was registered to an event manager before updating enable_event".format(
                     _u.get_type_name(self)))
 
         #-- Intercept the event that indicates when the movement started
@@ -139,10 +138,10 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         def callback_start(time_in_trial, time_in_session):
             self.movement_started(time_in_trial)
 
-        event_manager.register_operation(self._movement_started_event, callback_start, recurring=True,
+        event_manager.register_operation(self.enable_event, callback_start, recurring=True,
                                          description="{:}.movement_started()".format(_u.get_type_name(self)))
 
-        # -- Intercept the event that indicates when the movement terminates
+        #-- Intercept the event that indicates when the movement terminates
 
         # noinspection PyUnusedLocal
         def callback_end(t1, t2):
@@ -150,7 +149,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
                 self._guide.stimulus.visible = False
                 self._should_set_guide_visible = False
 
-        event_manager.register_operation(self._movement_ended_event, callback_end, recurring=True,
+        event_manager.register_operation(self.disable_event, callback_end, recurring=True,
                                          description="{:}: hide speed guide".format(_u.get_type_name(self)))
 
 
@@ -435,44 +434,6 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
                     _u.get_type_name(self), total_distance))
 
         self._milestones = np.array(milestones)
-
-    #-------------------------------------------------------------
-    @property
-    def movement_started_event(self):
-        """
-        An event that is dispatched when movement starts. When the event is dispatched,
-        :func:`~trajtracker.validators.GlobalSpeedValidator.movement_started` will be invoked.
-        """
-        return self._movement_started_event
-
-    @movement_started_event.setter
-    def movement_started_event(self, value):
-        _u.validate_attr_type(self, "movement_started_event", value, trajtracker.events.Event, none_allowed=True)
-        if self._registered:
-            raise trajtracker.InvalidStateError(
-                "{:}.movement_started_event cannot be changed after registering this object to the event manager".format(
-                    _u.get_type_name(self)))
-
-        self._movement_started_event = value
-
-    #-------------------------------------------------------------
-    @property
-    def movement_ended_event(self):
-        """
-        An event that is dispatched when movement ends (by default: end of trial).
-        This triggers hiding the guide line.
-        """
-        return self._movement_ended_event
-
-    @movement_ended_event.setter
-    def movement_ended_event(self, value):
-        _u.validate_attr_type(self, "movement_ended_event", value, trajtracker.events.Event)
-        if self._registered:
-            raise trajtracker.InvalidStateError(
-                "{:}.movement_ended_event cannot be changed after registering this object to the event manager".format(
-                    _u.get_type_name(self)))
-
-        self._movement_ended_event = value
 
     #-------------------------------------------------------------
     @property

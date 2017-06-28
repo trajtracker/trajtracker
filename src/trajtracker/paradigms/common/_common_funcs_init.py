@@ -196,7 +196,6 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
             milestones=config.global_speed_validator_milestones,
             show_guide=config.speed_guide_enabled)
         v.do_present_guide = False
-        v.movement_started_event = FINGER_STARTED_MOVING
         v.enable_event = FINGER_STARTED_MOVING
         v.disable_event = FINGER_STOPPED_MOVING
         exp_info.add_validator(v, 'global_speed')
@@ -609,29 +608,43 @@ def create_confidence_slider(exp_info):
     """
     config = exp_info.config
 
+    y = config.confidence_slider_y
+    validate_config_param_type("confidence_slider_y", numbers.Number, y)
+    if not isinstance(y, int):
+        # noinspection PyTypeChecker
+        if -0.5 <= y <= 0.5:
+            y = int(y * exp_info.screen_size[1])
+        else:
+            raise ValueError('Invalid config.confidence_slider_y ({:}): expecting either an integer or ratio of screen height (between -0.5 and 0.5)'.format(y))
+
     validate_config_param_type("confidence_rating", bool, config.confidence_rating)
     if not exp_info.config.confidence_rating:
         return
 
     #-- Create the confidence slider
-    slider_bgnd = _create_confidence_slider_background(config.confidence_slider_picture, config.confidence_slider_height, exp_info)
+    slider_bgnd = _create_confidence_slider_background(exp_info)
     gauge = _create_slider_gauge(slider_bgnd.surface_size[0])
     slider = ttrk.stimuli.Slider(slider_bgnd, gauge, orientation=ttrk.stimuli.Orientation.Vertical,
-                                 min_value=0, max_value=100)
+                                 min_value=0, max_value=100, position=(0, y))
 
     exp_info.stimuli.add(slider.stimulus, "confidence_slider", visible=False)
     exp_info.confidence_slider = slider
 
 
 #-----------------------------------------------------------------------------------------
-def _create_confidence_slider_background(filename, height, exp_info):
+# Create the slider's background (red-to-green scale)
+#
+def _create_confidence_slider_background(exp_info):
+
+    filename = exp_info.config.confidence_slider_picture
+    height = exp_info.config.confidence_slider_height
 
     validate_config_param_type("confidence_slider_height", numbers.Number, height)
     validate_config_param_type("confidence_slider_picture", str, filename)
 
     #-- Find slider height in pixels
     if isinstance(height, numbers.Number) and 0 < height <= 1:
-        height = int(np.round(height* exp_info.screen_size[1]))
+        height = int(np.round(height * exp_info.screen_size[1]))
 
     #-- Load picture
     file_path = ttrk.paradigms.images_dir + os.path.sep + filename
@@ -647,11 +660,17 @@ def _create_confidence_slider_background(filename, height, exp_info):
 
 
 #-----------------------------------------------------------------------------------------
+# Create the slider's moving part (the gauge)
+#
 def _create_slider_gauge(width):
 
-    rect1 = xpy.stimuli.Rectangle(size=(width, 5), position=(0, 0), colour=xpy.misc.constants.C_WHITE)
-    rect2 = xpy.stimuli.Rectangle(size=(int(width*1.2), 3), position=(0, 0), colour=xpy.misc.constants.C_WHITE)
+    width1 = int(width*0.8)
+    width2 = int(width*1.2)
+    rect1 = xpy.stimuli.Rectangle(size=(width1, 7), position=(0, 0), colour=xpy.misc.constants.C_WHITE)
+    rect2 = xpy.stimuli.Rectangle(size=(width2, 3), position=(0, 0), colour=xpy.misc.constants.C_WHITE)
 
-    rect2.plot(rect1)
+    canvas = xpy.stimuli.Canvas(size=(width2, 7), position=(0, 0))
+    rect1.plot(canvas)
+    rect2.plot(canvas)
 
-    return rect1
+    return canvas

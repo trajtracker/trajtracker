@@ -99,34 +99,37 @@ def run_trial(exp_info, trial):
     rc = common.wait_until_finger_moves(exp_info, trial)
     if rc is not None:
         if rc[1] is not None:
-            trial_failed(rc[1], exp_info, trial, u.get_time() - trial.start_time)
+            trial_failed(rc[1], exp_info, trial)
         return rc[0]
 
     while True:  # This loop runs once per frame
 
         # -- Update all displayable elements
         exp_info.stimuli.present()
+        curr_time = u.get_time()
 
         if not ttrk.env.mouse.check_button_pressed(0):
             trial_failed(ExperimentError("FingerLifted", "You lifted your finger in mid-trial"),
-                         exp_info, trial, u.get_time() - trial.start_time)
+                         exp_info, trial)
             return RunTrialResult.Failed
 
         #-- Inform relevant objects (validators, trajectory tracker, event manager, etc.) of the progress
         err = common.update_movement_in_traj_sensitive_objects(exp_info, trial)
         if err is not None:
-            trial_failed(err, exp_info, trial, u.get_time() - trial.start_time)
+            trial_failed(err, exp_info, trial)
             return RunTrialResult.Failed
 
         #-- Check if a response button was reached
         user_response = get_touched_button(exp_info)
         if user_response is not None:
 
-            movement_time = u.get_time() - trial.results['time_started_moving'] - trial.start_time
-            if movement_time < exp_info.config.min_trial_duration:
+            common.on_response_made(exp_info, trial, curr_time)
+            exp_info.sounds_ok[0].play()
+
+            if trial.movement_time < exp_info.config.min_trial_duration:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
                                              "Please move more slowly"),
-                             exp_info, trial, u.get_time() - trial.start_time)
+                             exp_info, trial)
                 return RunTrialResult.Failed
 
             trial_succeeded(exp_info, trial, user_response)
@@ -165,9 +168,6 @@ def initialize_trial(exp_info, trial):
     for hotspot in exp_info.response_hotspots:
         hotspot.reset()
 
-    exp_info.text_target.terminate_display()
-    exp_info.generic_target.terminate_display()
-
     #-- Reset the display for this trial
     exp_info.stimuli.present()
 
@@ -186,7 +186,7 @@ def initialize_trial(exp_info, trial):
 
 
 #----------------------------------------------------------------
-def trial_failed(err, exp_info, trial, time_in_trial):
+def trial_failed(err, exp_info, trial):
     """
     Called when the trial failed for any reason 
     (only when a strict error occurred; pointing at an incorrect location does not count as failure) 
@@ -197,11 +197,9 @@ def trial_failed(err, exp_info, trial, time_in_trial):
     :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo
     :param trial:
     :type trial: trajtracker.paradigms.dchoice.TrialInfo
-    :param time_in_trial:
-    :type time_in_trial: float
     """
     common.trial_failed_common(err, exp_info, trial)
-    trial_ended(exp_info, trial, time_in_trial, "ERR_" + err.err_code, -1)
+    trial_ended(exp_info, trial, "ERR_" + err.err_code, -1)
 
 
 #----------------------------------------------------------------
@@ -225,9 +223,7 @@ def trial_succeeded(exp_info, trial, user_response):
 
     show_feedback(exp_info, trial, user_response)
 
-    exp_info.sounds_ok[0].play()
-
-    trial_ended(exp_info, trial, time_in_trial, "OK", user_response)
+    trial_ended(exp_info, trial, "OK", user_response)
 
     exp_info.trajtracker.save_to_file(trial.trial_num)
 
@@ -275,15 +271,15 @@ def get_feedback_stim_num(exp_info, trial, user_response):
     else:
         raise ttrk.ValueError("Unsupported config.feedback_select_by ({:})".format(selectby))
 
+
 #------------------------------------------------
-def trial_ended(exp_info, trial, time_in_trial, success_err_code, user_response):
+def trial_ended(exp_info, trial, success_err_code, user_response):
     """
     This function is called whenever a trial ends, either successfully or with failure.
     It updates the result files.
 
     :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo 
     :type trial: trajtracker.paradigms.dchoice.TrialInfo 
-    :param time_in_trial: 
     :param success_err_code: A string code to write as status for this trial
     :param user_response: The number of the button that was pressed (-1 = no button)
     """
@@ -291,7 +287,7 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code, user_response)
     exp_info.stimuli.present()
 
     if exp_info.config.save_results:
-        update_trials_file(exp_info, trial, time_in_trial, success_err_code, user_response)
+        update_trials_file(exp_info, trial, success_err_code, user_response)
 
         #-- Save the session at the end of each trial, to make sure it's always saved - even if
         #-- the experiment software unexpectedly terminates
@@ -299,18 +295,17 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code, user_response)
 
 
 #------------------------------------------------
-def update_trials_file(exp_info, trial, time_in_trial, success_err_code, user_response):
+def update_trials_file(exp_info, trial, success_err_code, user_response):
     """
     Add an entry (line) to the trials.csv file
 
     :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo 
     :type trial: trajtracker.paradigms.dchoice.TrialInfo 
-    :param time_in_trial: 
     :param success_err_code: A string code to write as status for this trial 
     :param user_response: The number of the button that was pressed (-1 = no button)
     """
 
-    trial_out_row = common.prepare_trial_out_row(exp_info, trial, time_in_trial, success_err_code)
+    trial_out_row = common.prepare_trial_out_row(exp_info, trial, success_err_code)
 
     trial_out_row['expectedResponse'] = -1 if trial.expected_response is None else trial.expected_response
     trial_out_row['UserResponse'] = user_response

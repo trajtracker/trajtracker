@@ -173,10 +173,15 @@ def update_text_target_for_trial(exp_info, trial, use_numeric_target_as_default=
     """
     Update properties of the text stimuli according to the current trial info
 
+    :param exp_info:
     :type exp_info: trajtracker.paradigms.common.BaseExperimentInfo
-    :type trial: trajtracker.paradigms.common.BaseTrialInfo 
-    """
 
+    :param trial:
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo
+    
+    :param use_numeric_target_as_default: For number-to-position paradigm: if this is set to True, the text.target column 
+            in the CSV input file becomes optional, and the "target" column is used as the default text to show. 
+    """
     if not trial.use_text_targets:
         # No text in this trial
         exp_info.text_target.texts = []
@@ -185,7 +190,7 @@ def update_text_target_for_trial(exp_info, trial, use_numeric_target_as_default=
     if "text.target" in trial.csv_data:
         # -- Set the text to show as target (or several, semicolon-separated texts, in case of RSVP)
         trial.text_target = trial.csv_data["text.target"]
-    elif use_numeric_target_as_default:
+    elif use_numeric_target_as_default and 'target' in dir(trial):
         trial.text_target = str(trial.target)
     else:
         raise ttrk.BadFormatError("The input CSV file does not contain a 'text.target' column!")
@@ -496,11 +501,9 @@ def indent_xml(elem, level=0):
 
 
 #------------------------------------------------
+# noinspection PyIncorrectDocstring
 def open_trials_file(exp_info, additional_fields):
     """
-    :param exp_info:
-    :type exp_info: trajtracker.paradigms.common.BaseExperimentInfo
-     
     :param additional_fields: List of field names in the CSV file (on top of the common fields)
     """
 
@@ -545,17 +548,12 @@ def trial_failed_common(err, exp_info, trial):
 
 
 #----------------------------------------------------------------
-def prepare_trial_out_row(exp_info, trial, time_in_trial, success_err_code):
+def prepare_trial_out_row(exp_info, trial, success_err_code):
     """
     Get values to save in the trials.csv output file 
     
     :return: A dict with some values for the file 
     """
-
-    if time_in_trial == 0 or 'time_started_moving' not in trial.results:
-        movement_time = 0
-    else:
-        movement_time = time_in_trial - trial.results['time_started_moving']
 
     if trial.use_text_targets and trial.use_generic_targets:
         presented_target = 'text="{:}";generic="{:}"'.format(trial.text_target, trial.generic_target)
@@ -574,7 +572,7 @@ def prepare_trial_out_row(exp_info, trial, time_in_trial, success_err_code):
         'LineNum': trial.file_line_num,
         'presentedTarget': presented_target,
         'status': success_err_code,
-        'movementTime': "{:.3g}".format(movement_time),
+        'movementTime': "{:.3g}".format(0 if (trial.movement_time is None) else trial.movement_time),
         'timeInSession': "{:.3g}".format(trial.start_time - exp_info.session_start_time),
         'timeUntilFingerMoved': "{:.3g}".format(t_move),
         'timeUntilTarget': "{:.3g}".format(t_target),
@@ -601,16 +599,35 @@ def _get_trials_csv_out_common_fields(exp_info):
 
 
 #----------------------------------------------------------------
+# noinspection PyIncorrectDocstring
+def on_response_made(exp_info, trial, response_time):
+    """
+    Called when the subject responded (by touching a response button, the number line, etc.)
+    
+    :param response_time: The absolute time when response was made (result of get_time()) 
+    """
+
+    exp_info.text_target.terminate_display()
+    exp_info.generic_target.terminate_display()
+
+    time_in_trial = response_time - trial.start_time
+    trial.movement_time = time_in_trial - trial.results['time_started_moving']
+
+    exp_info.event_manager.dispatch_event(FINGER_STOPPED_MOVING, time_in_trial,
+                                          response_time - exp_info.session_start_time)
+
+
+#----------------------------------------------------------------
 def run_post_trial_operations(exp_info, trial):
     """
     Run operations that are needed after the main part of the trial. 
     
-    :param exp_info: 
-    :param trial: 
-    :return: 
+    :param exp_info:
+    :type exp_info: trajtracker.paradigms.common.BaseExperimentInfo
+    
+    :param trial:
+    :type trial: trajtracker.paradigms.common.BaseTrialInfo
     """
-    #todo: doc
-
     if exp_info.config.confidence_rating:
         return acquire_confidence_rating(exp_info, trial)
 
@@ -622,9 +639,11 @@ def acquire_confidence_rating(exp_info, trial):
 
     slider = exp_info.confidence_slider
     slider.reset()
-    slider.visible = True
 
-    #todo: Hide number line / response buttons (remember to show them later)
+    #-- Show the confidence meter, hide experiment elements
+    slider.visible = True
+    #for obj in exp_info.main_task_visual_objects:
+    #    obj.visible = False
 
     mouse = ttrk.env.mouse
 
@@ -635,10 +654,17 @@ def acquire_confidence_rating(exp_info, trial):
     exp_info.start_point.reset()
     #todo: what if you slide through the start point? I don't want that! add arg to the wait function?
     exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp,
+                                                       on_loop_present=exp_info.stimuli,
                                                        on_loop_callback=update_slider)
 
-    #-- Trial was aborted without selecting confidence
+    #-- Hide the confidence meter
+    slider.visible = False
+    #for obj in exp_info.main_task_visual_objects:
+    #    obj.visible = True
+    exp_info.stimuli.present()
+
     if slider.current_value is None:
+        # -- Trial was aborted without selecting confidence
         trial.results['confidence'] = None
         trial.results['confidence_n_moves'] = 0
         return RunTrialResult.Aborted

@@ -26,9 +26,10 @@ import random
 
 import trajtracker as ttrk
 import trajtracker.utils as u
-from trajtracker.validators import ExperimentError
+from trajtracker.movement import StartPoint
 from trajtracker.paradigms import common
 from trajtracker.paradigms.common import RunTrialResult, FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING
+from trajtracker.validators import ExperimentError
 
 from trajtracker.paradigms.num2pos import ExperimentInfo, TrialInfo, create_experiment_objects
 
@@ -73,6 +74,7 @@ def run_trials(exp_info):
         ttrk.log_write("====================== Starting trial #{:} =====================".format(trial_num))
 
         run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config, exp_info.config), next_trial_already_initiated)
+        next_trial_already_initiated = False
         if run_trial_rc == RunTrialResult.Aborted:
             print("   Trial aborted.")
             continue
@@ -111,8 +113,10 @@ def run_trial(exp_info, trial, trial_already_initiated):
 
     initialize_trial(exp_info, trial)
 
-    if (not trial_already_initiated) or (exp_info.start_point.state != StartPoint.State.init):
+    if trial_already_initiated:
+        exp_info.start_point.mark_as_initialized()
 
+    else:
         exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp,
                                                            on_loop_present=exp_info.stimuli,
                                                            event_manager=exp_info.event_manager,
@@ -130,8 +134,7 @@ def run_trial(exp_info, trial, trial_already_initiated):
 
         #-- Update all displayable elements
         exp_info.stimuli.present()
-        time_in_trial = u.get_time() - trial.start_time
-        time_in_session = u.get_time() - exp_info.session_start_time
+        curr_time = u.get_time()
 
         #-- Validate that finger still touches the screen
         if not ttrk.env.mouse.check_button_pressed(0):
@@ -148,14 +151,15 @@ def run_trial(exp_info, trial, trial_already_initiated):
         if exp_info.numberline.touched:
 
             #-- Validate that it wasn't too fast
-            movement_time = time_in_trial - trial.results['time_started_moving']
+            movement_time = curr_time - trial.start_time - trial.results['time_started_moving']
             if movement_time < exp_info.config.min_trial_duration:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
                                              "Please move more slowly"),
                              exp_info, trial)
                 return RunTrialResult.Failed
 
-            exp_info.event_manager.dispatch_event(FINGER_STOPPED_MOVING, time_in_trial, time_in_session)
+            common.on_response_made(exp_info, trial, curr_time)
+            play_success_sound(exp_info, trial)
             trial.stopped_moving_event_dispatched = True
 
             #-- Optionally, run additional stages
@@ -193,9 +197,6 @@ def initialize_trial(exp_info, trial):
 
     exp_info.start_point.reset()
     exp_info.numberline.reset()    # mark the line as yet-untouched
-
-    exp_info.text_target.terminate_display()
-    exp_info.generic_target.terminate_display()
 
     exp_info.stimuli.present()  # reset the display
 
@@ -243,7 +244,7 @@ def trial_failed(err, exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
     """
     common.trial_failed_common(err, exp_info, trial)
-    trial_ended(exp_info, trial, u.get_time() - trial.start_time, "ERR_" + err.err_code)
+    trial_ended(exp_info, trial, "ERR_" + err.err_code)
 
 
 #------------------------------------------------
@@ -269,29 +270,26 @@ def trial_succeeded(exp_info, trial):
     time_in_session = curr_time - exp_info.session_start_time
     exp_info.event_manager.dispatch_event(ttrk.events.TRIAL_SUCCEEDED, time_in_trial, time_in_session)
 
-    play_success_sound(exp_info, trial)
-
-    trial_ended(exp_info, trial, time_in_trial, "OK")
+    trial_ended(exp_info, trial, "OK")
 
     exp_info.trajtracker.save_to_file(trial.trial_num)
 
 
 #------------------------------------------------
-def trial_ended(exp_info, trial, time_in_trial, success_err_code):
+def trial_ended(exp_info, trial, success_err_code):
     """
     This function is called whenever a trial ends, either successfully or with failure.
     It updates the result files.
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    :param time_in_trial: 
     :param success_err_code: A string code to write as status for this trial 
     """
 
     exp_info.stimuli.present()
 
     if exp_info.config.save_results:
-        update_trials_file(exp_info, trial, time_in_trial, success_err_code)
+        update_trials_file(exp_info, trial, success_err_code)
 
         #-- Save the session at the end of each trial, to make sure it's always saved - even if
         #-- the experiment software unexpectedly terminates
@@ -299,17 +297,16 @@ def trial_ended(exp_info, trial, time_in_trial, success_err_code):
 
 
 #------------------------------------------------
-def update_trials_file(exp_info, trial, time_in_trial, success_err_code):
+def update_trials_file(exp_info, trial, success_err_code):
     """
     Add an entry (line) to the trials.csv file
     
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo 
     :type trial: trajtracker.paradigms.num2pos.TrialInfo 
-    :param time_in_trial: 
     :param success_err_code: A string code to write as status for this trial 
     """
 
-    trial_out_row = common.prepare_trial_out_row(exp_info, trial, time_in_trial, success_err_code)
+    trial_out_row = common.prepare_trial_out_row(exp_info, trial, success_err_code)
 
     endpoint = exp_info.numberline.response_value
     trial_out_row['endPoint'] = "" if endpoint is None else "{:.3g}".format(endpoint)

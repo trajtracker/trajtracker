@@ -70,6 +70,7 @@ class ExperimentInfo(BaseExperimentInfo):
         self.stimuli.add(nl, "numberline")
         self._trajectory_sensitive_objects.append(nl)
         self._event_sensitive_objects.append(nl)
+        self.main_task_visual_objects.append(nl)
 
 
     #---------------------------------------------------------------

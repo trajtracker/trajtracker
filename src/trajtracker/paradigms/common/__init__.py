@@ -51,6 +51,7 @@ from ._common_funcs_run import \
     init_experiment, \
     on_finger_started_moving, \
     on_finger_touched_screen, \
+    on_response_made, \
     open_trials_file, \
     prepare_trial_out_row, \
     run_post_trial_operations, \

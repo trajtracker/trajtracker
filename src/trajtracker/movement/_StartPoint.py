@@ -150,12 +150,25 @@ class StartPoint(ttrk.TTrkObject):
 
 
     #-----------------------------------------------------------------
+    def mark_as_initialized(self):
+        """
+        Force the StartPoint object into an "init" :attr:`~trajtracker.movement.StartPoint.State`, as if
+        it was touched by the mouse/finger. This is useful in case trial initiation was triggered in another way.
+        """
+        if self._state not in (StartPoint.State.reset, StartPoint.State.mouse_up):
+            raise ttrk.InvalidStateError("StartPoint.mark_as_initialized() called but the StartPoint's present state is {:}".
+                                         format(self._state))
+
+        self._state = StartPoint.State.init
+
+
+    #-----------------------------------------------------------------
     def reset(self):
         """
         Reset this object. This method should be called when the trial is initialized.
         """
         self._log_func_enters("reset")
-        self._state = self.State.reset
+        self._state = StartPoint.State.reset
         self._last_checked_coords = (None, None)
 
 
@@ -183,11 +196,11 @@ class StartPoint(ttrk.TTrkObject):
             raise Exception("trajtracker internal error: {:}.check_xy() was called when state=reset".format(
                 _u.get_type_name(self)))
 
-        elif self._state == self.State.mouse_up:
+        elif self._state == StartPoint.State.mouse_up:
             # Trial not initialized yet, the mouse/finger was last observed unclicked:
             # waiting for a touch inside start_area
             if self._start_area.overlapping_with_position((x_coord, y_coord)):
-                self._state = self.State.init
+                self._state = StartPoint.State.init
                 if self._should_log(ttrk.log_info):
                     self._log_write("touched in start area: ({:},{:}). Setting state=init".format(x_coord, y_coord), True)
                 self._log_func_returns("check_xy", True)
@@ -196,7 +209,7 @@ class StartPoint(ttrk.TTrkObject):
                 self._log_func_returns("check_xy", False)
                 return False
 
-        elif self._state == self.State.init:
+        elif self._state == StartPoint.State.init:
             #-- Trial initialized but not started: waiting for a touch outside start_area
 
             if self._start_area.overlapping_with_position((x_coord, y_coord)):
@@ -210,13 +223,13 @@ class StartPoint(ttrk.TTrkObject):
                 # Left the start area into the exit area
                 if self._should_log(ttrk.log_info):
                     self._log_write("touched in exit area: ({:},{:}). Setting state=start".format(x_coord, y_coord), True)
-                self._state = self.State.start
+                self._state = StartPoint.State.start
 
             else:
                 # Left the start area into another (invalid) area
                 if self._should_log(ttrk.log_info):
                     self._log_write("touched in invalid area: ({:},{:}). Setting state=error".format(x_coord, y_coord), True)
-                self._state = self.State.error
+                self._state = StartPoint.State.error
 
             self._log_func_returns("check_xy", True)
             return True
@@ -225,8 +238,8 @@ class StartPoint(ttrk.TTrkObject):
         return False
 
 
-
     #-----------------------------------------------------------------
+    # noinspection PyIncorrectDocstring
     def wait_until_startpoint_touched(self, exp, on_loop_callback=None, on_loop_present=None,
                                       event_manager=None, trial_start_time=None, session_start_time=None,
                                       max_wait_time=None):
@@ -320,6 +333,7 @@ class StartPoint(ttrk.TTrkObject):
         return None
 
     #------------------------------------------------
+    # noinspection PyIncorrectDocstring
     def wait_until_exit(self, exp, on_loop_callback=None, on_loop_present=None, event_manager=None,
                         trial_start_time=None, session_start_time=None, max_wait_time=None):
         """
@@ -371,13 +385,13 @@ class StartPoint(ttrk.TTrkObject):
                 self.check_xy(finger_pos[0], finger_pos[1])
             else:
                 #-- Finger lifted
-                self._log_func_returns("wait_until_exit", self.State.aborted)
+                self._log_func_returns("wait_until_exit", StartPoint.State.aborted)
                 self._state = StartPoint.State.aborted
                 return None
 
             if max_wait_time is not None and u.get_time() - time_started_waiting >= max_wait_time:
                 self._state = StartPoint.State.timeout
-                self._log_func_returns("wait_until_exit", self.State.timeout)
+                self._log_func_returns("wait_until_exit", StartPoint.State.timeout)
                 return None
 
             # Invoke custom operations on each loop iteration
