@@ -110,7 +110,6 @@ def create_response_buttons(exp_info):
         for i in range(2):
             button = xpy.stimuli.Rectangle(size=size, position=positions[i], colour=colors[i])
             exp_info.response_buttons.append(button)
-            exp_info.main_task_visual_objects.append(button)
             exp_info.stimuli.add(button, visible=True, stimulus_id="resp_btn_%d" % i)
 
     else:

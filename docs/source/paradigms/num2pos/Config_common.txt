@@ -239,6 +239,29 @@ Fixation stimulus
     X position the "start" rectangle
 
 
+Subjective confidence rating
+----------------------------
+
+This feature will show, after each trial, a slider with which the subjects will rate their confidence.
+
+.. autoinstanceattribute:: Config.confidence_rating
+    :annotation: = False (bool)
+
+    Whether to ask for such confidence rating after each trial
+
+.. autoinstanceattribute:: Config.confidence_slider_height
+    :annotation: = 0.7 in num2pos paradigm, or 0.8 in discrete-choice paradigm
+
+    The slider's height.
+    Either height in pixels (int) or percentage of the screen height (a value between 0 and 1)
+
+.. autoinstanceattribute:: Config.confidence_slider_y
+    :annotation: = -0.05 in num2pos paradigm, or 0 in discrete-choice paradigm
+
+    The slider's vertical position (horizontal position = middle).
+    Either position in pixels (int) or percentage of the screen height (a value between -0.5 and 0.5)
+
+
 Error-message text box
 ----------------------
 

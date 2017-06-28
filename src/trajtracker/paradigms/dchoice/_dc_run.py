@@ -41,13 +41,16 @@ def run_trials(exp_info):
 
     trial_num = 1
 
+    next_trial_already_initiated = False
+
     while len(exp_info.trials) > 0:
 
         trial_config = exp_info.trials[0]
 
         ttrk.log_write("====================== Starting trial #{:} =====================".format(trial_num))
 
-        run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config, exp_info.config))
+        run_trial_rc = run_trial(exp_info, TrialInfo(trial_num, trial_config, exp_info.config), next_trial_already_initiated)
+        next_trial_already_initiated = False
         if run_trial_rc == RunTrialResult.Aborted:
             print("   Trial aborted.")
             continue
@@ -56,9 +59,10 @@ def run_trials(exp_info):
 
         exp_info.exp_data['nTrialsCompleted'] += 1
 
-        if run_trial_rc == RunTrialResult.Succeeded:
+        if run_trial_rc in (RunTrialResult.Succeeded, RunTrialResult.SucceededAndProceed):
 
             exp_info.exp_data['nTrialsSucceeded'] += 1
+            next_trial_already_initiated = (run_trial_rc == RunTrialResult.SucceededAndProceed)
 
         elif run_trial_rc == RunTrialResult.Failed:
 
@@ -74,24 +78,32 @@ def run_trials(exp_info):
 
 
 #----------------------------------------------------------------
-def run_trial(exp_info, trial):
+def run_trial(exp_info, trial, trial_already_initiated):
     """
     Run a single trial
 
-    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo 
+    :param exp_info:
+    :type exp_info: trajtracker.paradigms.dchoice.ExperimentInfo
+    
+    :param trial:
     :type trial: trajtracker.paradigms.dchoice.TrialInfo
+    
+    :param trial_already_initiated: Indicates if the "start" point was already touched
 
-    :return: True if the trial ended successfully, False if it failed
+    :return: RunTrialResult
     """
 
     initialize_trial(exp_info, trial)
 
-    exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp,
-                                                       on_loop_present=exp_info.stimuli,
-                                                       event_manager=exp_info.event_manager,
-                                                       trial_start_time=trial.start_time,
+    if trial_already_initiated:
+        exp_info.start_point.mark_as_initialized()
 
-                                                       session_start_time=exp_info.session_start_time)
+    else:
+        exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp,
+                                                           on_loop_present=exp_info.stimuli,
+                                                           event_manager=exp_info.event_manager,
+                                                           trial_start_time=trial.start_time,
+                                                           session_start_time=exp_info.session_start_time)
 
     hide_feedback_stimuli(exp_info)
     common.on_finger_touched_screen(exp_info, trial)
@@ -124,7 +136,6 @@ def run_trial(exp_info, trial):
         if user_response is not None:
 
             common.on_response_made(exp_info, trial, curr_time)
-            exp_info.sounds_ok[0].play()
 
             if trial.movement_time < exp_info.config.min_trial_duration:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
@@ -132,8 +143,15 @@ def run_trial(exp_info, trial):
                              exp_info, trial)
                 return RunTrialResult.Failed
 
-            trial_succeeded(exp_info, trial, user_response)
-            return RunTrialResult.Succeeded
+            exp_info.sounds_ok[0].play()
+            trial.stopped_moving_event_dispatched = True
+
+            #-- Optionally, run additional stages
+            run_trial_result = common.run_post_trial_operations(exp_info, trial)
+            if run_trial_result in (RunTrialResult.Succeeded, RunTrialResult.SucceededAndProceed):
+                trial_succeeded(exp_info, trial, user_response)
+
+            return run_trial_result
 
         xpy.io.Keyboard.process_control_keys()
 

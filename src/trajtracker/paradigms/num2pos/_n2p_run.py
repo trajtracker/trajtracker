@@ -150,17 +150,16 @@ def run_trial(exp_info, trial, trial_already_initiated):
         #-- Check if the number line was reached
         if exp_info.numberline.touched:
 
+            common.on_response_made(exp_info, trial, curr_time)
+
             #-- Validate that it wasn't too fast
-            movement_time = curr_time - trial.start_time - trial.results['time_started_moving']
-            if movement_time < exp_info.config.min_trial_duration:
+            if trial.movement_time < exp_info.config.min_trial_duration:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
                                              "Please move more slowly"),
                              exp_info, trial)
                 return RunTrialResult.Failed
 
-            common.on_response_made(exp_info, trial, curr_time)
             play_success_sound(exp_info, trial)
-            trial.stopped_moving_event_dispatched = True
 
             #-- Optionally, run additional stages
             run_trial_result = common.run_post_trial_operations(exp_info, trial)

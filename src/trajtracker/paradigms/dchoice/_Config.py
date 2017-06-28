@@ -182,3 +182,6 @@ class Config(BaseConfig):
         #: Pictures to use as feedback (when feedback_mode = 'picture').
         #: Specify here two expyriment.stimuli.Picture objects.
         self.feedback_pictures = feedback_pictures
+
+        self.confidence_slider_height = 0.8
+        self.confidence_slider_y = 0

@@ -616,6 +616,8 @@ def on_response_made(exp_info, trial, response_time):
     exp_info.event_manager.dispatch_event(FINGER_STOPPED_MOVING, time_in_trial,
                                           response_time - exp_info.session_start_time)
 
+    trial.stopped_moving_event_dispatched = True
+
 
 #----------------------------------------------------------------
 def run_post_trial_operations(exp_info, trial):
@@ -642,8 +644,6 @@ def acquire_confidence_rating(exp_info, trial):
 
     #-- Show the confidence meter, hide experiment elements
     slider.visible = True
-    #for obj in exp_info.main_task_visual_objects:
-    #    obj.visible = False
 
     mouse = ttrk.env.mouse
 
@@ -659,8 +659,6 @@ def acquire_confidence_rating(exp_info, trial):
 
     #-- Hide the confidence meter
     slider.visible = False
-    #for obj in exp_info.main_task_visual_objects:
-    #    obj.visible = True
     exp_info.stimuli.present()
 
     if slider.current_value is None:

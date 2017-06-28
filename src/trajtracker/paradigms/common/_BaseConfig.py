@@ -203,7 +203,6 @@ class BaseConfig(object):
         #: Whether to get confidence rating at the end of the trial
         self.confidence_rating = confidence_rating
 
-        self.confidence_slider_labels = ['Correct', '?', 'Error']
         self.confidence_slider_height = 0.7
         self.confidence_slider_y = -0.05
         self.confidence_slider_picture = 'confidence_slider_grey.bmp'
