@@ -8,7 +8,8 @@ A simple two-choice task. Stimuli = left/right arrows.
 
 import expyriment as xpy
 import trajtracker as ttrk
-from trajtracker.paradigms import dchoice
+import trajtrackerp as ttrkp
+from trajtrackerp import dchoice
 
 if not xpy.misc.is_android_running():
     xpy.control.defaults.window_mode = True
@@ -35,7 +36,7 @@ if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
 
 #-- Get subject info
-(subj_id, subj_name) = ttrk.paradigms.common.get_subject_name_id()
+(subj_id, subj_name) = ttrkp.common.get_subject_name_id()
 
 #-- Run the experiment
 exp_info = dchoice.initialize_experiment(config, exp, subj_id, subj_name)

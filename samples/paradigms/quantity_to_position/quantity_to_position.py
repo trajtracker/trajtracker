@@ -14,7 +14,8 @@ import random
 
 import expyriment as xpy
 import trajtracker as ttrk
-from trajtracker.paradigms import num2pos
+import trajtrackerp as ttrkp
+from trajtrackerp import num2pos
 
 
 #----------------------------------------------------------------
@@ -125,18 +126,18 @@ if not xpy.misc.is_android_running():
 stimuli = create_stimuli(0, 100)
 
 #-- Get subject info
-(subj_id, subj_name) = ttrk.paradigms.common.get_subject_name_id()
+(subj_id, subj_name) = ttrkp.common.get_subject_name_id()
 
 
 #-- Run the experiment
 
-exp_info = ttrk.paradigms.num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
-ttrk.paradigms.num2pos.create_experiment_objects(exp_info)
+exp_info = ttrkp.num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
+ttrkp.num2pos.create_experiment_objects(exp_info)
 exp_info.generic_target.available_stimuli = stimuli
 
-ttrk.paradigms.num2pos.register_to_event_manager(exp_info)
-ttrk.paradigms.num2pos.run_trials(exp_info)
-ttrk.paradigms.num2pos.save_session_file(exp_info)
+ttrkp.num2pos.register_to_event_manager(exp_info)
+ttrkp.num2pos.run_trials(exp_info)
+ttrkp.num2pos.save_session_file(exp_info)
 
 #-- Shutdown Expyriment
 xpy.control.end()

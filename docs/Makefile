@@ -61,7 +61,7 @@ html: copy_config_common
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 copy_config_common:
-	cat $(SRCDIR)/paradigms/num2pos/Config_common.txt | sed 's/currentmodule:: trajtracker.paradigms.num2pos/currentmodule:: trajtracker.paradigms.dchoice/' > $(SRCDIR)/paradigms/dchoice/Config_common.txt
+	cat $(SRCDIR)/ttrkp/num2pos/Config_common.txt | sed 's/currentmodule:: trajtrackerp.num2pos/currentmodule:: trajtrackerp.dchoice/' > $(SRCDIR)/ttrkp/dchoice/Config_common.txt
 
 .PHONY: dirhtml
 dirhtml:

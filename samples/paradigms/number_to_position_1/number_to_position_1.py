@@ -10,7 +10,8 @@ A simple version of the number-to-position experiment:
 
 import expyriment as xpy
 import trajtracker as ttrk
-from trajtracker.paradigms import num2pos
+import trajtrackerp as ttrkp
+from trajtrackerp import num2pos
 
 
 if not xpy.misc.is_android_running():
@@ -31,7 +32,7 @@ if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
 
 #-- Get subject info
-(subj_id, subj_name) = ttrk.paradigms.common.get_subject_name_id()
+(subj_id, subj_name) = ttrkp.common.get_subject_name_id()
 
 #-- Run the experiment
 num2pos.run_full_experiment(config, exp, subj_id, subj_name)

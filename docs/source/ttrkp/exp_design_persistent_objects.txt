@@ -1,0 +1,26 @@
+
+- Placeholders for the stimuli: a :class:`~trajtracker.stimuli.MultiTextBox` for text stimuli, and
+  a :class:`~trajtracker.stimuli.MultiStimulus` for other stimuli (pictures, shapes, etc.)
+
+- A :class:`~trajtracker.movement.RectStartPoint` for initiating a trial
+
+- A :class:`~trajtracker.stimuli.StimulusContainer` that keeps all the experiment's presentable objects
+
+- A :class:`~trajtracker.movement.TrajectoryTracker` for saving the finger trajectories
+
+- Movement validators: :class:`~trajtracker.validators.GlobalSpeedValidator` and
+  :class:`~trajtracker.validators.InstantaneousSpeedValidator` to enforce speed,
+  :class:`~trajtracker.validators.MovementAngleValidator` to prevent downward movement,
+  and :class:`~trajtracker.validators.` to prevent zigzag movement.
+
+- An :class:`~trajtracker.events.EventManager` - because the program works with
+  :doc:`events </ttrk/events/events_overview>`
+
+- Sounds (`expyriment.stimuli.Audio <http://docs.expyriment.org/expyriment.stimuli.Audio.html>`_ objects)
+  to play when the trial ends (successfully or with an error).
+
+- An `expyriment.stimuli.TextBox <http://docs.expyriment.org/expyriment.stimuli.TextBox.html>`_ for presenting
+  error messages.
+
+- A *dict* with experiment-level results (which is saved to the results file at the end of the exepriment).
+  Trial-level results (which are saved in trials.csv) are stored on the TrialInfo object.

@@ -14,8 +14,8 @@ Expyriment-based tools for psychology experiments, focusing on finger/mouse trac
    :maxdepth: 1
    :glob:
 
-   full_package_doc
-   paradigms
+   ttrk/full_package_doc
+   ttrkp/paradigms
 
 
 Indices and tables

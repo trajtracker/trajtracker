@@ -113,4 +113,3 @@ from . import events
 from . import stimuli
 from . import movement
 from . import validators
-from . import paradigms

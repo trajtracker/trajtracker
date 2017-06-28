@@ -23,8 +23,8 @@ copy the trajtracker.paradigms.num2pos.run_full_experiment() function and make a
 """
 
 import expyriment as xpy
-import trajtracker as ttrk
-from trajtracker.paradigms import num2pos, common
+import trajtrackerp as ttrkp
+from trajtrackerp import num2pos, common
 
 
 #-- Change this to True to switch into stimulus-then-move mode
@@ -73,13 +73,13 @@ if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
 
 #-- Get subject info
-(subj_id, subj_name) = ttrk.paradigms.common.get_subject_name_id()
+(subj_id, subj_name) = ttrkp.common.get_subject_name_id()
 
 
 #-- Run the experiment
 
 # The lines below (until the "End of copied code" comment) were copied here from
-# trajtracker.paradigms.num2pos.run_full_experiment()
+# ttrkp.num2pos.run_full_experiment()
 
 exp_info = num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
 num2pos.create_experiment_objects(exp_info)

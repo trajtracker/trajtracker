@@ -1,8 +1,8 @@
 import unittest
 
 import trajtracker as ttrk
-from trajtracker.paradigms import common, dchoice
-from trajtracker.paradigms.dchoice._dc_init import _get_feedback_rect_sizes, _get_feedback_stim_positions
+from trajtrackerp import common, dchoice
+from trajtrackerp.dchoice._dc_init import _get_feedback_rect_sizes, _get_feedback_stim_positions
 
 
 class MyExpInfo(dchoice.ExperimentInfo):

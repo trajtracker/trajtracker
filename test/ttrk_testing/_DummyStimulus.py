@@ -13,3 +13,6 @@ class DummyStimulus(Rectangle):
         self.presented = True
         self.presented_args = {'update': update, 'clear': clear}
 
+    @property
+    def surface_size(self):
+        return self.size

@@ -37,20 +37,20 @@ class SliderTests(unittest.TestCase):
         gauge = DummyStimulus()
         slider = Slider(bgnd, gauge)
 
-        self.assertFalse(bgnd.visible)
+        self.assertFalse(slider.stimulus.visible)
         self.assertFalse(gauge.visible)
 
         slider.current_value = 5
 
-        self.assertFalse(bgnd.visible)
+        self.assertFalse(slider.stimulus.visible)
         self.assertFalse(gauge.visible)
 
         slider.visible = True
-        self.assertTrue(bgnd.visible)
+        self.assertTrue(slider.stimulus.visible)
         self.assertTrue(gauge.visible)
 
         slider.visible = False
-        self.assertFalse(bgnd.visible)
+        self.assertFalse(slider.stimulus.visible)
         self.assertFalse(gauge.visible)
 
 
