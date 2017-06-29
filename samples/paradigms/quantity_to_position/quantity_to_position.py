@@ -13,6 +13,7 @@ import numpy as np
 import random
 
 import expyriment as xpy
+
 import trajtracker as ttrk
 import trajtrackerp as ttrkp
 from trajtrackerp import num2pos

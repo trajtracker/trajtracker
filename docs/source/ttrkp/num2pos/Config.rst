@@ -20,6 +20,14 @@ Number line
 
     The value at the right end of the number line.
 
+.. autoinstanceattribute:: Config.max_response_excess
+    :annotation: = None (number)
+
+    Determines how far it's valid to go beyond the end of the number line on each side.
+    Responses farther than this will result in an an error.
+    The value is specified as percentage of the number line's length (e.g., 0.1 = allow exceeding the ends of
+    the number line by 10% its length to either direction).
+
 .. autoinstanceattribute:: Config.min_numberline_value
     :annotation: = 0 (number)
 

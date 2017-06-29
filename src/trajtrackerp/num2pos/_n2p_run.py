@@ -130,6 +130,8 @@ def run_trial(exp_info, trial, trial_already_initiated):
             trial_failed(rc[1], exp_info, trial)
         return rc[0]
 
+    nl = exp_info.numberline
+
     while True:  # This loop runs once per frame
 
         #-- Update all displayable elements
@@ -148,11 +150,22 @@ def run_trial(exp_info, trial, trial_already_initiated):
             return RunTrialResult.Failed
 
         #-- Check if the number line was reached
-        if exp_info.numberline.touched:
+        if nl.touched:
 
             common.on_response_made(exp_info, trial, curr_time)
 
-            #-- Validate that it wasn't too fast
+            #-- Validate that the response wasn't too far
+            max_excess = exp_info.config.max_response_excess
+            if max_excess is not None and (nl.response_value < nl.min_value or nl.response_value > nl.max_value):
+                excess = (nl.min_value - nl.response_value) if (nl.response_value < nl.min_value) \
+                    else (nl.response_value - nl.max_value)
+                excess /= (nl.max_value - nl.min_value)
+                if excess > max_excess:
+                    trial_failed(ExperimentError("ResponseTooFar", "Please point at the number line"),
+                                 exp_info, trial)
+                    return RunTrialResult.Failed
+
+            #-- Validate that the response wasn't too fast
             if trial.movement_time < exp_info.config.min_trial_duration:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
                                              "Please move more slowly"),

@@ -69,17 +69,32 @@ def create_numberline(exp_info):
 
     config = exp_info.config
 
-    _u.validate_func_arg_type(None, "create_numberline", "max_value", config.max_numberline_value, Number)
+    common.validate_config_param_type("min_numberline_value", Number, config.min_numberline_value)
+    common.validate_config_param_type("max_numberline_value", Number, config.max_numberline_value)
+    common.validate_config_param_type("max_response_excess", Number, config.max_response_excess, True)
+    common.validate_config_param_type("nl_distance_from_top", int, config.nl_distance_from_top)
+    common.validate_config_param_type("nl_end_tick_height", int, config.nl_end_tick_height, True)
+    common.validate_config_param_type("nl_labels_box_size", ttrk.TYPE_SIZE, config.nl_labels_box_size)
+    common.validate_config_param_type("nl_labels_colour", ttrk.TYPE_RGB, config.nl_labels_colour)
+    common.validate_config_param_type("nl_labels_font_name", str, config.nl_labels_font_name)
+    common.validate_config_param_type("nl_labels_offset", ttrk.TYPE_COORD, config.nl_labels_offset)
+    common.validate_config_param_type("nl_labels_visible", bool, config.nl_labels_visible)
+    common.validate_config_param_type("nl_length", Number, config.max_numberline_value)
+    common.validate_config_param_type("nl_line_colour", ttrk.TYPE_RGB, config.nl_line_colour)
+    common.validate_config_param_type("nl_line_width", int, config.nl_line_width)
+    common.validate_config_param_type("post_response_target", bool, config.post_response_target)
+    common.validate_config_param_type("show_feedback", bool, config.show_feedback)
 
-    if isinstance(config.nl_length, int) and config.nl_length > 1:
-        nl_length = config.nl_length
-    elif isinstance(config.nl_length, Number) and 0 < config.nl_length <= 1:
-        nl_length = int(exp_info.screen_size[0] * config.nl_length)
-    else:
-        raise ttrk.ValueError("Invalid value for config.nl_length: {:}".format(config.nl_length))
+    nl_length = common.xy_to_pixels(config.nl_length, exp_info.screen_size[0])
+    if nl_length is None:
+        raise ttrk.ValueError("Invalid config.nl_length value ({:})".format(config.nl_length))
+
+    distance_from_top = common.xy_to_pixels(config.nl_distance_from_top, exp_info.screen_size[1])
+    if distance_from_top is None:
+        raise ttrk.ValueError("Invalid config.nl_distance_from_top value ({:})".format(config.nl_distance_from_top))
 
     numberline = ttrk.stimuli.NumberLine(
-        position=(0, int(exp_info.screen_size[1] / 2 - config.nl_distance_from_top)),
+        position=(0, int(exp_info.screen_size[1] / 2) - distance_from_top),
         line_length=nl_length,
         line_width=config.nl_line_width,
         min_value=config.min_numberline_value,

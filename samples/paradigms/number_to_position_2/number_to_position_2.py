@@ -23,6 +23,8 @@ copy the trajtracker.paradigms.num2pos.run_full_experiment() function and make a
 """
 
 import expyriment as xpy
+
+import trajtracker as ttrk
 import trajtrackerp as ttrkp
 from trajtrackerp import num2pos, common
 

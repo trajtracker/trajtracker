@@ -42,7 +42,7 @@ from ._common_funcs_init import \
     get_subject_name_id, \
     load_sound, \
     register_to_event_manager, \
-    size_to_pixels, \
+    xy_to_pixels, \
     validate_config_param_type, \
     validate_config_param_values
 

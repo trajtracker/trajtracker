@@ -9,6 +9,7 @@ A simple version of the number-to-position experiment:
 """
 
 import expyriment as xpy
+
 import trajtracker as ttrk
 import trajtrackerp as ttrkp
 from trajtrackerp import num2pos

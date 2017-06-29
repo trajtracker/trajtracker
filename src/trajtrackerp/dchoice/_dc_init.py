@@ -313,14 +313,14 @@ def _get_feedback_rect_sizes(exp_info):
     #-- If size was explicitly provided: use it
     if size_param is not None and not isinstance(size_param, numbers.Number):
 
-        single_size = common.size_to_pixels(size_param, exp_info.screen_size)
+        single_size = common.xy_to_pixels(size_param, exp_info.screen_size)
         if single_size is None:
             #-- The "feedback_rect_size" argument is NOT a pair of numbers.
             #-- So we expect it to be an array with two sets of coordinates.
 
             common.validate_config_param_type("feedback_rect_size", (list, tuple, np.ndarray),
                                               size_param, type_name="array/list/tuple")
-            result = [common.size_to_pixels(s, exp_info.screen_size) for s in size_param]
+            result = [common.xy_to_pixels(s, exp_info.screen_size) for s in size_param]
             if len(size_param) != 2 or result[0] is None or result[1] is None:
                 raise ttrk.ValueError('Invalid config.feedback_rect_size: expecting either a size or a pair of sizes')
 

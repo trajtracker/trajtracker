@@ -512,7 +512,7 @@ def validate_config_param_type(param_name, param_type, param_value, none_allowed
     Validate that a certain configuration parameter is of the specified type
     """
 
-    if none_allowed and value is None:
+    if none_allowed and param_value is None:
         return
 
     if isinstance(param_type, (type, tuple)):
@@ -528,7 +528,7 @@ def validate_config_param_type(param_name, param_type, param_value, none_allowed
                                  format(param_name, param_value))
 
     elif param_type == ttrk.TYPE_COORD:
-        if not u.is_coord(param_value):
+        if not u.is_coord(param_value, allow_float=True):
             raise ttrk.TypeError("config.{:} was set to an invalid value ({:}) - expecting (x, y)".
                                  format(param_name, param_value))
         if isinstance(param_value, geometry.XYPoint):
@@ -567,35 +567,53 @@ def validate_config_param_values(param_name, param_value, allowed_values):
 
 #-----------------------------------------------------------------------------------------
 # noinspection PyIncorrectDocstring
-def size_to_pixels(value, screen_size=None):
+def xy_to_pixels(value, screen_size, parameter_name=None):
     """
-    Check if the given value denotes a stimulus size, and return it in pixels
+    Translate a stimulus size or position to pixels.
     
-    :param screen_size: If provided, the function will  
-    :return: The size in pixels, as tuple
+    The input is either one value (x or y) or a pair of values (x, y).
+    It may denote either a stimulus size or a position.
+    
+    If x/y is an int value (or a pair of ints), it is left unchanged.
+    If it is a float value, it is interpreted as percentage of the screen size. In this case,  
+    the value should be between 0.0 and 1.0 for size, or between -0.5 and 0.5 for position (but the function will
+    accept any value between -0.5 and 1.0)
+    
+    :param value: The value to convert - either a number or a pair of numbers  
+    :param screen_size: The screen size - either a number or a pair of numbers (must match the "value" paremeter)
+    :param parameter_name: If this is not None, errors will yield an exception, indicating this parameter
+    :return: An int or a pair of ints (scale = pixels). If the input value is not a valid size, return None.
     """
-    if not u.is_collection(value) or len(value) != 2:
-        return None
 
-    result = []
-    for i in range(2):
-        v = value[i]
-        if isinstance(v, int) and v > 0:
-            pass
+    if isinstance(value, numbers.Number):
 
-        elif isinstance(v, numbers.Number) and 0 < v <= 1:
-            if screen_size is None:
-                ttrk.log_write("TrajTracker warning in trajtrackerp.common.size_to_pixels(): got 0 < size <= 1, but screen_size was not provided. Returned None.", True)
-                return None
-            else:
-                v = int(np.round(v * screen_size[i]))
+        #-- A single value
+
+        if isinstance(value, int):
+            return value
+
+        elif -0.5 <= value <= 1:
+            _u.validate_func_arg_type(None, "common.xy_to_pixels", "screen_size", screen_size, int)
+            return int(np.round(value * screen_size))
 
         else:
             return None
 
-        result.append(v)
+    if u.is_collection(value) and len(value) == 2 and \
+            isinstance(value[0], numbers.Number) and isinstance(value[1], numbers.Number):
 
-    return tuple(result)
+        #-- Pair of values
+        _u.validate_func_arg_is_collection(None, "common.xy_to_pixels", "screen_size", screen_size, 2, 2)
+
+        retval = xy_to_pixels(value[0], screen_size[0]), xy_to_pixels(value[1], screen_size[1])
+        if retval[0] is None or retval[1] is None:
+            return None
+        else:
+            return retval
+
+    else:
+        #-- Not a valid xy
+        return None
 
 
 #-----------------------------------------------------------------------------------------
@@ -610,12 +628,10 @@ def create_confidence_slider(exp_info):
 
     y = config.confidence_slider_y
     validate_config_param_type("confidence_slider_y", numbers.Number, y)
-    if not isinstance(y, int):
-        # noinspection PyTypeChecker
-        if -0.5 <= y <= 0.5:
-            y = int(y * exp_info.screen_size[1])
-        else:
-            raise ValueError('Invalid config.confidence_slider_y ({:}): expecting either an integer or ratio of screen height (between -0.5 and 0.5)'.format(y))
+    y = xy_to_pixels(y, exp_info.screen_size[1])
+    if y is None:
+        raise ttrk.ValueError('Invalid config.confidence_slider_y ({:}): '.format(config.confidence_slider_y) +
+                              'expecting either an integer or ratio of screen height (between -0.5 and 0.5)')
 
     validate_config_param_type("confidence_rating", bool, config.confidence_rating)
     if not exp_info.config.confidence_rating:
@@ -643,8 +659,9 @@ def _create_confidence_slider_background(exp_info):
     validate_config_param_type("confidence_slider_picture", str, filename)
 
     #-- Find slider height in pixels
-    if isinstance(height, numbers.Number) and 0 < height <= 1:
-        height = int(np.round(height * exp_info.screen_size[1]))
+    height = xy_to_pixels(height, exp_info.screen_size[1])
+    if height is None:
+        raise ttrk.ValueError("Invalid config.confidence_slider_height ({:})".format(exp_info.config.confidence_slider_height))
 
     #-- Load picture
     file_path = ttrk.trajtrackerp.images_dir + os.path.sep + filename

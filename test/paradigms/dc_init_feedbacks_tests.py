@@ -27,10 +27,10 @@ class InitFeedbackTests(unittest.TestCase):
 
     #----------------------------------------------------------------------
     def test_size_to_pixels(self):
-        self.assertEqual(common.size_to_pixels((10, 5), (200, 100)), (10, 5))
-        self.assertEqual(common.size_to_pixels((0.1, 5), (200, 100)), (20, 5))
-        self.assertIsNone(common.size_to_pixels((0, 10)))
-        self.assertIsNone(common.size_to_pixels((0.1, 10)))
+        self.assertEqual(common.xy_to_pixels((10, 5), (200, 100)), (10, 5))
+        self.assertEqual(common.xy_to_pixels((0.1, 5), (200, 100)), (20, 5))
+        self.assertIsNone(common.xy_to_pixels((0, 10)))
+        self.assertIsNone(common.xy_to_pixels((0.1, 10)))
 
 
     #===================================================
