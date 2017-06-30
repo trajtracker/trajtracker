@@ -578,6 +578,9 @@ def prepare_trial_out_row(exp_info, trial, success_err_code):
         'timeUntilTarget': "{:.3g}".format(t_target),
     }
 
+    for col in exp_info.exported_trial_csv_columns:
+        row[col] = trial.csv_data[col]
+
     if exp_info.config.confidence_rating:
         c = trial.results['confidence'] if 'confidence' in trial.results else None
         row['confidence'] = "" if (c is None) else c
@@ -589,7 +592,7 @@ def prepare_trial_out_row(exp_info, trial, success_err_code):
 def _get_trials_csv_out_common_fields(exp_info):
 
     fields = ['trialNum', 'LineNum', 'presentedTarget', 'status', 'movementTime',
-              'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget']
+              'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget'] + exp_info.exported_trial_csv_columns
 
     if exp_info.config.confidence_rating:
         fields.append('confidence')
@@ -652,7 +655,6 @@ def acquire_confidence_rating(exp_info, trial):
 
     #-- Wait until START is clicked; meanwhile, update the confidence slider
     exp_info.start_point.reset()
-    #todo: what if you slide through the start point? I don't want that! add arg to the wait function?
     exp_info.start_point.wait_until_startpoint_touched(exp_info.xpy_exp,
                                                        on_loop_present=exp_info.stimuli,
                                                        on_loop_callback=update_slider)

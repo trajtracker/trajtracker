@@ -50,12 +50,31 @@ def create_experiment_objects(exp_info):
     :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
     """
 
-    exp_info.trials = load_data_source(exp_info.config)
+    load_data_source(exp_info)
 
     create_numberline(exp_info)
     common.create_common_experiment_objects(exp_info)
+    create_experiment_attrs(exp_info)
 
     create_sounds(exp_info)
+
+
+#----------------------------------------------------------------
+def create_experiment_attrs(exp_info):
+    """
+    Set some experiment-level attributes
+
+    :param exp_info: 
+    :type exp_info: trajtracker.paradigms.num2pos.ExperimentInfo
+    """
+
+    config = exp_info.config
+
+    exp_info.exp_data['MinTarget'] = config.min_numberline_value
+    exp_info.exp_data['MaxTarget'] = config.max_numberline_value
+    exp_info.exp_data['ShowFeedback'] = 1 if config.show_feedback else 0
+    if config.max_response_excess is not None:
+        exp_info.exp_data['MaxResponseExcess'] = config.max_response_excess
 
 
 #----------------------------------------------------------------
@@ -114,6 +133,10 @@ def create_numberline(exp_info):
     numberline.labels_offset = config.nl_labels_offset
 
     exp_info.numberline = numberline
+
+    #-- Save for results
+    exp_info.exp_data['NLLength'] = config.nl_length
+    exp_info.exp_data['NLDistanceFromTop'] = distance_from_top
 
     #-- Feedback arrow/line
 
@@ -192,15 +215,12 @@ def create_sounds(exp_info):
 
 
 #----------------------------------------------------------------
-def load_data_source(config):
+def load_data_source(exp_info):
     """
     Loads the CSV file with the per-trial configuration
-    
-    :param config: the program's configuration
-    :type config: :doc:`Config <Config>`
     """
 
-    ds = config.data_source
+    ds = exp_info.config.data_source
 
     if isinstance(ds, str):
         #-- Load from file
@@ -213,23 +233,25 @@ def load_data_source(config):
         loader.add_field('nl.position.x%', float, optional=True)
         loader.add_field('nl.position.y', int, optional=True)
 
-        return loader.load_file(ds)
+        exp_info.trials, fieldnames = loader.load_file(ds)
+        exp_info.exported_trial_csv_columns = [f for f in fieldnames if f not in ('target')]
+        return
 
     _u.validate_func_arg_is_collection(None, "load_data_source", "config.data_source", ds,
                                        min_length=1, allow_set=True)
 
     if sum([not isinstance(x, Number) for x in ds]) == 0:
         #-- A list of numbers was provided: simulate it as a CSV
-        return [{"target": x, ttrk.io.CSVLoader.FLD_LINE_NUM: 0} for x in ds]
+        exp_info.trials = [{"target": x, ttrk.io.CSVLoader.FLD_LINE_NUM: 0} for x in ds]
 
-    if sum([not isinstance(x, dict) for x in ds]) == 0:
+    elif sum([not isinstance(x, dict) for x in ds]) == 0:
         #-- An explicit list of trials was provided
         for row in ds:
             if "target" not in row or not isinstance(row["target"], Number):
                 raise trajtracker.ValueError("The data source must contain a 'target' field")
             if ttrk.io.CSVLoader.FLD_LINE_NUM not in row:
                 row[ttrk.io.CSVLoader.FLD_LINE_NUM] = 0
-        return ds
+        exp_info.trials = ds
 
-    raise ttrk.TypeError("invalid config.data_source")
-
+    else:
+        raise ttrk.TypeError("invalid config.data_source")

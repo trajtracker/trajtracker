@@ -22,8 +22,8 @@ config = dchoice.Config("ChooseArrowDir", max_trial_duration=2, data_source="cho
                         speed_guide_enabled=True)
 
 stimuli = {
-    'left': xpy.stimuli.Picture("arrow-left.bmp"),
-    'right': xpy.stimuli.Picture("arrow-right.bmp")
+    'L': xpy.stimuli.Picture("arrow-left.bmp"),
+    'R': xpy.stimuli.Picture("arrow-right.bmp")
 }
 
 

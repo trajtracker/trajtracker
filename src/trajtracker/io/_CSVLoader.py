@@ -78,7 +78,8 @@ class CSVLoader(ttrk.TTrkObject):
         """
         Load data from the CSV file
 
-        :return: list with one dict per row, transformed to the required types
+        :return: a tuple with two elements: (1) list with one dict per row, transformed to the required types; 
+                (2) List of field names that were found in the file.
         """
 
         _u.validate_func_arg_type(self, "load_file", "filename", filename, str)
@@ -95,7 +96,7 @@ class CSVLoader(ttrk.TTrkObject):
             row = self._transform_types(row, filename)
             result.append(row)
 
-        return result
+        return result, fieldnames
 
 
     #------------------------------------------------

@@ -77,6 +77,7 @@ class BaseExperimentInfo(object):
 
         #: The list of trials (loaded from the CSV file)
         self.trials = None
+        self.exported_trial_csv_columns = []
 
         #: Time when the session started.
         self.session_start_time = None

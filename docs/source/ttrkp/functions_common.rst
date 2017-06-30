@@ -21,9 +21,9 @@ Functions in _common_funcs_init.py
 .. autofunction:: trajtrackerp.common.get_subject_name_id
 .. autofunction:: trajtrackerp.common.load_sound
 .. autofunction:: trajtrackerp.common.register_to_event_manager
-.. autofunction:: trajtrackerp.common.size_to_pixels
 .. autofunction:: trajtrackerp.common.validate_config_param_type
 .. autofunction:: trajtrackerp.common.validate_config_param_values
+.. autofunction:: trajtrackerp.common.xy_to_pixels
 
 
 

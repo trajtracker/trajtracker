@@ -475,5 +475,6 @@ def load_data_source(exp_info):
     loader.add_field('left_resp_btn.text', str, optional=True)
     loader.add_field('right_resp_btn.text', str, optional=True)
 
-    exp_info.trials = loader.load_file(ds_filename)
+    exp_info.trials, fieldnames = loader.load_file(ds_filename)
 
+    exp_info.exported_trial_csv_columns = [f for f in fieldnames if f not in ('expected_response')]
