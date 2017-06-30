@@ -18,7 +18,6 @@ import trajtracker as ttrk
 import trajtrackerp as ttrkp
 from trajtrackerp import num2pos
 
-
 #----------------------------------------------------------------
 
 if not xpy.misc.is_android_running():

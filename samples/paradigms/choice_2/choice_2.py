@@ -20,7 +20,6 @@ config = dchoice.Config("ChooseArrowDir", max_trial_duration=2, data_source="cho
                         feedback_stim_type='rectangle', feedback_select_by='accuracy',
                         feedback_place='middle',
                         speed_guide_enabled=True)
-
 stimuli = {
     'L': xpy.stimuli.Picture("arrow-left.bmp"),
     'R': xpy.stimuli.Picture("arrow-right.bmp")
@@ -28,10 +27,8 @@ stimuli = {
 
 
 #-- Initialize Expyriment
-
 exp = ttrk.initialize()
 xpy.control.start(exp)
-
 if not xpy.misc.is_android_running():
     exp.mouse.show_cursor()
 
