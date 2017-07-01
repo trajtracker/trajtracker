@@ -79,6 +79,10 @@ class BaseExperimentInfo(object):
         self.trials = None
         self.exported_trial_csv_columns = []
 
+        #: Fields from trial.results that should be exported to the CSV file
+        #: :type: dict: field name => default value
+        self.exported_trial_result_fields = {}
+
         #: Time when the session started.
         self.session_start_time = None
 

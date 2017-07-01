@@ -104,11 +104,11 @@ def create_numberline(exp_info):
     common.validate_config_param_type("post_response_target", bool, config.post_response_target)
     common.validate_config_param_type("show_feedback", bool, config.show_feedback)
 
-    nl_length = common.xy_to_pixels(config.nl_length, exp_info.screen_size[0])
+    nl_length = common.xy_to_pixels(config.nl_length, exp_info.screen_size[0], 'config.nl_length')
     if nl_length is None:
         raise ttrk.ValueError("Invalid config.nl_length value ({:})".format(config.nl_length))
 
-    distance_from_top = common.xy_to_pixels(config.nl_distance_from_top, exp_info.screen_size[1])
+    distance_from_top = common.xy_to_pixels(config.nl_distance_from_top, exp_info.screen_size[1], 'config.nl_distance_from_top')
     if distance_from_top is None:
         raise ttrk.ValueError("Invalid config.nl_distance_from_top value ({:})".format(config.nl_distance_from_top))
 
@@ -135,7 +135,7 @@ def create_numberline(exp_info):
     exp_info.numberline = numberline
 
     #-- Save for results
-    exp_info.exp_data['NLLength'] = config.nl_length
+    exp_info.exp_data['NLLength'] = nl_length
     exp_info.exp_data['NLDistanceFromTop'] = distance_from_top
 
     #-- Feedback arrow/line

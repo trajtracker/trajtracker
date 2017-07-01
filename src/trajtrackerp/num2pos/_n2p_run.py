@@ -20,6 +20,8 @@ You should have received a copy of the GNU General Public License
 along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from __future__ import division
+
 import expyriment as xpy
 import numpy as np
 import random
@@ -237,10 +239,20 @@ def update_numberline_for_trial(exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo
     """
 
-    common.update_attr_by_csv_config(exp_info, trial, exp_info.numberline, 'nl.position', 'position')
+    upd_xy = common.update_attr_by_csv_config(exp_info, trial, exp_info.numberline, 'nl.position', 'position')
 
-    common.update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'x')
-    common.update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'y')
+    upd_x = common.update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'x')
+    upd_y = common.update_obj_position(exp_info, trial, exp_info.numberline, 'nl', 'y')
+
+    #-- Save number line coordinates in output file
+
+    if upd_xy or upd_x:
+        exp_info.exported_trial_result_fields['nl.position.x'] = None
+        trial.results['nl.position.x'] = exp_info.numberline.position[0]
+
+    if upd_xy or upd_y:
+        exp_info.exported_trial_result_fields['nl.position.y'] = None
+        trial.results['nl.position.y'] = exp_info.numberline.position[1]
 
 
 #------------------------------------------------

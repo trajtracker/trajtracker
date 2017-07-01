@@ -20,7 +20,7 @@ You should have received a copy of the GNU General Public License
 along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
+from __future__ import division
 import numpy as np
 import csv
 import numbers
@@ -208,12 +208,21 @@ def update_text_target_for_trial(exp_info, trial, use_numeric_target_as_default=
     update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.background_colour',
                               'background_colour')
     update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.size', 'size')
-    update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.position', 'position')
-    _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'x')
-    _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'y')
-
     update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.onset_time', 'onset_time')
     update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.duration', 'duration')
+
+    upd_xy = update_attr_by_csv_config(exp_info, trial, exp_info.text_target, 'text.position', 'position')
+    upd_x = _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'x')
+    upd_y = _update_target_stimulus_position(exp_info, trial, exp_info.text_target, 'text', 'y')
+
+    #-- Save stimulus coordinates in output file
+    if upd_xy or upd_x or upd_y:
+        exp_info.exported_trial_result_fields['text.position'] = None
+        trial.results['text.position'] = format_coord_to_csv(exp_info.text_target.position)
+
+
+def format_coord_to_csv(coord_list):
+    return ";".join( ["{:}:{:}".format(c[0], c[1]) for c in coord_list] )
 
 
 # ----------------------------------------------------------------
@@ -234,10 +243,15 @@ def update_generic_target_for_trial(exp_info, trial):
 
     exp_info.generic_target.shown_stimuli = trial.csv_data['genstim.target'].split(";")
 
-    update_attr_by_csv_config(exp_info, trial, exp_info.generic_target, 'genstim.position', 'position')
+    upd_xy = update_attr_by_csv_config(exp_info, trial, exp_info.generic_target, 'genstim.position', 'position')
 
-    _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'x')
-    _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'y')
+    upd_x = _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'x')
+    upd_y = _update_target_stimulus_position(exp_info, trial, exp_info.generic_target, 'genstim', 'y')
+
+    #-- Save stimulus coordinates to the output file
+    if upd_xy or upd_x or upd_y:
+        exp_info.exported_trial_result_fields['v.position'] = None
+        trial.results['genstim.position'] = format_coord_to_csv(exp_info.generic_target.position)
 
 
 # ------------------------------------------------
@@ -281,10 +295,12 @@ def update_attr_by_csv_config(exp_info, trial, target_obj, csv_name, attr_name):
     
     :param attr_name: The name of the attribute to update
     :type attr_name: str
+    
+    :return: Whether updated anthing or not
     """
 
     if csv_name not in trial.csv_data:
-        return
+        return False
 
     value = trial.csv_data[csv_name]
     if isinstance(target_obj, ttrk.stimuli.BaseMultiStim) and \
@@ -295,6 +311,7 @@ def update_attr_by_csv_config(exp_info, trial, target_obj, csv_name, attr_name):
                 attr_name, exp_info.config.data_source, len(value), target_obj.n_stim))
 
     setattr(target_obj, attr_name, value)
+    return True
 
 
 # ------------------------------------------------
@@ -312,7 +329,7 @@ def _update_target_stimulus_position(exp_info, trial, target_holder, col_name_pr
 
     csv_col, coord_as_percentage = _get_x_or_y_col(trial, col_name_prefix, x_or_y)
     if csv_col is None:
-        return
+        return False
 
     n_stim = target_holder.n_stim
 
@@ -338,6 +355,8 @@ def _update_target_stimulus_position(exp_info, trial, target_holder, col_name_pr
 
     target_holder.position = pos
 
+    return True
+
 
 # ------------------------------------------------
 def update_obj_position(exp_info, trial, visual_obj, col_name_prefix, x_or_y):
@@ -356,6 +375,8 @@ def update_obj_position(exp_info, trial, visual_obj, col_name_prefix, x_or_y):
     :type col_name_prefix: str
     
     :param x_or_y: 'x' or 'y', indicating which column to look for in the CSV file
+    
+    :return: Whether updated anthing or not
     """
 
     if x_or_y not in ('x', 'y'):
@@ -364,13 +385,14 @@ def update_obj_position(exp_info, trial, visual_obj, col_name_prefix, x_or_y):
 
     csv_col, coord_as_percentage = _get_x_or_y_col(trial, col_name_prefix, x_or_y)
     if csv_col is None:
-        return
+        return False
 
     coord = trial.csv_data[csv_col]
     if coord_as_percentage:
         coord = coord_to_pixels(coord, csv_col, exp_info.config.data_source, is_x)
 
     visual_obj.position = (coord, visual_obj.position[1]) if is_x else (visual_obj.position[0], coord)
+    return True
 
 
 # ------------------------------------------------
@@ -410,15 +432,15 @@ def coord_to_pixels(coord, col_name, filename, is_x):
 
     coord_list = coord if isinstance(coord, list) else [coord]
     # noinspection PyTypeChecker
-    if sum([not (-1.5 <= c <= 2.5) for c in coord_list]) > 0:
+    if sum([not (-1 <= c <= 1) for c in coord_list]) > 0:
         # Some coordinates are way off the screen bounds
-        raise ttrk.ValueError("Invalid {:} in the CSV file {:}: within-screen coordinates are in the range 0-1".
-                              format(col_name, filename))
+        raise ttrk.ValueError("Invalid {:} in the CSV file {:} ({:}): when position is specified as %, its values must be between -1 and 1".
+                              format(col_name, filename, coord_list))
 
     if isinstance(coord, list):
-        return [int(np.round((c - 0.5) * screen_size)) for c in coord]
+        return [int(np.round(c * screen_size)) for c in coord]
     else:
-        return int(np.round((coord - 0.5) * screen_size))
+        return int(np.round(coord * screen_size))
 
 
 # ------------------------------------------------
@@ -581,22 +603,21 @@ def prepare_trial_out_row(exp_info, trial, success_err_code):
     for col in exp_info.exported_trial_csv_columns:
         row[col] = trial.csv_data[col]
 
-    if exp_info.config.confidence_rating:
-        c = trial.results['confidence'] if 'confidence' in trial.results else None
-        row['confidence'] = "" if (c is None) else c
-        row['confidence_n_moves'] = trial.results['confidence_n_moves'] if 'confidence_n_moves' in trial.results else 0
+    for field in exp_info.exported_trial_result_fields.keys():
+        v = trial.results[field] if (field in trial.results) else exp_info.exported_trial_result_fields[field]
+        row[field] = "" if v is None else v
 
     return row
+
 
 #----------------------------------------------------------------
 def _get_trials_csv_out_common_fields(exp_info):
 
-    fields = ['trialNum', 'LineNum', 'presentedTarget', 'status', 'movementTime',
-              'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget'] + exp_info.exported_trial_csv_columns
+    additional_cols = exp_info.exported_trial_csv_columns + list(exp_info.exported_trial_result_fields.keys())
+    additional_cols = sorted(list(set(additional_cols)))
 
-    if exp_info.config.confidence_rating:
-        fields.append('confidence')
-        fields.append('confidence_n_moves')
+    fields = ['trialNum', 'LineNum', 'presentedTarget', 'status', 'movementTime',
+              'timeInSession', 'timeUntilFingerMoved', 'timeUntilTarget'] + additional_cols
 
     return fields
 
@@ -664,13 +685,11 @@ def acquire_confidence_rating(exp_info, trial):
     exp_info.stimuli.present()
 
     if slider.current_value is None:
-        # -- Trial was aborted without selecting confidence
-        trial.results['confidence'] = None
-        trial.results['confidence_n_moves'] = 0
+        #-- Trial was aborted without selecting confidence
         return RunTrialResult.Aborted
 
     #-- Confidence selected!
-    trial.results['confidence'] = slider.current_value
+    trial.results['confidence'] = int(slider.current_value * 100) / 100
     trial.results['confidence_n_moves'] = slider.n_moves
 
     return RunTrialResult.SucceededAndProceed

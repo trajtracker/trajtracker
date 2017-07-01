@@ -88,11 +88,17 @@ The trials file contains one line per completed trial (both succeeded and failed
 - **timeUntilTarget**: Time from touching the screen until the target's t=0 (note that if you defined
   onset_time > 0 for all targets, this time will be earlier than the targets' actual onset time).
   In stimulusThenMove mode, this value is always 0.
+- The columns from the :doc:`trials input file <input_data_format>`.
+- **text.position, genstim.position**: These fields will appear if the input file changed the stimulus position
+  in any way (even if only x or y coordinates were defined). They will contain the stimuli position(s), formatted
+  as x1:y1;x2:y2;x3:y3 etc.
 
 In the number-to-position paradigm, the file also contains these columns:
 
 - **target**: The target location
 - **endPoint**: The location mrked by the subject on the number line, using the number line's scale
+- **nl.position.x, nl.position.y**: The number line's position, in pixels. These columns will appear even if the
+  input file contained the columns *nl.position.x%* or *nl.position.y%*
 
 In the discrete-choice paradigm, the file also contains these columns:
 

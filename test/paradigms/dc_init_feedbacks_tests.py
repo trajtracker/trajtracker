@@ -2,6 +2,7 @@ import unittest
 
 import trajtracker as ttrk
 from trajtrackerp import common, dchoice
+# noinspection PyProtectedMember
 from trajtrackerp.dchoice._dc_init import _get_feedback_rect_sizes, _get_feedback_stim_positions
 
 
@@ -20,17 +21,17 @@ class MyExpInfo(dchoice.ExperimentInfo):
         self._screen_size = value
 
 
-
 #============================================================================
 
 class InitFeedbackTests(unittest.TestCase):
 
     #----------------------------------------------------------------------
     def test_size_to_pixels(self):
-        self.assertEqual(common.xy_to_pixels((10, 5), (200, 100)), (10, 5))
-        self.assertEqual(common.xy_to_pixels((0.1, 5), (200, 100)), (20, 5))
-        self.assertIsNone(common.xy_to_pixels((0, 10)))
-        self.assertIsNone(common.xy_to_pixels((0.1, 10)))
+        self.assertEqual(common.xy_to_pixels((10, 5), (200, 100), 'parameter'), (10, 5))
+        self.assertEqual(common.xy_to_pixels((0.1, 5), (200, 100), 'parameter'), (20, 5))
+        self.assertEqual(common.xy_to_pixels(0.1, 200, 'parameter'), 20)
+        self.assertRaises(ttrk.TypeError, lambda: common.xy_to_pixels('x', 10, 'parameter'))
+        self.assertRaises(ttrk.TypeError, lambda: common.xy_to_pixels(7.5, 10, 'parameter'))
 
 
     #===================================================

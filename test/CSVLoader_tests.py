@@ -26,7 +26,7 @@ class CSVLoaderTests(unittest.TestCase):
         loader = DbgCSVLoader(['a', 'b'], [{'a':'1', 'b':'2'}, {'a':'10', 'b':'20'}])
         loader.add_field('b', int)
 
-        data = loader.load_file('dummy file')
+        data, fields = loader.load_file('dummy file')
 
         self.assertEqual('1', data[0]['a'])
         self.assertEqual('10', data[1]['a'])
@@ -40,7 +40,9 @@ class CSVLoaderTests(unittest.TestCase):
         loader = DbgCSVLoader(['a', 'b'], [{'a': '1', 'b': '2'}, {'a': '10', 'b': '20'}])
         loader.add_field('b', lambda x: int(x)+1)
 
-        data = loader.load_file('dummy file')
+        data, fields = loader.load_file('dummy file')
+
+        self.assertEqual({'a', 'b'}, set(fields))
 
         self.assertEqual('1', data[0]['a'])
         self.assertEqual('10', data[1]['a'])

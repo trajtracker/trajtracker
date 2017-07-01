@@ -29,6 +29,7 @@ import expyriment as xpy
 from expyriment.misc import geometry
 
 import trajtracker as ttrk
+import trajtrackerp as ttrkp
 # noinspection PyProtectedMember
 import trajtracker._utils as _u
 import trajtracker.utils as u
@@ -65,7 +66,7 @@ def get_subject_name_id():
 #----------------------------------------------------------------
 def create_common_experiment_objects(exp_info):
     """
-    Create configuration for the experiment - object common to several trajtrackerp.
+    Create configuration for the experiment - object common to several paradigms.
     
     exp_info.trials must be set before calling this function.
 
@@ -449,7 +450,7 @@ def load_sound(config, filename):
 def create_csv_loader():
     """
     Create a :class:`~trajtracker.io.CSVLoader` for loading the data from the CSV file; 
-    initialize the loader with definitions of the columns common to all trajtrackerp. 
+    initialize the loader with definitions of the columns common to all paradigms. 
     """
 
     loader = ttrk.io.CSVLoader()
@@ -468,7 +469,9 @@ def create_csv_loader():
     loader.add_field('text.size', get_parser_for(ttrk.io.csv_formats.parse_size), optional=True)
     loader.add_field('text.position', get_parser_for(ttrk.io.csv_formats.parse_coord), optional=True)
     loader.add_field('text.position.x', get_parser_for(int), optional=True)
+    loader.add_field('text.position.x%', get_parser_for(float), optional=True)
     loader.add_field('text.position.y', get_parser_for(int), optional=True)
+    loader.add_field('text.position.y%', get_parser_for(float), optional=True)
     loader.add_field('text.onset_time', get_parser_for(float), optional=True)
     loader.add_field('text.duration', get_parser_for(float), optional=True)
 
@@ -567,7 +570,7 @@ def validate_config_param_values(param_name, param_value, allowed_values):
 
 #-----------------------------------------------------------------------------------------
 # noinspection PyIncorrectDocstring
-def xy_to_pixels(value, screen_size, parameter_name=None):
+def xy_to_pixels(value, screen_size, parameter_name):
     """
     Translate a stimulus size or position to pixels.
     
@@ -597,7 +600,7 @@ def xy_to_pixels(value, screen_size, parameter_name=None):
             return int(np.round(value * screen_size))
 
         else:
-            return None
+            raise ttrk.TypeError('Invalid value of {:} ({:})'.format(parameter_name, value))
 
     if u.is_collection(value) and len(value) == 2 and \
             isinstance(value[0], numbers.Number) and isinstance(value[1], numbers.Number):
@@ -605,15 +608,12 @@ def xy_to_pixels(value, screen_size, parameter_name=None):
         #-- Pair of values
         _u.validate_func_arg_is_collection(None, "common.xy_to_pixels", "screen_size", screen_size, 2, 2)
 
-        retval = xy_to_pixels(value[0], screen_size[0]), xy_to_pixels(value[1], screen_size[1])
-        if retval[0] is None or retval[1] is None:
-            return None
-        else:
-            return retval
+        return xy_to_pixels(value[0], screen_size[0], "{:}[0]".format(parameter_name)), \
+               xy_to_pixels(value[1], screen_size[1], "{:}[1]".format(parameter_name))
 
     else:
         #-- Not a valid xy
-        return None
+        raise ttrk.TypeError('Invalid value of {:} ({:})'.format(parameter_name, value))
 
 
 #-----------------------------------------------------------------------------------------
@@ -628,7 +628,7 @@ def create_confidence_slider(exp_info):
 
     y = config.confidence_slider_y
     validate_config_param_type("confidence_slider_y", numbers.Number, y)
-    y = xy_to_pixels(y, exp_info.screen_size[1])
+    y = xy_to_pixels(y, exp_info.screen_size[1], 'config.confidence_slider_y')
     if y is None:
         raise ttrk.ValueError('Invalid config.confidence_slider_y ({:}): '.format(config.confidence_slider_y) +
                               'expecting either an integer or ratio of screen height (between -0.5 and 0.5)')
@@ -646,6 +646,9 @@ def create_confidence_slider(exp_info):
     exp_info.stimuli.add(slider.stimulus, "confidence_slider", visible=False)
     exp_info.confidence_slider = slider
 
+    exp_info.exported_trial_result_fields['confidence'] = ""
+    exp_info.exported_trial_result_fields['confidence_n_moves'] = 0
+
 
 #-----------------------------------------------------------------------------------------
 # Create the slider's background (red-to-green scale)
@@ -659,12 +662,12 @@ def _create_confidence_slider_background(exp_info):
     validate_config_param_type("confidence_slider_picture", str, filename)
 
     #-- Find slider height in pixels
-    height = xy_to_pixels(height, exp_info.screen_size[1])
+    height = xy_to_pixels(height, exp_info.screen_size[1], 'config.confidence_slider_height')
     if height is None:
         raise ttrk.ValueError("Invalid config.confidence_slider_height ({:})".format(exp_info.config.confidence_slider_height))
 
     #-- Load picture
-    file_path = ttrk.trajtrackerp.images_dir + os.path.sep + filename
+    file_path = ttrkp.images_dir + os.path.sep + filename
     slider_pic = xpy.stimuli.Picture(file_path)
 
     #-- Resize picture

@@ -40,7 +40,7 @@ class BaseTrialInfo(object):
         #: In "stimulus-then-move" mode, this is the time when the finger touched the screen
         self.targets_t0 = None
 
-        #: results collected during the experiment
+        #: results collected during the experiment (dict)
         self.results = {}
 
         #: The line number (in the CSV file) that corresponds with this trial
