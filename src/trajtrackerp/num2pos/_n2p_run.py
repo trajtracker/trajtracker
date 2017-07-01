@@ -195,7 +195,6 @@ def on_finger_touched_screen(exp_info, trial):
     :type trial: trajtracker.paradigms.num2pos.TrialInfo
     """
 
-    exp_info.target_pointer.visible = False
     update_numberline_for_trial(exp_info, trial)
     common.on_finger_touched_screen(exp_info, trial)
 
@@ -285,9 +284,7 @@ def trial_succeeded(exp_info, trial):
     print("   Trial ended successfully.")
 
     if exp_info.config.post_response_target:
-        c = exp_info.numberline.value_to_coords(trial.target)
-        exp_info.target_pointer.position = c[0], c[1] + exp_info.target_pointer_height / 2
-        exp_info.target_pointer.visible = True
+        exp_info.numberline.show_target_pointer_on(trial.target)
 
     curr_time = u.get_time()
     time_in_trial = curr_time - trial.start_time

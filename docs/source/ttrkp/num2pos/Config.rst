@@ -44,6 +44,17 @@ Number line
     The length of the number line. The length is specified either in pixels (an int value larger than 1)
     or as percentage of the screen width (a number between 0 and 1).
 
+.. autoinstanceattribute:: Config.nl_offset_event
+    :annotation: = None (trajtracker.events.Event)
+
+    Defines when the number line should be hidden.
+
+.. autoinstanceattribute:: Config.nl_onset_event
+    :annotation: = None (trajtracker.events.Event)
+
+    Defines when the number line should be displayed. If False, the number line will be displayed from
+    the start of the experiement.
+
 .. autoinstanceattribute:: Config.show_feedback
     :annotation: = True (bool)
 

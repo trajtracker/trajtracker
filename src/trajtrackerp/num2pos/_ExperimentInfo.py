@@ -23,6 +23,7 @@ along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 import expyriment as xpy
 
 import trajtracker as ttrk
+# noinspection PyProtectedMember
 import trajtracker._utils as _u
 
 from trajtrackerp.common import BaseExperimentInfo

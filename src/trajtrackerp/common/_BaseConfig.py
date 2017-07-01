@@ -33,6 +33,9 @@ FINGER_STARTED_MOVING = ttrk.events.Event("FINGER_STARTED_MOVING")
 #-- or the trial failed.
 FINGER_STOPPED_MOVING = ttrk.events.Event("FINGER_STOPPED_MOVING")
 
+#-- This event is dispatched when the participant responded for the main task (num2pos / decision)
+RESPONSE_MADE = ttrk.events.Event("RESPONSE_MADE")
+
 
 class BaseConfig(object):
 

@@ -61,6 +61,7 @@ class Config(BaseConfig):
                  nl_line_width=2, nl_end_tick_height=5, nl_line_colour=xpy.misc.constants.C_WHITE,
                  nl_labels_font_name="Arial", nl_labels_box_size=(100, 30), nl_labels_offset=(0, 20),
                  nl_labels_colour=xpy.misc.constants.C_GREY, nl_distance_from_top=80,
+                 nl_onset_event=None, nl_offset_event=None,
                  max_response_excess=None):
 
         super(Config, self).__init__(
@@ -134,6 +135,8 @@ class Config(BaseConfig):
         self.nl_labels_offset = nl_labels_offset
         self.nl_labels_colour = nl_labels_colour
         self.nl_distance_from_top = nl_distance_from_top  # Distance of the numberline's main line from top-of-screen
+        self.nl_onset_event = nl_onset_event
+        self.nl_offset_event = nl_offset_event
 
         #----- Configuration of sounds -----
 

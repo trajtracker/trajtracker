@@ -76,6 +76,7 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         """
 
         super(NumberLine, self).__init__()
+        ttrk.events.OnsetOffsetObj.__init__(self)
 
         #-- When preloaded, visual properties cannot be changed any longer
         self._preloaded = False
@@ -106,12 +107,17 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         self._touch_distance = 0        # Issue a "touch" dchoice when the finger is closer than this to the line
                                         # _touch_directioned=True and distance<0 means that finger must cross the line and get this far on the other side
 
+        #-- Feedback stimulus (shows where the finger/mouse landed on the number line)
         self.feedback_stimuli = feedback_stimuli
         self.feedback_stim_chooser = None
         self.feedback_stim_offset = None
         self.feedback_stim_hide_event = None
         self._feedback_stim_selector = ttrk.stimuli.StimulusSelector()   # dummy selector
         self._feedback_stim_selector.visible = False
+
+        #-- Target pointer (visually indicate the target position)
+        self._target_pointer_stimulus = None
+        self._target_pointer_offset = (0, 0)
 
         self.visible = visible
 
@@ -157,11 +163,31 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
     #--------------------------------------------------------------
     def on_registered(self, event_manager):
+
+        if self.onset_event is not None:
+            event_manager.register_operation(event=self.onset_event,
+                                             operation=self._get_visibility_setter(True),
+                                             recurring=True,
+                                             description="Show the number line")
+
+        if self.offset_event is not None:
+            event_manager.register_operation(event=self.offset_event,
+                                             operation=self._get_visibility_setter(False),
+                                             recurring=True,
+                                             description="Hide the number line")
+
         event_manager.register_operation(event=self.feedback_stim_hide_event,
                                          operation=lambda t1, t2: self.hide_feedback_stim(),
                                          recurring=True,
                                          description="Hide the NumberLine's feedback stimulus")
 
+    def _get_visibility_setter(self, visible):
+        def f(t1, t2):
+            self.visible = visible
+            if not visible and self._target_pointer_stimulus is not None:
+                self._target_pointer_stimulus.visible = False
+
+        return f
 
     #===================================================================================
     #      Plotting
@@ -367,6 +393,31 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
             return 0, self._line_length/2
 
 
+    #-------------------------------------------------------
+    def show_target_pointer_on(self, nl_value):
+        """
+        Show :attr:`~trajtracker.stimuli.NumberLine.target_pointer_stimulus` in the specified location
+        
+        :param nl_value: A location on the number line, defined using its scale
+        :type nl_value: numbers.Number
+        """
+
+        if self._target_pointer_stimulus is None:
+            raise ttrk.InvalidStateError("{:}.show_target_pointer_on() was called without first setting target_pointer_stimulus".
+                                         format(_u.get_type_name(self)))
+
+        c = self.value_to_coords(nl_value)
+
+        if self.orientation == Orientation.Horizontal:
+            coord = c[0], self.position[1]
+        else:
+            coord = self.position[0], c[1]
+
+        offset = self._target_pointer_offset
+        self._target_pointer_stimulus.position = coord[0] + offset[0], coord[1] + offset[1]
+        self._target_pointer_stimulus.visible = True
+
+
     #===================================================================================
     #      Track movement
     #===================================================================================
@@ -493,11 +544,13 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
 
 
     #---------------------------------------------------------
-    def hide_feedback_stim(self):
+    def hide_feedback_stim(self, hide_target_pointer=True):
         """
         Hide a previously-showed feedback stimulus
         """
         self._feedback_stim_selector.visible = False
+        if hide_target_pointer and self._target_pointer_stimulus is not None:
+            self._target_pointer_stimulus.visible = False
 
 
     #===================================================================================
@@ -1068,6 +1121,43 @@ class NumberLine(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         _u.validate_attr_type(self, "feedback_stim_hide_event", value, ttrk.events.Event,
                               none_allowed=True)
         self._feedback_stim_hide_event = value
+
+
+    ###################################
+    #  Target pointer
+    ###################################
+
+    #-----------------------------------------------------------
+    @property
+    def target_pointer_stimulus(self):
+        """
+        A stimulus that will indicate the target, positioned on the number line.
+        """
+        return self._target_pointer_stimulus
+
+    @target_pointer_stimulus.setter
+    def target_pointer_stimulus(self, stim):
+        if "present" not in dir(stim):
+            raise ttrk.TypeError(
+                "{:}.target_pointer_stimulus was set with a non-stimulus value".format(_u.get_type_name(self)))
+        self._target_pointer_stimulus = stim
+
+    #-----------------------------------------------------------
+    @property
+    def target_pointer_offset(self):
+        """
+        An offset of :attr:`~trajtracker.stimuli.NumberLine.target_pointer_stimulus` relatively
+        to the target location on the number line.
+        
+        :type: tuple (x, y)
+        """
+        return self._target_pointer_offset
+
+    @target_pointer_offset.setter
+    def target_pointer_offset(self, value):
+        _u.validate_attr_type(self, "target_pointer_offset", value, ttrk.TYPE_COORD)
+        self._target_pointer_offset = value
+        self._log_property_changed("target_pointer_offset")
 
 
     ###################################

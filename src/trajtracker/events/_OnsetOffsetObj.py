@@ -28,35 +28,35 @@ import trajtracker._utils as _u
 class OnsetOffsetObj(object):
 
     def __init__(self):
-        self.onset = None
-        self.offset = None
+        self.onset_event = None
+        self.offset_event = None
 
     #---------------------------------------------------
     @property
-    def onset(self):
+    def onset_event(self):
         """
         The time when the object should appear on screen. 
         
         :type: :class:`~trajtracker.events.Event`, or *None* to avoid automatic onset.
         """
-        return self._onset
+        return self._onset_event
 
-    @onset.setter
-    def onset(self, value):
+    @onset_event.setter
+    def onset_event(self, value):
         _u.validate_attr_type(self, "onset", value, Event, none_allowed=True)
-        self._onset = value
+        self._onset_event = value
 
     #---------------------------------------------------
     @property
-    def offset(self):
+    def offset_event(self):
         """
         The time when the object should disappear from screen. 
         
         :type: :class:`~trajtracker.events.Event`, or *None* to avoid automatic offset.
         """
-        return self._offset
+        return self._offset_event
 
-    @offset.setter
-    def offset(self, value):
+    @offset_event.setter
+    def offset_event(self, value):
         _u.validate_attr_type(self, "offset", value, Event, none_allowed=True)
-        self._offset = value
+        self._offset_event = value

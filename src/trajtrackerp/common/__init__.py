@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License
 along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ._BaseConfig import BaseConfig, FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING
+from ._BaseConfig import BaseConfig, FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING, RESPONSE_MADE
 from ._BaseExperimentInfo import BaseExperimentInfo
 from ._BaseTrialInfo import BaseTrialInfo
 

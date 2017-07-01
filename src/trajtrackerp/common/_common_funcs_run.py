@@ -38,8 +38,7 @@ import trajtracker.utils as u
 from trajtracker.validators import ExperimentError
 from trajtracker.movement import StartPoint
 
-# noinspection PyProtectedMember
-from trajtrackerp.common._BaseConfig import FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING
+from trajtrackerp.common import FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING, RESPONSE_MADE
 
 
 RunTrialResult = Enum('RunTrialResult', 'Succeeded SucceededAndProceed Failed Aborted')
@@ -638,6 +637,9 @@ def on_response_made(exp_info, trial, response_time):
     trial.movement_time = time_in_trial - trial.results['time_started_moving']
 
     exp_info.event_manager.dispatch_event(FINGER_STOPPED_MOVING, time_in_trial,
+                                          response_time - exp_info.session_start_time)
+
+    exp_info.event_manager.dispatch_event(RESPONSE_MADE, time_in_trial,
                                           response_time - exp_info.session_start_time)
 
     trial.stopped_moving_event_dispatched = True

@@ -165,14 +165,23 @@ def create_numberline(exp_info):
         if config.feedback_accuracy_levels is not None:
             numberline.feedback_stim_chooser = config.feedback_accuracy_levels
 
-    #-- For directly showing the target
-
-    exp_info.target_pointer = xpy.stimuli.Rectangle(size=(3, 30),
-                                                    colour=xpy.misc.constants.C_WHITE)
-    exp_info.target_pointer.preload()
-    exp_info.target_pointer_height = exp_info.target_pointer.size[1]
+    #-- For directly showing the target (in this case as feedback, after the response was made)
+    if config.post_response_target:
+        target_pointer = xpy.stimuli.Rectangle(size=(3, 30), colour=xpy.misc.constants.C_WHITE)
+        target_pointer.preload()
+        exp_info.stimuli.add(target_pointer, "target_pointer", visible=False)
+        numberline.target_pointer_stimulus = target_pointer
+        numberline.target_pointer_offset = 0, int(target_pointer.size[1] / 2)
 
     numberline.preload()
+
+    numberline.onset_event = config.nl_onset_event
+    numberline.offset_event = config.nl_offset_event
+
+    numberline.visible = numberline.onset_event is None
+
+    if (numberline.onset_event is not None) or (numberline.offset_event is not None):
+        exp_info.event_manager.register(numberline)
 
 
 #------------------------------------------------
