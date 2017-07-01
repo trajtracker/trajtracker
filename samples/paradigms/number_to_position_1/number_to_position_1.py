@@ -20,7 +20,7 @@ if not xpy.misc.is_android_running():
     ttrk.log_to_console = True
 
 
-config = num2pos.Config("Num2Pos(0-100*2)", max_trial_duration=2, max_numberline_value=100,
+config = num2pos.Config("Num2Pos(0-100*2)", max_movement_time=2, max_numberline_value=100,
                         speed_guide_enabled=True, data_source=range(101) * 2)
 
 

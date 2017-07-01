@@ -43,7 +43,7 @@ accuracy_levels = [.05, .1]
 
 config = num2pos.Config("Num2Pos(D+U)",
                         stimulus_then_move=STIMULUS_THEN_MOVE,
-                        max_trial_duration=2,
+                        max_movement_time=2,
                         speed_guide_enabled=True,
                         max_numberline_value=100,
                         data_source="number_to_position_2.csv",  # Read targets from this CSV file

@@ -35,7 +35,7 @@ ttrk.env.default_log_level = ttrk.log_info
 accuracy_levels = [.05, .1]
 
 config = num2pos.Config("Q2Pos(D+U)",
-                        max_trial_duration=2,
+                        max_movement_time=2,
                         speed_guide_enabled=True,
                         max_numberline_value=100,
                         data_source="quantity_to_position.csv",  # Read targets from this CSV file

@@ -33,7 +33,7 @@ class Config(BaseConfig):
     the number-to-position experiment
     """
 
-    def __init__(self, experiment_id, data_source, max_trial_duration,
+    def __init__(self, experiment_id, data_source, max_movement_time,
                  use_text_targets=True, use_generic_targets=False,
 
                  fixation_type='cross', fixation_text=None,
@@ -44,7 +44,7 @@ class Config(BaseConfig):
 
                  text_target_height=0.6, shuffle_trials=True,
                  log_stimulus_onset_offset=False,
-                 min_trial_duration=0.2, speed_guide_enabled=False, min_inst_speed=10,
+                 min_movement_time=0.2, speed_guide_enabled=False, min_inst_speed=10,
                  grace_period=0.3, max_zigzags=8, save_results=True, sound_by_accuracy=None,
                  sounds_dir=sounds_dir,
                  stimulus_then_move=False, finger_must_start_upwards=True,
@@ -67,7 +67,7 @@ class Config(BaseConfig):
         super(Config, self).__init__(
             experiment_id=experiment_id,
             data_source=data_source,
-            max_trial_duration=max_trial_duration,
+            max_movement_time=max_movement_time,
             use_text_targets=use_text_targets,
             use_generic_targets=use_generic_targets,
             fixation_type=fixation_type,
@@ -82,7 +82,7 @@ class Config(BaseConfig):
             text_target_height=text_target_height,
             shuffle_trials=shuffle_trials,
             log_stimulus_onset_offset=log_stimulus_onset_offset,
-            min_trial_duration=min_trial_duration,
+            min_movement_time=min_movement_time,
             speed_guide_enabled=speed_guide_enabled,
             min_inst_speed=min_inst_speed,
             grace_period=grace_period,

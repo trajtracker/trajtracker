@@ -48,7 +48,7 @@ class BaseConfig(object):
                  fixzoom_show_event, fixzoom_start_zoom_event,
 
                  text_target_height, log_stimulus_onset_offset,
-                 min_trial_duration, max_trial_duration,
+                 min_movement_time, max_movement_time,
                  speed_guide_enabled, min_inst_speed,
                  grace_period, max_zigzags, save_results, sounds_dir,
                  finger_must_start_upwards,
@@ -134,8 +134,8 @@ class BaseConfig(object):
         #----- Configuration of validators -----
 
         # Minimal and maximal valid time for reaching the number line (in seconds)
-        self.min_trial_duration = min_trial_duration
-        self.max_trial_duration = max_trial_duration
+        self.min_movement_time = min_movement_time
+        self.max_movement_time = max_movement_time
 
         # If True, the speed limit will be visualized as a moving line
         self.speed_guide_enabled = speed_guide_enabled

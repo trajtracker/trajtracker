@@ -193,7 +193,7 @@ def create_validators(exp_info, direction_validator, global_speed_validator, ins
             origin_coord=exp_info.start_point.position[1] + exp_info.start_point.start_area.size[1] / 2,
             end_coord=exp_info.speed_validation_end_y_coord(),
             grace_period=config.grace_period,
-            max_trial_duration=config.max_trial_duration,
+            max_movement_time=config.max_movement_time,
             milestones=config.global_speed_validator_milestones,
             show_guide=config.speed_guide_enabled)
         v.do_present_guide = False
@@ -485,6 +485,8 @@ def create_csv_loader():
     loader.add_field('fixation.position.x', int, optional=True)
     loader.add_field('fixation.position.x%', float, optional=True)
     loader.add_field('fixation.position.y', int, optional=True)
+
+    loader.add_field('min_movement_time', float, optional=True)
 
     return loader
 

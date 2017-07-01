@@ -15,7 +15,7 @@ if not xpy.misc.is_android_running():
     xpy.control.defaults.window_mode = True
     ttrk.log_to_console = True
 
-config = dchoice.Config("ChooseArrowDir", max_trial_duration=2, data_source="choice_2.csv",
+config = dchoice.Config("ChooseArrowDir", max_movement_time=3, data_source="choice_2.csv",
                         use_generic_targets=True, use_text_targets=False,
                         feedback_stim_type='rectangle', feedback_select_by='accuracy',
                         feedback_place='middle',
@@ -38,9 +38,15 @@ if not xpy.misc.is_android_running():
 #-- Get subject info
 (subj_id, subj_name) = ttrkp.common.get_subject_name_id()
 
-#-- Run the experiment
+#-- Initialize the experiment objects
+
 exp_info = dchoice.initialize_experiment(config, exp, subj_id, subj_name)
 exp_info.generic_target.available_stimuli = stimuli
+
+exp_info.generic_target.onset_time = [0, 0.3, 0.6, 0.9, 1.2, 1.5]
+exp_info.generic_target.duration = 0.1
+
+#-- Run the experiment
 dchoice.run_trials(exp_info)
 
 #-- Shutdown Expyriment

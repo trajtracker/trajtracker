@@ -168,7 +168,8 @@ def run_trial(exp_info, trial, trial_already_initiated):
                     return RunTrialResult.Failed
 
             #-- Validate that the response wasn't too fast
-            if trial.movement_time < exp_info.config.min_trial_duration:
+            min_movement_time = trial.csv_data['min_movement_time'] if ('min_movement_time' in trial.csv_data) else exp_info.config.min_movement_time
+            if trial.movement_time < min_movement_time:
                 trial_failed(ExperimentError(ttrk.validators.InstantaneousSpeedValidator.err_too_fast,
                                              "Please move more slowly"),
                              exp_info, trial)

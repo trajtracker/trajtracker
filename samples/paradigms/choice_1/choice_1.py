@@ -15,7 +15,7 @@ if not xpy.misc.is_android_running():
     xpy.control.defaults.window_mode = True
     ttrk.log_to_console = True
 
-config = dchoice.Config("ChooseDir", max_trial_duration=2, data_source="choice_1.csv",
+config = dchoice.Config("ChooseDir", max_movement_time=2, data_source="choice_1.csv",
                         use_text_targets=True,
                         feedback_stim_type='rectangle', feedback_select_by='response',
                         feedback_place='button',

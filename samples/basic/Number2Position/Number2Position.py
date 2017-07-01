@@ -21,7 +21,7 @@ xpy.control.defaults.window_mode = True
 ttrk.log_to_console = True
 
 #-- Experiment constants
-MAX_TRIAL_DURATION = 2
+max_movement_time = 2
 MAX_NUMBERLINE_VALUE = 100
 GUIDE_ENABLED = True
 N_TRIALS = 20
@@ -192,7 +192,7 @@ trajectory_sensitive_objects.append(direction_validator)
 global_speed_validator = \
     ttrk.validators.GlobalSpeedValidator(origin_coord=start_area.position[1] + start_area.size[1] / 2,
                                          end_coord=number_line.position[1],
-                                         grace_period=0.3, max_trial_duration=MAX_TRIAL_DURATION,
+                                         grace_period=0.3, max_movement_time=max_movement_time,
                                          milestones=[(.5, .33), (.5, .67)], show_guide=GUIDE_ENABLED)
 global_speed_validator.do_present_guide = False
 trajectory_sensitive_objects.append(global_speed_validator)

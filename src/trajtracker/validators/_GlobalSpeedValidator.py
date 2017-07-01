@@ -56,7 +56,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
     #-----------------------------------------------------------------------------------
     def __init__(self, enabled=True, origin_coord=None, end_coord=None, axis=ValidationAxis.y,
-                 grace_period=None, max_trial_duration=None, milestones=None, show_guide=False):
+                 grace_period=None, max_movement_time=None, milestones=None, show_guide=False):
         """
         Constructor - invoked when you create a new object by writing GlobalSpeedValidator()
 
@@ -75,8 +75,8 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         :param grace_period: See :attr:`~trajtracker.validators.GlobalSpeedValidator.grace_period`
         :type grace_period: number
 
-        :param max_trial_duration: See :attr:`~trajtracker.validators.GlobalSpeedValidator.max_trial_duration`
-        :type max_trial_duration: number
+        :param max_movement_time: See :attr:`~trajtracker.validators.GlobalSpeedValidator.max_movement_time`
+        :type max_movement_time: number
 
         :param milestones: See :attr:`~trajtracker.validators.GlobalSpeedValidator.milestones`
         :type milestones: list
@@ -96,9 +96,9 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         else:
             self.milestones = milestones
 
-        self._max_trial_duration = None
-        if max_trial_duration is not None:
-            self.max_trial_duration = max_trial_duration
+        self._max_movement_time = None
+        if max_movement_time is not None:
+            self.max_movement_time = max_movement_time
 
         self._origin_coord = None
         if origin_coord is not None:
@@ -199,7 +199,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         _u.update_xyt_validate_and_log(self, position, time_in_trial)
         self._assert_initialized(self._origin_coord, "origin_coord")
         self._assert_initialized(self._end_coord, "end_coord")
-        self._assert_initialized(self._max_trial_duration, "max_trial_duration")
+        self._assert_initialized(self._max_movement_time, "max_movement_time")
 
         if not self._enabled:
             return None
@@ -265,7 +265,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
         remaining_time = time
         result = self._origin_coord
         for milestone in self._milestones:
-            ms_duration = milestone.time_percentage * self._max_trial_duration
+            ms_duration = milestone.time_percentage * self._max_movement_time
             ms_distance = milestone.distance_percentage * total_distance
             if remaining_time > ms_duration:
                 remaining_time -= ms_duration
@@ -346,16 +346,16 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
     #-----------------------------------------------------------------------------------
     @property
-    def max_trial_duration(self):
+    def max_movement_time(self):
         """The maximal duration of a trial (in seconds)."""
-        return self._max_trial_duration
+        return self._max_movement_time
 
-    @max_trial_duration.setter
-    def max_trial_duration(self, value):
-        value = _u.validate_attr_numeric(self, "max_trial_duration", value, _u.NoneValues.ChangeTo0)
-        _u.validate_attr_positive(self, "max_trial_duration", value)
-        self._max_trial_duration = value
-        self._log_property_changed("max_trial_duration")
+    @max_movement_time.setter
+    def max_movement_time(self, value):
+        value = _u.validate_attr_numeric(self, "max_movement_time", value, _u.NoneValues.ChangeTo0)
+        _u.validate_attr_positive(self, "max_movement_time", value)
+        self._max_movement_time = value
+        self._log_property_changed("max_movement_time")
 
     #-----------------------------------------------------------------------------------
 
@@ -364,7 +364,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
     @property
     def milestones(self):
         """
-        This attribute indicates how the overall speed limit (:attr:`~trajtracker.validators.GlobalSpeedValidator.max_trial_duration`)
+        This attribute indicates how the overall speed limit (:attr:`~trajtracker.validators.GlobalSpeedValidator.max_movement_time`)
         should be interpolated.
 
         By default, the interpolation is linear. But you can define several milestones - e.g., "mouse/finger must complete X%
