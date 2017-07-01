@@ -141,3 +141,10 @@ All these columns are optional.
 
 **fixation.text**
     The text to show as fixation stimulus. This is applied only if *config.fixation_type = 'text'*
+
+
+Columns to modify behavior
+++++++++++++++++++++++++++
+
+**min_movement_time**
+    The finger's minimal movement time (= duration from starting to move until making a response)
