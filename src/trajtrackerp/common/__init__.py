@@ -42,6 +42,7 @@ from ._common_funcs_init import \
     get_subject_name_id, \
     load_sound, \
     register_to_event_manager, \
+    show_fixation, \
     xy_to_pixels, \
     validate_config_param_type, \
     validate_config_param_values
@@ -56,7 +57,6 @@ from ._common_funcs_run import \
     prepare_trial_out_row, \
     run_post_trial_operations, \
     save_session_file, \
-    show_fixation, \
     trial_failed_common, \
     update_attr_by_csv_config, \
     update_fixation_for_trial, \

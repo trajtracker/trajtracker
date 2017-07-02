@@ -42,7 +42,7 @@ class BaseConfig(object):
     def __init__(self, experiment_id, data_source, shuffle_trials,
                  use_text_targets, use_generic_targets,
 
-                 fixation_type, fixation_text,
+                 fixation_type, hide_fixation_event, fixation_text,
                  fixzoom_box_size, fixzoom_dot_radius, fixzoom_dot_colour,
                  fixzoom_zoom_duration, fixzoom_stay_duration,
                  fixzoom_show_event, fixzoom_start_zoom_event,
@@ -92,6 +92,8 @@ class BaseConfig(object):
 
         #: The type of fixation to use: 'cross', 'text', 'zoom', or None
         self.fixation_type = fixation_type
+
+        self.hide_fixation_event = hide_fixation_event
 
         #: Default text to use for a text fixation
         self.fixation_text = fixation_text

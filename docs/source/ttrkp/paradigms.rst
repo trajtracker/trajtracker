@@ -104,3 +104,13 @@ The simplest way to do such modifications is to copy the relevant functions into
 You can see an example for the way it is done in the
 `number_to_position_2 <https://github.com/trajtracker/trajtracker/tree/master/samples/number_to_position_2>`_
 sample script.
+
+Resource files
+++++++++++++++
+
+TrajTracker includes the source code for the two paradigms above, and also some resource files:
+
+- Sounds (to indicate successful / incorrect trial)
+- Images for simple stimuli
+
+These files are in the `src/res <https://github.com/trajtracker/trajtracker/tree/master/src/res>`_ sub-directory.

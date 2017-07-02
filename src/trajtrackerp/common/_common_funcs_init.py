@@ -389,6 +389,21 @@ def create_fixation(exp_info):
     else:
         raise ttrk.ValueError("Invalid config.fixation_type ({:})".format(fixtype))
 
+    if exp_info.config.hide_fixation_event is not None:
+        exp_info.event_manager.register_operation(event=exp_info.config.hide_fixation_event,
+                                                  operation=lambda t1, t2: show_fixation(exp_info, False),
+                                                  recurring=True,
+                                                  description="Hide fixation")
+
+#----------------------------------------------------------------
+def show_fixation(exp_info, visible=True):
+
+    if visible and isinstance(exp_info.fixation, ttrk.stimuli.FixationZoom):
+        exp_info.fixation.reset()
+
+    if exp_info.fixation is not None:
+        exp_info.fixation.visible = visible
+
 
 #----------------------------------------------------------------
 def create_fixation_cross(exp_info):

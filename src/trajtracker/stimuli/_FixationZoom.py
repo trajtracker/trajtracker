@@ -187,7 +187,7 @@ class FixationZoom(ttrk.TTrkObject):
             #-- Either the zoom-in did not start yet, or it's already finished zooming in and the stimulus was hidden
             return
 
-        if time_in_session > self._start_zoom_time + self._zoom_duration + self._stay_duration:
+        if (self._stay_duration is not None) and time_in_session > (self._start_zoom_time + self._zoom_duration + self._stay_duration):
             self.hide()
         else:
             self._set_dot_position_for_time(time_in_session - self._start_zoom_time)
@@ -371,13 +371,15 @@ class FixationZoom(ttrk.TTrkObject):
     @property
     def stay_duration(self):
         """
-        Duration (in seconds) the stimulus remains on screen, after zoom in is finished, before it disappears
+        Duration (in seconds) the stimulus remains on screen, after zoom in is finished, before it disappears.
+        
+        If set to None, the stimulus will not disappear but remain on screen.
         """
         return self._stay_duration
 
     @stay_duration.setter
     def stay_duration(self, value):
-        _u.validate_attr_numeric(self, "stay_duration", value)
+        _u.validate_attr_numeric(self, "stay_duration", value, none_value=True)
         _u.validate_attr_not_negative(self, "stay_duration", value)
         self._stay_duration = value
         self._log_property_changed(self, "stay_duration")

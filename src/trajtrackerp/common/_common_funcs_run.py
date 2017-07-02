@@ -38,7 +38,7 @@ import trajtracker.utils as u
 from trajtracker.validators import ExperimentError
 from trajtracker.movement import StartPoint
 
-from trajtrackerp.common import FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING, RESPONSE_MADE
+from trajtrackerp.common import show_fixation, FINGER_STARTED_MOVING, FINGER_STOPPED_MOVING, RESPONSE_MADE
 
 
 RunTrialResult = Enum('RunTrialResult', 'Succeeded SucceededAndProceed Failed Aborted')
@@ -91,7 +91,6 @@ def on_finger_started_moving(exp_info, trial):
     :type trial: trajtracker.paradigms.common.BaseTrialInfo 
     """
 
-    show_fixation(exp_info, False)
     t = u.get_time()
     time_in_trial = t - trial.start_time
     time_in_session = t - exp_info.session_start_time
@@ -157,17 +156,7 @@ def wait_until_finger_moves(exp_info, trial):
     return None
 
 
-# ----------------------------------------------------------------
-def show_fixation(exp_info, visible=True):
-
-    if isinstance(exp_info.fixation, ttrk.stimuli.FixationZoom):
-        exp_info.fixation.reset()
-
-    if exp_info.fixation is not None:
-        exp_info.fixation.visible = visible
-
-
-# ----------------------------------------------------------------
+#----------------------------------------------------------------
 def update_text_target_for_trial(exp_info, trial, use_numeric_target_as_default=False):
     """
     Update properties of the text stimuli according to the current trial info

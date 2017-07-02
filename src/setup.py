@@ -13,7 +13,7 @@ setup(name='trajtracker',
       author_email='dror@trajtracker.com',
       license='GPL',
       packages=find_packages(),
-      install_requires=['expyriment', 'numpy'],
+      install_requires=['expyriment', 'numpy', 'enum34', 'scipy'],
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Intended Audience :: Science/Research',

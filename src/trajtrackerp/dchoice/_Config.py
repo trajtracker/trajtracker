@@ -23,7 +23,7 @@ along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 from enum import Enum
 import expyriment as xpy
 # noinspection PyProtectedMember
-from trajtrackerp.common._BaseConfig import BaseConfig
+from trajtrackerp.common._BaseConfig import BaseConfig, FINGER_STARTED_MOVING
 from trajtrackerp import sounds_dir
 
 
@@ -32,7 +32,7 @@ class Config(BaseConfig):
     def __init__(self, experiment_id, data_source, max_movement_time,
                  use_text_targets=True, use_generic_targets=False,
 
-                 fixation_type='cross', fixation_text=None,
+                 fixation_type='cross', hide_fixation_event=FINGER_STARTED_MOVING, fixation_text=None,
                  fixzoom_box_size=(40, 40), fixzoom_dot_radius=3,
                  fixzoom_dot_colour=xpy.misc.constants.C_GREY,
                  fixzoom_zoom_duration=0.2, fixzoom_stay_duration=0.1,
@@ -67,6 +67,7 @@ class Config(BaseConfig):
             use_text_targets=use_text_targets,
             use_generic_targets=use_generic_targets,
             fixation_type=fixation_type,
+            hide_fixation_event=hide_fixation_event,
             fixation_text=fixation_text,
             fixzoom_box_size=fixzoom_box_size,
             fixzoom_dot_radius=fixzoom_dot_radius,

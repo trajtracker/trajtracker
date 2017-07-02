@@ -130,17 +130,17 @@ Additional parameters when config.use_generic_targets = True
 Fixation stimulus
 -----------------
 
-.. autoinstanceattribute:: Config.fixation_type
-    :annotation: - 'cross' (default), 'text', 'zoom', or None
-
-    The type of fixation stimulus.
-    When using 'text' fixation, you can set the text via *fixation_text* or via the CSV config file.
-
 .. autoinstanceattribute:: Config.fixation_text
     :annotation: - str
 
     The default fixation text to use when :attr:`~trajtrackerp.num2pos.Config.fixation_type` = 'text'.
     This value can be overriden by column *fixation.text* in the CSV config file.
+
+.. autoinstanceattribute:: Config.fixation_type
+    :annotation: - 'cross' (default), 'text', 'zoom', or None
+
+    The type of fixation stimulus.
+    When using 'text' fixation, you can set the text via *fixation_text* or via the CSV config file.
 
 .. autoinstanceattribute:: Config.fixzoom_box_size
     :annotation: = (40, 40) (width, height)
@@ -183,6 +183,12 @@ Fixation stimulus
 
     Relevant when :attr:`~trajtrackerp.num2pos.Config.fixation_type` = 'zoom'.
     See :attr:`FixationZoom.zoom_duration <trajtracker.stimuli.FixationZoom.zoom_duration>`
+
+.. autoinstanceattribute:: Config.hide_fixation_event
+    :annotation: = FINGER_STARTED_MOVING (trajtracker.events.Event)
+
+    The event on which the fixation stimulus will be hidden.
+    None = don't hide the fixation.
 
 .. autoinstanceattribute:: Config.log_stimulus_onset_offset
     :annotation: = False (bool)
