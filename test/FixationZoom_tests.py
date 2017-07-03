@@ -89,8 +89,8 @@ class FixationZoomTests(unittest.TestCase):
     def test_set_stay_duration(self):
         FixationZoom(stay_duration=1)
         FixationZoom(stay_duration=0)
+        FixationZoom(stay_duration=None)
         self.assertRaises(ttrk.TypeError, lambda: FixationZoom(stay_duration='a'))
-        self.assertRaises(ttrk.TypeError, lambda: FixationZoom(stay_duration=None))
         self.assertRaises(ttrk.ValueError, lambda: FixationZoom(stay_duration=-1))
 
 
