@@ -6,14 +6,14 @@ data_files = [(dir_name, [dir_name + "/" + filename for filename in listdir(dir_
 
 
 setup(name='trajtracker',
-      version='0.3.0',
+      version='0.4.0',
       description='Framework for creating trajectory-tracking experiments',
       url='http://trajtracker.com',
       author='Dror Dotan',
       author_email='dror@trajtracker.com',
       license='GPL',
       packages=find_packages(),
-      install_requires=['expyriment', 'numpy', 'enum34', 'scipy'],
+      install_requires=['expyriment', 'numpy', 'enum34'],
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Intended Audience :: Science/Research',

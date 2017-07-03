@@ -331,7 +331,7 @@ def update_trials_file(exp_info, trial, success_err_code):
     trial_out_row = common.prepare_trial_out_row(exp_info, trial, success_err_code)
 
     endpoint = exp_info.numberline.response_value
-    trial_out_row['endPoint'] = "" if endpoint is None else "{:.3g}".format(endpoint)
+    trial_out_row['endPoint'] = "N/A" if endpoint is None else "{:.3g}".format(endpoint)
     trial_out_row['target'] = trial.target
 
     if exp_info.trials_file_writer is None:

@@ -26,7 +26,12 @@ from __future__ import division
 import numbers
 
 import numpy as np
-from scipy import misc
+
+try:
+    from scipy import misc
+    scipy_loaded = True
+except ImportError:
+    scipy_loaded = False
 
 import trajtracker
 import trajtracker._utils as _u
@@ -46,6 +51,8 @@ class LocationColorMap(trajtracker.TTrkObject):
         :param use_mapping: See :attr:`~trajtracker.misc.LocationColorMap.use_mapping`
         :param colormap: See :attr:`~trajtracker.misc.LocationColorMap.colormap`
         """
+        if not scipy_loaded:
+            raise ImportError("To use TrajTracker's {:} class, you must install the scipy package".format(_u.get_type_name(self)))
 
         super(LocationColorMap, self).__init__()
 
