@@ -70,8 +70,8 @@ def create_experiment_attrs(exp_info):
 
     config = exp_info.config
 
-    exp_info.exp_data['MinTarget'] = config.min_numberline_value
-    exp_info.exp_data['MaxTarget'] = config.max_numberline_value
+    exp_info.exp_data['NLMinValue'] = config.min_numberline_value
+    exp_info.exp_data['NLMaxValue'] = config.max_numberline_value
     exp_info.exp_data['ShowFeedback'] = 1 if config.show_feedback else 0
     if config.max_response_excess is not None:
         exp_info.exp_data['MaxResponseExcess'] = config.max_response_excess

@@ -54,6 +54,7 @@ class EnabledDisabledObj(object):
     def enabled(self, value):
         _u.validate_attr_type(self, "enabled", value, bool)
         self._enabled = value
+        self._log_property_changed("enabled")
 
     #-------------------------------------------
     @property
@@ -73,6 +74,7 @@ class EnabledDisabledObj(object):
             raise trajtracker.InvalidStateError("{:}.enable_event cannot be set after the object was registered to the event manager".format(
                 _u.get_type_name(self)))
         self._enable_event = value
+        self._log_property_changed("enable_event")
 
     #-------------------------------------------
     @property
@@ -92,6 +94,7 @@ class EnabledDisabledObj(object):
             raise trajtracker.InvalidStateError("{:}.disable_event cannot be set after the object was registered to the event manager".format(
                 _u.get_type_name(self)))
         self._disable_event = value
+        self._log_property_changed("disable_event")
 
     #-------------------------------------------
     # Register enable/disable operations on the event manager

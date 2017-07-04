@@ -94,7 +94,7 @@ def on_finger_started_moving(exp_info, trial):
     t = u.get_time()
     time_in_trial = t - trial.start_time
     time_in_session = t - exp_info.session_start_time
-    trial.results['time_started_moving'] = time_in_trial
+    trial.time_started_moving = time_in_trial
 
     #-- This event is dispatched before calling present(), because it might trigger operations that
     #-- show/hide stuff
@@ -103,7 +103,7 @@ def on_finger_started_moving(exp_info, trial):
     exp_info.stimuli.present()
 
     if not exp_info.config.stimulus_then_move:
-        trial.results['targets_t0'] = u.get_time() - trial.start_time
+        trial.targets_t0 = u.get_time() - trial.start_time
 
 
 #----------------------------------------------------------------
@@ -574,8 +574,8 @@ def prepare_trial_out_row(exp_info, trial, success_err_code):
     else:
         presented_target = ""
 
-    t_move = trial.results['time_started_moving'] if 'time_started_moving' in trial.results else -1
-    t_target = trial.results['targets_t0'] if 'targets_t0' in trial.results else -1
+    t_move = -1 if (trial.time_started_moving is None) else trial.time_started_moving
+    t_target = -1 if (trial.targets_t0 is None) else trial.targets_t0
 
     row = {
         'trialNum': trial.trial_num,
@@ -623,7 +623,7 @@ def on_response_made(exp_info, trial, response_time):
     exp_info.generic_target.terminate_display()
 
     time_in_trial = response_time - trial.start_time
-    trial.movement_time = time_in_trial - trial.results['time_started_moving']
+    trial.movement_time = time_in_trial - trial.time_started_moving
 
     exp_info.event_manager.dispatch_event(FINGER_STOPPED_MOVING, time_in_trial,
                                           response_time - exp_info.session_start_time)

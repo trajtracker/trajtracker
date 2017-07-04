@@ -136,8 +136,6 @@ def run_trial(exp_info, trial, trial_already_initiated):
 
     while True:  # This loop runs once per frame
 
-        #-- Update all displayable elements
-        exp_info.stimuli.present()
         curr_time = u.get_time()
 
         #-- Validate that finger still touches the screen
@@ -186,6 +184,11 @@ def run_trial(exp_info, trial, trial_already_initiated):
 
         xpy.io.Keyboard.process_control_keys()
 
+        #-- Update all displayable elements.
+        #-- This is done when the loop ends, not when it starts, because there was another present()
+        #-- call just before the loop, inside wait_until_finger_moves()
+        exp_info.stimuli.present()
+
 
 #----------------------------------------------------------------
 def on_finger_touched_screen(exp_info, trial):
@@ -227,7 +230,7 @@ def initialize_trial(exp_info, trial):
     exp_info.stimuli.present()
 
     if exp_info.config.stimulus_then_move:
-        trial.results['targets_t0'] = u.get_time() - trial.start_time
+        trial.targets_t0 = u.get_time() - trial.start_time
 
 
 #------------------------------------------------

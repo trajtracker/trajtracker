@@ -138,6 +138,13 @@ def create_response_buttons(exp_info):
         exp_info.response_hotspots.append(hotspot)
         exp_info.trajectory_sensitive_objects.append(hotspot)
 
+    exp_info.exp_data['ResponseButtonWidth'] = size[0]
+    exp_info.exp_data['ResponseButtonHeight'] = size[1]
+    exp_info.exp_data['ResponseButton1X'] = positions[0][0]
+    exp_info.exp_data['ResponseButton1Y'] = positions[0][1]
+    exp_info.exp_data['ResponseButton2X'] = positions[1][0]
+    exp_info.exp_data['ResponseButton2Y'] = positions[1][1]
+
 
 #----------------------------------------------------------------
 def _get_response_buttons_positions(exp_info, button_size):

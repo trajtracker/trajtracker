@@ -1,0 +1,7 @@
+Version 0.5.0
+=============
+
+Paradigms:
+* Discrete choice paradigm: saving information about the response buttons in the session.xml file
+* Num2Pos paradigm: renamed some fields in the session.xml file
+* Changed where we call stimuli.present() in the trial loop, so not to lose the first frame

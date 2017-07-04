@@ -298,14 +298,14 @@ Movement restrictions (validators)
     This parameter applies both to :class:`~trajtracker.validators.InstantaneousSpeedValidator` and to
     :class:`~trajtracker.validators.GlobalSpeedValidator`
 
-.. autoinstanceattribute:: Config.max_trial_duration
+.. autoinstanceattribute:: Config.max_movement_time
     :annotation: - number, mandatory parameter
 
     Maximal valid time from leaving the "start" rectangle until reaching the number line (in seconds)
     This parameter also affects the speed limit per time point (via
     :class:`~trajtracker.validators.GlobalSpeedValidator` )
 
-.. autoinstanceattribute:: Config.min_trial_duration
+.. autoinstanceattribute:: Config.min_movement_time
     :annotation: = 0.2 (number)
 
     Minimal valid time from leaving the "start" rectangle until reaching the number line (in seconds)

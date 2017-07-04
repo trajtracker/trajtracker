@@ -6,7 +6,7 @@ data_files = [(dir_name, [dir_name + "/" + filename for filename in listdir(dir_
 
 
 setup(name='trajtracker',
-      version='0.4.0',
+      version='0.4.1',
       description='Framework for creating trajectory-tracking experiments',
       url='http://trajtracker.com',
       author='Dror Dotan',
