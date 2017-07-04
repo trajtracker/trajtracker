@@ -18,3 +18,4 @@ too, as detailed below:
 .. autoclass:: trajtrackerp.common.BaseTrialInfo
     :members:
     :member-order: alphabetical
+    :noindex:

@@ -21,5 +21,5 @@ The operations triggered by events are:
 - Showing/hiding stimuli: this happens in certain delay after TRIAL_STARTED (when
   *config.stimulus_then_move = True*) or after FINGER_STARTED_MOVING (when *config.stimulus_then_move = False*)
 - Hiding the feedback arrow (runs on TRIAL_STARTED)
-- Enabling the :class:`~trajtracker.movement.TrajectoryTracker` and all validators on FINGER_STARTED_MOVING,
+- Enabling the `TrajectoryTracker <http://trajtracker.com/apiref/ttrk/movement/TrajectoryTracker.html>`_ and all validators on FINGER_STARTED_MOVING,
   and disabling them on FINGER_STOPPED_MOVING.

@@ -29,7 +29,7 @@ The persistent objects
 The following objects exist throughout the experiment session (all are stored as part of the
 :class:`~trajtrackerp.num2pos.ExperimentInfo` object):
 
-- A :class:`~trajtracker.stimuli.NumberLine`
+- A `NumberLine <http://trajtracker.com/apiref/ttrk/stimuli/NumberLine.html>`_
 
 - Objects that can visually denote specific locations on the number line: a feedback arrow, and a vertical
   line indicating the correct target location.

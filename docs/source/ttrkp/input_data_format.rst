@@ -26,8 +26,8 @@ All columns that refer to stimuli can contain either a single value or a semicol
 Conventions for column names
 ++++++++++++++++++++++++++++
 
-- Columns that refer to the text stimuli (the :class:`~trajtracker.stimuli.MultiTextBox`) are called *text.<something>*.
-- Columns that refer to non-text stimuli (the :class:`~trajtracker.stimuli.MultiStimulus`) are called *genstim.<something>*.
+- Columns that refer to the text stimuli (the *MultiTextBox* object) are called *text.<something>*.
+- Columns that refer to non-text stimuli (the *MultiStimulus* object) are called *genstim.<something>*.
 - Columns that refer to the fixation stimulus are called *fixation.<something>*.
 - In the number-to-position paradigm: Columns that refer to the number line are called *nl.<something>*.
 
@@ -37,8 +37,9 @@ Columns to define the target stimulus & response location
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 There are two columns where you can indicate the target to present - one for text targets
-(a :class:`~trajtracker.stimuli.MultiTextBox`) and one for non-text targets (a
-:class:`~trajtracker.stimuli.MultiStimulus` ). Each of these columns can include several stimuli, separated by
+(a `MultiTextBox <http://trajtracker.com/apiref/ttrk/stimuli/MultiTextBox.html>`_)
+and one for non-text targets (a `MultiTextBox <http://trajtracker.com/apiref/ttrk/stimuli/MultiStimulus.html>`_).
+Each of these columns can include several stimuli, separated by
 semicolon. In other columns, you can define the time when each of these stimuli will appear on screen
 and disappear.
 
@@ -46,8 +47,9 @@ and disappear.
     The text(s) to present as the target stimulus.
 
 **genstim.target**
-    The :class:`~trajtracker.stimuli.MultiStimulus` generic stimulus keeps all stimuli in a
-    :class:`~trajtracker.stimuli.StimulusSelector` , where each stimulus has a string ID. *genstim.target* is the
+    The *MultiStimulus* generic stimulus keeps all stimuli in a
+    `StimulusSelector <http://trajtracker.com/apiref/ttrk/stimuli/StimulusSelector.html>`_
+    where each stimulus has a string ID. *genstim.target* is the
     ID(s) of the stimulus (or stimuli) to present as targets.
 
     If you include here several semicolon-separated stimulus IDs (e.g. to create an RSVP),

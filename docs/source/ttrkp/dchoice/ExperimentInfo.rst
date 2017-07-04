@@ -25,3 +25,5 @@ too, as detailed below:
     :members:
     :exclude-members: __init__
     :member-order: alphabetical
+    :noindex:
+

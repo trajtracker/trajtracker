@@ -1,5 +1,5 @@
 
-.. currentmodule:: trajtrackerp.num2pos
+.. currentmodule:: trajtrackerp.dchoice
 
 
 General:
@@ -61,7 +61,7 @@ Additional parameters
     :annotation: = [0.0] (list of numbers)
 
     Default onset time for the target. If more than one target is specified, one onset time per target is due.
-    See `~trajtracker.stimuli.MultiStimulus.onset_time`
+    See `MultiStimulus.onset_time <http://trajtracker.com/apiref/ttrk/stimuli/MultiStimulus.html#trajtracker.stimuli.MultiStimulus.onset_time>`_
 
 .. autoinstanceattribute:: Config.target_duration
     :annotation: = [1000.0] (list of numbers)
@@ -95,7 +95,8 @@ Additional parameters when config.use_text_targets = True
     :annotation: = False (boolean)
 
     When showing multiple texts, this indicates if the last one should remain on screen or
-    disappear after a delay (see :attr:`MultiTextBox.last_stimulus_remains <trajtracker.stimuli.MultiTextBox.last_stimulus_remains>`)
+    disappear after a delay (see
+    `MultiTextBox.last_stimulus_remains <http://trajtracker.com/apiref/ttrk/stimuli/MultiTextBox.html#trajtracker.stimuli.MultiTextBox.last_stimulus_remains>`_)
 
 .. autoinstanceattribute:: Config.text_target_width
     :annotation: = 300 (int)
@@ -122,8 +123,8 @@ Additional parameters when config.use_generic_targets = True
     :annotation: = False (boolean)
 
     When showing multiple texts, this indicates if the last one should remain on screen or
-    disappear after a delay (see :attr:`MultiStimulus.last_stimulus_remains <trajtracker.stimuli.MultiStimulus.last_stimulus_remains>`)
-
+    disappear after a delay (see
+    `MultiStimulus.last_stimulus_remains <http://trajtracker.com/apiref/ttrk/stimuli/MultiStimulus.html#trajtracker.stimuli.MultiStimulus.last_stimulus_remains>`_)
 
 
 
@@ -146,43 +147,43 @@ Fixation stimulus
     :annotation: = (40, 40) (width, height)
 
     Relevant when :attr:`~trajtrackerp.num2pos.Config.fixation_type` = 'zoom'.
-    See :attr:`FixationZoom.box_size <trajtracker.stimuli.FixationZoom.box_size>`
+    See `FixationZoom.box_size <http://trajtracker.com/apiref/ttrk/stimuli/FixationZoom.html#trajtracker.stimuli.FixationZoom.box_size>`_
 
 .. autoinstanceattribute:: Config.fixzoom_dot_colour
     :annotation: = Grey (RGB color)
 
     Relevant when :attr:`~trajtrackerp.num2pos.Config.fixation_type` = 'zoom'.
-    See :attr:`FixationZoom.dot_colour <trajtracker.stimuli.FixationZoom.dot_colour>`
+    See `FixationZoom.dot_colour <http://trajtracker.com/apiref/ttrk/stimuli/FixationZoom.html#trajtracker.stimuli.FixationZoom.dot_colour>`_
 
 .. autoinstanceattribute:: Config.fixzoom_dot_radius
     :annotation: = 3 (int)
 
     Relevant when :attr:`~trajtrackerp.num2pos.Config.fixation_type` = 'zoom'.
-    See :attr:`FixationZoom.dot_radius <trajtracker.stimuli.FixationZoom.dot_radius>`
+    See `FixationZoom.dot_radius <http://trajtracker.com/apiref/ttrk/stimuli/FixationZoom.html#trajtracker.stimuli.FixationZoom.dot_radius>`_
 
 .. autoinstanceattribute:: Config.fixzoom_show_event
-    :annotation: = None (:class:`~trajtracker.events.Event`)
+    :annotation: = None (trajtracker.events.Event)
 
     Relevant when :attr:`~trajtrackerp.num2pos.Config.fixation_type` = 'zoom'.
-    See :attr:`FixationZoom.show_event <trajtracker.stimuli.FixationZoom.show_event>`
+    See `FixationZoom.show_event <http://trajtracker.com/apiref/ttrk/stimuli/FixationZoom.html#trajtracker.stimuli.FixationZoom.show_event>`_
 
 .. autoinstanceattribute:: Config.fixzoom_start_zoom_event
-    :annotation: = None (:class:`~trajtracker.events.Event`)
+    :annotation: = None (trajtracker.events.Event)
 
     Relevant when :attr:`~trajtrackerp.num2pos.Config.fixation_type` = 'zoom'.
-    See :attr:`FixationZoom.start_zoom_event <trajtracker.stimuli.FixationZoom.start_zoom_event>`
+    See `FixationZoom.start_zoom_event <http://trajtracker.com/apiref/ttrk/stimuli/FixationZoom.html#trajtracker.stimuli.FixationZoom.start_zoom_event>`_
 
 .. autoinstanceattribute:: Config.fixzoom_stay_duration
     :annotation: = 0.1 (number)
 
     Relevant when :attr:`~trajtrackerp.num2pos.Config.fixation_type` = 'zoom'.
-    See :attr:`FixationZoom.stay_duration <trajtracker.stimuli.FixationZoom.stay_duration>`
+    See `FixationZoom.stay_duration <http://trajtracker.com/apiref/ttrk/stimuli/FixationZoom.html#trajtracker.stimuli.FixationZoom.stay_duration>`_
 
 .. autoinstanceattribute:: Config.fixzoom_zoom_duration
     :annotation: = 0.2 (number)
 
     Relevant when :attr:`~trajtrackerp.num2pos.Config.fixation_type` = 'zoom'.
-    See :attr:`FixationZoom.zoom_duration <trajtracker.stimuli.FixationZoom.zoom_duration>`
+    See `FixationZoom.zoom_duration <http://trajtracker.com/apiref/ttrk/stimuli/FixationZoom.html#trajtracker.stimuli.FixationZoom.zoom_duration>`_
 
 .. autoinstanceattribute:: Config.hide_fixation_event
     :annotation: = FINGER_STARTED_MOVING (trajtracker.events.Event)
@@ -295,15 +296,16 @@ Movement restrictions (validators)
     :annotation: = 0.3 (number)
 
     Duration (in seconds) in the beginning of the trial during which speed is not validated.
-    This parameter applies both to :class:`~trajtracker.validators.InstantaneousSpeedValidator` and to
-    :class:`~trajtracker.validators.GlobalSpeedValidator`
+    This parameter applies to both
+    `InstantaneousSpeedValidator <http://trajtracker.com/apiref/ttrk/validators/InstantaneousSpeedValidator.html>`_
+    and `GlobalSpeedValidator <http://trajtracker.com/apiref/ttrk/validators/GlobalSpeedValidator.html>`_.
 
 .. autoinstanceattribute:: Config.max_movement_time
     :annotation: - number, mandatory parameter
 
     Maximal valid time from leaving the "start" rectangle until reaching the number line (in seconds)
     This parameter also affects the speed limit per time point (via
-    :class:`~trajtracker.validators.GlobalSpeedValidator` )
+    `GlobalSpeedValidator <http://trajtracker.com/apiref/ttrk/validators/GlobalSpeedValidator.html>`_ )
 
 .. autoinstanceattribute:: Config.min_movement_time
     :annotation: = 0.2 (number)
@@ -311,7 +313,7 @@ Movement restrictions (validators)
     Minimal valid time from leaving the "start" rectangle until reaching the number line (in seconds)
 
 
-**Specific configuration for** :class:`~trajtracker.validators.InstantaneousSpeedValidator`
+**Specific configuration for** `InstantaneousSpeedValidator <http://trajtracker.com/apiref/ttrk/validators/InstantaneousSpeedValidator.html>`_
 
 .. autoinstanceattribute:: Config.min_inst_speed
     :annotation: = 10 (number)
@@ -319,12 +321,12 @@ Movement restrictions (validators)
     The minimal instantaneous speed (pixels per second).
 
 
-**Specific configuration for** :class:`~trajtracker.validators.GlobalSpeedValidator`
+**Specific configuration for** `GlobalSpeedValidator <http://trajtracker.com/apiref/ttrk/validators/GlobalSpeedValidator.html>`_
 
 .. autoinstanceattribute:: Config.global_speed_validator_milestones
     :annotation: = [(.5, .33), (.5, .67)]
 
-    See :attr:`GlobalSpeedValidator.milestones <trajtracker.validators.GlobalSpeedValidator.milestones>`
+    See `GlobalSpeedValidator.milestones <http://trajtracker.com/apiref/ttrk/validators/GlobalSpeedValidator.html#trajtracker.stimuli.GlobalSpeedValidator.milestones>`_
 
 .. autoinstanceattribute:: Config.speed_guide_enabled
     :annotation: = False (bool)
@@ -332,34 +334,33 @@ Movement restrictions (validators)
     If True, the speed limit will be visualized as a moving line.
 
 
-**Specific configuration for** :class:`~trajtracker.validators.MovementAngleValidator`
+**Specific configuration for** `MovementAngleValidator <http://trajtracker.com/apiref/ttrk/validators/MovementAngleValidator.html>`_
 
 .. autoinstanceattribute:: Config.dir_validator_calc_angle_interval
     :annotation: = 20 (int)
 
-    See :attr:`MovementAngleValidator.calc_angle_interval <trajtracker.validators.MovementAngleValidator.calc_angle_interval>`
+    See `MovementAngleValidator.calc_angle_interval <http://trajtracker.com/apiref/ttrk/validators/MovementAngleValidator.html#trajtracker.stimuli.MovementAngleValidator.calc_angle_interval>`_
 
 .. autoinstanceattribute:: Config.dir_validator_max_angle
     :annotation: = 90 (number)
 
-    See :attr:`MovementAngleValidator.max_angle <trajtracker.validators.MovementAngleValidator.max_angle>`
+    See `MovementAngleValidator.max_angle <http://trajtracker.com/apiref/ttrk/validators/MovementAngleValidator.html#trajtracker.stimuli.MovementAngleValidator.max_angle>`_
 
 .. autoinstanceattribute:: Config.dir_validator_min_angle
     :annotation: = -90 (number)
 
-    See :attr:`MovementAngleValidator.min_angle <trajtracker.validators.MovementAngleValidator.min_angle>`
+    See `MovementAngleValidator.min_angle <http://trajtracker.com/apiref/ttrk/validators/MovementAngleValidator.html#trajtracker.stimuli.MovementAngleValidator.min_angle>`_
 
 
-**Specific configuration for** :class:`~trajtracker.validators.NCurvesValidator`
+**Specific configuration for** `NCurvesValidator <http://trajtracker.com/apiref/ttrk/validators/NCurvesValidator.html>`_
 
 .. autoinstanceattribute:: Config.max_zigzags
     :annotation: = 8 (int)
 
     Maximal number of left-right deviations allowed per trial.
-    This parameter applies to :class:`~trajtracker.validators.NCurvesValidator`
 
 .. autoinstanceattribute:: Config.zigzag_validator_min_angle_change_per_curve
     :annotation: = 10 (int)
 
-    See :attr:`NCurvesValidator.min_angle_change_per_curve <trajtracker.validators.NCurvesValidator.min_angle_change_per_curve>`
+    See `NCurvesValidator.min_angle_change_per_curve <http://trajtracker.com/apiref/ttrk/validators/NCurvesValidator.html#trajtracker.stimuli.NCurvesValidator.min_angle_change_per_curve>`_
 
