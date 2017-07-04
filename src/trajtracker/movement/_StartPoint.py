@@ -219,7 +219,7 @@ class StartPoint(ttrk.TTrkObject):
 
             elif self._exit_area is None or self._exit_area.overlapping_with_position((x_coord, y_coord)):
                 # Left the start area into the exit area
-                self._log_write(ttrk.log_debug, "touched in exit area: ({:},{:}). Setting state=start".format(x_coord, y_coord), True)
+                self._log_write_if(ttrk.log_debug, "touched in exit area: ({:},{:}). Setting state=start".format(x_coord, y_coord), True)
                 self._state = StartPoint.State.start
 
             else:
