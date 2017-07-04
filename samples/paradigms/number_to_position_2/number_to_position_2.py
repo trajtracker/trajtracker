@@ -15,8 +15,7 @@ into the other, the MultiTextBox defines "onset_time" and "duration" for each of
 
 Defining onset_time and duration could have been done by adding two columns with this name to the
 number_to_position_2.csv file. However, here I used a different method: I defined MultiTextBox.onset_time and
-MultiTextBox.duration in advance, only once, when initializing the experiment. To allow this, I had to 
-copy the trajtracker.paradigms.num2pos.run_full_experiment() function and make a small modification.
+MultiTextBox.duration in advance, only once, when initializing the experiment.
 
 @author: Dror Dotan
 @copyright: Copyright (c) 2017, Dror Dotan
@@ -78,16 +77,12 @@ if not xpy.misc.is_android_running():
 (subj_id, subj_name) = ttrkp.common.get_subject_name_id()
 
 
-#-- Run the experiment
-
-# The lines below (until the "End of copied code" comment) were copied here from
-# ttrkp.num2pos.run_full_experiment()
+#-- Initialize the experiment objects
 
 exp_info = num2pos.ExperimentInfo(config, exp, subj_id, subj_name)
 num2pos.create_experiment_objects(exp_info)
 
-#-- These 5 lines were not in the original version of run_full_experiment(), I added them only here.
-#-- Making this small modification is the reason that I copied run_full_experiment()
+#-- Customize them
 if STIMULUS_THEN_MOVE:
     exp_info.text_target.onset_time = [0.5, 0.6]
 else:
@@ -95,10 +90,9 @@ else:
 exp_info.text_target.duration = [0.1, 2]
 
 common.register_to_event_manager(exp_info)
+
+#-- Run the experiment
 num2pos.run_trials(exp_info)
-
-#End of copied code
-
 
 #-- Shutdown Expyriment
 xpy.control.end()

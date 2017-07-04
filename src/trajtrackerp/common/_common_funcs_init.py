@@ -24,6 +24,7 @@ import time
 import numbers
 import os
 import numpy as np
+import re
 
 import expyriment as xpy
 from expyriment.misc import geometry
@@ -56,9 +57,12 @@ def get_subject_name_id():
                                 message_colour=xpy.misc.constants.C_WHITE)
     while True:
         subj_id = id_input.get(default_id)
-        if subj_id != "":
+        #-- Make sure that the subject ID is acceptable in file names and would make a valid
+        #-- struct key in Matlab
+        if re.match("^[A-Za-z_][A-Za-z0-9_]*$", subj_id):
             break
-
+        ttrk.log_write("Invalid subject ID ({:})".format(subj_id), True)
+        xpy.io.Keyboard.process_control_keys()
 
     return subj_id, subj_name
 

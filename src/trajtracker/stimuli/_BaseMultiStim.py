@@ -542,7 +542,7 @@ class StimulusEnableDisableOp(object):
 
     #--------------------------------------------------
     def __call__(self, *args, **kwargs):
-        self._multistim._log_write_if(ttrk.log_info, str(self))
+        self._multistim._log_write_if(ttrk.log_debug, str(self))
         self._multistim._set_visible(self._stimulus_num, self._visible)
 
 

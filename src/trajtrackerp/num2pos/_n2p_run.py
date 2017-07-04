@@ -37,30 +37,6 @@ from trajtrackerp.num2pos import ExperimentInfo, TrialInfo, create_experiment_ob
 
 
 #----------------------------------------------------------------
-def run_full_experiment(config, xpy_exp, subj_id, subj_name=""):
-    """
-    A default implementation for running a complete experiment, end-to-end: loading the data,
-    initializing all objects, running all trials, and saving the results.
-    
-    :param config:
-    :type config: trajtracker.paradigms.num2pos.Config 
-
-    :param xpy_exp: Expyriment's `active experiment <http://docs.expyriment.org/expyriment.design.Experiment.html>`_
-                    object
-    :param subj_id: The subject initials from the num2pos app welcome screen
-    :param subj_name: The subject name from the num2pos app welcome screen (or an empty string) 
-    """
-
-    exp_info = ExperimentInfo(config, xpy_exp, subj_id, subj_name)
-
-    create_experiment_objects(exp_info)
-
-    common.register_to_event_manager(exp_info)
-
-    run_trials(exp_info)
-
-
-#----------------------------------------------------------------
 def run_trials(exp_info):
 
     common.init_experiment(exp_info)

@@ -201,8 +201,7 @@ class StartPoint(ttrk.TTrkObject):
             # waiting for a touch inside start_area
             if self._start_area.overlapping_with_position((x_coord, y_coord)):
                 self._state = StartPoint.State.init
-                if self._should_log(ttrk.log_info):
-                    self._log_write("touched in start area: ({:},{:}). Setting state=init".format(x_coord, y_coord), True)
+                self._log_write_if(ttrk.log_debug, "touched in start area: ({:},{:}). Setting state=init".format(x_coord, y_coord), True)
                 self._log_func_returns("check_xy", True)
                 return True
             else:
@@ -215,20 +214,17 @@ class StartPoint(ttrk.TTrkObject):
             if self._start_area.overlapping_with_position((x_coord, y_coord)):
                 # still in the start area
                 self._log_func_returns("check_xy", False)
-                if self._should_log(ttrk.log_debug):
-                    self._log_write("still in start area: ({:},{:})".format(x_coord, y_coord), True)
+                self._log_write_if(ttrk.log_debug, "still in start area: ({:},{:})".format(x_coord, y_coord), True)
                 return False
 
             elif self._exit_area is None or self._exit_area.overlapping_with_position((x_coord, y_coord)):
                 # Left the start area into the exit area
-                if self._should_log(ttrk.log_info):
-                    self._log_write("touched in exit area: ({:},{:}). Setting state=start".format(x_coord, y_coord), True)
+                self._log_write(ttrk.log_debug, "touched in exit area: ({:},{:}). Setting state=start".format(x_coord, y_coord), True)
                 self._state = StartPoint.State.start
 
             else:
                 # Left the start area into another (invalid) area
-                if self._should_log(ttrk.log_info):
-                    self._log_write("touched in invalid area: ({:},{:}). Setting state=error".format(x_coord, y_coord), True)
+                self._log_write_if(ttrk.log_debug, "touched in invalid area: ({:},{:}). Setting state=error".format(x_coord, y_coord), True)
                 self._state = StartPoint.State.error
 
             self._log_func_returns("check_xy", True)
@@ -293,8 +289,7 @@ class StartPoint(ttrk.TTrkObject):
             if not ttrk.env.mouse.check_button_pressed(0) and self._state == StartPoint.State.reset:
                 # Mouse/finger is UP
                 self._state = StartPoint.State.mouse_up
-                if self._should_log(ttrk.log_info):
-                    self._log_write("Mouse unclicked. Setting state=mouse_up", True)
+                self._log_write_if(ttrk.log_debug, "Mouse unclicked. Setting state=mouse_up", True)
 
             elif ttrk.env.mouse.check_button_pressed(0) and self._state == StartPoint.State.mouse_up:
                 # Mouse/finger touched the screen

@@ -36,7 +36,6 @@ from ._n2p_run import \
     initialize_trial, \
     on_finger_touched_screen, \
     play_success_sound, \
-    run_full_experiment, \
     run_trial, \
     run_trials, \
     trial_ended, \

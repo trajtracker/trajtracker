@@ -36,7 +36,10 @@ if not xpy.misc.is_android_running():
 (subj_id, subj_name) = ttrkp.common.get_subject_name_id()
 
 #-- Run the experiment
-num2pos.run_full_experiment(config, exp, subj_id, subj_name)
+exp_info = ExperimentInfo(config, xpy_exp, subj_id, subj_name)
+num2pos.create_experiment_objects(exp_info)
+common.register_to_event_manager(exp_info)
+num2pos.run_trials(exp_info)
 
 #-- Shutdown Expyriment
 xpy.control.end()

@@ -64,7 +64,6 @@ Functions in _n2p_init.py
 Functions in _n2p_run.py
 ------------------------
 
-.. autofunction:: trajtrackerp.num2pos.run_full_experiment
 .. autofunction:: trajtrackerp.num2pos.initialize_trial
 .. autofunction:: trajtrackerp.num2pos.on_finger_touched_screen
 .. autofunction:: trajtrackerp.num2pos.play_success_sound
