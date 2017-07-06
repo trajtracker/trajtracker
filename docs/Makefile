@@ -55,13 +55,10 @@ clean:
 	rm -rf $(BUILDDIR)/*
 
 .PHONY: html
-html: copy_config_common
+html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
-
-copy_config_common:
-	./copy_config_common.sh $(SRCDIR)
 
 .PHONY: dirhtml
 dirhtml:
