@@ -12,7 +12,7 @@ setup(name='trajtracker',
       packages=find_packages(),
       install_requires=['expyriment', 'numpy', 'enum34'],
       classifiers=[
-          'Development Status :: 3 - Alpha',
+          'Development Status :: 4 - Beta',
           'Intended Audience :: Science/Research',
           'Topic :: Scientific/Engineering',
           'Programming Language :: Python :: 2.7',
