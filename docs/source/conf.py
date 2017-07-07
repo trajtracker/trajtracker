@@ -53,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'TrajTracker'
-copyright = u'2017, <a href="https://drordotan.wixsite.com/dror">Dror Dotan</a>. | <a href="https://drordotan.wixsite.com/trajtracker">Home</a>'
+copyright = u'2017, <a href="https://trajtracker.wixsite.com/dror">Dror Dotan</a>. | <a href="https://trajtracker.wixsite.com/trajtracker">Home</a>'
 author = u'Dror Dotan'
 
 # The version info for the project you're documenting, acts as replacement for
