@@ -21,6 +21,14 @@ You should have received a copy of the GNU General Public License
 along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+def version():
+    """
+    Returns the package version
+    :return: tuple with 3 items: #major, #minor, #bugfix
+    """
+    return 1, 1, 0
+
+
 import expyriment as xpy
 
 #-- Log levels (each level will also print the higher log levels)
@@ -39,16 +47,6 @@ env = Environment()
 #: When set to True, this will print all log messages to the console (on top of printing them
 #: to the log file)
 log_to_console = False
-
-
-#----------------------------------------------------------
-def version():
-    """
-    Return trajtracker version number ("major.minor.build")
-    
-    :return: str
-    """
-    return "0.1.01"
 
 
 #----------------------------------------------------------

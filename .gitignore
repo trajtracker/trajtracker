@@ -2,4 +2,6 @@
 docs/build/
 samples/**/data
 samples/**/events
-docs/source/ttrkp/dchoice/Config_common.txt
+src/dist
+src/trajtracker.egg-info
+src/build

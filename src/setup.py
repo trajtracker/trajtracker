@@ -1,9 +1,11 @@
 from setuptools import setup, find_packages
 from os import listdir
+import trajtracker
 
+ver = trajtracker.version()
 
 setup(name='trajtracker',
-      version='1.1.0',
+      version='{:}.{:}.{:}'.format(ver[0], ver[1], ver[2]),
       description='Framework for creating trajectory-tracking experiments',
       url='http://trajtracker.com',
       author='Dror Dotan',
