@@ -65,7 +65,8 @@ class FingerLiftedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
     def max_offscreen_duration(self):
         """
         The maximal duration (in seconds) that the finger is allowed to remain off-screen in mid trial.
-        :type: numbers.Number
+
+        :type: number
         """
         return self._max_offscreen_duration
 

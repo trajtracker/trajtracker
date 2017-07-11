@@ -45,6 +45,7 @@ Perform various validations on mouse/finger movement during the trial.
    :maxdepth: 1
    :glob:
 
+   FingerLiftedValidator: issue an error when the finger is lifted in mid-trial <validators/FingerLiftedValidator>
    GlobalSpeedValidator: enforce minimal speed by defining milestones <validators/GlobalSpeedValidator>
    InstantaneousSpeedValidator: enforce minimal/maximal momentary speed <validators/InstantaneousSpeedValidator>
    LocationsValidator: allow touching only predefined screen locations <validators/LocationsValidator>

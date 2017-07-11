@@ -3,7 +3,7 @@ from os import listdir
 
 
 setup(name='trajtracker',
-      version='1.0.0',
+      version='1.1.0',
       description='Framework for creating trajectory-tracking experiments',
       url='http://trajtracker.com',
       author='Dror Dotan',

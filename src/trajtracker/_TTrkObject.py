@@ -40,7 +40,8 @@ class TTrkObject(object):
     @property
     def log_level(self):
         """
-        Logging level of this object: log_none, log_error (default), log_warn, log_info, log_debug, log_trace
+        Logging level of this object: trajtracker.log_none, log_error (default), log_warn,
+        log_info, log_debug, log_trace
         """
         return self._log_level
 
