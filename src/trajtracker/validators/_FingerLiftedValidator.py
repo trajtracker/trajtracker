@@ -111,4 +111,4 @@ class FingerLiftedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
             return trajtracker.validators.create_experiment_error(
                 self, self.err_finger_lifted, "You lifted your finger")
 
-        return  None
+        return None

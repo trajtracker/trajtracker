@@ -69,7 +69,7 @@ class TTrkObject(object):
     #
     def _log_property_changed(self, attr_name, value=None):
 
-        if not self._should_log(ttrk.log_trace):
+        if not self._should_log(ttrk.log_debug):
             return
 
         if value is None:
@@ -78,7 +78,7 @@ class TTrkObject(object):
         if len(value) > 100:
             value = value[:100]
 
-        self._log_write("set_obj_attr,{:}.{:},{:}".format(type(self).__name__, attr_name, value))
+        self._log_write("Set {:}.{:} = {:}".format(type(self).__name__, attr_name, value))
 
 
     #-------------------------------------------------

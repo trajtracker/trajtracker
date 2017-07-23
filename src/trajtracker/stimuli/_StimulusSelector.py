@@ -131,5 +131,4 @@ class StimulusSelector(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
         for s in self._stimuli.values():
             s.position = value
 
-        if self._should_log(ttrk.log_trace):
-            self._log_write("set_obj_attr,{:}.position,{:}".format(_u.get_type_name(self), value))
+        self._log_property_changed("position", value)
