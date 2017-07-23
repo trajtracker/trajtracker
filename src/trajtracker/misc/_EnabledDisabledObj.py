@@ -25,6 +25,7 @@ along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 import trajtracker
 import trajtracker._utils as _u
 
+from trajtracker import deprecated
 from trajtracker.events import Event
 
 
@@ -37,10 +38,10 @@ class EnabledDisabledObj(object):
     def __init__(self, enabled=False):
         self._registered = False
         self.enabled = enabled
-        self.enable_event = None
-        self.disable_event = None
+        self.enable_events = ()
+        self.disable_events = ()
 
-    # -------------------------------------------
+    #-------------------------------------------
     @property
     def enabled(self):
         """
@@ -58,23 +59,44 @@ class EnabledDisabledObj(object):
 
     #-------------------------------------------
     @property
+    @deprecated
     def enable_event(self):
         """
         The event on which the object should be enabled. This will work only when the object is registered
         to an :class:`~trajtracker.events.EventManager`
 
+        **Note:** This property is deprecated, use *enable_events* instead
+
         :type: Event
         """
-        return self._enable_event
+        return None if len(self._enable_events) == 0 else self._enable_events[0]
 
     @enable_event.setter
+    @deprecated
     def enable_event(self, value):
-        _u.validate_attr_type(self, "enable_event", value, Event, none_allowed=True)
+        self.enable_events = () if value is None else (value,)
+
+    #-------------------------------------------
+    @property
+    def enable_events(self):
+        """
+        The events on which the object should be enabled. This will work only when the object is registered
+        to an :class:`~trajtracker.events.EventManager`
+
+        :type: collection of Event objects
+        """
+        return self._enable_events
+
+    @enable_events.setter
+    def enable_events(self, value):
+        value = _u.validate_attr_is_collection(self, "enable_events", value, none_allowed=True)
+        for v in value:
+            _u.validate_attr_type(self, "enable_events", v, Event)
         if self._registered:
-            raise trajtracker.InvalidStateError("{:}.enable_event cannot be set after the object was registered to the event manager".format(
+            raise trajtracker.InvalidStateError("{:}.enable_events cannot be set after the object was registered to the event manager".format(
                 _u.get_type_name(self)))
-        self._enable_event = value
-        self._log_property_changed("enable_event")
+        self._enable_events = tuple(value)
+        self._log_property_changed("enable_events")
 
     #-------------------------------------------
     @property
@@ -83,18 +105,37 @@ class EnabledDisabledObj(object):
         The event on which the object should be disabled. This will work only when the object is registered
         to an :class:`~trajtracker.events.EventManager`
 
+        **Note:** This property is deprecated, use *disable_events* instead
+
         :type: Event
         """
-        return self._disable_event
+        return None if len(self._disable_events) == 0 else self._disable_events[0]
 
     @disable_event.setter
     def disable_event(self, value):
-        _u.validate_attr_type(self, "disable_event", value, Event, none_allowed=True)
+        self.disable_events = () if value is None else (value,)
+
+    #-------------------------------------------
+    @property
+    def disable_events(self):
+        """
+        The events on which the object should be disabled. This will work only when the object is registered
+        to an :class:`~trajtracker.events.EventManager`
+
+        :type: collection of Event objects
+        """
+        return self._disable_events
+
+    @disable_events.setter
+    def disable_events(self, value):
+        value = _u.validate_attr_is_collection(self, "disable_events", value, none_allowed=True)
+        for v in value:
+            _u.validate_attr_type(self, "disable_events", v, Event)
         if self._registered:
-            raise trajtracker.InvalidStateError("{:}.disable_event cannot be set after the object was registered to the event manager".format(
+            raise trajtracker.InvalidStateError("{:}.disable_events cannot be set after the object was registered to the event manager".format(
                 _u.get_type_name(self)))
-        self._disable_event = value
-        self._log_property_changed("disable_event")
+        self._disable_events = tuple(value)
+        self._log_property_changed("disable_events")
 
     #-------------------------------------------
     # Register enable/disable operations on the event manager
@@ -103,12 +144,11 @@ class EnabledDisabledObj(object):
 
         self._registered = True
 
-        if self.enable_event is not None:
-            event_manager.register_operation(self.enable_event, EnableDisableOp(self, True), recurring=True)
+        for event in self._enable_events:
+            event_manager.register_operation(event, EnableDisableOp(self, True), recurring=True)
 
-        if self.disable_event is not None:
-            event_manager.register_operation(self.disable_event, EnableDisableOp(self, False), recurring=True)
-
+        for event in self._disable_events:
+            event_manager.register_operation(event, EnableDisableOp(self, False), recurring=True)
 
 
 #------------------------------------------------------------------------

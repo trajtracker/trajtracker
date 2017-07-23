@@ -139,34 +139,6 @@ class GlobalSpeedValidatorTests(unittest.TestCase):
                         milestones=[GlobalSpeedValidator.Milestone(.2, .2), GlobalSpeedValidator.Milestone(.5, .1)]))
 
 
-    #--------------------------------------------------
-    def ____test_config_from_xml(self):
-
-        v = GlobalSpeedValidator()
-        configer = trajtracker.io.XmlConfigUpdater()
-        xml = ET.fromstring('''
-        <config axis="y" origin_coord="5" end_coord="10" grace_period="0.5" max_movement_time="3"
-                guide_warning_time_delta="0.2">
-            <milestones>
-                <milestone time="0.5" distance="0.3"/>
-                <milestone time="0.5" distance="0.7"/>
-            </milestones>
-        </config>
-        ''')
-        configer.configure_object(xml, v)
-        self.assertEqual(ValidationAxis.y, v.axis)
-        self.assertEqual(5, v.origin_coord)
-        self.assertEqual(10, v.end_coord)
-        self.assertEqual(0.5, v.grace_period)
-        self.assertEqual(3, v.max_movement_time)
-        self.assertEqual(0.2, v.guide_warning_time_delta)
-        self.assertEqual(2, len(v.milestones))
-        self.assertEqual(0.5, v.milestones[0].time_percentage)
-        self.assertEqual(0.3, v.milestones[0].distance_percentage)
-        self.assertEqual(0.5, v.milestones[1].time_percentage)
-        self.assertEqual(0.7, v.milestones[1].distance_percentage)
-
-
     #=================================================================================
     #             Validate
     #=================================================================================

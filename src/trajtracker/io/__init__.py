@@ -23,6 +23,5 @@ along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 
 from ._CSVLoader import CSVLoader
 from ._Mouse import Mouse
-from ._XmlConfigUpdater import XmlConfigUpdater, fromXML
 
 import trajtracker.io.csv_formats

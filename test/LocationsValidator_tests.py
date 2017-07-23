@@ -78,36 +78,6 @@ class LocationsValidatorTests(unittest.TestCase):
         except:
             pass
 
-    # --------------------------------------------------
-    def ____test_config_from_xml(self):
-
-        v = LocationsValidator([[]])
-        configer = trajtracker.io.XmlConfigUpdater()
-        xml = ET.fromstring('''
-        <config default_valid="True">
-            <position>(1,2)</position>
-            <valid_colors>
-                <color>(0,0,1)</color>
-                <color>(0,0,2)</color>
-            </valid_colors>
-            <invalid_colors>
-                <color>(0,0,10)</color>
-                <color>(0,0,20)</color>
-            </invalid_colors>
-        </config>
-        ''')
-        configer.configure_object(xml, v)
-        self.assertEqual(True, v.default_valid)
-        self.assertEqual((1, 2), v.position)
-
-        self.assertEqual(2, len(v.valid_colors))
-        self.assertTrue(1 in v.valid_colors)
-        self.assertTrue(2 in v.valid_colors)
-
-        self.assertEqual(2, len(v.invalid_colors))
-        self.assertTrue(10 in v.invalid_colors)
-        self.assertTrue(20 in v.invalid_colors)
-
 
     #------------------------------------------------------------
     def test_validate_default_invalid(self):

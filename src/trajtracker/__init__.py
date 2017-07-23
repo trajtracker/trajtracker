@@ -91,7 +91,7 @@ class TypeError(TrajTrackerError):
 
 
 # noinspection PyProtectedMember
-from trajtracker._ttrk_funcs import log_write, initialize
+from trajtracker._ttrk_funcs import log_write, initialize, deprecated
 
 #============================================================================
 #   Import the TrajTracker modules

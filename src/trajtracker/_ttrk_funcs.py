@@ -34,6 +34,7 @@ def log_write(msg, print_to_console=False):
     :param print_to_console: If true, print the message also to console 
     """
 
+    # noinspection PyProtectedMember
     xpy._internals.active_exp._event_file_log(msg, 1)
 
     if ttrk.log_to_console or print_to_console:
@@ -55,3 +56,20 @@ def initialize():
     ttrk.env.mouse = ttrk.io.Mouse(exp.mouse)
 
     return exp
+
+
+#-------------------------------------------------
+def deprecated(func):
+    # This is a decorator which can be used to mark functions
+    # as deprecated. It will result in a warning being emitted
+    # when the function is used.'''
+
+    def new_func(*args, **kwargs):
+        log_write("WARNING: function {:} is deprecated and may be removed in next TrajTracker versions".format(func.__name__), True)
+        return func(*args, **kwargs)
+
+    new_func.__name__ = func.__name__
+    new_func.__doc__ = func.__doc__
+    new_func.__dict__.update(func.__dict__)
+
+    return new_func

@@ -94,20 +94,6 @@ class MoveByGradientValidatorTests(unittest.TestCase):
         except trajtracker.TypeError:
             pass
 
-    # --------------------------------------------------
-    def ____test_config_from_xml(self):
-
-        v = MoveByGradientValidator([[]])
-        configer = trajtracker.io.XmlConfigUpdater()
-        xml = ET.fromstring('''
-        <config max_valid_back_movement="0.5" position="(1,2)" rgb_should_ascend="True" cyclic="True"/>
-        ''')
-        configer.configure_object(xml, v)
-        self.assertEqual(0.5, v.max_valid_back_movement)
-        self.assertEqual((1, 2), v.position)
-        self.assertEqual(True, v.rgb_should_ascend)
-        self.assertEqual(True, v.cyclic)
-
     #-------------------------------------------------------
     def test_validate_basic(self):
         val = MoveByGradientValidator(grad)

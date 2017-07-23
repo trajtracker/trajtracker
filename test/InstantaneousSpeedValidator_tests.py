@@ -118,22 +118,6 @@ class InstantaneousSpeedValidatorTests(unittest.TestCase):
         self.assertIsNotNone(validator.update_xyt((2.99, 4), 1))
 
 
-    #--------------------------------------------------
-    def ____test_config_from_xml(self):
-
-        v = InstantaneousSpeedValidator()
-        configer = trajtracker.io.XmlConfigUpdater()
-        xml = ET.fromstring('''
-        <config axis="y" min_speed="1" max_speed="10" grace_period="0.5" calculation_interval="2.5"/>
-        ''')
-        configer.configure_object(xml, v)
-        self.assertEqual(ValidationAxis.y, v.axis)
-        self.assertEqual(1, v.min_speed)
-        self.assertEqual(10, v.max_speed)
-        self.assertEqual(0.5, v.grace_period)
-        self.assertEqual(2.5, v.calculation_interval)
-
-
 
 if __name__ == '__main__':
     unittest.main()

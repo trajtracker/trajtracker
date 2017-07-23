@@ -160,18 +160,5 @@ class TrajectoryTrackerTestCase(unittest.TestCase):
         self.assertRaises(trajtracker.TypeError, lambda: TrajectoryTracker(track_if_no_movement=None))
 
 
-    #--------------------------------------------------
-    def ____test_config_from_xml(self):
-
-        trk = TrajectoryTracker()
-        configer = trajtracker.io.XmlConfigUpdater()
-        xml = ET.fromstring('<config track_if_no_movement="True" enabled="True" enable_event="A" disable_event="B+1"/>')
-        configer.configure_object(xml, trk)
-        self.assertEqual(True, trk.enabled)
-        self.assertEqual(trajtracker.events.Event("A"), trk.enable_event)
-        self.assertEqual(trajtracker.events.Event("B") + 1, trk.disable_event)
-        self.assertEqual(True, trk.track_if_no_movement)
-
-
 if __name__ == '__main__':
     unittest.main()

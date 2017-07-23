@@ -158,19 +158,6 @@ class DirectionValidatorTestCase(unittest.TestCase):
         self.assertIsNone(val.update_xyt((0, 1), 0.3))   # Moving back in a valid direction
 
 
-    # --------------------------------------------------
-    def ____test_config_from_xml(self):
-
-        v = MovementAngleValidator()
-        configer = trajtracker.io.XmlConfigUpdater()
-        xml = ET.fromstring('<config min_angle="1" max_angle="2" calc_angle_interval="3" grace_period="4"/>')
-        configer.configure_object(xml, v)
-        self.assertEqual(1, v.min_angle)
-        self.assertEqual(2, v.max_angle)
-        self.assertEqual(3, v.calc_angle_interval)
-        self.assertEqual(4, v.grace_period)
-
-
 
 if __name__ == '__main__':
     unittest.main()
