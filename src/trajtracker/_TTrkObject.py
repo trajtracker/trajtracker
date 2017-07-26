@@ -99,8 +99,8 @@ class TTrkObject(object):
     #-------------------------------------------------
     # Write to log when entering a function
     #
-    def _log_func_enters(self, func_name, args=()):
-        if self._should_log(ttrk.log_trace):
+    def _log_func_enters(self, func_name, args=(), log_level=ttrk.log_trace):
+        if self._should_log(log_level):
             args = ",".join([str(a) for a in args])
             self._log_write("enter_func,{:}({:})".format(func_name, args), prepend_self=True)
 

@@ -206,7 +206,7 @@ class GlobalSpeedValidator(trajtracker.TTrkObject, EnabledDisabledObj):
 
         #-- If this is the first call in a trial: do nothing
         if self._time0 is None:
-            raise trajtracker.InvalidStateError("{:}.update_xyt() was called without calling movement_started() first".format(_u.get_type_name(self)))
+            return
 
         if time_in_trial < self._time0:
             raise trajtracker.InvalidStateError("{0}.update_xyt() was called with time={1}, but the movement started at time={2}".format(self.__class__, time_in_trial, self._time0))

@@ -117,9 +117,10 @@ class EventManager(ttrk.TTrkObject):
         if event.extends is not None:
             self._dispatch_event(event.extends, time_in_trial, time_in_session)
 
-        self._log_write_if(ttrk.log_info, "Dispatching event {:}, time_in_session={:}".format(event.event_id, time_in_session))
+        self._log_write_if(ttrk.log_info, "Dispatching event {:}, time_in_trial={:}, time_in_session={:}".format(event.event_id, time_in_trial, time_in_session))
 
         if event.event_id not in self._operations_by_event:
+            self._log_write_if(ttrk.log_trace, "No operations to invoke for event {:}".format(event.event_id))
             return
 
         added_pending_op = False
