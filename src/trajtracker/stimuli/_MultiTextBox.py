@@ -41,7 +41,7 @@ class MultiTextBox(BaseMultiStim):
 
 
     #----------------------------------------------------
-    def __init__(self, text=None, text_font="Arial", text_size=26, text_bold=False, text_italic=False, text_underline=False,
+    def __init__(self, texts=None, text_font="Arial", text_size=26, text_bold=False, text_italic=False, text_underline=False,
                  text_justification=1, text_colour=xpy.misc.constants.C_WHITE,
                  background_colour=xpy.misc.constants.C_BLACK, size=None, position=(0, 0),
                  onset_time=None, duration=None, last_stimulus_remains=False,
@@ -49,7 +49,7 @@ class MultiTextBox(BaseMultiStim):
 
         super(MultiTextBox, self).__init__(onset_time=onset_time, duration=duration, last_stimulus_remains=last_stimulus_remains)
 
-        self.texts = text
+        self.texts = texts
         self.text_font = text_font
         self.text_size = text_size
         self.text_bold = text_bold

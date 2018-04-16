@@ -14,6 +14,9 @@ Each value to present is implemented as a separate Expyriment TextBox, which mea
 - Changing from one text to another is not time-consuming, and can be safely done in mid-trial. The
   only time-consuming operation is when you initialize the stimuli (which should be done at the beginning of the trial)
 
+A MultiTextBox is not by itself a stimulus (e.g., it does not have a present() method). The
+stimulus-like methods can be accessed via :attr:`~trajtracker.stimuli.MultiTextBox.stimulus`.
+
 
 Using this class:
 -----------------

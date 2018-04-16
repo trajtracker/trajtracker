@@ -13,6 +13,9 @@ On each trial, you define which of these stimuli to show. Thus, switching betwee
 not time-consuming, and can be safely done in mid-trial. The only time-consuming operation is
 the initialization of stimuli, which would typically be done before the experiment starts.
 
+A MultiStimulus is not by itself a stimulus (e.g., it does not have a present() method). The
+stimulus-like methods can be accessed via :attr:`~trajtracker.stimuli.MultiStimulus.stimulus`.
+
 
 Using this class:
 -----------------

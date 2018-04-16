@@ -233,6 +233,9 @@ class StimulusContainer(ttrk.TTrkObject, ttrk.events.OnsetOffsetObj):
     def __getitem__(self, item):
         return self._stimuli[item]['stimulus']
 
+    def __contains__(self, item):
+        return item in self._stimuli
+
     def __str__(self):
         return "{:}[{:}]".format(_u.get_type_name(self), ",".join([str(k) for k in self._stimuli.keys()]))
 
