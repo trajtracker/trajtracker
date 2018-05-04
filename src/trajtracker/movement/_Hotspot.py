@@ -56,6 +56,7 @@ class Hotspot(ttrk.TTrkObject):
     def reset(self, time=None):
         self._touched = False
         self._dispatched = False
+        self._start_touch_time = None
 
 
     #----------------------------------------------------------------------------
@@ -85,6 +86,7 @@ class Hotspot(ttrk.TTrkObject):
             return
 
         if not self._enabled:
+            self._log_write_if(ttrk.log_trace, "Hotspot {:} is disabled, ignored".format(self._name))
             return
 
         if self._start_touch_time is None:
@@ -103,6 +105,7 @@ class Hotspot(ttrk.TTrkObject):
     def _invoke_on_touched(self, time_in_trial, time_in_session):
 
         self._touched = True
+        self._log_write_if(ttrk.log_trace, "Hotspot {:} touched".format(self._name))
 
         #-- Directly invoke a callback action
         if self._on_touched_callback is not None:
