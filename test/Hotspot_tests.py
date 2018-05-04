@@ -36,6 +36,18 @@ class HotspotTests(unittest.TestCase):
         Hotspot()
 
     #------------------------------------------------
+    def test_set_name(self):
+        Hotspot(name='a')
+        self.assertRaises(ttrk.TypeError, lambda: Hotspot(name=None))
+        self.assertRaises(ttrk.TypeError, lambda: Hotspot(name=3))
+
+    #------------------------------------------------
+    def test_set_enabled(self):
+        Hotspot(enabled=False)
+        self.assertRaises(ttrk.TypeError, lambda: Hotspot(enabled=""))
+        self.assertRaises(ttrk.TypeError, lambda: Hotspot(enabled=None))
+
+    #------------------------------------------------
     def test_set_area(self):
         Hotspot(area=Rectangle((10, 10)))
         self.assertRaises(ttrk.TypeError, lambda: Hotspot(area=""))
@@ -85,6 +97,17 @@ class HotspotTests(unittest.TestCase):
 
         spot.update_xyt((4, 4), 1, 1)
         self.assertEquals(1, em.dispatched)
+
+
+    #------------------------------------------------
+    def test_disabled(self):
+        em = DbgEventManager()
+        cb = CallbackObj()
+        spot = Hotspot(em, area=Rectangle((10, 10)), on_touched_callback=cb, on_touched_dispatch_event="a", enabled=False)
+
+        spot.update_xyt((4, 4), 1, 1)
+        self.assertEquals(0, em.dispatched)
+        self.assertEquals(0, cb.called)
 
 
     #------------------------------------------------

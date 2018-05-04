@@ -51,22 +51,22 @@ class MultiTextBoxTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_set_text(self):
-        mtb = MultiTextBoxDbg(text=['a', 'b'])
+        mtb = MultiTextBoxDbg(texts=['a', 'b'])
         self.assertEqual(['a', 'b'], mtb.texts)
         mtb.texts = 'a',
         mtb.texts = None
 
     def test_set_text_invalid(self):
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text='hi'))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text=5))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text=[5]))
-        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(text=[None]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(texts='hi'))
+        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(texts=5))
+        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(texts=[5]))
+        self.assertRaises(ttrk.TypeError, lambda: MultiTextBoxDbg(texts=[None]))
 
     #---------------------------------------------------
     def test_set_text_font(self):
         mtb = MultiTextBoxDbg(text_font='Arial')
         self.assertEqual('Arial', mtb.text_font)
-        mtb.text_font = 'Arial','Barial'
+        mtb.text_font = 'Arial', 'Barial'
         mtb.text_font = None
 
     def test_set_text_font_invalid(self):
@@ -125,7 +125,7 @@ class MultiTextBoxTests(unittest.TestCase):
     #---------------------------------------------------
     def test_set_text_colour(self):
         rsvp = MultiTextBoxDbg(text_colour=(1, 2, 3))
-        self.assertEqual((1,2,3), rsvp.text_colour)
+        self.assertEqual((1, 2, 3), rsvp.text_colour)
         rsvp.text_colour = (1, 2, 3), (4, 5, 6)
         rsvp.text_colour = None
 
@@ -137,7 +137,7 @@ class MultiTextBoxTests(unittest.TestCase):
     #---------------------------------------------------
     def test_set_background_colour(self):
         rsvp = MultiTextBoxDbg(background_colour=(1, 2, 3))
-        self.assertEqual((1,2,3), rsvp.background_colour)
+        self.assertEqual((1, 2, 3), rsvp.background_colour)
         rsvp.background_colour = (1, 2, 3), (4, 5, 6)
         rsvp.background_colour = None
 
@@ -215,22 +215,22 @@ class MultiTextBoxTests(unittest.TestCase):
     #   Validation function for RSVP properties
     #==============================================================================
 
-    def _create_good_rsvp(self, text=('a', 'b', 'c'), text_font='Arial', text_size=1, text_justification=1,
-                        text_colour=(255, 255, 255), background_colour=(0, 0, 0), size=(20, 20), position=(0, 0),
-                        text_bold=False, text_italic=False, text_underline=False,
-                        onset_time=(0, 1, 2), duration=1, start_event=TRIAL_STARTED):
+    def _create_good_rsvp(self, texts=('a', 'b', 'c'), text_font='Arial', text_size=1, text_justification=1,
+                          text_colour=(255, 255, 255), background_colour=(0, 0, 0), size=(20, 20), position=(0, 0),
+                          text_bold=False, text_italic=False, text_underline=False, onset_time=(0, 1, 2), duration=1,
+                          start_event=TRIAL_STARTED):
 
-        return MultiTextBoxDbg(text=text, text_font=text_font, text_size=text_size, text_justification=text_justification,
-                            text_bold=text_bold, text_italic=text_italic, text_underline=text_underline,
-                            text_colour=text_colour, background_colour=background_colour,
-                            size=size, position=position, onset_time=onset_time, duration=duration,
-                            onset_event=start_event)
+        return MultiTextBoxDbg(texts=texts, text_font=text_font, text_size=text_size, text_justification=text_justification,
+                               text_bold=text_bold, text_italic=text_italic, text_underline=text_underline,
+                               text_colour=text_colour, background_colour=background_colour,
+                               size=size, position=position, onset_time=onset_time, duration=duration,
+                               onset_event=start_event)
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_ok(self):
         self._create_good_rsvp()._validate()
-        self._create_good_rsvp(text_font=('Arial','Arial','Arial','Arial'))._validate()
+        self._create_good_rsvp(text_font=('Arial', 'Arial', 'Arial', 'Arial'))._validate()
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
@@ -242,52 +242,53 @@ class MultiTextBoxTests(unittest.TestCase):
     # noinspection PyTypeChecker
     def test_validate_bad_text_size(self):
         self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_size=None)._validate())
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_size=(1,2))._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_size=(1, 2))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_text_bold(self):
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_bold=(True,True))._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_bold=(True, True))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_text_italic(self):
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_italic=(True,True))._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_italic=(True, True))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_text_underline(self):
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_underline=(True,True))._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_underline=(True, True))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_justification(self):
         self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_justification=None)._validate())
-        self.assertRaises(ttrk.TypeError, lambda: self._create_good_rsvp(text_justification=('center', 'center'))._validate())
+        self.assertRaises(ttrk.TypeError, lambda: self._create_good_rsvp(
+            text_justification=('center', 'center'))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_text_colour(self):
         self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_colour=None)._validate())
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_colour=((1, 2, 3), ))._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(text_colour=((1, 2, 3),))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_background_colour(self):
         self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(background_colour=None)._validate())
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(background_colour=((1, 2, 3), ))._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(background_colour=((1, 2, 3),))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_size(self):
         self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(size=None)._validate())
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(size=((10, 10), ))._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(size=((10, 10),))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
     def test_validate_bad_position(self):
         self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(position=None)._validate())
-        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(position=((10, 10), ))._validate())
+        self.assertRaises(ttrk.ValueError, lambda: self._create_good_rsvp(position=((10, 10),))._validate())
 
     #---------------------------------------------------
     # noinspection PyTypeChecker
@@ -301,7 +302,7 @@ class MultiTextBoxTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_noevents_one_stim_onset_time0(self):
-        rsvp = self._create_good_rsvp(text=['a'], onset_time=[0], duration=1)
+        rsvp = self._create_good_rsvp(texts=['a'], onset_time=[0], duration=1)
         rsvp.init_for_trial()
         self.assertEqual([False], rsvp.stim_visibility)
         self.assertEqual(False, rsvp._stimuli[0].visible)
@@ -319,7 +320,7 @@ class MultiTextBoxTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_noevents_one_stim_onset_time_gt_0(self):
-        rsvp = self._create_good_rsvp(text=['a'], onset_time=[1], duration=1)
+        rsvp = self._create_good_rsvp(texts=['a'], onset_time=[1], duration=1)
         rsvp.init_for_trial()
         rsvp.start_showing(10)
         self.assertEqual([False], rsvp.stim_visibility)
@@ -334,7 +335,7 @@ class MultiTextBoxTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_noevents_two_stim_onset_time(self):
-        rsvp = self._create_good_rsvp(text=['a', 'b'], onset_time=[0, 3], duration=1)
+        rsvp = self._create_good_rsvp(texts=['a', 'b'], onset_time=[0, 3], duration=1)
 
         rsvp.init_for_trial()
         self.assertEqual([False, False], rsvp.stim_visibility)
@@ -374,7 +375,7 @@ class MultiTextBoxTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_noevents_last_stim_remains(self):
-        rsvp = self._create_good_rsvp(text=['a', 'b'], onset_time=[0, 3], duration=1)
+        rsvp = self._create_good_rsvp(texts=['a', 'b'], onset_time=[0, 3], duration=1)
         rsvp.last_stimulus_remains = True
 
         rsvp.init_for_trial()
@@ -386,7 +387,7 @@ class MultiTextBoxTests(unittest.TestCase):
 
     #---------------------------------------------------
     def test_noevents_cleanup(self):
-        rsvp = self._create_good_rsvp(text=['a'], onset_time=[0, 3], duration=1)
+        rsvp = self._create_good_rsvp(texts=['a'], onset_time=[0, 3], duration=1)
 
         rsvp.init_for_trial()
         rsvp.start_showing(10)
@@ -408,7 +409,7 @@ class MultiTextBoxTests(unittest.TestCase):
     def test_events_one_stim_onset_time0(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_rsvp(text=['a'], onset_time=[0], duration=1)
+        rsvp = self._create_good_rsvp(texts=['a'], onset_time=[0], duration=1)
         em.register(rsvp)
 
         em.dispatch_event(TRIAL_INITIALIZED, time_in_trial=1, time_in_session=1)
@@ -435,7 +436,7 @@ class MultiTextBoxTests(unittest.TestCase):
     def test_events_one_stim_onset_time_gt_0(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_rsvp(text=['a'], onset_time=[1], duration=1)
+        rsvp = self._create_good_rsvp(texts=['a'], onset_time=[1], duration=1)
         em.register(rsvp)
 
         em.dispatch_event(TRIAL_INITIALIZED, time_in_trial=1, time_in_session=1)
@@ -463,7 +464,7 @@ class MultiTextBoxTests(unittest.TestCase):
     def test_events_two_stim_onset_time(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_rsvp(text=['a', 'b'], onset_time=[0, 3], duration=1)
+        rsvp = self._create_good_rsvp(texts=['a', 'b'], onset_time=[0, 3], duration=1)
         em.register(rsvp)
 
         em.dispatch_event(TRIAL_INITIALIZED, time_in_trial=1, time_in_session=1)
@@ -491,7 +492,7 @@ class MultiTextBoxTests(unittest.TestCase):
     def test_events_last_stim_remains(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_rsvp(text=['a', 'b'], onset_time=[0, 3], duration=1)
+        rsvp = self._create_good_rsvp(texts=['a', 'b'], onset_time=[0, 3], duration=1)
         rsvp.last_stimulus_remains = True
         em.register(rsvp)
 
@@ -506,7 +507,7 @@ class MultiTextBoxTests(unittest.TestCase):
     def test_events_simultaneous_events(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_rsvp(text=['a', 'b'], onset_time=[1, 0], duration=2)
+        rsvp = self._create_good_rsvp(texts=['a', 'b'], onset_time=[1, 0], duration=2)
         em.register(rsvp)
 
         em.dispatch_event(TRIAL_INITIALIZED, time_in_trial=1, time_in_session=1)
@@ -529,7 +530,7 @@ class MultiTextBoxTests(unittest.TestCase):
     def test_events_cancel(self):
         em = EventManager()
         em.log_level = ttrk.log_trace
-        rsvp = self._create_good_rsvp(text=['a', 'b'], onset_time=[1, 0], duration=2)
+        rsvp = self._create_good_rsvp(texts=['a', 'b'], onset_time=[1, 0], duration=2)
         em.register(rsvp)
 
         em.dispatch_event(TRIAL_INITIALIZED, time_in_trial=1, time_in_session=1)

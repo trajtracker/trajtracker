@@ -25,7 +25,7 @@ def version():
 
     :return: tuple with 3 items: #major, #minor, #bugfix
     """
-    return 1, 1, 1
+    return 1, 2, 0
 
 
 import expyriment as xpy

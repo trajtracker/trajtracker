@@ -1,12 +1,18 @@
-Version 1.1
+Version 1.2
 ===========
+- Hotspot: added properties name, enabled
 
-- Added FingerLiftedValidator
-- Changed distribution mode to wheel
-
+Version 1.1.2
+=============
+- MultiTextBox constructor: argument "text" changed to "texts"
 
 Version 1.1.1
 =============
 - EnabledDisabledObj can have several enable/disable events
 - Fixed minor issues with logging
+
+Version 1.1
+===========
+- Added FingerLiftedValidator
+- Changed distribution mode to wheel
 

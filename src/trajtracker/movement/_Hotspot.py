@@ -31,10 +31,11 @@ class Hotspot(ttrk.TTrkObject):
 
     #----------------------------------------------------
     def __init__(self, event_manager=None, area=None, min_touch_duration=0,
-                 on_touched_dispatch_event=None, on_touched_callback=None):
+                 on_touched_dispatch_event=None, on_touched_callback=None, enabled=True, name=''):
 
         super(Hotspot, self).__init__()
 
+        self.name = name
         self._event_manager = event_manager
         self.area = area
         self.min_touch_duration = min_touch_duration
@@ -43,6 +44,7 @@ class Hotspot(ttrk.TTrkObject):
         self._start_touch_time = None
         self._dispatched = False
         self._touched = False
+        self.enabled = enabled
 
 
     #==============================================================================
@@ -53,6 +55,7 @@ class Hotspot(ttrk.TTrkObject):
     #----------------------------------------------------------------------------
     def reset(self, time=None):
         self._touched = False
+        self._dispatched = False
 
 
     #----------------------------------------------------------------------------
@@ -70,18 +73,25 @@ class Hotspot(ttrk.TTrkObject):
         else:
             _u.update_xyt_validate_and_log(self, position, time_in_trial, time_in_session)
 
-        now_touching = self._area.overlapping_with_position(position)
+        now_touching_me = self._area.overlapping_with_position(position)
+        self._log_write_if(ttrk.log_trace, "Hotspot {:}: touch detected in position {:}, this {:} hotspot".
+                           format(self._name, position, "overlaps" if now_touching_me else "does not overlap"))
 
-        if not now_touching:
+        if not now_touching_me:
             # Stopped touching
             self._start_touch_time = None
             self._dispatched = False
+            self._log_write_if(ttrk.log_trace, "Hotspot {:}: stopped touching".format(self._name))
+            return
+
+        if not self._enabled:
             return
 
         if self._start_touch_time is None:
             # Started touching
             self._start_touch_time = time_in_trial
             self._dispatched = False
+            self._log_write_if(ttrk.log_trace, "Hotspot {:}: started touching".format(self._name))
 
         if not self._dispatched and time_in_trial - self._start_touch_time >= self._min_touch_duration:
             # Touching for long enough
@@ -96,6 +106,7 @@ class Hotspot(ttrk.TTrkObject):
 
         #-- Directly invoke a callback action
         if self._on_touched_callback is not None:
+            self._log_write_if(ttrk.log_trace, "Hotspot {:}: invoking callback function".format(self._name))
             self._on_touched_callback(time_in_trial)
 
         #-- Dispatch an event
@@ -103,6 +114,7 @@ class Hotspot(ttrk.TTrkObject):
             if time_in_session is None:
                 raise ttrk.ValueError("When {:} is dispatching an event, update_xyt() should get time_in_session".format(_u.get_type_name(self)))
 
+            self._log_write_if(ttrk.log_trace, "Hotspot {:}: dispatching 'touch' event".format(self._name))
             self._event_manager.dispatch_event(ttrk.events.Event(self._on_touched_dispatch_event), time_in_trial, time_in_session)
 
 
@@ -119,6 +131,29 @@ class Hotspot(ttrk.TTrkObject):
     #==============================================================================
     #        Configuration
     #==============================================================================
+
+    #----------------------------------------------------
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        _u.validate_attr_type(self, 'name', value, str)
+        self._name = value
+
+
+    #----------------------------------------------------
+    @property
+    def enabled(self):
+        """Whether the hotspot is currently enabled (active) or not. Default = True."""
+        return self._enabled
+
+    @enabled.setter
+    def enabled(self, value):
+        _u.validate_attr_type(self, 'enabled', value, bool)
+        self._enabled = value
+
 
     #----------------------------------------------------
     @property
