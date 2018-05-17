@@ -105,7 +105,7 @@ class Hotspot(ttrk.TTrkObject):
     def _invoke_on_touched(self, time_in_trial, time_in_session):
 
         self._touched = True
-        self._log_write_if(ttrk.log_trace, "Hotspot {:} touched".format(self._name))
+        self._log_write_if(ttrk.log_debug, "Hotspot {:} touched".format(self._name))
 
         #-- Directly invoke a callback action
         if self._on_touched_callback is not None:

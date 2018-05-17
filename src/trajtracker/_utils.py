@@ -185,9 +185,16 @@ def validate_attr_is_coord(obj, attr_name, value, change_none_to_0=False, allow_
         value = (value.x, value.y)
 
     validate_attr_is_collection(obj, attr_name, value, 2, 2)
-    elem_type = numbers.Number if allow_float else int
-    validate_attr_type(obj, "{:}[0]".format(attr_name), value[0], elem_type)
-    validate_attr_type(obj, "{:}[1]".format(attr_name), value[1], elem_type)
+    if allow_float:
+        validate_attr_type(obj, "{:}[0]".format(attr_name), value[0], numbers.Number)
+        validate_attr_type(obj, "{:}[1]".format(attr_name), value[1], numbers.Number)
+
+    else:
+        if is_whole_number(value[0]) and is_whole_number(value[1]):
+            value = int(value[0]), int(value[1])
+        else:
+            validate_attr_type(obj, "{:}[0]".format(attr_name), value[0], int)
+            validate_attr_type(obj, "{:}[1]".format(attr_name), value[1], int)
 
     return value
 
@@ -300,10 +307,19 @@ def validate_func_arg_is_coord(obj, func_name, arg_name, value, change_none_to_0
     if isinstance(value, geometry.XYPoint):
         value = (value.x, value.y)
 
-    elem_type = numbers.Number if allow_float else int
     validate_func_arg_is_collection(obj, func_name, arg_name, value, 2, 2)
-    validate_func_arg_type(obj, func_name, "{:}[0]".format(arg_name), value[0], elem_type)
-    validate_func_arg_type(obj, func_name, "{:}[1]".format(arg_name), value[1], elem_type)
+
+    if allow_float:
+        validate_func_arg_type(obj, func_name, "{:}[0]".format(arg_name), value[0], numbers.Number)
+        validate_func_arg_type(obj, func_name, "{:}[1]".format(arg_name), value[1], numbers.Number)
+
+    else:
+        if isinstance(value[0], (float, int)) and int(value[0]) == value[0] and \
+            isinstance(value[1], (float, int)) and int(value[1]) == value[1]:
+            value = int(value[0]), int(value[1])
+        else:
+            validate_func_arg_type(obj, func_name, "{:}[0]".format(arg_name), value[0], int)
+            validate_func_arg_type(obj, func_name, "{:}[1]".format(arg_name), value[1], int)
 
     return value
 
@@ -368,8 +384,16 @@ def is_coord(value, allow_float=False):
     if not is_collection(value) or len(value) != 2:
         return False
 
-    elem_type = numbers.Number if allow_float else int
-    return isinstance(value[0], elem_type) and isinstance(value[1], elem_type)
+    if allow_float:
+        return isinstance(value[0], numbers.Number) and isinstance(value[1], numbers.Number)
+    else:
+        return is_whole_number(value[0]) and is_whole_number(value[1])
+
+
+#--------------------------------------
+def is_whole_number(n):
+    """Check whether n is a whole number: either an integer, or a whole-number float"""
+    return isinstance(n, int) or (isinstance(n, float) and int(n) == n)
 
 
 #--------------------------------------

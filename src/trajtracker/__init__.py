@@ -28,8 +28,6 @@ def version():
     return 1, 2, 0
 
 
-import expyriment as xpy
-
 #-- Log levels (each level will also print the higher log levels)
 log_trace = 1
 log_debug = 2
