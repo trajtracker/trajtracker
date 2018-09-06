@@ -3,6 +3,7 @@ Version 1.2
 - Hotspot: added properties name, enabled
 - Hotspot - fixed a bug in reset(): some data was not reset, causing clicks to be sometimes missed.
 - x/y coordinates had to be of type int; now they can also be whole-number float values (e.g., 20.0)
+- Bugfix in StartPoint.wait_until_exit(), which occurred when not providing the "session_start_time" parameter
 
 Version 1.1.2
 =============
@@ -17,4 +18,3 @@ Version 1.1
 ===========
 - Added FingerLiftedValidator
 - Changed distribution mode to wheel
-
