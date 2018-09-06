@@ -372,7 +372,7 @@ class StartPoint(ttrk.TTrkObject):
 
             curr_time = u.get_time()
             time_in_trial = None if trial_start_time is None else curr_time - trial_start_time
-            time_in_session = curr_time - session_start_time
+            time_in_session = None if session_start_time is None else curr_time - session_start_time
 
             if ttrk.env.mouse.check_button_pressed(0):
                 #-- Finger still touching screen
