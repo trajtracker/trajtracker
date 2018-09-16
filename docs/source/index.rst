@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-TrajTracker documentation
-=========================
+TrajTracker |version| documentation
+==============================
 
 
 General

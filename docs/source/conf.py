@@ -54,7 +54,9 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'TrajTracker'
-copyright = u'2017, <a href="https://trajtracker.wixsite.com/dror">Dror Dotan</a>. | <a href="https://trajtracker.wixsite.com/trajtracker">Home</a>'
+copyright = u'2017, <a href="https://trajtracker.wixsite.com/dror">Dror Dotan</a>. | ' + \
+            u'<a href="https://trajtracker.wixsite.com/trajtracker">Home</a> | ' +\
+            u'TrajTracker {:}'.format(trajtracker.version_str())
 author = u'Dror Dotan'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -122,7 +124,9 @@ html_theme = 'alabaster'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+    'show_powered_by': False,
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
