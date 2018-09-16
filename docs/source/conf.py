@@ -56,7 +56,8 @@ master_doc = 'index'
 project = u'TrajTracker'
 copyright = u'2017, <a href="https://trajtracker.wixsite.com/dror">Dror Dotan</a>. | ' + \
             u'<a href="https://trajtracker.wixsite.com/trajtracker">Home</a> | ' +\
-            u'TrajTracker {:}'.format(trajtracker.version_str())
+            u'TrajTracker ' + trajtracker.version_str() + \
+            u' (<a href="http://www.trajtracker.com/apiref-all.html">see other versions</a>)'
 author = u'Dror Dotan'
 
 # The version info for the project you're documenting, acts as replacement for

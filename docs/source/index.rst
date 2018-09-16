@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 TrajTracker |version| documentation
-==============================
+===================================
 
 
 General
