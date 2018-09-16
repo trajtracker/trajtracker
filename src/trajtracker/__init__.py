@@ -28,6 +28,12 @@ def version():
     return 1, 2, 0
 
 
+def version_str():
+    """ Returns the package version as a string: major.minor.bugfix """
+    v = version()
+    return '{:}.{:}.{:}'.format(v[0], v[1], v[2])
+
+
 #-- Log levels (each level will also print the higher log levels)
 log_trace = 1
 log_debug = 2
