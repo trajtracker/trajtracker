@@ -5,3 +5,4 @@ samples/**/events
 src/dist
 src/trajtracker.egg-info
 src/build
+CHANGES.txt
