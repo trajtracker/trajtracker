@@ -1,0 +1,24 @@
+Steps for creating a release in TrajTracker:
+
+Before creating the release:
+============================
+- Run unitests
+- Run unitests of "TrajTracker Paradigms" with the new version (to see if TrajTracker paradigms requires upgrading too).
+- Update version number in trajtracker/__init__.py
+- Make sure that src/ChangeLog.txt is updated
+- Generate documentation (in "docs", run "make clean" then "make html"). Verify the documentation is OK.
+- Create a distribution file by running src/create_distribution.sh
+
+Creating the release:
+=====================
+- Commit branch develop
+- Merge branch develop into master
+- Create a branch for the release
+- Merge master back into develop (usually this should do nothing)
+- Push all three branches
+
+After creating the release:
+===========================
+- Upload documentation to the website as "apiref-#.#.#"
+- Change the static link "apiref" to point to the latest documentation
+- Update the new version in apiref-all.html
