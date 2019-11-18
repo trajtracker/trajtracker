@@ -22,21 +22,20 @@ along with TrajTracker.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from __future__ import division
-from numpy import pi
-import numpy as np
+
 import decimal
 import numbers
 
-import pygame
-from pygame.ftfont import Font
-from pygame import freetype
-
+import numpy as np
 # noinspection PyProtectedMember
 from expyriment.misc import _timer as xpy_timer
 from expyriment.misc import geometry, find_font
+from pygame import freetype
+from pygame.ftfont import Font
 
 # noinspection PyProtectedMember
-from trajtracker._utils import is_collection
+from trajtracker._utils import is_collection, _is_rgb
+from trajtracker import ValueError
 
 
 #--------------------------------------------------------------------------
@@ -78,7 +77,7 @@ def color_rgb_to_num(rgb):
     Convert an RGB color (3 integers, each 0-255) to a single int value (between 0 and 0xFFFFFF)
     """
     if not is_rgb(rgb):
-        raise trajtracker.ValueError("invalid argument to color_rgb_to_num(), expecting a 3*integer list/tuple")
+        raise ValueError("invalid argument to color_rgb_to_num(), expecting a 3*integer list/tuple")
     return (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]
 
 
@@ -89,7 +88,7 @@ def color_num_to_rgb(value):
     if isinstance(value, int) and 0 <= value <= 0xFFFFFF:
         return int(np.floor(value / 2 ** 16)), int(np.floor(value / 256)) % 256, value % 256
     else:
-        raise trajtracker.ValueError("invalid argument to color_num_to_rgb(), expecting a 3*integer list/tuple")
+        raise ValueError("invalid argument to color_num_to_rgb(), expecting a 3*integer list/tuple")
 
 
 #--------------------------------------------------------------------------
@@ -97,9 +96,7 @@ def is_rgb(rgb):
     """
     Check if the given value is a valid RGB color (3 integers, each 0-255)
     """
-    return isinstance(rgb, (list, tuple, np.ndarray)) and len(rgb) == 3 \
-           and sum([isinstance(c, numbers.Number) for c in rgb]) == 3 \
-           and sum([0 <= c <= 255 for c in rgb]) == 3
+    return _is_rgb(rgb)
 
 
 #--------------------------------------

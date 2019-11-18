@@ -160,6 +160,9 @@ def _is_rgb(value, accept_single_num=False, none_allowed=False):
     if value is None:
         return None, none_allowed
 
+    if isinstance(value, xpy.misc.Colour):
+        return value, True
+
     if accept_single_num and isinstance(value, int) and 0 <= value < 2**24:
         return (int(np.floor(value / 2 ** 16)), int(np.floor(value / 256)) % 256, value % 256), True
 
