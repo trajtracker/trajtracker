@@ -25,7 +25,7 @@ def version():
 
     :return: tuple with 3 items: #major, #minor, #bugfix
     """
-    return 1, 2, 0
+    return 1, 2, 1
 
 
 def version_str():
